@@ -1,6 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.31)
-
-## CRT must be consistent with DACOM
+﻿## CRT must be consistent with DACOM
 #if (MSVC)
 #    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 #endif()
@@ -32,6 +30,8 @@ add_executable(adb WIN32
         Pch.cpp
         database.RC
 )
+
+add_dependencies(adb DosFile)
 
 target_include_directories(adb PRIVATE
         .
@@ -83,4 +83,11 @@ add_custom_command(TARGET adb POST_BUILD
         $<TARGET_FILE:DACOM>
         $<TARGET_FILE_DIR:adb>
         COMMENT "Copying DACOM.dll to executable directory"
+)
+
+add_custom_command(TARGET adb POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:DosFile>
+        $<TARGET_FILE_DIR:adb>
+        COMMENT "Copying DosFile.dll to executable directory"
 )

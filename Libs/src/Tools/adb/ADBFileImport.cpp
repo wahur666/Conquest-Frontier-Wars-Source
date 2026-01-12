@@ -73,16 +73,16 @@ BOOL CALLBACK DlgProc_ADBFileImport(HWND hwnd, UINT message, UINT wParam, LPARAM
 {
 	if (message == WM_INITDIALOG)
         SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-	ADBFileImport* THIS = (ADBFileImport*)GetWindowLongPtr(hwnd, DWLP_USER);
+	ADBFileImport* that = (ADBFileImport*)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	switch( message )
 	{
 		case WM_INITDIALOG:
 		{
 			DWORD count = 0;
-			THIS->outFile->SetCurrentDirectory("\\");
-			THIS->inFile->SetCurrentDirectory("\\");
-			IFILESYSTEM_CountNumFiles( count, THIS->inFile );
+			that->outFile->SetCurrentDirectory("\\");
+			that->inFile->SetCurrentDirectory("\\");
+			IFILESYSTEM_CountNumFiles( count, that->inFile );
 
 			SetWindowText( hwnd, "ADB File Import" );
 			SetDlgItemText(hwnd,IDC_STATIC1,"Importing from ADB file...");
@@ -104,9 +104,9 @@ BOOL CALLBACK DlgProc_ADBFileImport(HWND hwnd, UINT message, UINT wParam, LPARAM
 		}
 		case WM_TIMER:
 		{
-			if( THIS->Update( GetDlgItem(hwnd,IDC_PROGRESS1) ) == false )
+			if( that->Update( GetDlgItem(hwnd,IDC_PROGRESS1) ) == false )
 			{
-				THIS->Uninit();
+				that->Uninit();
 				EndDialog(hwnd, IDOK);
 			}
 			break;
@@ -237,15 +237,15 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 
 	if (message == WM_INITDIALOG)
         SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-	ADBFileImport* THIS = (ADBFileImport*)GetWindowLongPtr(hwnd, DWLP_USER);
+	ADBFileImport* that = (ADBFileImport*)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	switch( message )
 	{
 		case WM_INITDIALOG:
 		{
-			THIS->fileView   = GetDlgItem(hwnd,IDC_TREE_FILELIST);
-			THIS->treeView   = GetDlgItem(hwnd,IDC_TREE_BTLIST);
-			THIS->bSelectAll = false;
+			that->fileView   = GetDlgItem(hwnd,IDC_TREE_FILELIST);
+			that->treeView   = GetDlgItem(hwnd,IDC_TREE_BTLIST);
+			that->bSelectAll = false;
 
 			for( StringList::iterator git = fileList.begin(); git != fileList.end(); git++ )
 			{
@@ -262,8 +262,8 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 				const char* fname = strchr( (*git).c_str(), '\\');
 				strncpy( filename, fname + 1, 128 );
 
-				SelectTypes_AddItemToTree( THIS->treeView, dirname, 0 );
-				SelectTypes_AddItemToTree( THIS->fileView, filename, 0 );
+				SelectTypes_AddItemToTree( that->treeView, dirname, 0 );
+				SelectTypes_AddItemToTree( that->fileView, filename, 0 );
 			}
 
 			break;
@@ -272,9 +272,9 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 		{
 			if( LOWORD(wParam) == IDOK )
 			{
-				THIS->bAutoOverwrite = Button_GetCheck( GetDlgItem(hwnd,IDC_CHECK_OVERWRITE) ) != 0;
+				that->bAutoOverwrite = Button_GetCheck( GetDlgItem(hwnd,IDC_CHECK_OVERWRITE) ) != 0;
 
-				if( THIS->bAutoOverwrite )
+				if( that->bAutoOverwrite )
 				{
 					EndDialog(hwnd, IDOK);
 					return 0;
@@ -282,7 +282,7 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 				
 				// create a list of files that will be updated here
 
-				HTREEITEM sibling = TreeView_GetRoot(THIS->treeView);
+				HTREEITEM sibling = TreeView_GetRoot(that->treeView);
 				while( sibling )
 				{
 					// exclude by file type
@@ -294,7 +294,7 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 					tv.hItem = sibling;
 					tv.cchTextMax = sizeof(buffer);
 					tv.pszText = buffer;
-					if(TreeView_GetItem(THIS->treeView,&tv))
+					if(TreeView_GetItem(that->treeView,&tv))
 					{
 						// has this family been checked?
 						if( (tv.state >> 12) == 2 )
@@ -302,10 +302,10 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 							SelectTypes_ExcludeFile( buffer );
 						}
 					}
-					sibling = TreeView_GetNextSibling(THIS->treeView,sibling);
+					sibling = TreeView_GetNextSibling(that->treeView,sibling);
 				}
 
-				sibling = TreeView_GetRoot(THIS->fileView);
+				sibling = TreeView_GetRoot(that->fileView);
 				while( sibling )
 				{
 					// exclude by file name
@@ -317,7 +317,7 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 					tv.hItem = sibling;
 					tv.cchTextMax = sizeof(buffer);
 					tv.pszText = buffer;
-					if(TreeView_GetItem(THIS->treeView,&tv))
+					if(TreeView_GetItem(that->treeView,&tv))
 					{
 						// has this family been checked?
 						if( (tv.state >> 12) == 2 )
@@ -325,7 +325,7 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 							SelectTypes_ExcludeFile( buffer );
 						}
 					}
-					sibling = TreeView_GetNextSibling(THIS->treeView,sibling);
+					sibling = TreeView_GetNextSibling(that->treeView,sibling);
 				}
 
 				EndDialog(hwnd, IDOK);
@@ -336,8 +336,8 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 			}
 			else if( LOWORD(wParam) == IDC_RADIO_SELECT_ALL )
 			{
-				THIS->bSelectAll ^= true;
-				Button_SetCheck( GetDlgItem(hwnd,IDC_RADIO_SELECT_ALL), THIS->bSelectAll );
+				that->bSelectAll ^= true;
+				Button_SetCheck( GetDlgItem(hwnd,IDC_RADIO_SELECT_ALL), that->bSelectAll );
 			}
 			break;
 		}

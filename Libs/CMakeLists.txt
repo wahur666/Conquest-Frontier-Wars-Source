@@ -15,6 +15,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(src/DACOM)
+add_custom_target(force_DACOM_rebuild ALL
+        COMMAND ${CMAKE_COMMAND} -E echo "Forcing DACOM rebuild"
+)
+add_dependencies(DACOM force_DACOM_rebuild)
+add_subdirectory(src/DOSFile)
 add_subdirectory(src/Tools/adb)
 
 add_executable(CFW_Rebuild
@@ -39,4 +44,11 @@ add_custom_command(TARGET CFW_Rebuild POST_BUILD
         $<TARGET_FILE:DACOM>
         $<TARGET_FILE_DIR:CFW_Rebuild>
         COMMENT "Copying DACOM.dll to executable directory"
+)
+
+add_custom_command(TARGET CFW_Rebuild POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:DosFile>
+        $<TARGET_FILE_DIR:CFW_Rebuild>
+        COMMENT "Copying DosFile.dll to executable directory"
 )

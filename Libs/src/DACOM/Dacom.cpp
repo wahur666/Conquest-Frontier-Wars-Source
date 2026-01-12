@@ -745,18 +745,21 @@ void DACOManager::LoadAllFromPath (const C8 *searchName)
 	if (GetEnvironmentVariable("DACOM", search_path, sizeof(search_path)) == 0)
 		search_path[0] = 0;
 	startptr = search_path;
-	
+	bool loaded_app_path = false;
 	do
 	{
 		if ((endptr = strchr(startptr,';')) != 0)			// get end of first path
 			*endptr++ = 0;
 		
-		if (GetAbsolutePath(load_path, app_path, startptr, sizeof(load_path)))
+		if (GetAbsolutePath(load_path, app_path, startptr, sizeof(load_path))) {
+			if (_stricmp(load_path, app_path) == 0)
+				loaded_app_path = true;
+
 			LoadAllFromDirectory(load_path, searchName);
-		
+		}
 	} while ((startptr = endptr) != 0);
-	
-	LoadAllFromDirectory(app_path, searchName);
+	if (!loaded_app_path)
+		LoadAllFromDirectory(app_path, searchName);
 }
 //--------------------------------------------------------------------------//
 //
