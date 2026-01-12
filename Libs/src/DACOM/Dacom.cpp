@@ -21,6 +21,8 @@ $Author: Jasony $
 */
 
 #define WIN32_LEAN_AND_MEAN
+#include <string>
+#include <vector>
 #include <windows.h>
 
 #include "libver.h"
@@ -151,6 +153,20 @@ struct DACOManager : public ICOManager
 	static BOOL32 __stdcall GetAbsolutePath (C8 *lpOutput, const C8 *lpBaseDir, const C8 *lpInput, LONG lSize);
 
 	DEFMETHOD(PostConstructor)(void);
+
+	std::vector<std::string> ReadAllProfileLines(HANDLE hSection)
+	{
+		std::vector<std::string> lines;
+		C8 buffer[1024];
+		U32 lineNum = 0;
+
+		while (parser->ReadProfileLine(hSection, lineNum++, buffer, sizeof(buffer)) != 0)
+		{
+			lines.push_back(std::string(buffer));
+		}
+
+		return lines;
+	}
 };
 
 //--------------------------------------------------------------------------//
@@ -813,9 +829,15 @@ BOOL32 DACOManager::initialize (void)
 
 			GENERAL_TRACE_1("DACOM: initialize: Loading DLL's from [Libraries] group.\n");
 
-			while (parser->ReadProfileLine(hSection, line++, buffer, sizeof(buffer)) != 0)
+			// Then replace your while loop with this:
+			auto lines = ReadAllProfileLines(hSection);
+
+			for (const auto& line : lines)
 			{
 				char * ptr;
+
+				// Make a copy since we'll be modifying ptr
+				strcpy_s(buffer, sizeof(buffer), line.c_str());
 
 				ptr = buffer;
 				while (*ptr == ' ')
