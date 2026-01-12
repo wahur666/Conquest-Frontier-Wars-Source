@@ -133,7 +133,7 @@ enum SYMKIND {
 struct Symbol
 {
 	unsigned long dwRefs;
-	char 	*name;
+	const char 	*name;
 	unsigned hash;
   	SYMBOL link;
   	SYMBOL left;
@@ -188,7 +188,7 @@ class SymbolManager
 {
 	SYMBOL SymbolArray[MAX_LEVELS];	
 	int current_level;
-	static char *search_name;
+	static const char *search_name;
 	static unsigned search_hashval;
 
 	void remove_tree(int level);
@@ -211,23 +211,23 @@ public:
 
 	SYMBOL set_reserved(void);
 
-	SYMBOL get_symbol(char *_name, char create=0)
+	SYMBOL get_symbol(const char *_name, char create=0)
 	{	
 		return get_symbol(_name, get_hash(_name), create);
 	}
 
-	SYMBOL get_symbol(char *_name, unsigned hashval, char create = 0);
+	SYMBOL get_symbol(const char *_name, unsigned hashval, char create = 0);
 
-	SYMBOL create_symbol(char *_name, unsigned hashval, int level);
+	SYMBOL create_symbol(const char *_name, unsigned hashval, int level);
 
-	SYMBOL create_symbol(char *_name)
+	SYMBOL create_symbol(const char *_name)
 	{
 		return create_symbol(_name, get_hash(_name), current_level);
 	}
 
-	SYMBOL insertbt(char *_name, int basictp, int siz);
+	SYMBOL insertbt(const char *_name, int basictp, int siz);
 
-	SYMBOL insertfn(char *_name, SYMBOL resulttp, SYMBOL argtp);
+	SYMBOL insertfn(const char *_name, SYMBOL resulttp, SYMBOL argtp);
 
 	int set_current_level(int new_level);   // return new current level
 	
@@ -257,7 +257,7 @@ public:
 
 	static void print_node(SYMBOL node);
 
-	static unsigned get_hash(char *_name);
+	static unsigned get_hash(const char *_name);
 };
 
 //--------------------------------------------------------------------------//

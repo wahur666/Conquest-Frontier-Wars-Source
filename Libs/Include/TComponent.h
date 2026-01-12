@@ -27,7 +27,7 @@
 //----------------------------------//
 
 #define daoffsetofclass(base, derived) ((U32)(static_cast<base*>((derived*)8))-8)
-#define daoffsetofmember(base, member) (size_t)((&(((base *)0)->member))+0)
+#define daoffsetofmember(base, member) ((U32)offsetof(base, member))
 #define dasizeofmember(base,member) (size_t)((&(((base *)0)->member))+1)-(size_t)((&(((base *)0)->member))+0)
 #include "TempStr2.h"
 

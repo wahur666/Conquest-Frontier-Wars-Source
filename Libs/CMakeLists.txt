@@ -20,6 +20,7 @@ add_custom_target(force_DACOM_rebuild ALL
 )
 add_dependencies(DACOM force_DACOM_rebuild)
 add_subdirectory(src/DOSFile)
+add_subdirectory(src/Viewer/Docuview)
 add_subdirectory(src/Tools/adb)
 
 add_executable(CFW_Rebuild
