@@ -15,8 +15,8 @@
 // NOTE: for some components, hence let it in there.
 //
 #define DA_HEAP_DEFINE_NEW_OPERATOR(classname)	\
-	void * classname::operator new( size_t size ) { return calloc( size, 1 ); } \
-	void classname::operator delete( void *ptr ) { ::free( ptr ); }
+	inline void * classname::operator new( size_t size ) { return calloc( size, 1 ); } \
+	inline void classname::operator delete( void *ptr ) { ::free( ptr ); }
 
 #define DA_HEAP_DEFINE_HEAP_MESSAGE(hinstance) 
 

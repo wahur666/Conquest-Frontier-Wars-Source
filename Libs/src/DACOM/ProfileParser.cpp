@@ -97,6 +97,9 @@ struct DACOM_NO_VTABLE ProfileParser : public IProfileParser
 
 	const char * getLine (HANDLE hSection, int line)
 	{
+		if (fileBuffer == NULL) {
+			return 0;
+		}
 		return getLine(fileBuffer+((U32)hSection), line);
 	}
 };
