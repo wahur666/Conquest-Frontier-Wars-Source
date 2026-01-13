@@ -125,8 +125,8 @@ struct PROPERTY
 
 struct DACOM_VARIANT
 {
-	DAVARENUM variantType;
-	U32		  dwReserved1;
+	DAVARENUM variantType = {};
+	U32		  dwReserved1 = 0;
 
 	union 
 	{
@@ -153,10 +153,7 @@ struct DACOM_VARIANT
 	};
 
 
-	DACOM_VARIANT (void)
-	{
-		memset(this, 0, sizeof(*this));
-	}
+	DACOM_VARIANT (void) {	}
 
 	DACOM_VARIANT (U8 _val)
 	{

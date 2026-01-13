@@ -33,12 +33,11 @@
 
 struct DOCDESC : public DAFILEDESC
 {
-	void *				memory;
-	U32					memoryLength;
+	void *				memory = nullptr;
+	U32					memoryLength = 0;
 
 	DOCDESC (const C8 *_file_name = NULL, const C8 *_interfaceName = "IDocument") : DAFILEDESC(_file_name, _interfaceName)
 	{
-		memset(((char *)this)+sizeof(DAFILEDESC), 0, sizeof(*this)-sizeof(DAFILEDESC));
 		size = sizeof(*this);
 	};
 };

@@ -525,12 +525,11 @@ BOOL Image(IFileSystem * file,IFileSystem * newFile);
 
 inline BOOL32 MyPreprocessFile (const C8 *fileIn)
 {
-	STARTUPINFO info;
+	STARTUPINFO info = {};
 	BOOL32 result;
 	char commandLine[128];
 	PROCESS_INFORMATION processInfo;
 
-	memset(&info, 0, sizeof(info));
 	info.cb = sizeof(info);
 
 	strcpy(commandLine, "cl /P /EP /nologo ");
@@ -580,8 +579,7 @@ void * PreprocessToMemory (const C8 *filename)
 
 	if ((pMemory = malloc(dwFileSize+1)) == 0)
 		goto Done;
-
-	memset(pMemory, 0, dwFileSize+1);
+	pMemory = {};
 	ReadFile(hTemp, pMemory, dwFileSize, &dwBytesRead, 0);
 
 Done:
@@ -688,7 +686,7 @@ static BOOL32 ParseResourceFile(char *filename)
 		goto Done;
 
 	pMemory = new char[dwFileSize];
-	memset( pMemory, 0, dwFileSize);
+	pMemory = {};
 	ReadFile(hTemp, pMemory, dwFileSize, &dwBytesRead, 0);
 	CloseHandle(hTemp);
 	hTemp = INVALID_HANDLE_VALUE;
@@ -758,7 +756,7 @@ Done:
 	{
 		int newSize = szData.size();
 		pPreprocessResources = new char[ newSize ];
-		memset( pPreprocessResources, 0x00, newSize );
+		pPreprocessResources = {};
 		memcpy( pPreprocessResources, szData.c_str(), newSize );
 
 		USER_DEFAULTS* defs = DEFAULTS->GetDefaults();
@@ -1158,8 +1156,7 @@ void Alias_SaveArchetype( char *atName, char *atNewName )
 
 		if( mainDoc->CreateInstance(&fdesc,fs) == GR_OK )
 		{
-			AliasStruct alias;
-			memset( &alias, 0, sizeof(alias) );
+			AliasStruct alias = {};
 			alias.dwSize = sizeof(alias);
 			strcpy( alias.name, atNewName ); 
 

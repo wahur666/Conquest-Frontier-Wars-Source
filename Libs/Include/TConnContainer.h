@@ -35,28 +35,27 @@ template <class Type> struct DACOM_NO_VTABLE ConnectionPointContainer : public I
 //-----------------------------------------
 //
 template <class Type>
-GENRESULT ConnectionPointContainer< Type >::FindConnectionPoint (const C8 *connectionName, struct IDAConnectionPoint **connPoint)
+GENRESULT ConnectionPointContainer<Type>::FindConnectionPoint(
+	const C8* connectionName,
+	IDAConnectionPoint** connPoint)
 {
-	int i;
-	const _DACOM_INTMAP_ENTRY *array = Type::_GetEntriesOut();
+	const auto* array = Type::_GetEntriesOut();
 
-	for (i = 0; array[i].interface_name; i++)
-	{
-		IDAConnectionPoint *point;
+	for (int i = 0; array[i].interface_name; i++) {
+		if (strcmp(array[i].interface_name, connectionName) != 0)
+			continue;
 
-		point = (IDAConnectionPoint *) ( ((U32)this) + array[i].offset - ((U32)
-					(static_cast<ConnectionPointContainer<Type>*>((Type*)8) )
-					-8) );
+		// Use std::bit_cast or just pointer arithmetic properly
+		auto* point = reinterpret_cast<IDAConnectionPoint*>(
+			reinterpret_cast<std::uintptr_t>(this) + array[i].offset
+		);
 
-		if (strcmp(array[i].interface_name, connectionName) == 0)
-		{
-			*connPoint = point;
-			point->AddRef();
-			return GR_OK;
-		}
+		*connPoint = point;
+		point->AddRef();
+		return GR_OK;
 	}
 
-	*connPoint = 0;
+	*connPoint = nullptr;
 	return GR_INTERFACE_UNSUPPORTED;
 }
 //-----------------------------------------

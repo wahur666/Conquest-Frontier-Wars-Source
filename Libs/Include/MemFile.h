@@ -37,13 +37,12 @@
 //
 struct MEMFILEDESC : public DAFILEDESC
 {
-	PVOID		lpBuffer;
-	DWORD		dwBufferSize;
-	DWORD		dwFlags;
+	PVOID		lpBuffer = nullptr;
+	DWORD		dwBufferSize = 0;
+	DWORD		dwFlags = 0;
 
 	MEMFILEDESC (const C8 *_file_name = NULL, const C8 *_interface_name = "IFileSystem") : DAFILEDESC(_file_name, _interface_name)
 	{
-		memset(((C8 *)this)+sizeof(DAFILEDESC), 0, sizeof(*this)-sizeof(DAFILEDESC));
 		size = sizeof(*this);
 		lpImplementation = "MEM";
 	}

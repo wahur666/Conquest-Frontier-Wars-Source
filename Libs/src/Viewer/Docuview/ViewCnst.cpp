@@ -416,8 +416,7 @@ GENRESULT ViewConstructor::DestroySymbols (HANDLE hSymbolList)
 //
 void ViewConstructor::CorrelateSymbol (SYMBOL oldSymbol, void *pOldData, SYMBOL newSymbol, void *pNewData)
 {
-	memset(pNewData, 0, DataViewer::GetType(newSymbol)->size);		// initialize output to 0
-
+	pNewData = {};
 	::CorrelateSymbol(oldSymbol, (char *)pOldData, newSymbol, (char *)pNewData);
 }
 //--------------------------------------------------------------------------//

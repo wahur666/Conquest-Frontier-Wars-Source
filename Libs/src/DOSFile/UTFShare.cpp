@@ -410,7 +410,7 @@ BOOL SharedUTF::init (DAFILEDESC *lpDesc)
 			(dwAccess & GENERIC_WRITE) && 
 			pParent->GetFileSize(hParentFile) == 0)
 		{
-			UTF_DIR_ENTRY entry;
+			UTF_DIR_ENTRY entry = {};
 			SYSTEMTIME systemTime;
 			DWORD dwName = MAKE_4CHAR(0, '\\', 0, 0);
 
@@ -419,8 +419,7 @@ BOOL SharedUTF::init (DAFILEDESC *lpDesc)
 			// need to create a new file header
 			if (pParent->SetFilePointer(hParentFile, 0) != 0)
 				goto Done;
-
-			memset(&header, 0, sizeof(header));
+			header = {};
 			header.dwIdentifier = MAKE_4CHAR('U','T','F',' ');
 			header.dwVersion = UTF_VERSION;
 
@@ -452,7 +451,6 @@ BOOL SharedUTF::init (DAFILEDESC *lpDesc)
 			
 			// write out the directory
 
-			memset(&entry, 0, sizeof(entry));
 			entry.dwName = 1;
 			entry.dwAttributes = FILE_ATTRIBUTE_DIRECTORY;
 			entry.dwSpaceAllocated = 
@@ -1955,8 +1953,8 @@ UTF_DIR_ENTRY * SharedUTF::CreateNewEntry_S (LPCTSTR lpPathName, BOOL bFailIfExi
 				dwLastError = ERROR_NOT_ENOUGH_MEMORY;
 				goto Done;
 			}
+			pNewDir = {};
 			// all old pointers to directory are now invalid (pEntry -> garbage)
-			memset(pNewDir, 0, dir.getDirEntrySize());
 			pNewDir->dwAttributes = FILE_ATTRIBUTE_UNUSED;
 			if ((pNewDir->dwName = FindName(ptr, dir.getNames())) == 0)
 				pNewDir->dwName = dir.addName(ptr, UTF_EXTRA_NAME_SPACE);

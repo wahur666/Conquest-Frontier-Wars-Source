@@ -52,22 +52,20 @@ typedef long (__stdcall IFileSystem::*DAFILE_SERIAL_PROC) (void *lpContext);
 
 struct DAFILEDESC : public DACOMDESC
 {
-   LPCTSTR               lpImplementation;
-   LPCTSTR               lpFileName;
-   DWORD                 dwDesiredAccess;
-   DWORD                 dwShareMode;
-   LPSECURITY_ATTRIBUTES lpSecurityAttributes;
-   DWORD                 dwCreationDistribution;
-   DWORD                 dwFlagsAndAttributes;
-   HANDLE                hTemplateFile;
-   LPFILESYSTEM          lpParent;
-   HANDLE                hParent;
-   HANDLE				 hFindFirst;
+   LPCTSTR               lpImplementation = nullptr;
+   LPCTSTR               lpFileName = nullptr;
+   DWORD                 dwDesiredAccess = 0;
+   DWORD                 dwShareMode = 0;
+   LPSECURITY_ATTRIBUTES lpSecurityAttributes = {};
+   DWORD                 dwCreationDistribution = 0;
+   DWORD                 dwFlagsAndAttributes = 0;
+   HANDLE                hTemplateFile = nullptr;
+   LPFILESYSTEM          lpParent = {};
+   HANDLE                hParent = nullptr;
+   HANDLE				 hFindFirst = nullptr;
 
-   DAFILEDESC (const C8 *_file_name = NULL, const C8 *_interface_name = "IFileSystem") : DACOMDESC(_interface_name)
+   DAFILEDESC (const C8 *_file_name = nullptr, const C8 *_interface_name = "IFileSystem") : DACOMDESC(_interface_name)
    {
-      memset(((C8 *)this)+sizeof(DACOMDESC), 0, sizeof(*this)-sizeof(DACOMDESC));
-
       dwDesiredAccess        = GENERIC_READ;
 	  dwShareMode			 = FILE_SHARE_READ;
       dwCreationDistribution = OPEN_EXISTING;

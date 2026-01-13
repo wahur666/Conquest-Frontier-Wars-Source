@@ -1067,15 +1067,13 @@ extern "C"
 
 	GENRESULT DACOM_GetDllVersion( const char *dll_name, U32 *out_major, U32 *out_minor, U32 *out_build )
 	{
-		VS_FIXEDFILEINFO ffi;
+		VS_FIXEDFILEINFO ffi = {};
 		TCHAR filename[_MAX_PATH];
 		DWORD dwDummyHandle, len; // will always be set to zero
 		HMODULE hModule = NULL; 
 		LPVOID lpvi;
 		UINT iLen;
 		BYTE *vi;
-
-		memset( &ffi, 0, sizeof(VS_FIXEDFILEINFO) );
 
 		*out_major = 0;
 		*out_minor = 0;

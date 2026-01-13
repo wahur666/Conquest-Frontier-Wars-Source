@@ -74,8 +74,7 @@ HTREEITEM TreeView_InsertBranch( HWND _hTree, char* _label, HTREEITEM _item )
 {
 	HTREEITEM hItem = _item;
 
-	TVITEM item;
-	memset( &item, 0, sizeof(item) );
+	TVITEM item = {};
 	char buffer[128];
 
 	if( hItem == TVI_ROOT )
@@ -89,7 +88,6 @@ HTREEITEM TreeView_InsertBranch( HWND _hTree, char* _label, HTREEITEM _item )
 
 	while( hItem != NULL )
 	{
-		memset( &item, 0, sizeof(item) );
 		item.mask = TVIF_HANDLE | TVIF_TEXT;
 		item.hItem = hItem;
 		item.pszText = buffer;
@@ -105,14 +103,13 @@ HTREEITEM TreeView_InsertBranch( HWND _hTree, char* _label, HTREEITEM _item )
 		hItem = TreeView_GetNextSibling( _hTree, hItem );
 	}
 
-	TVINSERTSTRUCT insert;
+	TVINSERTSTRUCT insert = {};
 	
 	item.mask = TVIF_TEXT | TVIF_PARAM;
 	item.pszText = _label;
 	item.cchTextMax = 128;
 	item.lParam = (DWORD)-1;
 
-	memset( &insert, 0, sizeof(insert) );
 	memcpy( &insert.item, &item, sizeof(item) );
 
 	insert.hParent = _item;

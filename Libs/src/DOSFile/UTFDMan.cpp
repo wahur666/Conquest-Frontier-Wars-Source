@@ -326,7 +326,7 @@ BOOL DirectoryManager::addEntries (int iNumEntries)
 
 	// initialize the new entries
 	pNewDir = (UTF_DIR_ENTRY *) (((char *)pDirectory) + dwOldDirLength);
-	memset(pNewDir, 0, dwNewDirLength - dwOldDirLength);	// Virtual Alloc has already set this correctly
+	pNewDir = {};
 
 	while (iNumEntries > 1)
 	{
@@ -510,8 +510,7 @@ BOOL DirectoryManager::removeEntry (UTF_DIR_ENTRY *pParent, UTF_DIR_ENTRY * pEnt
 	}
 	
 	// link it into the unused list
-
-	memset(pEntry, 0, getHeader()->dwDirEntrySize);
+	pEntry = {};
 	pEntry->dwAttributes = FILE_ATTRIBUTE_UNUSED;
 	pEntry->dwNext = (getHeader()->dwUnusedEntryOffset != 0) ? getHeader()->dwUnusedEntryOffset - getHeader()->dwDirectoryOffset : 0;
 	pBase->header.dwUnusedEntryOffset = ((char *)pEntry) - ((char *)getDirectory()) + getHeader()->dwDirectoryOffset;
@@ -867,7 +866,7 @@ BOOL DirectoryManager::increaseNameSpace (int iNumBytes)
 
 	// initialize the new entries
 	pNewName = (char *) (((char *)pNames) + dwOldNameLength);
-	memset(pNewName, 0, dwNewNameLength - dwOldNameLength);	// Virtual Alloc has already set this correctly
+	pNewName = {};
 
 	// go through every entry in the header --
 	// for each whose data offset started after 'dwStart', add the increment value

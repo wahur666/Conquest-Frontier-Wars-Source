@@ -240,7 +240,7 @@ void EnumTypes()
 }
 //----------------------------------------------------------------------------
 //
-LONG_PTR CALLBACK ListControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LONG lParam)
+LONG_PTR CALLBACK ListControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LONG_PTR lParam)
 {
 	WNDPROC oldProc = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 

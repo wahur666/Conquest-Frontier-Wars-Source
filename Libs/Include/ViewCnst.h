@@ -23,6 +23,7 @@
 #ifndef DACOM_H
 #include "DACOM.h"
 #endif
+#include <vector>
 
 typedef void *HANDLE;
 struct Symbol;
@@ -124,12 +125,11 @@ struct DACOM_NO_VTABLE IViewConstructor2 : public __baseViewConstructor
 
 inline BOOL32 __baseViewConstructor::PreprocessFile (const C8 *fileIn, HANDLE hFileOut)
 {
-	STARTUPINFO info;
+	STARTUPINFO info = {};
 	BOOL32 result;
 	char commandLine[128];
 	PROCESS_INFORMATION processInfo;
 
-	memset(&info, 0, sizeof(info));
 	info.cb = sizeof(info);
 
 	strcpy_s(commandLine, "cl /EP /nologo ");
@@ -181,33 +181,33 @@ inline HANDLE __baseViewConstructor::CreateTempFile (void)
 //
 inline GENRESULT __baseViewConstructor::FullParseFile (const C8 *filename)
 {
-	GENRESULT result=GR_GENERIC;
-	HANDLE hTemp;
-	void *pMemory;
-	DWORD dwFileSize, dwBytesRead;
+	GENRESULT result = GR_GENERIC;
 
-	if ((hTemp = CreateTempFile()) == INVALID_HANDLE_VALUE)
-		goto Done;
+	HANDLE hTemp = CreateTempFile();
+	if (hTemp == INVALID_HANDLE_VALUE)
+		return result;
 
 	if (PreprocessFile(filename, hTemp) == 0)
-		goto Done;
+	{
+		CloseHandle(hTemp);
+		return result;
+	}
 
 	SetFilePointer(hTemp, 0, 0, FILE_BEGIN);
-	if ((dwFileSize = GetFileSize(hTemp, 0)) == 0)
-		goto Done;
-
-	if ((pMemory = malloc(dwFileSize+1)) == 0)
-		goto Done;
-
-	memset(pMemory, 0, dwFileSize+1);
-	if (ReadFile(hTemp, pMemory, dwFileSize, &dwBytesRead, 0))
-		result = ParseMemory((const C8 *)pMemory);
-
-	free(pMemory);
-
-Done:
-	if (hTemp != INVALID_HANDLE_VALUE)
+	DWORD dwFileSize = GetFileSize(hTemp, 0);
+	if (dwFileSize == 0)
+	{
 		CloseHandle(hTemp);
+		return result;
+	}
+
+	std::vector<C8> pMemory(dwFileSize + 1, 0);
+
+	DWORD dwBytesRead;
+	if (ReadFile(hTemp, pMemory.data(), dwFileSize, &dwBytesRead, 0))
+		result = ParseMemory(pMemory.data());
+
+	CloseHandle(hTemp);
 	return result;
 }
 #endif    // #ifdef _INC_WINDOWS

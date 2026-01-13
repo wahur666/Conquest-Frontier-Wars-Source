@@ -78,25 +78,25 @@ struct CHILD_FILE
 //--------------------------------------------------------------------------//
 struct DACOM_NO_VTABLE IFF : public IFileSystem
 {
-   char				szFilename[MAX_PATH+4];
-   DWORD			dwAccess;            // The mode for the file
-   DWORD			dwLastError;
-   LPFILESYSTEM		pParent;
-   HANDLE			hMapping;			// handle to memory mapped file
+   char				szFilename[MAX_PATH+4] = {};
+   DWORD			dwAccess = 0;            // The mode for the file
+   DWORD			dwLastError = 0;
+   LPFILESYSTEM		pParent = {};
+   HANDLE			hMapping = nullptr;			// handle to memory mapped file
 
-   CHILD_FILE		child[MAX_CHILD_HANDLES];
-   HANDLE			handles[MAX_CHILD_HANDLES];
+   CHILD_FILE		child[MAX_CHILD_HANDLES] = {};
+   HANDLE			handles[MAX_CHILD_HANDLES] = {};
 
-   FORM				ffhandles[MAX_FINDFIRST_HANDLES];
+   FORM				ffhandles[MAX_FINDFIRST_HANDLES] = {};
 
-   FORM				form[MAX_FORMS];		// pool of available form structs
+   FORM				form[MAX_FORMS] = {};		// pool of available form structs
 
-   DWORD			dwChunkOffset;
-   DWORD			dwChunkName;
-   DWORD			dwChunkLength;	
-   DWORD			dwFormName;
+   DWORD			dwChunkOffset = 0;
+   DWORD			dwChunkName = 0;
+   DWORD			dwChunkLength = 0;
+   DWORD			dwFormName = 0;
 
-   BOOL				bBusy;
+   BOOL				bBusy = 0;
 
    BEGIN_DACOM_MAP_INBOUND(IFF)
    DACOM_INTERFACE_ENTRY(IFileSystem)
@@ -109,7 +109,6 @@ struct DACOM_NO_VTABLE IFF : public IFileSystem
    
    IFF (void)
    {
-      memset(((char *) this)+sizeof(DWORD), 0, sizeof(*this)-sizeof(DWORD));
       memset(handles+1, 0xFF, sizeof(handles)-sizeof(HANDLE));
 	  child[0].dwCurrentForm=(DWORD)-1;
    }
@@ -1484,9 +1483,8 @@ int IFF::ReadChunkInfo (DWORD dwNewOffset)
 	{
 		long buf[3];
 		DWORD result;
-		OVERLAPPED overlapped;
+		OVERLAPPED overlapped = {};
 
-		memset(&overlapped, 0, sizeof(overlapped));
 		overlapped.Offset = dwChunkOffset = dwNewOffset;
 		if (pParent->ReadFile(handles[0], (unsigned char *)buf, 12, &result, &overlapped) == 0)
 			pParent->GetOverlappedResult(handles[0], &overlapped, &result, 1);
@@ -1682,8 +1680,7 @@ LONG IFF::FindNextFile_S (LPVOID lpContext)
 	else
 	{
 		result = 1;
-
-		memset(lpData, 0, sizeof(*lpData));
+		lpData = {};
 		lpData->dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
 		if ((dwAccess & GENERIC_WRITE) == 0)
 			lpData->dwFileAttributes |= FILE_ATTRIBUTE_READONLY;

@@ -52,17 +52,15 @@
 typedef void *HANDLE;
 #endif
 
-struct VIEWDESC : public DACOMDESC
-{
-	const C8 *			className;
-	struct IDocument *	doc;
-	U32  dwFlags;			// no flags defined yet
-	HANDLE hOwnerWindow;
-	struct IStringSet * spellingSet; //used to check spelling
+struct VIEWDESC : public DACOMDESC {
+	const C8 *			className = nullptr;
+	struct IDocument *	doc = {};
+	U32  dwFlags = 0;			// no flags defined yet
+	HANDLE hOwnerWindow = nullptr;
+	struct IStringSet * spellingSet = {}; //used to check spelling
 
 	VIEWDESC (const C8 *_interfaceName = "IViewer") : DACOMDESC(_interfaceName)
 	{
-		memset(((char *)this)+sizeof(DACOMDESC), 0, sizeof(*this)-sizeof(DACOMDESC));
 		size = sizeof(*this);
 	};
 };

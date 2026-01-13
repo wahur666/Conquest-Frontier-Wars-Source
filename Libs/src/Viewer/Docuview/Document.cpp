@@ -28,6 +28,9 @@
 #include <windows.h>
 #pragma warning (disable : 4355 4201)
 
+#include <vector>
+#include <string>
+
 #include "TConnContainer.h"
 #include "Document.h"
 #include "IDocClient.h"
@@ -320,10 +323,14 @@ GENRESULT Document::QueryInterface (const C8 *interface_name, void **instance)
 {
 	int i;
 	const _DACOM_INTMAP_ENTRY * interfaces = _GetEntriesIn();
+	std::vector<std::string> interfacess = {};
 
 	for (i = 0; interfaces[i].interface_name; i++)
 	{
-		if (strcmp(interfaces[i].interface_name, interface_name) == 0)
+		interfacess.push_back(interfaces[i].interface_name);
+	}
+	for (auto basic_string: interfacess) {
+		if (strcmp(basic_string.c_str(), interface_name) == 0)
 		{
 			IDAComponent *result = (IDAComponent *) (((char *) this) + interfaces[i].offset);
 			result->AddRef();
@@ -331,6 +338,7 @@ GENRESULT Document::QueryInterface (const C8 *interface_name, void **instance)
 			return GR_OK;
 		}
 	}
+
 
 	*instance = 0;
 	return GR_INTERFACE_UNSUPPORTED;

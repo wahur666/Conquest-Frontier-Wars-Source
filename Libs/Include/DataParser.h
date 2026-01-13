@@ -26,11 +26,10 @@ typedef Symbol *SYMBOL;
 //
 struct DPARSERDESC : public DACOMDESC
 {
-	SYMBOL symbol;
+	SYMBOL symbol = {};
 
 	DPARSERDESC (const C8 *_interfaceName = "IDataParser") : DACOMDESC(_interfaceName)
 	{
-		memset(((char *)this)+sizeof(DACOMDESC), 0, sizeof(*this)-sizeof(DACOMDESC));
 		size = sizeof(*this);
 	};
 };

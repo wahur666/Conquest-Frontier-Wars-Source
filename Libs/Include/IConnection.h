@@ -59,10 +59,9 @@ struct DACOM_NO_VTABLE IDAConnectionPointContainer : public IDAComponent
 
 inline GENRESULT IDAComponent::QueryOutgoingInterface (const C8 *connectionName, struct IDAConnectionPoint **connection)
 {
-	struct IDAConnectionPointContainer *container;
-	GENRESULT result;
-
-	if ((result = QueryInterface( IID_IDAConnectionPointContainer, (void **)&container)) == GR_OK)
+	struct IDAConnectionPointContainer *container = {};
+	GENRESULT result = QueryInterface( IID_IDAConnectionPointContainer, (void **)&container);
+	if (result == GR_OK)
 	{
 		result = container->FindConnectionPoint(connectionName, connection);
 		container->Release();

@@ -1188,7 +1188,7 @@ BOOL DataViewer::UpdateListView (void)
 //	int iItemToEdit;
 //	iItemToEdit = ListView_GetNextItem(hListView, -1, LVNI_SELECTED);
 //	ListView_DeleteAllItems(hListView);
-	LV_ITEM lvi;
+	LV_ITEM lvi = {};
 	char buffer[256];
 	char *ptr;
 	int numItems = ListView_GetItemCount(hListView); 
@@ -1198,9 +1198,8 @@ BOOL DataViewer::UpdateListView (void)
 		HMENU hMenu;
 		if ((hMenu = GetSystemMenu(hMainWindow, 0)) != 0)
 		{
-			MENUITEMINFO minfo;
+			MENUITEMINFO minfo = {};
 
-			memset(&minfo, 0, sizeof(minfo));
 			minfo.cbSize = sizeof(minfo);
 			minfo.fMask = MIIM_ID | MIIM_TYPE;
 			minfo.fType = MFT_STRING;
@@ -1213,7 +1212,6 @@ BOOL DataViewer::UpdateListView (void)
 		}
 	}
 
-	memset(&lvi, 0, sizeof(lvi));
 	lvi.mask = LVIF_TEXT | LVIF_STATE;
 
 	// set title
@@ -1786,10 +1784,9 @@ BOOL32 DataViewer::SetDataDirectory(const char *pDirName)
 BOOL32 DataViewer::SubstituteInstanceName (const char *pName)
 {
 	DataViewer *tmp=pViewerList;
-	char buffer[MAX_NAME_LENGTH];
+	char buffer[MAX_NAME_LENGTH] = {};
 	char *ptr, *ptr2;
 
-	memset(buffer, 0, sizeof(buffer));
 	if ((ptr = strchr(szInstanceName, 1)) != 0)
 	{
 		int len;
@@ -3266,8 +3263,7 @@ BOOL CALLBACK DataViewer_TreeViewDlgProc(HWND hwnd, UINT message, UINT wParam, L
 
 					if( hTreeItem )
 					{
-						TVITEM item;
-						memset( &item, 0, sizeof(item) );
+						TVITEM item = {};
 
 						item.mask = TVIF_HANDLE | TVIF_PARAM;
 						item.hItem = hTreeItem;

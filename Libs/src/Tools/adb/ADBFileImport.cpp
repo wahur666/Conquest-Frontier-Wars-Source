@@ -357,8 +357,7 @@ void ADBFileImport::Init( struct IFileSystem* _datafile )
 
     // Set the members of the OPENFILENAME structure.
 
-    OPENFILENAME ofn = {0}; // common dialog box structure
-	memset( &ofn, 0, sizeof(ofn) );
+    OPENFILENAME ofn = {}; // common dialog box structure
     char szDirName[256];    // directory string
     char szFileTitle[256];  // file-title string
 	char szDest[256];

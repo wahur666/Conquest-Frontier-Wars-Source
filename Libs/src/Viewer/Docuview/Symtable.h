@@ -132,35 +132,32 @@ enum SYMKIND {
 
 struct Symbol
 {
-	unsigned long dwRefs;
-	const char 	*name;
-	unsigned hash;
-  	SYMBOL link;
-  	SYMBOL left;
-  	SYMBOL right;
+	unsigned long dwRefs = 0;
+	const char 	*name = nullptr;
+	unsigned hash = 0;
+  	SYMBOL link = {};
+  	SYMBOL left = {};
+  	SYMBOL right = {};
 
-	SYMKIND kind;                /* kind of symbol -- see defines below. */
-	int    basicdt;             /* type code for basic data types       */
-	SYMBOL datatype;    /* pointer for more complex data types  */
-	int    blocklevel;
-	int    size;
-	int    offset;
-	int    alignment;
+	SYMKIND kind = {};                /* kind of symbol -- see defines below. */
+	int    basicdt = 0;             /* type code for basic data types       */
+	SYMBOL datatype = {};    /* pointer for more complex data types  */
+	int    blocklevel = 0;
+	int    size = 0;
+	int    offset = 0;
+	int    alignment = 0;
 	union  { 
 	 char  *stringconst;
 	 long  intnum;
 	 float realnum; 
-	} constval;
-	int    arrayval;		/* number of elements in array (in ARRAYSYM) */
-	int    modifiers;		/* type modifiers e.g. unsigned, volatile, etc. */
-	unsigned long internal_refs;	/* number of times elememts of this struct self reference (RECORDSYM) */
-	unsigned bit_offset:8;
-	unsigned bit_count:8;
+	} constval = {};
+	int    arrayval = 0;		/* number of elements in array (in ARRAYSYM) */
+	int    modifiers = 0;		/* type modifiers e.g. unsigned, volatile, etc. */
+	unsigned long internal_refs = 0;	/* number of times elememts of this struct self reference (RECORDSYM) */
+	unsigned bit_offset:8 = 0;
+	unsigned bit_count:8 = 0;
 
-	Symbol(void)
-	{
-	 	memset(this, 0, sizeof(*this));
-	}
+	Symbol(void) { }
 
 	void * operator new (size_t size);
 
