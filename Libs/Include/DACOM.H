@@ -435,13 +435,11 @@
 
 struct DACOMDESC
 {
-	U32 size = 0;                  // size of the structure + any extension
-	const C8 *interface_name = {};  // ASCIIZ name of requested interface
+	U32 size ;                  // size of the structure + any extension
+	const C8 *interface_name;  // ASCIIZ name of requested interface
 	
-	DACOMDESC (const C8 * _interface_name = 0)
+	DACOMDESC (const C8 * _interface_name = nullptr) : size(sizeof(*this)), interface_name(_interface_name)
 	{
-		size = sizeof(*this);
-		interface_name = _interface_name;
 	}
 };
 
@@ -455,17 +453,17 @@ struct DACOMDESC
 
 struct AGGDESC : public DACOMDESC
 {
-	struct IDAComponent *  outer;
-	struct IDAComponent ** inner;		
-	const  C8           *  description;
-	
-	AGGDESC (const C8 *_interfaceName = nullptr,
-		const C8 * _description = nullptr) : DACOMDESC(_interfaceName)
+	struct IDAComponent* outer;
+	struct IDAComponent** inner;
+	const C8* description;
+
+	AGGDESC(const C8* interface_name = nullptr, const C8* description = nullptr)
+		: DACOMDESC(interface_name),
+		  outer(nullptr),
+		  inner(nullptr),
+		  description(description)
 	{
-		outer = nullptr;
-		inner = nullptr;
-		description = _description;
-		size = sizeof(*this);
+		size = sizeof(*this);  // Keep this line for now
 	}
 };
 

@@ -482,7 +482,7 @@ bool ADBFileImport::Update( HWND _progressBar )
 		fdesc.lpImplementation = "DOS";
 
 		COMPTR<IFileSystem> srcFile;
-		if( inFile->CreateInstance(&fdesc,srcFile) == GR_OK )
+		if( inFile->CreateInstance(&fdesc,srcFile.void_addr()) == GR_OK )
 		{
 			DWORD srcFileSize = srcFile->GetFileSize();
 			DWORD bytesRead = 0;
@@ -497,7 +497,7 @@ bool ADBFileImport::Update( HWND _progressBar )
 			fdesc.lpImplementation = "DOS";
 
 			COMPTR<IFileSystem> dstFile;
-			if( outFile->CreateInstance(&fdesc,dstFile) == GR_OK )
+			if( outFile->CreateInstance(&fdesc,dstFile.void_addr()) == GR_OK )
 			{
 				DWORD bytesWrote = 0;
 				dstFile->WriteFile(0, srcMemory, bytesRead, &bytesWrote );
@@ -548,14 +548,14 @@ bool ADBFileImport::DetectChange( const char* _dirname, const char* _filename, I
 	fdesc.lpImplementation = "DOS";
 
 	COMPTR<IFileSystem> dstTestFile;
-	if( _outFile->CreateInstance(&fdesc,dstTestFile) != GR_OK )
+	if( _outFile->CreateInstance(&fdesc,dstTestFile.void_addr()) != GR_OK )
 	{
 		// this is true since the source file does not exist in the destination file system
 		return true;
 	}
 
 	COMPTR<IFileSystem> srcTestFile;
-	if( _inFile->CreateInstance(&fdesc,srcTestFile) != GR_OK )
+	if( _inFile->CreateInstance(&fdesc,srcTestFile.void_addr()) != GR_OK )
 	{
 		// well poop. this file should have existed in the source file!
 		assert( 0 && "Could not find file in source ADB file!");

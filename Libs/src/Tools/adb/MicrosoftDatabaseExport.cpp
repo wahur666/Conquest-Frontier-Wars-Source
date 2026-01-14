@@ -259,7 +259,7 @@ void MicrosoftDatabaseExport_EnumFiles( IFileSystem* file )
 
 				DAFILEDESC fdesc = fn.c_str();
 				COMPTR<IFileSystem> temp;
-				if( file->CreateInstance(&fdesc,temp) == GR_OK )
+				if( file->CreateInstance(&fdesc,temp.void_addr()) == GR_OK )
 				{
 					MicrosoftDatabaseExport_EnumFiles( temp );
 				}
@@ -466,7 +466,7 @@ void MicrosoftDatabaseExport::UpdateFiles( void )
 
 	DAFILEDESC fdesc = fn.c_str();
 	COMPTR<IFileSystem> temp;
-	if( dataFile->CreateInstance(&fdesc,temp) == GR_OK )
+	if( dataFile->CreateInstance(&fdesc,temp.void_addr()) == GR_OK )
 	{
 		CreateTableQuery table;
 		InsertDataRow    insert;

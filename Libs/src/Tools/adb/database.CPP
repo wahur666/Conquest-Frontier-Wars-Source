@@ -88,7 +88,7 @@ struct DocManager : DocumentClient
 
 extern DocManager *docManager;
 
-IViewConstructor2 * PARSER;
+IViewConstructor2 * PARSER = {};
 
 
 static LPTOP_LEVEL_EXCEPTION_FILTER prevExceptionHandler;
@@ -154,9 +154,9 @@ BOOL32 SetupParser (void)
 {
 	DACOMDESC desc = "IViewConstructor";
 	BOOL32 result = 0;
-	COMPTR<IViewConstructor> parser;
+	COMPTR<IViewConstructor> parser = {};
   
-	if (DACOM->CreateInstance(&desc, parser) == GR_OK)
+	if (DACOM->CreateInstance(&desc, parser.void_addr()) == GR_OK)
 	{
 		parser->QueryInterface("IViewConstructor2", (void **) & PARSER);
 		result = 1;

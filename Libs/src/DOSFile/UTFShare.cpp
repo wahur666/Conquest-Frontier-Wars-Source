@@ -1953,8 +1953,8 @@ UTF_DIR_ENTRY * SharedUTF::CreateNewEntry_S (LPCTSTR lpPathName, BOOL bFailIfExi
 				dwLastError = ERROR_NOT_ENOUGH_MEMORY;
 				goto Done;
 			}
-			pNewDir = {};
 			// all old pointers to directory are now invalid (pEntry -> garbage)
+			memset(pNewDir, 0, dir.getDirEntrySize());
 			pNewDir->dwAttributes = FILE_ATTRIBUTE_UNUSED;
 			if ((pNewDir->dwName = FindName(ptr, dir.getNames())) == 0)
 				pNewDir->dwName = dir.addName(ptr, UTF_EXTRA_NAME_SPACE);

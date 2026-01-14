@@ -59,7 +59,7 @@ U32 IFILESYSTEM_CountNumFiles( DWORD& count, IFileSystem* file )
 				DAFILEDESC fdesc = data.cFileName;
 				COMPTR<IFileSystem> temp;
 
-				file->CreateInstance( &fdesc, temp );
+				file->CreateInstance( &fdesc, temp.void_addr() );
 				IFILESYSTEM_CountNumFiles( count, temp );
 			}
 			else

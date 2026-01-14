@@ -137,6 +137,7 @@ GENRESULT ViewConstructor::Initialize (void)
 //
 GENRESULT ViewConstructor::CreateInstance (DACOMDESC *lpDesc, void **instance)
 {
+	// TODO: THIS CREATE INSTANCE IS RUNNING
 	GENRESULT		result        = GR_OK;
 	ViewConstructor *pNewInstance = NULL;
 	AGGDESC * aggDesc = (AGGDESC *) lpDesc;
@@ -416,7 +417,7 @@ GENRESULT ViewConstructor::DestroySymbols (HANDLE hSymbolList)
 //
 void ViewConstructor::CorrelateSymbol (SYMBOL oldSymbol, void *pOldData, SYMBOL newSymbol, void *pNewData)
 {
-	pNewData = {};
+	memset(pNewData, 0, DataViewer::GetType(newSymbol)->size);
 	::CorrelateSymbol(oldSymbol, (char *)pOldData, newSymbol, (char *)pNewData);
 }
 //--------------------------------------------------------------------------//
@@ -438,9 +439,9 @@ GENRESULT ViewConstructor::CreateViewer (VIEWDESC *lpDesc, void **instance)
 	GENRESULT result = GR_GENERIC;
 	DAComponent<DataViewer> *pNewInstance = NULL;
 	SYMBOL list = 0;
-	COMPTR<IDAConnectionPoint> connection;
+	COMPTR<IDAConnectionPoint> connection = nullptr;
 	HWND hOwnerWindow=0;
-
+	GENRESULT inter = GR_DATA_NOT_FOUND;
 	//
 	// If unsupported interface requested, fail call
 	//
@@ -470,8 +471,9 @@ GENRESULT ViewConstructor::CreateViewer (VIEWDESC *lpDesc, void **instance)
 	{
 		hOwnerWindow = (HWND) lpDesc->hOwnerWindow;
 	}
-
-	if (lpDesc->doc->QueryOutgoingInterface("IDocumentClient", connection) != GR_OK)
+	// TODO: This is fucked here
+	inter = lpDesc->doc->QueryOutgoingInterface("IDocumentClient", connection.addr());
+	if (inter != GR_OK)
 	{
 		result = GR_GENERIC;
 		goto Done;

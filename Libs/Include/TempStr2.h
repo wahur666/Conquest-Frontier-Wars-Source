@@ -5,19 +5,19 @@
 #include <cstdio>
 #include <format>
 
-constexpr size_t TempStrSize = 8 * 1024;
+constexpr size_t TempStrSize2 = 8 * 1024;
 
-class TempStr
+class TempStr2
 {
 private:
     std::string buffer;
 
 public:
-    TempStr() = default;
+    TempStr2() = default;
 
     // Constructor with variadic arguments (C++20 style with std::format)
     template<typename... Args>
-    TempStr(std::string_view fmt, Args&&... args)
+    TempStr2(std::string_view fmt, Args&&... args)
     {
         buffer = std::vformat(fmt, std::make_format_args(args...));
     }
@@ -52,8 +52,8 @@ public:
 private:
     void set_printf_impl(const char* fmt, va_list args)
     {
-        char temp[TempStrSize];
-        vsnprintf(temp, TempStrSize, fmt, args);
+        char temp[TempStrSize2];
+        vsnprintf(temp, TempStrSize2, fmt, args);
         buffer = temp;
     }
 };

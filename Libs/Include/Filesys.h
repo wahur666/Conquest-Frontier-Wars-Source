@@ -64,17 +64,17 @@ struct DAFILEDESC : public DACOMDESC
    HANDLE                hParent = nullptr;
    HANDLE				 hFindFirst = nullptr;
 
-   DAFILEDESC (const C8 *_file_name = nullptr, const C8 *_interface_name = "IFileSystem") : DACOMDESC(_interface_name)
-   {
-      dwDesiredAccess        = GENERIC_READ;
-	  dwShareMode			 = FILE_SHARE_READ;
-      dwCreationDistribution = OPEN_EXISTING;
-      dwFlagsAndAttributes   = FILE_ATTRIBUTE_NORMAL | 
-                               FILE_FLAG_SEQUENTIAL_SCAN;
-      lpFileName             = _file_name;
-      size                   = sizeof(*this);
-	  hFindFirst			 = INVALID_HANDLE_VALUE;
-   }
+	DAFILEDESC(const C8* _file_name = nullptr, const C8* _interface_name = "IFileSystem")
+	 : DACOMDESC(_interface_name),
+	   lpFileName(_file_name),
+	   dwDesiredAccess(GENERIC_READ),
+	   dwShareMode(FILE_SHARE_READ),
+	   dwCreationDistribution(OPEN_EXISTING),
+	   dwFlagsAndAttributes(FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN),
+	   hFindFirst(INVALID_HANDLE_VALUE)
+	 {
+			size = sizeof(*this);
+	 }
 };
 
 

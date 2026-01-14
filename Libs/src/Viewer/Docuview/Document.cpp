@@ -251,71 +251,88 @@ struct Document : public IDocument,
 };
 //--------------------------------------------------------------------------//
 //
-GENRESULT Document::CreateInstance (DACOMDESC *descriptor, void **instance)
+GENRESULT Document::CreateInstance(DACOMDESC *descriptor, void **instance)
 {
-	GENRESULT  result      = GR_OK;
-	IDocument *pNewInstance = NULL;
-	DOCDESC * lpDesc = (DOCDESC *) descriptor;
-	DAFILEDESC fdesc;
-	LPFILESYSTEM pNewFile;
+    GENRESULT result = GR_OK;
+    IDocument *pNewInstance = NULL;
+    DOCDESC *lpDesc = (DOCDESC *)descriptor;
+    DAFILEDESC fdesc = nullptr;
+    LPFILESYSTEM pNewFile = NULL;
 
-	if (lpDesc==0 || (lpDesc->interface_name==0))
-	{
-		result = GR_INTERFACE_UNSUPPORTED;
-		goto Done;
-	}
+    // Validate input descriptor
+    if (!lpDesc || !lpDesc->interface_name)
+    {
+        result = GR_INTERFACE_UNSUPPORTED;
+        goto Done;
+    }
 
-   //
-   // If unsupported interface requested, fail call
-   //
+    //
+    // If unsupported interface requested, fail call
+    // First check if it matches DOCDESC layout
+    // If not, check if it matches DAFILEDESC layout (guards against reading uninitialized fdesc)
+    //
 
-	if ((lpDesc->size != sizeof(*lpDesc)) || 
-		strcmp(lpDesc->interface_name, interface_name))
-	{
-		if ((lpDesc->size != sizeof(fdesc)) || strcmp(fdesc.interface_name, lpDesc->interface_name))
-		{
-			result = GR_INTERFACE_UNSUPPORTED;
-			goto Done;
-		}
-	}
+    if ((lpDesc->size != sizeof(*lpDesc)) ||
+        strcmp(lpDesc->interface_name, interface_name))
+    {
+        if ((lpDesc->size != sizeof(fdesc)) || strcmp(fdesc.interface_name, lpDesc->interface_name))
+        {
+            result = GR_INTERFACE_UNSUPPORTED;
+            goto Done;
+        }
+    }
 
-	if (lpDesc->lpFileName == 0 || lpDesc->lpFileName[0] == 0)
-	{
-		result = GR_INVALID_PARMS;
-		goto Done;
-	}
+    // Validate filename exists and is not empty
+    if (!lpDesc->lpFileName || lpDesc->lpFileName[0] == 0)
+    {
+        result = GR_INVALID_PARMS;
+        goto Done;
+    }
 
-	memcpy(((char *)&fdesc)+sizeof(DACOMDESC), descriptor+1, sizeof(fdesc)-sizeof(DACOMDESC));
+    // Copy descriptor fields into fdesc
+    // Only copy the portion after the common DACOMDESC header
+    memcpy(((char *)&fdesc) + sizeof(DACOMDESC),
+           ((char *)descriptor) + sizeof(DACOMDESC),
+           sizeof(fdesc) - sizeof(DACOMDESC));
 
-	if ((result = pFile->CreateInstance(&fdesc, (void **) &pNewFile)) != GR_OK)
-		goto Done;
+    // Create the file instance
+    result = pFile->CreateInstance(&fdesc, (void **)&pNewFile);
+    if (result != GR_OK)
+        goto Done;
 
-	if (fdesc.dwCreationDistribution != OPEN_EXISTING)
-		SetModified();
+    // If creating new file (not opening existing), mark as modified
+    if (fdesc.dwCreationDistribution != OPEN_EXISTING)
+        SetModified();
 
-	if (lpDesc->size == sizeof(*lpDesc) && lpDesc->memory)
-	{
-		DWORD dwWritten;
+    // Write initial memory contents if provided
+    if (lpDesc->size == sizeof(*lpDesc) && lpDesc->memory)
+    {
+        DWORD dwWritten = 0;
 
-		if (pNewFile->WriteFile(0, lpDesc->memory, lpDesc->memoryLength, &dwWritten, 0) == 0)
-		{
-			pNewFile->Release();
-			result = GR_GENERIC;
-			goto Done;
-		}
-	}
+        if (!pNewFile->WriteFile(0, lpDesc->memory, lpDesc->memoryLength, &dwWritten, 0))
+        {
+            pNewFile->Release();
+            result = GR_GENERIC;
+            goto Done;
+        }
+    }
 
-	pNewFile->Release();
-	pNewFile=0;
+    pNewFile->Release();
+    pNewFile = NULL;
 
-	if (fdesc.dwCreationDistribution != OPEN_EXISTING)
-		InitChildren();
+    // Initialize children if creating new file
+    if (fdesc.dwCreationDistribution != OPEN_EXISTING)
+        InitChildren();
 
-	result = GetChildDocument(lpDesc->lpFileName, &pNewInstance);
+    // Get the child document instance
+    result = GetChildDocument(lpDesc->lpFileName, &pNewInstance);
 
 Done:
-	*instance = (IDocument *) pNewInstance;
-	return result;
+    if (pNewFile)
+        pNewFile->Release();
+
+    *instance = (IDocument *)pNewInstance;
+    return result;
 }
 //--------------------------------------------------------------------------//
 //

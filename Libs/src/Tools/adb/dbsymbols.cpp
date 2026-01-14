@@ -781,7 +781,7 @@ bool DbSymbols::ExportRow( const char* _symbolName, struct IFileSystem* _dataFil
 
 	DAFILEDESC fdesc = _symbolName;
 	COMPTR<IFileSystem> f;
-	if( _dataFile->CreateInstance(&fdesc,f) != GR_OK )
+	if( _dataFile->CreateInstance(&fdesc,f.void_addr()) != GR_OK )
 	{
 		return false;
 	}

@@ -227,14 +227,15 @@ struct DACOM_NO_VTABLE IEventMessageFilter : public IDAComponent
 
 struct HKEVENTDESC : public AGGDESC
 {
-	struct IFileSystem *	file = {};
-	U32						joyMessage = 0;
-	U32                     hotkeyMessage = 0;
+	struct IFileSystem* file = nullptr;
+	U32 joyMessage = 0;
+	U32 hotkeyMessage = 0;
 
-    HKEVENTDESC (const C8 *_interfaceName = "IHotkeyEvent") : AGGDESC(_interfaceName)
+	HKEVENTDESC(const C8* interface_name = "IHotkeyEvent")
+		: AGGDESC(interface_name)
 	{
 		size = sizeof(*this);
-	};
+	}
 };
 
 #define IID_IHotkeyEvent MAKE_IID("IHotkeyEvent",1)

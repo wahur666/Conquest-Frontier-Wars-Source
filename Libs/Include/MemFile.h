@@ -56,9 +56,9 @@ struct MEMFILEDESC : public DAFILEDESC
 inline GENRESULT CreateUTFMemoryFile (MEMFILEDESC & desc, struct IFileSystem ** file)
 {
 	GENRESULT result;
-	COMPTR<IFileSystem> memfile;
+	COMPTR<IFileSystem> memfile = {};
 
-	if ((result = DACOM_Acquire()->CreateInstance(&desc, memfile)) == GR_OK)
+	if ((result = DACOM_Acquire()->CreateInstance(&desc, memfile.void_addr())) == GR_OK)
 	{
 		DAFILEDESC fdesc;
 

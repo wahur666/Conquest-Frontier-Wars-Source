@@ -465,7 +465,7 @@ GENRESULT DataViewer::OnClose (struct IDocument *document)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (doc->QueryOutgoingInterface(IID_IDocumentClient, connection) != GR_OK)
+		if (doc->QueryOutgoingInterface(IID_IDocumentClient, connection.addr()) != GR_OK)
 			return GR_GENERIC;
 
 		connection->Unadvise(connHandle);

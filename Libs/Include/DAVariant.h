@@ -125,7 +125,7 @@ struct PROPERTY
 
 struct DACOM_VARIANT
 {
-	DAVARENUM variantType = {};
+	DAVARENUM variantType = DAVT_EMPTY;
 	U32		  dwReserved1 = 0;
 
 	union 
@@ -153,7 +153,7 @@ struct DACOM_VARIANT
 	};
 
 
-	DACOM_VARIANT (void) {	}
+	DACOM_VARIANT() = default;
 
 	DACOM_VARIANT (U8 _val)
 	{

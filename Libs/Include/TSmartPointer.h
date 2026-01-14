@@ -18,6 +18,8 @@
 #include "DACOM.h"
 #endif
 
+#include <memory>
+
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------
@@ -25,124 +27,106 @@
 template <class Type>
 class COMPTR
 {
+private:
+	std::shared_ptr<Type> ptr;
+
 public:
-	Type *ptr;
-
-	COMPTR (void)
+	COMPTR() : ptr(nullptr)
 	{
-		ptr = 0;
 	}
 
-	COMPTR (Type *_ptr)
+	COMPTR(Type* _ptr) : ptr(_ptr)
 	{
-		if ((ptr = _ptr) != 0)
-			ptr->AddRef();
 	}
 
-	COMPTR (const COMPTR<Type> & new_ptr)
+	COMPTR(const COMPTR<Type>& new_ptr) : ptr(new_ptr.ptr)
 	{
-		if ((ptr = new_ptr.ptr) != 0)
-			ptr->AddRef();
 	}
 
-	~COMPTR (void)
+	// Move constructor for efficiency
+	COMPTR(COMPTR<Type>&& new_ptr) noexcept : ptr(std::move(new_ptr.ptr))
 	{
-		free();
 	}
 
-	void free (void)
+	~COMPTR() = default;
+
+	void free()
 	{
-		if (ptr)
-		{
-			ptr->Release();
-			ptr = 0;
-		}
+		ptr.reset();
 	}
 
-	Type * operator = (Type *new_ptr)
+	Type* operator=(Type* new_ptr)
 	{
-		if (ptr != new_ptr)
-		{
-			free();
-			if ((ptr = new_ptr) != 0)
-				ptr->AddRef();
-		} 
-		return (Type *) ptr;
+		ptr.reset(new_ptr);
+		return ptr.get();
 	}
 
-	const COMPTR & operator = (const COMPTR<Type> & new_ptr)
+	const COMPTR& operator=(const COMPTR<Type>& new_ptr)
 	{
-		free();
-		if ((ptr = new_ptr.ptr) != 0)
-			ptr->AddRef();
-
+		ptr = new_ptr.ptr;
 		return *this;
 	}
 
-	operator void ** (void)
+	// Move assignment
+	COMPTR& operator=(COMPTR<Type>&& new_ptr) noexcept
 	{
-		free();
-		return (void **) &ptr;
+		ptr = std::move(new_ptr.ptr);
+		return *this;
 	}
 
-	operator Type ** (void)
+	// Safe accessor for output parameters
+	// Usage: GetChildDocument("name", viewer.addr())
+	Type** addr()
 	{
-		free();
-		return (Type **) &ptr;
-	}
-	
-	operator Type * (void) const
-	{
-	 	return (Type *) ptr;
+		ptr.reset();
+		return (Type**)&ptr;
 	}
 
-	Type * operator -> (void) const
+	// For APIs expecting void**
+	void** void_addr()
 	{
-	 	return (Type *) ptr;
+		ptr.reset();
+		return (void**)&ptr;
 	}
 
-//EMAURER:  these seem as though they could be const, 
-//but having them const causes existing code elsewhere 
-//in the libraries not to compile.
-
-	bool operator == (const int i) //const
+	operator Type*() const
 	{
-	 	return (ptr == (Type *)i);
+		return ptr.get();
 	}
 
-	bool operator != (const int i) //const
+	Type* operator->() const
 	{
-	 	return (ptr != (Type *)i);
+		return ptr.get();
 	}
 
-	bool operator == (Type *cmp) //const
+	bool operator==(const int i) const
 	{
-	 	return (((Type *)ptr) == cmp);
+		return (ptr.get() == (Type*)i);
 	}
 
-	bool operator != (Type *cmp) //const
+	bool operator!=(const int i) const
 	{
-	 	return (((Type *)ptr) != cmp);
+		return (ptr.get() != (Type*)i);
 	}
 
-	operator bool (void) //const 
+	bool operator==(Type* cmp) const
 	{
-		return (ptr != 0);
+		return (ptr.get() == cmp);
 	}
 
-	bool operator ! (void) const
+	bool operator!=(Type* cmp) const
 	{
-		return (ptr==0);
+		return (ptr.get() != cmp);
 	}
 
-	bool operator == (const int i) const
+	operator bool() const
 	{
-	 	return (ptr == (Type *)i);
+		return ptr != nullptr;
 	}
 
-	bool operator != (const int i) const
+	bool operator!() const
 	{
-	 	return (ptr != (Type *)i);
+		return ptr == nullptr;
 	}
 };
 

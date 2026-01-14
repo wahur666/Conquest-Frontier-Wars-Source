@@ -182,16 +182,21 @@ struct BaseHeap : public IHeap
 
 struct HeapInstance : public BaseHeap
 {
-	FREE_BLOCK *			pFirstFreeBlock = {};
-	DWORD					dwBaseBlockSize = 0;
-	void *					pHeapBase = nullptr;
-	DWORD					dwHeapSize = 0;		// allocation size
-	DWORD					dwGrowSize = 0;
-	CRITICAL_SECTION		criticalSection = {};	// used only in multithreaded instances
+	FREE_BLOCK* pFirstFreeBlock = nullptr;
+	DWORD dwBaseBlockSize = 0;
+	void* pHeapBase = nullptr;
+	DWORD dwHeapSize = 0;
+	DWORD dwGrowSize = 0;
+	CRITICAL_SECTION criticalSection;
 
-
-	HeapInstance (void)
+	HeapInstance() : BaseHeap()
 	{
+		InitializeCriticalSection(&criticalSection);
+	}
+
+	~HeapInstance()
+	{
+		DeleteCriticalSection(&criticalSection);
 	}
 
 	// *** IDAComponent methods ***

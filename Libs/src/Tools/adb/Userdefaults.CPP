@@ -51,7 +51,7 @@ static char szDefaultsKey[] = "User Defaults";
 
 struct DACOM_NO_VTABLE UserDefaults : public IUserDefaults
 {
-	USER_DEFAULTS userDefaults = {};
+	USER_DEFAULTS userDefaults;
 	
 	// 
 	// interface mapping
@@ -115,7 +115,7 @@ struct DACOM_NO_VTABLE UserDefaults : public IUserDefaults
 void UserDefaults::init (void)
 {
 	// initialize the defaults structure
-
+	userDefaults = {};
 	userDefaults.dwSize = sizeof(userDefaults);
 	userDefaults.dwVersion = DEFAULTS_VERSION;
 	userDefaults.disableHeader = true;

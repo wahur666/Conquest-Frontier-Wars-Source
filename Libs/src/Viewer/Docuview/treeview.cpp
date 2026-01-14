@@ -88,6 +88,7 @@ HTREEITEM TreeView_InsertBranch( HWND _hTree, char* _label, HTREEITEM _item )
 
 	while( hItem != NULL )
 	{
+		item = {};
 		item.mask = TVIF_HANDLE | TVIF_TEXT;
 		item.hItem = hItem;
 		item.pszText = buffer;

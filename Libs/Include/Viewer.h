@@ -54,10 +54,10 @@ typedef void *HANDLE;
 
 struct VIEWDESC : public DACOMDESC {
 	const C8 *			className = nullptr;
-	struct IDocument *	doc = {};
+	struct IDocument *	doc = nullptr;
 	U32  dwFlags = 0;			// no flags defined yet
 	HANDLE hOwnerWindow = nullptr;
-	struct IStringSet * spellingSet = {}; //used to check spelling
+	struct IStringSet * spellingSet = nullptr; //used to check spelling
 
 	VIEWDESC (const C8 *_interfaceName = "IViewer") : DACOMDESC(_interfaceName)
 	{

@@ -283,7 +283,7 @@ public:
 		{
 			COMPTR<IStructEnumerator> _enumerator;
 
-			if (enumerator->QueryInterface(IID_IStructEnumerator, _enumerator)==GR_OK)
+			if (enumerator->QueryInterface(IID_IStructEnumerator, _enumerator.void_addr())==GR_OK)
 			{
 				result = enumerate(_enumerator);
 			}
@@ -303,7 +303,7 @@ public:
 		{
 			COMPTR<IDocument> doc;
 
-			if (_doc->QueryInterface(IID_IDocument, doc)==GR_OK)
+			if (_doc->QueryInterface(IID_IDocument, doc.void_addr())==GR_OK)
 			{
 				result = update(doc);
 			}

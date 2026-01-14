@@ -26,12 +26,13 @@ typedef Symbol *SYMBOL;
 //
 struct DPARSERDESC : public DACOMDESC
 {
-	SYMBOL symbol = {};
+	SYMBOL symbol;
 
-	DPARSERDESC (const C8 *_interfaceName = "IDataParser") : DACOMDESC(_interfaceName)
+	DPARSERDESC(const C8* interface_name = "IDataParser")
+		: DACOMDESC(interface_name), symbol()
 	{
 		size = sizeof(*this);
-	};
+	}
 };
 //--------------------------------------------------------------------------//
 // describes a variable instance within the structure that is being parsed

@@ -245,7 +245,7 @@ bool AccessFileImport::Update( HWND _progressBar )
 				fdesc.lpImplementation = "DOS";
 
 				COMPTR<IFileSystem> fileDump;
-				if( datafile->CreateInstance(&fdesc,fileDump) == GR_OK )
+				if( datafile->CreateInstance(&fdesc,fileDump.void_addr()) == GR_OK )
 				{
 					DWORD dwBytes = currentStructureSize;
 					fileDump->WriteFile( 0, newStructure, dwBytes, &dwBytes );
@@ -565,10 +565,9 @@ void ChangeListImport::Execute( HINSTANCE _hInstance, HWND _parent )
 			//datafile->SetCurrentDirectory("\\BT_TERRAINOBJECT");
 
 			COMPTR<IFileSystem> file;
-			if( datafile->CreateInstance(&fdesc,file) == GR_OK )
+			if( datafile->CreateInstance(&fdesc,file.void_addr()) == GR_OK )
 			{
-				int fileSize;
-				fileSize = file->GetFileSize();
+				int fileSize = file->GetFileSize();
 
 				SYMBOL baseSymbol = symbols->GetSymbolByName( szBaseSymbol );
 				if( baseSymbol )

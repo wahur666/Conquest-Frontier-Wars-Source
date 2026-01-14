@@ -37,6 +37,7 @@
 #include <time.h>
 #include <string>
 #include <CommCtrl.h>
+#include <vector>
 
 #include "dbtreeview.h"
 extern DbTreeView g_DbTreeView;
@@ -401,7 +402,7 @@ char * pPreprocessResources=0;
 char * pPreprocessBlock=0;
 HANDLE hSymbols = NULL;
 
-IViewer *viewer[NUM_VIEWERS];
+std::vector<COMPTR<IViewer>> viewer(NUM_VIEWERS);
 IDocument *docArray[NUM_VIEWERS];
 IDocument *mainDoc = NULL;
 IStringSet *stringSet = NULL;
@@ -579,7 +580,7 @@ void * PreprocessToMemory (const C8 *filename)
 
 	if ((pMemory = malloc(dwFileSize+1)) == 0)
 		goto Done;
-	pMemory = {};
+	memset(pMemory, 0, dwFileSize+1);
 	ReadFile(hTemp, pMemory, dwFileSize, &dwBytesRead, 0);
 
 Done:
@@ -686,7 +687,7 @@ static BOOL32 ParseResourceFile(char *filename)
 		goto Done;
 
 	pMemory = new char[dwFileSize];
-	pMemory = {};
+	memset( pMemory, 0, dwFileSize);
 	ReadFile(hTemp, pMemory, dwFileSize, &dwBytesRead, 0);
 	CloseHandle(hTemp);
 	hTemp = INVALID_HANDLE_VALUE;
@@ -756,7 +757,7 @@ Done:
 	{
 		int newSize = szData.size();
 		pPreprocessResources = new char[ newSize ];
-		pPreprocessResources = {};
+		memset( pPreprocessResources, 0x00, newSize );
 		memcpy( pPreprocessResources, szData.c_str(), newSize );
 
 		USER_DEFAULTS* defs = DEFAULTS->GetDefaults();
@@ -942,7 +943,7 @@ void InitDB()
 
 	for (i=0;i<NUM_VIEWERS;i++)
 	{
-		viewer[i] = NULL;
+		viewer.push_back(nullptr);
 	}
 
 	iggy = DEFAULTS->GetDefaults();
@@ -1077,9 +1078,9 @@ BOOL CALLBACK NameDlgProc(HWND hwnd, UINT message, UINT wParam, LPARAM lParam)
 //
 IViewer **OpenViewer(IDocument *doc,char *baseName,char *instName)
 {
-	VIEWDESC vdesc;
-    HWND hwnd;
-	S32 slot;
+	VIEWDESC vdesc = {};
+    HWND hwnd = {};
+	S32 slot = {};
 
 //	IViewer **curViewer;
 
@@ -1096,13 +1097,14 @@ IViewer **OpenViewer(IDocument *doc,char *baseName,char *instName)
 	if (viewer[slot])
 	{
 		(viewer[slot])->set_display_state(1);
-		return &viewer[slot];
+		return viewer[slot].addr();
 	}
 	else
 	{
 		doc->AddRef();
 		doc->Release();
-		if (PARSER->CreateInstance(&vdesc, (void **)&viewer[slot]) == GR_OK)
+		auto result = PARSER->CreateInstance(&vdesc, viewer[slot].void_addr());
+		if (result == GR_OK)
 		{
 			//??I don't ever want this extra reference, so just throw it out now and don't worry about it
 		//	viewer[slot]->Release();
@@ -1116,7 +1118,7 @@ IViewer **OpenViewer(IDocument *doc,char *baseName,char *instName)
 			(viewer[slot])->set_instance_name(instName);
 			(viewer[slot])->set_display_state(1);
 
-			return &viewer[slot];
+			return viewer[slot].addr();
 		}
 	}
 	
@@ -1154,7 +1156,7 @@ void Alias_SaveArchetype( char *atName, char *atNewName )
 		COMPTR<IFileSystem> fs;
 		U32 dwWritten;
 
-		if( mainDoc->CreateInstance(&fdesc,fs) == GR_OK )
+		if( mainDoc->CreateInstance(&fdesc,fs.void_addr()) == GR_OK )
 		{
 			AliasStruct alias = {};
 			alias.dwSize = sizeof(alias);
@@ -1244,13 +1246,13 @@ void NewArchetype(char *baseName,const char *defname)
 	
 	//open the appropriate directory - if it isn't there, create it
 	sprintf(pathName,"\\%s",baseName);
-	mainDoc->GetChildDocument(pathName,newDoc);
+	mainDoc->GetChildDocument(pathName,newDoc.addr());
 	if (newDoc == NULL)
 		mainDoc->CreateDirectory(pathName);
 
 	//get at the desired file
 	sprintf(pathName,"\\%s\\%s",baseName,nameBuffer);
-	mainDoc->GetChildDocument(pathName,newDoc);
+	mainDoc->GetChildDocument(pathName,newDoc.addr());
 
 	if (newDoc == NULL)
 	{
@@ -1426,7 +1428,7 @@ void Clone(char *name, const char *defname)
 	void *structure;
 	char pathName[64];
 
-	FindArchetype2(newDoc,baseName,name);
+	FindArchetype2(newDoc.addr(),baseName,name);
 	newDoc->SetFilePointer(0,0);
 
 	const U32 typeSize = newDoc->GetFileSize();
@@ -1453,13 +1455,13 @@ void Clone(char *name, const char *defname)
 	newDoc->AddRef();
 	newDoc->Release();
 	//open the appropriate directory - if it isn't there, create it
-	mainDoc->GetChildDocument(baseName,newDoc);
+	mainDoc->GetChildDocument(baseName,newDoc.addr());
 	if (newDoc == NULL)
 		mainDoc->CreateDirectory(baseName);
 
 	//get at the desired file
 	sprintf(pathName,"%s\\%s",baseName,nameBuffer);
-	mainDoc->GetChildDocument(pathName,newDoc);
+	mainDoc->GetChildDocument(pathName,newDoc.addr());
 
 	if (newDoc == NULL)
 	{
@@ -1471,7 +1473,7 @@ void Clone(char *name, const char *defname)
 		fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 		fdesc.dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE; 
 		fdesc.dwCreationDistribution = CREATE_ALWAYS;
-		mainDoc->CreateInstance(&fdesc, newDoc);
+		mainDoc->CreateInstance(&fdesc, newDoc.void_addr());
 		if (newDoc ==0)
 		{
 			MessageBox(hMainWindow,"Failed to create new file","Clone failed",MB_OK);
@@ -1494,10 +1496,10 @@ void Clone(char *name, const char *defname)
 
 void OpenArchetype(char *atName)
 {
-	char baseName[64];
-	COMPTR<IDocument> newDoc;
+	char baseName[64] = {};
+	COMPTR<IDocument> newDoc = {};
 
-	FindArchetype(newDoc,baseName,atName);
+	FindArchetype(newDoc.addr(),baseName,atName);
 
 //	docManager->MakeConnection(newDoc);
 	OpenViewer(newDoc,baseName,atName);
@@ -1830,7 +1832,7 @@ void NewDB()
 		goto Done;
 	}
 
-	CreateMemoryFile(temp);
+	CreateMemoryFile(temp.addr());
 	CreateDocument(temp,&mainDoc, CREATE_ALWAYS);
 	CreateStringSet();
 
@@ -1842,7 +1844,7 @@ void NewDB()
 	fdesc.lpImplementation = "DOS";
 	mainDoc->CreateDirectory(PARSEDIR);
 	mainDoc->SetCurrentDirectory(PARSEDIR);
-	mainDoc->CreateInstance(&fdesc,temp);
+	mainDoc->CreateInstance(&fdesc,temp.void_addr());
 	temp->WriteFile(0, pPreprocessBlock, strlen(pPreprocessBlock), LPDWORD(&dwWritten), 0);
 	//file.free();
 	mainDoc->SetCurrentDirectory("..");
@@ -2029,7 +2031,7 @@ struct ConvertEnumerator : FileEnumerator
 		NameTable::New(dataFound.cFileName);
 
 		//read old size and setup old doc
-		mainDoc->GetChildDocument(dataFound.cFileName,childDoc);
+		mainDoc->GetChildDocument(dataFound.cFileName,childDoc.addr());
 		size = childDoc->GetFileSize();
 		oldstruct = calloc(__max(size, PARSER->GetTypeSize(newSymbol)),1);
 		childDoc->ReadFile(0, oldstruct, size, LPDWORD(&dwRead),0);
@@ -2170,9 +2172,9 @@ void TextWritingStruct::update (HWND hwnd)
 		//
 		// create the viewer here, instead of inside the loop
 		//
-		mainDoc->GetChildDocument(data2.cFileName,childDoc);
+		mainDoc->GetChildDocument(data2.cFileName,childDoc.addr());
 		vdesc.doc = childDoc;
-		if (PARSER->CreateInstance(&vdesc, viewer) != GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) != GR_OK)
 		{
 			MessageBox(hwnd,"View creation error","WriteToText Error",MB_OK);
 			mainDoc->FindClose(handle2);
@@ -2182,7 +2184,7 @@ void TextWritingStruct::update (HWND hwnd)
 		}
 	}
 
-	mainDoc->GetChildDocument(data2.cFileName,childDoc);
+	mainDoc->GetChildDocument(data2.cFileName,childDoc.addr());
 
 	if (viewer->Invoke("Update", (IDocument *)childDoc) != GR_OK)
 	{
@@ -2300,7 +2302,7 @@ BOOL32 WriteToText (HWND hwnd, const char * fileName)
 			strcat(buffer, ".txt");
 	}
 
-	if (DACOM->CreateInstance(&fdesc, tws.structEnumerator.outFile)!=GR_OK)
+	if (DACOM->CreateInstance(&fdesc, tws.structEnumerator.outFile.void_addr())!=GR_OK)
 	{
 		MessageBox(hMainWindow,"Unable to open output file.","WriteToText Error",MB_OK);
 		goto Done;
@@ -2386,7 +2388,7 @@ GENRESULT CopyOpenFile(IFileSystem *file,char *fileName)
 	file->SetFilePointer(0,0);
 	file->ReadFile(0,buffer,dwSize,LPDWORD(&dwRead),0);
 
-	if ((result = CreateUTFMemoryFile(mdesc, temp)) != GR_OK)
+	if ((result = CreateUTFMemoryFile(mdesc, temp.addr())) != GR_OK)
 		return result;
 
 	temp.free();		// clears all of the sharing flags
@@ -2396,7 +2398,7 @@ GENRESULT CopyOpenFile(IFileSystem *file,char *fileName)
 	fdesc.dwShareMode = 0;
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if ((result = DACOM->CreateInstance(&fdesc,outFile)) == GR_OK)
+	if ((result = DACOM->CreateInstance(&fdesc,outFile.void_addr())) == GR_OK)
 	{
 		outFile->WriteFile(0,buffer,dwRead,LPDWORD(&dwWritten),0);
 	}
@@ -2415,9 +2417,9 @@ BOOL32 OpenDatabase(char *oldDB,char *oldH)
 	BOOL32 result = FALSE;
 	USER_DEFAULTS *iggy = DEFAULTS->GetDefaults();
 	
-	CreateMemoryFile(temp);
+	CreateMemoryFile(temp.addr());
 
-	if (DACOM->CreateInstance(&fdesc, temp2) != GR_OK)
+	if (DACOM->CreateInstance(&fdesc, temp2.void_addr()) != GR_OK)
 	{
 		//this means that we are trying an autoload, but someone deleted the file
 		KillDB();
@@ -2472,7 +2474,7 @@ BOOL32 OpenDatabase(char *oldDB,char *oldH)
 		fdesc.dwDesiredAccess = GENERIC_READ |GENERIC_WRITE;
 		fdesc.dwCreationDistribution = OPEN_ALWAYS;
 		
-		if (mainDoc->CreateInstance(&fdesc,temp) != GR_OK)
+		if (mainDoc->CreateInstance(&fdesc,temp.void_addr()) != GR_OK)
 		{
 			MessageBox(hMainWindow,"Couldn't create header",data.cFileName,MB_OK);
 			goto Done;
@@ -2586,7 +2588,7 @@ BOOL32 OpenDatabaseViaDir(char* dir)
 	ddesc.dwCreationDistribution = OPEN_EXISTING;
 	ddesc.dwFlagsAndAttributes   = FILE_ATTRIBUTE_DIRECTORY; //FILE_ATTRIBUTE_NORMAL;
 
-	if (DACOM->CreateInstance(&ddesc, newDocument) != GR_OK)
+	if (DACOM->CreateInstance(&ddesc, newDocument.void_addr()) != GR_OK)
 	{
 		// whoops! could not create mainDoc using this directory!
 		KillDB();
@@ -2974,7 +2976,7 @@ BOOL Image(IFileSystem * file,IFileSystem * newFile)
 				fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 				fdesc.dwShareMode = 0;  // no sharing
 				fdesc.dwCreationDistribution = CREATE_ALWAYS;
-				newFile->CreateInstance(&fdesc, newDoc);
+				newFile->CreateInstance(&fdesc, newDoc.void_addr());
 			}
 		}
 

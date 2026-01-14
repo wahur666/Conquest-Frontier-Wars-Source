@@ -132,7 +132,7 @@ bool PathExport_ExportFile( const char* _outpath, const char* _archname, IFileSy
 	// open up the archetype file
 	DAFILEDESC fdesc = _archname;
 	COMPTR<IFileSystem> f;
-	if( _dataFile->CreateInstance(&fdesc,f) != GR_OK )
+	if( _dataFile->CreateInstance(&fdesc,f.void_addr()) != GR_OK )
 	{
 		return false;
 	}

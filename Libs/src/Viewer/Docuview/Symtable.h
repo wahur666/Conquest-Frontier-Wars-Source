@@ -135,29 +135,29 @@ struct Symbol
 	unsigned long dwRefs = 0;
 	const char 	*name = nullptr;
 	unsigned hash = 0;
-  	SYMBOL link = {};
-  	SYMBOL left = {};
-  	SYMBOL right = {};
+  	SYMBOL link = nullptr;
+  	SYMBOL left = nullptr;
+  	SYMBOL right = nullptr;
 
-	SYMKIND kind = {};                /* kind of symbol -- see defines below. */
+	SYMKIND kind = ARGSYM;                /* kind of symbol -- see defines below. */
 	int    basicdt = 0;             /* type code for basic data types       */
-	SYMBOL datatype = {};    /* pointer for more complex data types  */
+	SYMBOL datatype = nullptr;    /* pointer for more complex data types  */
 	int    blocklevel = 0;
 	int    size = 0;
 	int    offset = 0;
 	int    alignment = 0;
-	union  { 
+	union  {
 	 char  *stringconst;
 	 long  intnum;
-	 float realnum; 
-	} constval = {};
+	 float realnum;
+	} constval {};
 	int    arrayval = 0;		/* number of elements in array (in ARRAYSYM) */
 	int    modifiers = 0;		/* type modifiers e.g. unsigned, volatile, etc. */
 	unsigned long internal_refs = 0;	/* number of times elememts of this struct self reference (RECORDSYM) */
 	unsigned bit_offset:8 = 0;
 	unsigned bit_count:8 = 0;
 
-	Symbol(void) { }
+	Symbol() = default;
 
 	void * operator new (size_t size);
 

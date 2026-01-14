@@ -81,7 +81,7 @@ struct DACOM_NO_VTABLE IFF : public IFileSystem
    char				szFilename[MAX_PATH+4] = {};
    DWORD			dwAccess = 0;            // The mode for the file
    DWORD			dwLastError = 0;
-   LPFILESYSTEM		pParent = {};
+   LPFILESYSTEM		pParent = nullptr;
    HANDLE			hMapping = nullptr;			// handle to memory mapped file
 
    CHILD_FILE		child[MAX_CHILD_HANDLES] = {};
@@ -96,7 +96,7 @@ struct DACOM_NO_VTABLE IFF : public IFileSystem
    DWORD			dwChunkLength = 0;
    DWORD			dwFormName = 0;
 
-   BOOL				bBusy = 0;
+   BOOL				bBusy = FALSE;
 
    BEGIN_DACOM_MAP_INBOUND(IFF)
    DACOM_INTERFACE_ENTRY(IFileSystem)
@@ -109,8 +109,12 @@ struct DACOM_NO_VTABLE IFF : public IFileSystem
    
    IFF (void)
    {
-      memset(handles+1, 0xFF, sizeof(handles)-sizeof(HANDLE));
-	  child[0].dwCurrentForm=(DWORD)-1;
+   		// Initialize handles[1..MAX] to INVALID_HANDLE_VALUE
+   		for (int i = 1; i < MAX_CHILD_HANDLES; i++)
+   		{
+   			handles[i] = INVALID_HANDLE_VALUE;
+   		}
+   		child[0].dwCurrentForm = (DWORD)-1;
    }
 
    ~IFF (void);

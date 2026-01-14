@@ -62,7 +62,7 @@ struct DACOM_NO_VTABLE DocumentClient : public IDocumentClient
 			COMPTR<IDAConnectionPoint> connection;
 			GENRESULT result;
 			
-			if ((result = _doc->QueryOutgoingInterface("IDocumentClient", connection)) == GR_OK)
+			if ((result = _doc->QueryOutgoingInterface("IDocumentClient", connection.addr())) == GR_OK)
 				connection->Unadvise(handle);
 			doc = 0;
 			return result;
@@ -76,7 +76,7 @@ struct DACOM_NO_VTABLE DocumentClient : public IDocumentClient
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (_doc->QueryOutgoingInterface("IDocumentClient", connection) == GR_OK)
+		if (_doc->QueryOutgoingInterface("IDocumentClient", connection.addr()) == GR_OK)
 		{
 			if (connection->Advise(this, &handle) == GR_OK)
 			{

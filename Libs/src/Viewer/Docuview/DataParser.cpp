@@ -122,7 +122,7 @@ BOOL32 DataParser::Enumerate (IParserCallback * callback)
 		vdesc.bitOffset = symbol->bit_offset;
 		vdesc.bitCount = symbol->bit_count;
 
-		CreateDataParser(symbol, parser);
+		CreateDataParser(symbol, parser.addr());
 
 		while (count-- > 0)
 		{
@@ -165,7 +165,7 @@ BOOL32 DataParser::Enumerate (IParserCallback * callback)
 			vdesc.bitCount = symbol->bit_count;
 
 			if (oldType != symbol->datatype)
-				CreateDataParser(symbol, parser);
+				CreateDataParser(symbol, parser.addr());
 
 			if ((result = callback->VarInstance(parser, vdesc)) == 0)
 				break;

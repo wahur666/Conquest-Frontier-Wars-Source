@@ -140,7 +140,7 @@ int DAPath::parse (char * buffer, COMPTR<IFileSystem> * & ptrs, int recurseCount
 		{
 			int i;
 			i = parse(ptr+1, ptrs, recurseCount+1);
-			createFileSystem(DACOM, buffer, ptrs[recurseCount]);
+			createFileSystem(DACOM, buffer, ptrs[recurseCount].addr());
 			return i;
 		}
 	}
@@ -153,7 +153,7 @@ int DAPath::parse (char * buffer, COMPTR<IFileSystem> * & ptrs, int recurseCount
 			ptrs = new COMPTR<IFileSystem>[recurseCount];
 
 		if (buffer[0])
-			createFileSystem(DACOM, buffer, ptrs[recurseCount-1]);
+			createFileSystem(DACOM, buffer, ptrs[recurseCount-1].addr());
 
 		return recurseCount;
 	}
@@ -189,7 +189,7 @@ bool DAPath::createFileSystem (IComponentFactory * factory, char * buffer, IFile
 	if ((ptr = strchr(buffer+1, '\\')) != 0)      //   '\'
 		*ptr++ = 0;
 
-	if (factory->CreateInstance(&fdesc, file) != GR_OK)
+	if (factory->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 	if (ptr && ptr[0])
 	{
