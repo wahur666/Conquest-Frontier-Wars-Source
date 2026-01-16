@@ -20,12 +20,13 @@ add_custom_target(force_DACOM_rebuild ALL
 )
 add_dependencies(DACOM force_DACOM_rebuild)
 add_subdirectory(src/DOSFile)
-add_subdirectory(src/x86Math)
+add_subdirectory(src/System)
 add_subdirectory(src/RenderPipeline/RPUL)
-add_subdirectory(src/x86Math/mathlib)
 add_subdirectory(src/Viewer/Docuview)
 add_subdirectory(src/Tools/adb)
 add_subdirectory(src/Tools/ObjView)
+add_subdirectory(src/x86Math)
+add_subdirectory(src/x86Math/mathlib)
 
 add_executable(CFW_Rebuild
         main.cpp
