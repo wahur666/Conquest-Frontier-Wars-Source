@@ -8,7 +8,7 @@ set(SOURCES
 # Header files (optional, for IDE)
 set(HEADERS
         # Add headers here if you have them, e.g. RPUL.h
-        ../../../Include/RPUL/Text.h
+        ../../../Include/RPUL.h
 )
 
 # Include directories
