@@ -43,7 +43,7 @@ HRESULT read_type_array( IFileSystem *IFS, const char *key, U32 num_to_read, Typ
 	U32 uBytesRead;
 
 	if( (h = IFS->OpenChild( &desc )) != INVALID_HANDLE_VALUE ) {
-		if( IFS->ReadFile( h, out_type, sizeof(Type) * num_to_read, &uBytesRead, NULL) && (uBytesRead == (num_to_read * sizeof(Type))) ) {
+		if( IFS->ReadFile( h, out_type, sizeof(Type) * num_to_read, LPDWORD(&uBytesRead), NULL) && (uBytesRead == (num_to_read * sizeof(Type))) ) {
 			IFS->CloseHandle( h );
 			return S_OK;
 		}
@@ -167,7 +167,7 @@ template <class Type> HRESULT ReadAllocVector (IFileSystem *IFS,
 
 		U32 uBytesRead;
 
-		BOOL r = IFS->ReadFile(h, _out_chunk, fsize, &uBytesRead, NULL);
+		BOOL r = IFS->ReadFile(h, _out_chunk, fsize, LPDWORD(&uBytesRead), NULL);
 
 		if (r)
 		{
