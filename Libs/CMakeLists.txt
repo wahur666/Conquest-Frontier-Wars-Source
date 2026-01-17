@@ -14,13 +14,10 @@ project(CFW_Rebuild LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(src/DACOM)
-add_custom_target(force_DACOM_rebuild ALL
-        COMMAND ${CMAKE_COMMAND} -E echo "Forcing DACOM rebuild"
-)
-add_dependencies(DACOM force_DACOM_rebuild)
 add_subdirectory(src/Anim)
 add_subdirectory(src/Channel)
+add_subdirectory(src/DACOM)
+add_subdirectory(src/DAHOTKEY)
 add_subdirectory(src/DOSFile)
 add_subdirectory(src/System)
 add_subdirectory(src/RenderPipeline/RPUL)
