@@ -383,13 +383,7 @@ public:
 //
 // Returns 2nd order skew-symmetric dual tensor of vector.
 //
-	friend Matrix dual(const Vector & v)
-	{
-		return Matrix (
-			0.0f, -v.z,  v.y,
-			 v.z, 0.0f, -v.x,
-			-v.y,  v.x, 0.0f );
-	}
+	friend Matrix dual(const Vector & v);
 
 	inline Vector get_i(void) const
 	{
@@ -538,6 +532,14 @@ public:
 		}
 	}
 };
+
+inline Matrix dual(const Vector & v)
+{
+	return Matrix (
+		0.0f, -v.z,  v.y,
+		 v.z, 0.0f, -v.x,
+		-v.y,  v.x, 0.0f );
+}
 
 //
 
