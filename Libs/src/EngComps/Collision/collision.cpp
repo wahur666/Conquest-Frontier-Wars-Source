@@ -7292,7 +7292,8 @@ bool RayConvexMesh(float & t, Vector & p, Vector & N, const Vector & base, const
 
 	float tnear = -FLT_MAX;
 	float tfar = FLT_MAX;
-	int front_normal, back_normal;
+	int front_normal = 0;
+	int back_normal = 0;
 
 	result = true;
 
