@@ -66,6 +66,8 @@ add_subdirectory(src/EngComps/EngineLights)     # lighting system
 add_subdirectory(src/EngComps/Hardpoint)     # Hardpoints
 add_subdirectory(src/EngComps/Property)     # Property
 add_subdirectory(src/EngComps/RenderMgr)     # renderer manager
+add_subdirectory(src/RenderPipeline)     # renderer manager
+
 #add_subdirectory(src/Engine)           # core engine
 #add_subdirectory(src/VertexBufferManager) # GPU buffer management
 #add_subdirectory(src/SoundManager)     # audio system
