@@ -61,8 +61,8 @@ add_subdirectory(src/Anim)             # animation system
 add_subdirectory(src/Channel)          # engine channels / events
 add_subdirectory(src/EngComps/Physics)          # physics
 add_subdirectory(src/EngComps/Collision)        # collision system
+add_subdirectory(src/EngComps/EngineCameras)    # camera system
 #add_subdirectory(src/Engine)           # core engine
-#add_subdirectory(src/EngineCameras)    # camera system
 #add_subdirectory(src/EngineLights)     # lighting system
 #add_subdirectory(src/RenderMgr)        # renderer manager
 #add_subdirectory(src/VertexBufferManager) # GPU buffer management
