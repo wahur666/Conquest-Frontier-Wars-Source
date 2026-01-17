@@ -14,14 +14,14 @@
 
 //
 
-template< class _Hnd, class _Ty, class _Pr = std::less<_Hnd>, class _A = std::allocator<_Ty> >
-class handlemap 
+template< class _Hnd, class _Ty, class _Pr = std::less<_Hnd>, class _A = std::allocator<std::pair<const _Hnd, _Ty>> >
+class handlemap
 {
 public:	// Interface
 
-	typedef typename std::map< _Hnd, _Ty, _Pr, _A >	database_type;
-	typedef _Ty								value_type;
-	typedef std::pair<_Hnd,_Ty>				pair_type;
+	typedef typename std::map< _Hnd, _Ty, _Pr, _A > database_type;
+	typedef _Ty value_type;
+	typedef std::pair<_Hnd,_Ty> pair_type;
 	typedef typename database_type::iterator			iterator;
 	typedef typename database_type::const_iterator	const_iterator;
 	typedef typename database_type::size_type		size_type;

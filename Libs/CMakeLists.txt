@@ -59,7 +59,7 @@ add_subdirectory(src/DOSFile)          # File I/O
 # -----------------------------
 add_subdirectory(src/Anim)             # animation system
 add_subdirectory(src/Channel)          # engine channels / events
-#add_subdirectory(src/Physics)          # physics
+add_subdirectory(src/EngComps/Physics)          # physics
 #add_subdirectory(src/Collision)        # collision system
 #add_subdirectory(src/Engine)           # core engine
 #add_subdirectory(src/EngineCameras)    # camera system
@@ -67,6 +67,9 @@ add_subdirectory(src/Channel)          # engine channels / events
 #add_subdirectory(src/RenderMgr)        # renderer manager
 #add_subdirectory(src/VertexBufferManager) # GPU buffer management
 #add_subdirectory(src/SoundManager)     # audio system
+#add_subdirectory(src/EngComps/Physics/ODE/Euler)      # missing, ODE physics
+#add_subdirectory(src/EngComps/Physics/ODE/RK4)      # missing, ODE physics
+add_subdirectory(src/EngComps/Physics/ODE/Trap)      # missing, ODE physics
 
 # -----------------------------
 # Tier 2 — Rendering / Shading
@@ -112,7 +115,6 @@ add_subdirectory(src/DAHOTKEY)                 # missing, core hotkey library
 # add_subdirectory(src/movielib) # missing, movie utilities
 # add_subdirectory(src/msgbuffer) # missing, networking
 # add_subdirectory(src/sockets)   # missing, networking
-# add_subdirectory(src/trap)      # missing, ODE physics
 # add_subdirectory(src/ui)        # missing, GUI
 # add_subdirectory(src/wavlib)    # missing, audio utils
 

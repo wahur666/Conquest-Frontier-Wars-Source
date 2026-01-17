@@ -364,6 +364,13 @@ public:
 	}
 };
 
+inline Vector operator*(const Quaternion &q, const Vector &v)
+{
+	// rotate v by q
+	Quaternion qv(v.x, v.y, v.z, 0);  // treat vector as pure quaternion
+	Quaternion res = q * qv * q.get_conjugate();
+	return Vector(res.x, res.y, res.z);
+}
 //
 
 #endif
