@@ -19,6 +19,7 @@ add_custom_target(force_DACOM_rebuild ALL
         COMMAND ${CMAKE_COMMAND} -E echo "Forcing DACOM rebuild"
 )
 add_dependencies(DACOM force_DACOM_rebuild)
+add_subdirectory(src/Anim)
 add_subdirectory(src/DOSFile)
 add_subdirectory(src/System)
 add_subdirectory(src/RenderPipeline/RPUL)

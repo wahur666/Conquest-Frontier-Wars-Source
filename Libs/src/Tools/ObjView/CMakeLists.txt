@@ -8,7 +8,6 @@ project(CmpndView CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
 add_executable(CmpndView WIN32
     ../Common/GetProfileInfo.cpp
     ../Common/Shapes.cpp
@@ -80,4 +79,26 @@ add_custom_command(TARGET CmpndView POST_BUILD
         $<TARGET_FILE:DACOM>
         $<TARGET_FILE_DIR:CmpndView>
         COMMENT "Copying DACOM.dll to executable directory"
+)
+add_dependencies(CmpndView System DosFile x86Math)
+
+add_custom_command(TARGET CmpndView POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:System>
+        $<TARGET_FILE_DIR:CmpndView>
+        COMMENT "Copying System.dll to executable directory"
+)
+
+add_custom_command(TARGET CmpndView POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:DosFile>
+        $<TARGET_FILE_DIR:CmpndView>
+        COMMENT "Copying DosFile.dll to executable directory"
+)
+
+add_custom_command(TARGET CmpndView POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:x86Math>
+        $<TARGET_FILE_DIR:CmpndView>
+        COMMENT "Copying x86Math.dll to executable directory"
 )

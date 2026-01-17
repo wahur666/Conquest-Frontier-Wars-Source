@@ -84,7 +84,7 @@ namespace Animation
 			user_data = NULL;
 		}
 
-		bool operator == (const Target & t)
+		bool equals (const Target & t) const
 		{
 			bool result;
 			if (type == t.type)
