@@ -60,15 +60,15 @@ add_subdirectory(src/DOSFile)          # File I/O
 add_subdirectory(src/Anim)             # animation system
 add_subdirectory(src/Channel)          # engine channels / events
 add_subdirectory(src/EngComps/Physics)          # physics
-#add_subdirectory(src/Collision)        # collision system
+add_subdirectory(src/EngComps/Collision)        # collision system
 #add_subdirectory(src/Engine)           # core engine
 #add_subdirectory(src/EngineCameras)    # camera system
 #add_subdirectory(src/EngineLights)     # lighting system
 #add_subdirectory(src/RenderMgr)        # renderer manager
 #add_subdirectory(src/VertexBufferManager) # GPU buffer management
 #add_subdirectory(src/SoundManager)     # audio system
-#add_subdirectory(src/EngComps/Physics/ODE/Euler)      # missing, ODE physics
-#add_subdirectory(src/EngComps/Physics/ODE/RK4)      # missing, ODE physics
+#add_subdirectory(src/EngComps/Physics/ODE/Euler)      # ODE physics, unused
+#add_subdirectory(src/EngComps/Physics/ODE/RK4)      #  ODE physics, unused
 add_subdirectory(src/EngComps/Physics/ODE/Trap)      # missing, ODE physics
 
 # -----------------------------
@@ -108,9 +108,6 @@ add_subdirectory(src/DAHOTKEY)                 # missing, core hotkey library
 # -----------------------------
 # Legacy / Missing / Discard
 # -----------------------------
-# add_subdirectory(src/COMHeap)  # legacy, discard
-# add_subdirectory(src/MSHeap)   # legacy, discard
-# add_subdirectory(src/FullBuild) # legacy, discard
 # add_subdirectory(src/char)     # missing, DeformView
 # add_subdirectory(src/movielib) # missing, movie utilities
 # add_subdirectory(src/msgbuffer) # missing, networking
