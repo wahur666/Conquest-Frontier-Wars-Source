@@ -23,8 +23,8 @@ VMesh::VMesh(const CollisionMesh * mesh)
 		num_normals = mesh->num_normals;
 		normals = new Vector[num_normals];
 		memcpy(normals, mesh->normals, sizeof(Vector) * num_normals);
-
-		for (int i = 0; i < num_vertices; i++)
+		int i;
+		for (i = 0; i < num_vertices; i++)
 		{
 			vertices[i].p = mesh->vertices[i].p;
 			vertices[i].n = mesh->vertices[i].n;
@@ -107,6 +107,7 @@ void VMesh::compute_vregions(void)
 
 		VPlane * p = vtx->planes;
 		int edges_found = 0;
+		int k;
 		for (k = 0; k < num_vtx_edges; k++)
 		{
 			e = edges + vtx_edges[k];
@@ -124,7 +125,7 @@ void VMesh::compute_vregions(void)
 // Compute edge voronoi regions.
 
 	VEdge * e = edges;
-	for (i = 0; i < num_edges; i++, e++)
+	for (int i = 0; i < num_edges; i++, e++)
 	{
 		e->id = i;
 		e->verts = vertices;
@@ -175,7 +176,7 @@ void VMesh::compute_vregions(void)
 
 // Compute face voronoi regions.
 	VFace * f = faces;
-	for (i = 0; i < num_faces; i++, f++)
+	for (int i = 0; i < num_faces; i++, f++)
 	{
 		f->id = i;
 		f->verts = vertices;

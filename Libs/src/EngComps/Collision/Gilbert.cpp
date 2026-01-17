@@ -165,7 +165,8 @@ static int gjk_backup(const Simplex & simplex)
 
 		int size = set[0];
 		float delta_set = 0.0f;
-		for (int j = 1; j <= size; j++)
+		int j;
+		for (j = 1; j <= size; j++)
 		{
 			int idx = set[j];
 			if (Delta[s][idx] <= 0)
@@ -207,8 +208,8 @@ Vector SolveSimplex(Simplex & s)
 
 	memset(s.lambda, 0, sizeof(float) * 4);	
 	memset(Delta, 0, sizeof(float) * num_subsets * 4);
-
-	for (int i = 0; i < num_subsets; i++)
+	int i;
+	for (i = 0; i < num_subsets; i++)
 	{
 		int * set = Subsets[i];
 		for (int j = 1; j <= set[0]; j++)
@@ -502,6 +503,7 @@ if (GlobalHack)
 
 		// Express x in q's frame for dot products with q's vertices.
 			Vector xq = x * Rq; // NOTE ORDER. Using transpose of Rq.
+			int i;
 			for (i = 0; i < q.num_vertices; i++, qv++)
 			{
 				float xb = dot_product(xq, qv->p);
@@ -622,7 +624,7 @@ for (i = 0; i < s.n; i++)
 
 		int num_up = 0;
 		int num_uq = 0;
-
+		int i;
 		for (i = 0; i < s.n; i++)
 		{
 			bool found = false;
@@ -642,7 +644,7 @@ for (i = 0; i < s.n; i++)
 			}
 
 			found = false;
-			for (j = 0; j < num_uq; j++)
+			for (int j = 0; j < num_uq; j++)
 			{
 				if (s.q[i] == uq[j])
 				{

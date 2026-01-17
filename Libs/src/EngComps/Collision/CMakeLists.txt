@@ -1,9 +1,3 @@
-cmake_minimum_required(VERSION 3.15)
-project(Collision)
-
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # Source and header files
 set(SOURCES
         cmesh.cpp
@@ -39,10 +33,8 @@ target_compile_definitions(Collision PRIVATE
         _WINDOWS
         _USRDLL
         COLLISION_EXPORTS
-        $<CONFIG:Debug>:_DEBUG
-        $<CONFIG:Debug>:DA_ERROR_LEVEL=8
-        $<CONFIG:Release>:NDEBUG
-        $<CONFIG:Release>:DA_ERROR_LEVEL=3
+        $<$<CONFIG:Debug>:_DEBUG;DA_ERROR_LEVEL=8>
+        $<$<CONFIG:Release>:NDEBUG;DA_ERROR_LEVEL=3>
 )
 
 # Link libraries
@@ -56,5 +48,5 @@ target_link_libraries(Collision PRIVATE
 target_compile_options(Collision PRIVATE
         /W3
         /Zi
-        $<CONFIG:Release>:/O2
+        $<$<CONFIG:Release>:/O2>
 )

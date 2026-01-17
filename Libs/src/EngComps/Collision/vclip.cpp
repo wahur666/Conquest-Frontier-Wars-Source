@@ -52,6 +52,7 @@ int vertex_vertex(Feature *& f1, const Vector & r1, const Matrix & R1, Feature *
 
 	Vector xv1 = r1 + R1 * v1->p;
 	p = f2->planes;
+	int i;
 	for (i = 0; i < f2->num_planes; i++, p++)
 	{
 		float d = p->compute_distance(xv1);
@@ -109,6 +110,7 @@ int vertex_edge(Feature *& f1, const Vector & r1, const Matrix & R1, Feature *& 
 	Feature * n1 = NULL;
 
 	p = f1->planes;
+	int i;
 	for (i = 0; i < f1->num_planes; i++, p++)
 	{
 		Feature * n = p->neighbor;
@@ -256,6 +258,7 @@ int vertex_face(Feature *& f1, const Vector & r1, const Matrix & R1, Feature *& 
 // See if any edges containing vertex point toward face.
 //
 	p = f1->planes;
+	int i;
 	for (i = 0; i < f1->num_planes; i++, p++)
 	{
 		VEdge * e = (VEdge *) p->neighbor;
@@ -426,7 +429,8 @@ int edge_edge_subtest(Feature *& f, const Vector & t, const Vector & h, Vector &
 	}
 
 	p++;
-	for (int i = 0; i < 2; i++, p++)
+	int i;
+	for (i = 0; i < 2; i++, p++)
 	{
 		dt = p->compute_distance(t);
 		dh = p->compute_distance(h);
@@ -1064,7 +1068,7 @@ int edge_face(Feature *& f1, const Vector & r1, const Matrix & R1, Feature *& f2
 			VVertex * minv = NULL;
 			VVertex * maxv = NULL;
 
-			i = p - (f2->planes+1);
+			int i = p - (f2->planes+1);
 			if (clip[i] == INSIDE)
 			{
 				break;
@@ -1447,7 +1451,7 @@ void vclip(VMesh & box1, CollisionMesh * _mesh1,
 		}
 	}
 
-	char * features[] = {"vert", "edge", "face"};
+	const char * features[] = {"vert", "edge", "face"};
 
 	if (result == PENETRATION)
 	{

@@ -131,7 +131,6 @@ VBox::VBox(float x, float y, float z)
 	edges[11].t[1] = 4;
 
 	int num_normals = 0;
-
 	VFace * f = faces;
 	for (int i = 0; i < num_faces; i++, f++)
 	{
@@ -146,9 +145,9 @@ VBox::VBox(float x, float y, float z)
 
 		f->normal = num_normals;
 		normals[num_normals++] = n;
-
+		int v;
 	// Find edges.
-		for (int v = 0; v < 3; v++)
+		for (v = 0; v < 3; v++)
 		{
 			int vert0 = f->v[v];
 			int vert1 = f->v[v+1];
@@ -167,7 +166,8 @@ VBox::VBox(float x, float y, float z)
 		int vert0 = f->v[3];
 		int vert1 = f->v[0];
 		VEdge * e = edges;
-		for (int j = 0; j < num_edges; j++, e++)
+		int j;
+		for (j = 0; j < num_edges; j++, e++)
 		{
 			if ((e->v[0] == vert0 && e->v[1] == vert1) || (e->v[0] == vert1 && e->v[1] == vert0))
 			{
@@ -185,7 +185,7 @@ VBox::VBox(float x, float y, float z)
 	}
 
 	VVertex * v = vertices;
-	for (i = 0; i < num_vertices; i++, v++)
+	for (int i = 0; i < num_vertices; i++, v++)
 	{
 		Vector n(0, 0, 0);
 
@@ -204,7 +204,7 @@ VBox::VBox(float x, float y, float z)
 	}
 
 	VEdge * e = edges;
-	for (i = 0; i < num_edges; i++, e++)
+	for (int i = 0; i < num_edges; i++, e++)
 	{
 		Vector n0 = normals[e->t[0]];
 		Vector n1 = normals[e->t[1]];
@@ -268,7 +268,7 @@ void VBox::compute_vregions(void)
 // NOTE THAT SOME OF THESE EDGES ARE UNNECESSARY. CLEAN IT UP LATER.
 //
 	VEdge * e = edges;
-	for (i = 0; i < num_edges; i++, e++)
+	for (int i = 0; i < num_edges; i++, e++)
 	{
 		e->id = i;
 		e->verts = vertices;
@@ -306,7 +306,7 @@ void VBox::compute_vregions(void)
 
 // Compute face voronoi regions.
 	VFace * f = faces;
-	for (i = 0; i < num_faces; i++, f++)
+	for (int i = 0; i < num_faces; i++, f++)
 	{
 		f->id = i;
 		f->verts = vertices;
@@ -495,7 +495,7 @@ void VBox::adjust(float x, float y, float z)
 	}
 
 	VEdge * e = edges;
-	for (i = 0; i < 12; i++, e++)
+	for (int i = 0; i < 12; i++, e++)
 	{
 	// Compute vertex-edge planes.
 		Vertex * v0 = vertices + e->v[0];
@@ -513,7 +513,7 @@ void VBox::adjust(float x, float y, float z)
 	}
 
 	VFace * f = faces;
-	for (i = 0; i < 6; i++, f++)
+	for (int i = 0; i < 6; i++, f++)
 	{
 		Vertex * v0 = vertices + f->v[0];
 
@@ -559,7 +559,7 @@ VCyl::VCyl(float len, float rad)
 
 // Generate edges.
 	VEdge * e = edges;
-	for (i = 0; i < CYL_STEPS; i++, e++)
+	for (int i = 0; i < CYL_STEPS; i++, e++)
 	{
 	// verticals.
 		e->v[0] = i;
@@ -579,6 +579,7 @@ VCyl::VCyl(float len, float rad)
 		e->v[1] = i + CYL_STEPS;
 	}
 #endif
+	int i;
 	for (i = 0; i < CYL_STEPS - 1; i++, e++)
 	{
 	// TOP corners.
@@ -688,17 +689,18 @@ VCyl::VCyl(float len, float rad)
 	{
 		int face_edges_found = 0;
 
+		int vertex;
 	// Find edges.
-		for (int v = 0; v < f->num_verts-1; v++)
+		for (vertex = 0; vertex < f->num_verts-1; vertex++)
 		{
-			int vert0 = f->v[v];
-			int vert1 = f->v[v+1];
+			int vert0 = f->v[vertex];
+			int vert1 = f->v[vertex+1];
 			VEdge * e = edges;
 			for (int j = 0; j < num_edges; j++, e++)
 			{
 				if ((e->v[0] == vert0 && e->v[1] == vert1) || (e->v[0] == vert1 && e->v[1] == vert0))
 				{
-					f->e[v] = j;
+					f->e[vertex] = j;
 					face_edges_found++;
 					break;
 				}
@@ -706,14 +708,14 @@ VCyl::VCyl(float len, float rad)
 		}
 
 	// close the loop.
-		int vert0 = f->v[v];
+		int vert0 = f->v[vertex];
 		int vert1 = f->v[0];
 		VEdge * e = edges;
 		for (int j = 0; j < num_edges; j++, e++)
 		{
 			if ((e->v[0] == vert0 && e->v[1] == vert1) || (e->v[0] == vert1 && e->v[1] == vert0))
 			{
-				f->e[v] = j;
+				f->e[vertex] = j;
 				face_edges_found++;
 				break;
 			}
@@ -875,7 +877,7 @@ VCyl::VCyl(float len, float rad)
 			c += vertices[f->v[j]].p;
 		}
 		c /= f->num_verts;
-		for (j = 0; j < f->num_planes; j++)
+		for (int j = 0; j < f->num_planes; j++)
 		{
 			float d = f->planes[j].compute_distance(c);
 			ASSERT(d >= epsilon);
@@ -898,7 +900,8 @@ void VCyl::adjust(float len, float rad)
 		float bottom = -top;
 
 		VVertex * v = vertices;
-		for (int i = 0; i < CYL_STEPS; i++, v++)
+		int i;
+		for (i = 0; i < CYL_STEPS; i++, v++)
 		{
 			v->p.z = 0;
 			v->p *= scalar;	// scale radius.

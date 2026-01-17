@@ -3883,7 +3883,7 @@ void AdjustCylinder(CollisionMesh * cyl, float length, float radius)
 
 	float half_len = length * 0.5;
 	v = cyl->vertices;
-	for (i = 0; i < 16; i++, v++)
+	for (int i = 0; i < 16; i++, v++)
 	{
 		v->p.z = half_len;
 		(v+16)->p = v->p;
@@ -5147,6 +5147,7 @@ bool TrilistTrilist  (CollisionData & data, const GeometricPrimitive * g1, const
 	int num_tri_cols = 0;
 
 	Triangle * t1 = mesh1->triangles;
+	int i;
 	for (i = 0; i < mesh1->num_triangles; i++, t1++)
 	{
 		const Vector * v0 = xformed + t1->v[0];
@@ -7189,6 +7190,7 @@ bool RayBox(float & t, Vector & p, const Vector & base, const Vector & dir, cons
 	else
 	{
 	// Calculate T distances to candidate planes
+		int i;
 		for (i = 0; i < 3; i++)
 		{
 			if (quadrant[i] != MIDDLE && fabs(direction[i]) > tolerance)
@@ -7303,6 +7305,7 @@ bool RayConvexMesh(float & t, Vector & p, Vector & N, const Vector & base, const
 
 	Triangle * tri = mesh.triangles;
 	float * D = mesh.triangle_d;
+	int i;
 	for (i = 0; i < mesh.num_triangles; i++, tri++, D++)
 	{
 	// vd = ray_direction dot plane_normal.

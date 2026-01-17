@@ -39,12 +39,12 @@ void GenerateCylinder(CollisionMesh * mesh, float len, float radius)
 	float bottom = -top;
 
 	Vertex * v = mesh->vertices;
-	for (i = 0; i < CYL_STEPS; i++, v++)
+	for (int i = 0; i < CYL_STEPS; i++, v++)
 	{
 		v->p.set(circle[i].x, circle[i].y, top);
 	}
 
-	for (i = 0; i < CYL_STEPS; i++, v++)
+	for (int i = 0; i < CYL_STEPS; i++, v++)
 	{
 		v->p.set(circle[i].x, circle[i].y, bottom);
 	}
@@ -57,6 +57,7 @@ void GenerateCylinder(CollisionMesh * mesh, float len, float radius)
 
 // Create radial part.
 	Triangle * t = mesh->triangles;
+	int i;
 	for (i = 0; i < CYL_STEPS - 1; i++)
 	{
 		t->v[0] = i;
@@ -239,6 +240,7 @@ void CollisionMesh::compute_normals(bool convex)
 //
 	Vector * n = normals + num_vertices;
 	Triangle * t = triangles;
+	int i;
 	for (i = 0; i < num_triangles; i++, n++, t++)
 	{
 		Vector r1 = vertices[t->v[1]].p - vertices[t->v[0]].p;
