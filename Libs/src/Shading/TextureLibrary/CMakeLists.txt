@@ -39,12 +39,14 @@ target_link_libraries(TextureLibrary PRIVATE
 target_compile_options(TextureLibrary PRIVATE
         /W3
         /Zi
-        $<$<CONFIG:Release>:/O2;/W4>
+        $<$<CONFIG:Debug>:/Zi /Od>
+        $<$<CONFIG:Release>:/Zi;/O2;/W4>  # Release: keep debug info, optimize)
 )
 
 # Linker options
 target_link_options(TextureLibrary PRIVATE
-        /FORCE:MULTIPLE
+        $<$<CONFIG:Debug>:/DEBUG:FULL>
+        $<$<CONFIG:Release>:/DEBUG:FULL>  # Keep full PDB in Release
 )
 
 

@@ -32,6 +32,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 #include "dacom.h"
 #include "FDump.h"
@@ -461,8 +462,7 @@ DA_HEAP_DEFINE_NEW_OPERATOR(Direct3D_RenderPipeline);
 
 //
 
-
-ID3DXEffect * loadEffectHelper(char* filename,IComponentFactory * DIR)
+ID3DXEffect * loadEffectHelper(const char* filename,IComponentFactory * DIR)
 {
 		//ICOManager *DACOM = DACOM_Acquire();
 		bool tripAssertion = false;
@@ -534,11 +534,11 @@ struct effectList
 	IComponentFactory * fileDir;
 	ID3DXEffect* effect;
 	effectList * next;
-	effectList()
-	{
-		effect = 0;
-		next = 0;
+	effectList() : fileName{}, fileDir(nullptr) {
+		effect = nullptr;
+		next = nullptr;
 	}
+
 	void loadEffect()
 	{
 		if (effect) (effect)->Release();

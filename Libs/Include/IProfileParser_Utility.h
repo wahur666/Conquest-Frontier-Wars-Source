@@ -28,7 +28,7 @@ inline U32 opt_get_u32( ICOManager *DACOM, IProfileParser *_IPP, const char *sec
 	static char buffer[1024+1];
 	COMPTR<IProfileParser> IPP;
 
-	if( (IPP = _IPP) || SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, (void**) &IPP ) ) ) {
+	if(SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, IPP.void_addr() ) ) ) {
 		HANDLE hSection;
 
 		*out_value = def_value;
@@ -85,7 +85,7 @@ inline float opt_get_float( ICOManager *DACOM, IProfileParser *_IPP, const char 
 	static char buffer[1024+1];
 	COMPTR<IProfileParser> IPP;
 
-	if( (IPP = _IPP) || SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, (void**) &IPP ) ) ) {
+	if(SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, IPP.void_addr() ) ) ) {
 		HANDLE hSection;
 
 		*out_value = def_value;
@@ -114,7 +114,7 @@ inline char *opt_get_string( ICOManager *DACOM, IProfileParser *_IPP, const char
 	static char buffer[1024+1];
 	COMPTR<IProfileParser> IPP;
 
-	if( (IPP = _IPP) || SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, (void**) &IPP ) ) ) {
+	if(SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, IPP.void_addr() ) ) ) {
 		HANDLE hSection;
 
 		strncpy( out_value, def_value, max_len );
@@ -136,7 +136,7 @@ inline Vector &opt_get_vector( ICOManager *DACOM, IProfileParser *_IPP, const ch
 	static char buffer[1024+1];
 	COMPTR<IProfileParser> IPP;
 
-	if( (IPP = _IPP) || SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, (void**) &IPP ) ) ) {
+	if(SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, IPP.void_addr() ) ) ) {
 		HANDLE hSection;
 
 		out_value = def_value;

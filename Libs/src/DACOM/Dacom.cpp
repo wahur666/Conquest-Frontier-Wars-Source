@@ -60,9 +60,6 @@ struct ADDED_LIBRARY
 {
 	HINSTANCE instance;                 // Win32 DLL instance
 	C8        base_name[12];            // Short library filename prefix
-	
-	ADDED_LIBRARY *next;                // Used by LList template
-	ADDED_LIBRARY *prev;
 };
 
 //
@@ -72,13 +69,9 @@ struct ADDED_LIBRARY
 struct REGISTERED_OBJECT
 {   
 	IComponentFactory *component;       // Component interface
-	void* *component2;       // Component interface
 	const C8          *interface_name;  // Name of interface
 	U32                priority;        // Implementation priority
 	ADDED_LIBRARY	  *library;		    // may be null if unknown
-	
-	REGISTERED_OBJECT *next;            // Used by LList template
-	REGISTERED_OBJECT *prev;
 };
 
 //
@@ -96,9 +89,8 @@ struct DACOManager : public ICOManager
 	U32 registration_cnt;            // # of components registered by DLLLoad()
 	ADDED_LIBRARY *pCurrentLibrary;	 // temp pointer to DLL being loaded
 	
-	LList <REGISTERED_OBJECT> object_list;
-	LList <ADDED_LIBRARY>     library_list;
-	
+	std::vector<REGISTERED_OBJECT> object_list;
+	std::vector<ADDED_LIBRARY>     library_list;
 	IProfileParser2 * parser;
 	IDAComponent   * innerParser;
 	
@@ -152,8 +144,6 @@ struct DACOManager : public ICOManager
 
 	static BOOL32 __stdcall GetAbsolutePath (C8 *lpOutput, const C8 *lpBaseDir, const C8 *lpInput, LONG lSize);
 
-	DEFMETHOD(PostConstructor)(void);
-
 	std::vector<std::string> ReadAllProfileLines(HANDLE hSection)
 	{
 		std::vector<std::string> lines;
@@ -167,6 +157,24 @@ struct DACOManager : public ICOManager
 
 		return lines;
 	}
+
+	std::string GetDirectoryPath(const std::string& filePath)
+	{
+		size_t lastBackslash = filePath.find_last_of('\\');
+		size_t lastColon = filePath.find_last_of(':');
+
+		size_t pos = std::string::npos;
+		if (lastBackslash != std::string::npos)
+			pos = lastBackslash + 1;
+		else if (lastColon != std::string::npos)
+			pos = lastColon + 1;
+
+		if (pos != std::string::npos)
+			return filePath.substr(0, pos);
+
+		return "";
+	}
+
 };
 
 //--------------------------------------------------------------------------//
@@ -184,6 +192,24 @@ DACOManager::DACOManager (void)
 	initialized = 0;
 	pCurrentLibrary = 0;
 	innerParser = NULL;
+	library_list = {};
+	object_list = {};
+
+	RegisterHeap(this);
+
+	IComponentFactory * factory = CreateProfileParserFactory();
+	RegisterComponent(factory, "IProfileParser");
+	factory->Release();
+
+	factory = CreateProfileParserFactory2();
+	RegisterComponent(factory, "IProfileParser2");
+
+	PROFPARSEDESC2 pdesc;
+	pdesc.inner = &innerParser;
+	pdesc.outer = this;
+	factory->CreateInstance( &pdesc, (void **) &parser );
+
+	factory->Release();
 }
 
 
@@ -206,26 +232,6 @@ GENRESULT DACOManager::QueryInterface (const C8 *interface_name, void **instance
 	
 	return GR_INTERFACE_UNSUPPORTED;
 }
-
-GENRESULT DACOManager::PostConstructor(void) {
-	RegisterHeap(this);
-
-	IComponentFactory * factory = CreateProfileParserFactory();
-	RegisterComponent(factory, "IProfileParser");
-	factory->Release();
-
-	factory = CreateProfileParserFactory2();
-	RegisterComponent(factory, "IProfileParser2");
-
-	PROFPARSEDESC2 pdesc;
-	pdesc.inner = &innerParser;
-	pdesc.outer = this;
-	factory->CreateInstance( &pdesc, (void **) &parser );
-
-	factory->Release();
-	return GR_OK;
-}
-
 
 //--------------------------------------------------------------------------//
 
@@ -271,17 +277,13 @@ GENRESULT DACOManager::CreateInstance (DACOMDESC *descriptor, //)
 		// until creation request is accepted
 		//
 		
-		REGISTERED_OBJECT *obj = NULL;
-		
-		while ((obj = object_list.next(obj)) != NULL)
-		{
-			if (!strcmp(obj->interface_name, descriptor->interface_name))
-            {
-				result = obj->component->CreateInstance(descriptor,
-					instance);
+		for (const auto obj: object_list) {
+			if (!strcmp(obj.interface_name, descriptor->interface_name))
+			{
+				result = obj.component->CreateInstance(descriptor, instance);
 				if (result == GR_OK)
 					break;
-            }
+			}
 		}
 	}
 	
@@ -290,58 +292,34 @@ GENRESULT DACOManager::CreateInstance (DACOMDESC *descriptor, //)
 
 //--------------------------------------------------------------------------//
 //
-GENRESULT DACOManager::RegisterComponent  (IComponentFactory *component, //)
-                                           const C8     *interface_name, 
-                                           U32           priority)
+GENRESULT DACOManager::RegisterComponent(
+	IComponentFactory* component,
+	const C8*          interface_name,
+	U32                priority)
 {
-	//
-	// Validate registration parameters
-	//
-	if ((component      == NULL) ||
-		(interface_name == NULL))
-	{
+	if (component == NULL || interface_name == NULL)
 		return GR_INVALID_PARMS;
-	}
-	
-	//
-	// Allocate new REGISTERED_OBJECT entry, linking it into the list 
-	// just before the first entry with lower or equal priority (if any)
-	//
-	// Higher-priority implementations appear earlier in the list, 
-	// and will be visited first by CreateInstance()
-	//
-	
-	REGISTERED_OBJECT *obj = NULL;
-	
-	while ((obj = object_list.next(obj)) != NULL)
+
+	auto it = object_list.begin();
+	for (; it != object_list.end(); ++it)
 	{
-		if (priority >= obj->priority)
-		{
+		if (priority >= it->priority)
 			break;
-		}
 	}
-	
-	obj = object_list.alloc(obj);
-	
-	obj->priority       = priority;
-	obj->component      = component;
-	obj->interface_name = interface_name;
-	obj->library		= pCurrentLibrary;
-	
-	//
-	// Add a reference to account for the stored obj->component pointer 
-	//
+
+	auto& obj = *object_list.insert(it, REGISTERED_OBJECT{});
+
+	obj.priority       = priority;
+	obj.component      = component;
+	obj.interface_name = interface_name;
+	obj.library        = pCurrentLibrary;
+
 	component->AddRef();
-	
-	//
-	// Increment registration count for this DLL to signal valid component
-	// registration, and return success
-	//
-	
 	++registration_cnt;
-	
+
 	return GR_OK;
 }
+
 
 //--------------------------------------------------------------------------//
 //
@@ -353,31 +331,18 @@ GENRESULT DACOManager::UnregisterComponent(IComponentFactory *component, //)
 	// registration
 	//
 	
-	REGISTERED_OBJECT *obj = NULL;
-	
-	while ((obj = object_list.prev(obj)) != NULL)
+	for (auto it = object_list.rbegin(); it != object_list.rend(); ++it)
 	{
-		//
-		// Component instance must match, as well as interface name 
-		// (if supplied)
-		//
-		
-		if ((obj->component == component) 
-			&&
-			((interface_name == NULL) || 
-			(!strcmp(interface_name, obj->interface_name))))
+		if (it->component == component &&
+			(interface_name == nullptr ||
+			 !std::strcmp(interface_name, it->interface_name)))
 		{
-			//
-			// Release reference before invalidating object pointer
-			//
-			
 			component->Release();
-			
-			object_list.free(obj);
+			object_list.erase(std::next(it).base());
 			return GR_OK;
 		}
 	}
-	
+
 	return GR_INVALID_PARMS;
 }
 
@@ -402,16 +367,14 @@ GENRESULT DACOManager::EnumerateComponents(const C8          *interface_name, //
 	//
 	
 	REGISTERED_OBJECT *obj = NULL;
-	
-	while ((obj = object_list.next(obj)) != NULL)
-	{
+
+	for (auto& o : object_list) {
 		//
 		// Component instance must match, as well as interface name 
 		// (if supplied)
 		//
-		
-		if ((interface_name == NULL) || (!strcmp(interface_name, 
-			obj->interface_name)))
+		obj = &o;   // safe: no mutation during use
+		if ((interface_name == NULL) || (!strcmp(interface_name, obj->interface_name)))
 		{
 			if (!callback(obj->component, 
 				obj->interface_name, 
@@ -458,13 +421,7 @@ GENRESULT DACOManager::AddLibrary(const C8 *DLL_filename)
 	// Allocate new entry for library
 	// 
 	
-	ADDED_LIBRARY *library = library_list.alloc();
-	
-	if (library == NULL)
-	{
-		return GR_OUT_OF_SPACE;
-	}
-	
+
 	//
 	// Attempt to load library
 	//
@@ -472,55 +429,53 @@ GENRESULT DACOManager::AddLibrary(const C8 *DLL_filename)
 	// destroy library entry and return failure
 	//
 	
+	ADDED_LIBRARY library{};   // stack object
+
 	registration_cnt = 0;
-	pCurrentLibrary = library;
-	
-	if( (library->instance = LoadLibrary(DLL_filename)) == NULL ) {
-		GENERAL_NOTICE( TempStr( "DACOM: AddLibrary: Unable to locate DLL '%s', ignoring...\n", DLL_filename ) );
+	pCurrentLibrary  = &library;
+
+	if ((library.instance = LoadLibrary(DLL_filename)) == NULL)
+	{
+		GENERAL_NOTICE(
+		   TempStr("DACOM: AddLibrary: Unable to locate DLL '%s', ignoring...\n",
+				 DLL_filename));
 	}
-	else {
+	else
+	{
 		U32 m, n, b;
-		DACOM_GetDllVersion( DLL_filename, &m, &n, &b );
-		GENERAL_NOTICE( TempStr( "DACOM: AddLibrary: DLL '%s' [%d.%d.%d]\n", DLL_filename, m, n, b ) );
+		DACOM_GetDllVersion(DLL_filename, &m, &n, &b);
+		GENERAL_NOTICE(
+		   TempStr("DACOM: AddLibrary: DLL '%s' [%d.%d.%d]\n",
+				 DLL_filename, m, n, b));
 	}
 
-	pCurrentLibrary = 0;
-	
-	if ((library->instance == NULL) || 
-		(registration_cnt  == 0))
+
+	pCurrentLibrary = nullptr;
+
+	if (library.instance == NULL || registration_cnt == 0)
 	{
-		if (library->instance != NULL)
-		{
-			FreeLibrary(library->instance);
-		}
-		
-		library_list.free(library);
+		if (library.instance != NULL)
+			FreeLibrary(library.instance);
+
 		return GR_GENERIC;
 	}
-	
-	//
-	// Otherwise, determine base filename and copy it to library entry
-	//
-	
+
+	// Rest of the code remains the same...
 	strncpy_s(buffer, DLL_filename, MAX_PATH);
 	buffer[MAX_PATH]=0;
 	GetShortPathName(buffer, buffer, MAX_PATH);
 	_strupr_s(buffer);
-	
-	//
-	// Truncate extension (".DLL"), and remove path prefix ("C:\FOO\");
-	//
-	
+
 	if ((ptr = strrchr(buffer, '\\')) == NULL)
 	{
 		ptr = buffer;
 	}
-	
+
 	if ((ptr = strrchr(ptr, '.')) != NULL)
 	{
 		*ptr = 0;
 	}
-	
+
 	if ((ptr = strrchr(buffer, '\\')) != NULL)
 	{
 		ptr++;
@@ -529,23 +484,13 @@ GENRESULT DACOManager::AddLibrary(const C8 *DLL_filename)
 	{
 		ptr = buffer;
 	}
-	
-	//
-	// Copy up to 8 characters to DLL descriptor
-	// 
-	
+
 	len = strlen(ptr);
-	
 	ptr = ptr + (len - __min(8, len));
-	
-	memcpy(library->base_name,
-		ptr, 
-		sizeof(library->base_name));
-	
-	//
-	// Return success
-	//
-	
+
+	memcpy(library.base_name, ptr, sizeof(library.base_name));
+
+	library_list.push_back(std::move(library));
 	return GR_OK;
 }
 
@@ -610,24 +555,20 @@ GENRESULT DACOManager::RemoveLibrary (const C8 *DLL_filename)
 	// Find library's list entry and destroy it
 	//
 	
-	ADDED_LIBRARY *lib = NULL;
-	
-	while ((lib = library_list.next(lib)) != NULL)
+	for (auto it = library_list.begin(); it != library_list.end(); ++it)
 	{
-		if (!strcmp(ptr, lib->base_name))
+		if (!std::strcmp(ptr, it->base_name))
 		{
-			//
-			// Library entry found; unlink related components, the unload the library module
-			//
-			UnregisterRelatedComponents(lib);
-			
-			FreeLibrary(lib->instance);
-			library_list.free(lib);
-			
+			UnregisterRelatedComponents(&*it);
+
+			if (it->instance != NULL)
+				FreeLibrary(it->instance);
+
+			library_list.erase(it);
 			return GR_OK;
 		}
 	}
-	
+
 	//
 	// Matching library not found -- return failure
 	//
@@ -643,27 +584,15 @@ GENRESULT DACOManager::ShutDown (void)
 	// object- and library-list entries in their inverse order of
 	// creation
 	//
-	
-	REGISTERED_OBJECT *obj;
-	
-	while ((obj = object_list.last()) != NULL)
-	{
-		obj->component->Release();
-		object_list.free(obj);
-	}
-	
-	//
-	// Free all libraries in inverse order of loading
-	//
-	
-	ADDED_LIBRARY *lib;
-	
-	while ((lib = library_list.last()) != NULL)
-	{
-		FreeLibrary(lib->instance);
-		library_list.free(lib);
-	}
-	
+
+	for (auto& obj : object_list)
+		obj.component->Release();
+	object_list.clear();
+
+	for (auto& lib : library_list)
+		if (lib.instance) FreeLibrary(lib.instance);
+	library_list.clear();
+
 	initialized = false;
 
 	return GR_OK;
@@ -696,49 +625,50 @@ GENRESULT DACOManager::SetINIConfig (const C8 *info, U32 flags)
 //--------------------------------------------------------------------------//
 //  path is of form "path\\"
 //
-BOOL32 DACOManager::LoadAllFromDirectory (const C8 *pathName, const C8 *searchName)
+BOOL32 DACOManager::LoadAllFromDirectory(const C8 *pathName, const C8 *searchName)
 {
-	HANDLE          search_handle;
 	WIN32_FIND_DATA found;
-	C8              name_buffer[MAX_PATH+4];
-	C8              filePath[MAX_PATH+4];
-	BOOL			result = 0;
-	const C8 *			tmp;
-	
-	if ((tmp = strrchr(searchName, '\\')) != 0)
-		tmp++;
-	else
-	if ((tmp = strrchr(searchName, ':')) != 0)
-		tmp++;
+	HANDLE search_handle;
+	BOOL result = 0;
 
-	if (tmp)
+	std::string searchNameStr(searchName);
+	std::string pathNameStr(pathName);
+
+	// Extract directory from searchName if it contains a path
+	std::string searchDir = GetDirectoryPath(searchNameStr);
+
+	// Build the search pattern
+	std::string searchPattern;
+	std::string filePath;
+
+	if (!searchDir.empty())
 	{
-		int len = tmp - searchName;
-		memcpy(filePath, searchName, len);
-		filePath[len] = 0;
-
-		strcpy_s(name_buffer, searchName);
+		// searchName contains a path (e.g., "C:\Libs\*.dll")
+		searchPattern = searchNameStr;
+		filePath = searchDir;
 	}
 	else
 	{
-		strcpy_s(name_buffer,pathName);
-		strcat_s(name_buffer,searchName);
-		strcpy_s(filePath,pathName);
+		// searchName is just a pattern (e.g., "*.dll")
+		searchPattern = pathNameStr + searchNameStr;
+		filePath = pathNameStr;
 	}
 
-	search_handle = FindFirstFile(name_buffer, &found);
-	
+	// Ensure filePath ends with backslash
+	if (!filePath.empty() && filePath.back() != '\\')
+		filePath += '\\';
+
+	// Search for files
+	search_handle = FindFirstFile(searchPattern.c_str(), &found);
+
 	if (search_handle != INVALID_HANDLE_VALUE)
 	{
-		result=1;
+		result = 1;
 		do
 		{
-
-			strcpy_s(name_buffer, filePath);
-			strcat_s(name_buffer, found.cFileName);
-			
-			AddLibrary(name_buffer);
-		} 
+			std::string fullPath = filePath + found.cFileName;
+			AddLibrary(fullPath.c_str());
+		}
 		while (FindNextFile(search_handle, &found));
 		
 		FindClose(search_handle);
@@ -951,30 +881,24 @@ BOOL32 DACOManager::GetAbsolutePath (C8 *lpOutput, const C8 *lpBaseDir, const C8
 //--------------------------------------------------------------------------//
 // library is going away, unregister any components that exist inside it
 //
-void DACOManager::UnregisterRelatedComponents (ADDED_LIBRARY *library)
+void DACOManager::UnregisterRelatedComponents(ADDED_LIBRARY* library)
 {
-	//
-	// Search list backwards to release components in inverse order of
-	// registration
-	//
-	
-	REGISTERED_OBJECT *obj = NULL;
-	
-	while ((obj = object_list.prev(obj)) != NULL)
+	for (auto it = object_list.rbegin(); it != object_list.rend(); )
 	{
-		if (obj->library == library)
+		if (it->library == library)
 		{
-			//
-			// Release reference before invalidating object pointer
-			//
-			
-			obj->component->Release();
-			
-			object_list.free(obj);
-			obj = NULL;
+			it->component->Release();
+
+			it = std::vector<REGISTERED_OBJECT>::reverse_iterator(
+					 object_list.erase(std::next(it).base()));
+		}
+		else
+		{
+			++it;
 		}
 	}
-}	
+}
+
 
 
 //
@@ -1051,7 +975,6 @@ extern "C"
 		//
 		
 		static DACOManager manager;
-		manager.PostConstructor();
 
 		//
 		// Return pointer to application-global static instance

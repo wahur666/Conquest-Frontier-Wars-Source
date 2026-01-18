@@ -240,7 +240,8 @@ GENRESULT SystemContainer::LoadSystemComponents (void)
 		if (DACOM->QueryInterface(IID_IProfileParser, parser.void_addr()) != GR_OK)
 			goto Done;
 
-		if ((hSection = parser->CreateSection("System")) == 0)
+		auto a = parser->CreateSection("System");
+		if ((hSection = a) == 0)
 			goto Done;
 
 		while (parser->ReadProfileLine(hSection, line++, buffer, sizeof(buffer)) != 0)
@@ -251,6 +252,9 @@ GENRESULT SystemContainer::LoadSystemComponents (void)
 			ptr = buffer;
 			while (*ptr == ' ' || *ptr == '\t')
 				ptr++;
+			if (*ptr == '[') {
+				goto Done;
+			}
 			if (*ptr == ';' || *ptr == 0)
 				continue;
 			if ((ptr2 = strchr(ptr, '=')) != 0)

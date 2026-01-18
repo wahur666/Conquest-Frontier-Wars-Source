@@ -15,6 +15,8 @@
 */
 //--------------------------------------------------------------------------//
 
+#include <vector>
+#include <string>
 
 #ifndef DACOM_H
 #include "DACOM.h"
@@ -219,10 +221,14 @@ GENRESULT DAComponentInner< Type, Base >::QueryInterface (const C8 *interface_na
 {
 	int i;
 	const _DACOM_INTMAP_ENTRY * interfaces = owner->_GetEntriesIn();
+	std::vector<std::string> interfacess = {};
 
 	for (i = 0; interfaces[i].interface_name; i++)
 	{
-		if (strcmp(interfaces[i].interface_name, interface_name) == 0)
+		interfacess.push_back(interfaces[i].interface_name);
+	}
+	for (auto basic_string: interfacess) {
+		if (strcmp(basic_string.c_str(), interface_name) == 0)
 		{
 			IDAComponent *result;
 

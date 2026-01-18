@@ -14,7 +14,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
+#include <string>
+#include <iostream>
 #include "IProfileParser.h"
 #include "TComponent.h"
 #include "HeapObj.h"
@@ -47,6 +48,7 @@ struct DACOM_NO_VTABLE ProfileParser : public IProfileParser
 	//
 
 	C8 * fileBuffer;
+	std::string strFileBuffer;
 	U32 bufferSize;
 
 
@@ -97,9 +99,6 @@ struct DACOM_NO_VTABLE ProfileParser : public IProfileParser
 
 	const char * getLine (HANDLE hSection, int line)
 	{
-		if (fileBuffer == NULL) {
-			return 0;
-		}
 		return getLine(fileBuffer+((U32)hSection), line);
 	}
 };
@@ -198,16 +197,21 @@ GENRESULT ProfileParser::Initialize (const C8 *fileName, ACCESS access)
 				fileSize = U32(access) & ~0x80000000;
 		}
 
-		if ((fileBuffer = (C8 *) calloc(fileSize+8,1)) != 0)
+		// CHANGED: Allocate without +8 offset, no +1
+		fileBuffer = (C8 *) calloc(fileSize + 1, 1);
+		if (fileBuffer != 0)
 		{
+			// CHANGED: Read directly into fileBuffer, no +1 offset
 			if (bBufferType)
-				memcpy(fileBuffer+1, fileName, fileSize);
+				memcpy(fileBuffer, fileName, fileSize);
 			else
-				::ReadFile(hFile, fileBuffer+1, fileSize, LPDWORD(&bytesRead), 0);
-			::free(oldBuffer);
-			bufferSize = fileSize+1;
+				::ReadFile(hFile, fileBuffer, fileSize, LPDWORD(&bytesRead), 0);
 
-			oldBuffer = fileBuffer+1;
+			::free(oldBuffer);
+			bufferSize = fileSize;
+			strFileBuffer = std::string(fileBuffer, fileSize);
+			// CHANGED: Start from fileBuffer, no +1
+			oldBuffer = fileBuffer;
 			while (*oldBuffer == ' ')
 				oldBuffer++;			// skip white space
 			do
@@ -222,12 +226,9 @@ GENRESULT ProfileParser::Initialize (const C8 *fileName, ACCESS access)
 
 						if (tmp2 == 0 || tmp2 > tmp)
 						{
-							// assume that previous character is not important,
-							// put double 00 for '[', single 0 for ']'
-
-							oldBuffer[-1] = 0;
-							*oldBuffer = 0;		// mark it
-							*tmp = 0;
+							// CHANGED: Mark the '[' directly, no oldBuffer[-1]
+							*oldBuffer = 0;		// mark opening bracket
+							*tmp = 0;			// mark closing bracket
 							oldBuffer = tmp+1;
 						}
 					}
@@ -305,29 +306,31 @@ Done:
 }
 //--------------------------------------------------------------------------//
 //
-const char * ProfileParser::getSection (const char * buffer, int count)
+const char * ProfileParser::getSection(const char * buffer, int count)
 {
-	int len;
+	if (buffer == nullptr)
+		return nullptr;
 
-	while (count>0)
+	while (count > 0)
 	{
-		len = strlen(buffer);
-		buffer += len;
-		if (buffer[1] != 0)		// found a ']'
-		{
+		// Find the next '[' character
+		while (*buffer != '\0' && *buffer != '[')
 			buffer++;
-		}
-		else
-		if (buffer[2] != 0)		// found a '['
-		{
-			count--;
-			buffer += 2;
-		}
-		else
-			return 0;			// end of the line
+
+		// If we hit end of buffer, fail
+		if (*buffer == '\0')
+			return nullptr;
+
+		// We found '[', move past it to point at section name
+		buffer++;
+		count--;
+
+		// If this is the section we want, return pointer to name
+		if (count == 0)
+			return buffer;  // Points to section name (e.g., "System]")
 	}
 
-	return buffer;
+	return nullptr;
 }
 //--------------------------------------------------------------------------//
 //
@@ -442,43 +445,51 @@ BOOL32 ProfileParser2::EnumerateKeys (IProfileCallback * callback, HANDLE hSecti
 HANDLE ProfileParser::CreateSection (const C8 *sectionName, CREATE_MODE mode)
 {
 	HANDLE result = 0;
-
+	const char * buffer = nullptr;  // Declare outside to avoid goto skip
+	fileBuffer = (C8 *)malloc(strFileBuffer.size() + 1);
+	strcpy(fileBuffer, strFileBuffer.c_str());
 	if (mode != PP_OPENEXISTING)
 		goto Done;						// nothing else is supported yet
 	if (fileBuffer == 0)
 		goto Done;						// not initialized?
 
-	//
-	// is requested sectionName already found within buffer?
-	//
+	// Start searching from the beginning
+	buffer = fileBuffer;
 
-	if (sectionName > fileBuffer && sectionName < fileBuffer+bufferSize)
+	// Keep searching for sections
+	while (true)
 	{
-		result = (HANDLE) (sectionName - fileBuffer);
-	}
-	else
-	{	  
-		//
-		// else we must search for the section name 
-		//
-		const char * buffer = fileBuffer;
-
+		// Get the next section (skip to '[')
 		buffer = getSection(buffer, 1);
-		while (buffer)
-		{
-			if (compare(buffer, sectionName) == 0)
-			{
-				result = (HANDLE) (buffer - fileBuffer);
-				goto Done;
-			}
+		if (buffer == nullptr)
+			break;  // No more sections found
 
-			buffer = getSection(buffer, 1);
+		// Find the end of section name (the ']')
+		const char * sectionEnd = strchr(buffer, ']');
+		if (sectionEnd == nullptr)
+			break;  // Malformed section, stop searching
+
+		// Extract section name length
+		int sectionNameLen = sectionEnd - buffer;
+		int inputLen = strlen(sectionName);
+
+		// Compare section names (case-insensitive)
+		if (sectionNameLen == inputLen &&
+			strnicmp(buffer, sectionName, sectionNameLen) == 0)
+		{
+			// Found matching section!
+			result = (HANDLE) (buffer - fileBuffer);
+			goto Done;
 		}
+
+		// Move past the ']' to search for next section
+		buffer = sectionEnd + 1;
 	}
 
-Done:
-	return result;
+	Done:
+		return result;
 }
+
 //--------------------------------------------------------------------------//
 //
 BOOL32 ProfileParser::CloseSection (HANDLE hSection)
