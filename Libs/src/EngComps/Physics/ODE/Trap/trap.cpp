@@ -70,7 +70,6 @@ struct Server : public IComponentFactory
    
 	Server(void)
 	{
-		memset(((C8 *) this)+sizeof(U32), 0, sizeof(*this)-sizeof(U32));
 		ref_cnt = 1;
 	}                            
 
