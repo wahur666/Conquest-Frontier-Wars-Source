@@ -123,7 +123,7 @@ inline HRESULT read_alloc_chunk( IFileSystem *IFS, const char *key, U32 num_elem
 
 		U32 num_bytes = num_elements * sizeof(Type);
 
-		if( IFS->ReadFile( h, buf, num_bytes, &uBytesRead, NULL) && (uBytesRead == num_bytes) ) {
+		if( IFS->ReadFile( h, buf, num_bytes, LPDWORD(&uBytesRead), NULL) && (uBytesRead == num_bytes) ) {
 			IFS->CloseHandle( h );
 			return S_OK;
 		}

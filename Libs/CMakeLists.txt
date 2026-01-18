@@ -67,13 +67,13 @@ add_subdirectory(src/EngComps/Hardpoint)     # Hardpoints
 add_subdirectory(src/EngComps/Property)     # Property
 add_subdirectory(src/EngComps/RenderMgr)     # renderer manager
 add_subdirectory(src/RenderPipeline)     # renderer manager
+add_subdirectory(src/Engine)           # core engine
 
-#add_subdirectory(src/Engine)           # core engine
 #add_subdirectory(src/VertexBufferManager) # GPU buffer management
 #add_subdirectory(src/SoundManager)     # audio system
 #add_subdirectory(src/EngComps/Physics/ODE/Euler)      # ODE physics, unused
 #add_subdirectory(src/EngComps/Physics/ODE/RK4)      #  ODE physics, unused
-add_subdirectory(src/EngComps/Physics/ODE/Trap)      # missing, ODE physics
+add_subdirectory(src/EngComps/Physics/ODE/Trap)      # ODE physics
 
 # -----------------------------
 # Tier 2 — Rendering / Shading
@@ -82,9 +82,9 @@ add_subdirectory(src/RenderPipeline/RPUL)       # render pipeline library
 add_subdirectory(src/Shading/LightManager)     # lighting
 #add_subdirectory(src/Shading/Materials)        # materials
 #add_subdirectory(src/Shading/TextureLibrary)   # textures
-#add_subdirectory(src/RendComp/PolyMesh)        # polygon mesh
-#add_subdirectory(src/RendComp/NURBMesh)        # missing, NURBS library
-#add_subdirectory(src/RendComp/Optics)          # missing, optics library
+add_subdirectory(src/RendComp/PolyMesh)        # polygon mesh
+#add_subdirectory(src/RendComp/NURBMesh)        # NURBS library, Not portable, missing files, not used
+add_subdirectory(src/RendComp/Optics)          # optics library
 #add_subdirectory(src/RendComp/TriMesh)         # missing, triangle mesh library
 
 # -----------------------------

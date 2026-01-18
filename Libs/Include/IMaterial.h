@@ -157,6 +157,7 @@ struct IMaterial : public IDAComponent
 	//
 	virtual GENRESULT COMAPI get_num_passes( U32 *out_num_passes ) = 0;
 
+	void Realize() {}
 };
 
 
