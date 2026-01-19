@@ -41,13 +41,37 @@ target_link_libraries(D3DRenderPipe PRIVATE
 # MSVC compiler options
 target_compile_options(D3DRenderPipe PRIVATE
         /W3
-        /Zi
-        $<$<CONFIG:Release>:/O2;/Oi;/Oy>
+        /Zi                    # Generate debug info (kept for Release too)
+        # Debug-specific flags
+        $<$<CONFIG:Debug>:
+        /O0                # No optimization (critical for debugging)
+        /RTC1              # Runtime error checks (stack frames, uninit vars)
+        /GS                # Buffer security check
+        /Gm-               # Disable incremental compilation (can cause issues)
+        /fp:precise        # Precise floating point (no fast math in debug)
+        /guard:cf          # Control flow guard (catch vtable corruption)
+        >
+        # Release-specific flags
+        $<$<CONFIG:Release>:
+        /O2                # Full optimization
+        /Oi                # Inline intrinsics
+        /Oy-               # Don't omit frame pointers (keeps stack traces valid)
+        /fp:fast           # Fast floating point
+        >
 )
 
 # Linker options
 target_link_options(D3DRenderPipe PRIVATE
         /FORCE:MULTIPLE
+        # Debug-specific linker flags
+        $<$<CONFIG:Debug>:
+        /DEBUG:FULL        # Full debug info
+        /INCREMENTAL:NO    # Disable incremental linking in debug
+        >
+        # Release-specific linker flags
+        $<$<CONFIG:Release>:
+        /DEBUG             # Keep debug info even in Release (for crash dumps)
+        >
 )
 
 target_include_directories(D3DRenderPipe PRIVATE

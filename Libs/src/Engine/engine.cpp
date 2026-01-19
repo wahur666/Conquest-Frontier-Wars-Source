@@ -447,7 +447,9 @@ GENRESULT ENGINE::load_engine_components( struct IDAComponent *system )
 		bool eq_seen = false;
 					
 		char* tok = strtok( buffer, " \t" );
-
+		if (tok != NULL && *tok == '[') {
+			break;
+		}
 		while( tok != NULL ) {
 			if( *tok != ';' ) {
 				if( !ptr ) {

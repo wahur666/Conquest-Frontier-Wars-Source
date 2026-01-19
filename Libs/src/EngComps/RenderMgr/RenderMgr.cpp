@@ -1348,6 +1348,10 @@ GENRESULT RenderMgr::load_render_components (void)
 		// remove leading whitespace
 		for( p = line; *p && (*p == '\t' && *p == ' '); p++ );
 
+		if (*p == '[') {
+			break;
+		}
+
 		// check for comment
 		if( *p == ';' ) {
 			continue;

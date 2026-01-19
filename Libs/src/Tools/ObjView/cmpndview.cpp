@@ -2672,7 +2672,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		GENERAL_TRACE_1 ("Failed to find IID_IMaterialLibrary\n");
 	}
 
-#if _DEBUG
+#if 0 && _DEBUG
 	if( FAILED( System->QueryInterface ( IID_IRenderDebugger, (void**) &RenderDebugger ) ) ) {
 		GENERAL_TRACE_1 ("Failed to find IID_IRenderDebugger\n");
 	}

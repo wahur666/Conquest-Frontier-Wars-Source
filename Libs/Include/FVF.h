@@ -41,14 +41,9 @@ static U32 FVF_OTHER_SIZE[16]	= { 0,		//				|				|				|
 
 struct D3DVERTEX
 {
-	SINGLE nx;
-    SINGLE ny;
-    SINGLE nz;
-    SINGLE tu;
-    SINGLE tv;
-    SINGLE x ;    
-	SINGLE y;
-    SINGLE z ;
+	float x, y, z;
+	float nx, ny, nz;
+	float u, v;
 };
 
 #endif

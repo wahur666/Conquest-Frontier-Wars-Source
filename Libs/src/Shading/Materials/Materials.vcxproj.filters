@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source files">
+      <UniqueIdentifier>{df6ca580-bc0f-4695-971c-856c666b1342}</UniqueIdentifier>
+      <Extensions>*.cpp</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{3caef498-3bd1-425c-9ebe-e3746475edf2}</UniqueIdentifier>
+      <Extensions>*.h</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BaseMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="BumpMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="DcDtBtEcMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="DcDtBtMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="DcDtEcEtMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="DcDtEtMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="EcEtMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="EmbossBumpMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialLibrary.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Materials.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="NullMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="perlin.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProceduralBase.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProceduralManager.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProceduralMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProceduralNoise.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProceduralSwirl.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectionMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Tools\Common\Shapes.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpecularMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="StateMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="ToonShadeMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="TwoSidedMaterial.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseMaterial.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Materials.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="perlin.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProceduralNoise.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProceduralSwirl.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

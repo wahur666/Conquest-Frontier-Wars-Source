@@ -81,7 +81,7 @@ add_subdirectory(src/EngComps/Physics/ODE/Trap)      # ODE physics
 # -----------------------------
 add_subdirectory(src/RenderPipeline/RPUL)       # render pipeline library
 add_subdirectory(src/Shading/LightManager)     # lighting
-#add_subdirectory(src/Shading/Materials)        # materials
+add_subdirectory(src/Shading/Materials)        # materials
 add_subdirectory(src/Shading/TextureLibrary)   # textures
 add_subdirectory(src/RendComp/PolyMesh)        # polygon mesh
 #add_subdirectory(src/RendComp/NURBMesh)        # NURBS library, Not portable, missing files, not used
