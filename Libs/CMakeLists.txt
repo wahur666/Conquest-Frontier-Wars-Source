@@ -88,6 +88,7 @@ add_subdirectory(src/RendComp/PolyMesh)        # polygon mesh
 add_subdirectory(src/RendComp/Optics)          # optics library
 #add_subdirectory(src/RendComp/TriMesh)         # missing, triangle mesh library
 add_subdirectory(src/MaterialManager)
+add_subdirectory(src/TextureManager)
 
 # -----------------------------
 # Tier 3 — Tools / Viewers / Editors
