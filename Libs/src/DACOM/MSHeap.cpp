@@ -16,8 +16,9 @@
 
 #include "BaseHeap.h"
 #include "FDump.h"
-#include "TComponent.h"
+// #include "TComponent.h"
 #include "Malloc.h"
+#include "TComponentSafe.h"
 
 #pragma warning (disable : 4100)		// formal parameter unused
 
@@ -35,20 +36,20 @@ int __cdecl STANDARD_DUMP (ErrorCode code, const C8 *fmt, ...);
 
 //--------------------------------------------------------------------------//
 //
-struct MSHeap : public IHeap
+struct MSHeap : public IHeap, DAComponentSafe<IDAComponent>
 {
 	//
 	// interface mapping
 	//
-	BEGIN_DACOM_MAP_INBOUND(MSHeap)
-	DACOM_INTERFACE_ENTRY(IHeap)
-	DACOM_INTERFACE_ENTRY2(IID_IHeap,IHeap)
-	END_DACOM_MAP()
+	// BEGIN_DACOM_MAP_INBOUND(MSHeap)
+	// DACOM_INTERFACE_ENTRY(IHeap)
+	// DACOM_INTERFACE_ENTRY2(IID_IHeap,IHeap)
+	// END_DACOM_MAP()
 
 	DA_ERROR_HANDLER		pErrorHandler;
 
 	// *** IDAComponent methods ***
-	
+
 	DEFMETHOD(CreateInstance) (DACOMDESC *descriptor, void **instance);
 
    // *** IHeap methods ***
@@ -56,7 +57,7 @@ struct MSHeap : public IHeap
 	DEFMETHOD_(void *,AllocateMemory) (U32 numBytes, const C8 *msg);
 
 	DEFMETHOD_(void *,ClearAllocateMemory) (U32 numBytes, const C8 *msg, U8 initChar);
-	
+
 	DEFMETHOD_(void *,ReallocateMemory) (void *prevBlock, U32 newSize, const C8 *msg);
 
 	DEFMETHOD_(BOOL32,FreeMemory) (void *allocatedBlock);
@@ -68,7 +69,7 @@ struct MSHeap : public IHeap
 	DEFMETHOD_(const C8 *,GetBlockMessage) (void *allocatedBlock);
 
 	DEFMETHOD_(BOOL32,DidAlloc) (void *allocatedBlock);
-	
+
 	DEFMETHOD_(U32,GetAvailableMemory) (void);
 
 	DEFMETHOD_(U32,GetLargestBlock) (void);
@@ -93,6 +94,13 @@ struct MSHeap : public IHeap
 	virtual void * __stdcall malloc_pass_through (const C8 * msg);
 	virtual void * __stdcall realloc_pass_through (const C8 * msg);
 	virtual void * __stdcall calloc_pass_through (const C8 * msg);
+
+	void FinalizeInterfaces()
+	{
+		RegisterInterface("IHeap", "IHeap", static_cast<IHeap*>(this));
+		RegisterInterface("IHeap", IID_IHeap, static_cast<IHeap*>(this));
+	}
+
 };
 //--------------------------------------------------------------------------//
 //----------------------------MSHeap Class Methods--------------------------//
@@ -187,7 +195,7 @@ DA_ERROR_HANDLER MSHeap::SetErrorHandler (DA_ERROR_HANDLER proc)
 	DA_ERROR_HANDLER result = pErrorHandler;
 
 	pErrorHandler = proc;
- 	
+
 	return result;
 }
 //--------------------------------------------------------------------------//
@@ -250,7 +258,9 @@ BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 		{
 			hInstance = hinstDLL;
 
-			HEAP = g_pMSHeap = new DAComponent<MSHeap>;
+			HEAP = g_pMSHeap = new DAComponentSafe<MSHeap>;
+			const auto a = dynamic_cast<MSHeap*>(HEAP);
+			a->FinalizeInterfaces();
 			// Setup the standard error report function.
 			FDUMP = STANDARD_DUMP;
 		}
@@ -265,7 +275,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
    return TRUE;
 }
 
-extern "C" 
+extern "C"
 {
 //--------------------------------------------------------------------------//
 //

@@ -17,9 +17,11 @@
 #include <string>
 #include <iostream>
 #include "IProfileParser.h"
-#include "TComponent.h"
+// #include "TComponent.h"
 #include "HeapObj.h"
 #include <da_heap_utility.h>
+
+#include "TComponentSafe.h"
 
 #ifdef PROFILE_PARSER_IS_CASE_SENSITIVE
 #define compare strcmp
@@ -33,15 +35,11 @@
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
-struct DACOM_NO_VTABLE ProfileParser : public IProfileParser
+struct DACOM_NO_VTABLE ProfileParser : IProfileParser,  DAComponentSafe<IDAComponent>
 {
 	//
 	// interface mapping
 	//
-	BEGIN_DACOM_MAP_INBOUND(ProfileParser)
-	DACOM_INTERFACE_ENTRY(IProfileParser)
-	DACOM_INTERFACE_ENTRY2(IID_IProfileParser,IProfileParser)
-	END_DACOM_MAP()
 
 	//
 	// data items
@@ -97,29 +95,30 @@ struct DACOM_NO_VTABLE ProfileParser : public IProfileParser
 
 	static const char * __fastcall getSection (const char * buffer, int count);
 
-	const char * getLine (HANDLE hSection, int line)
+	const char * getLine (HANDLE hSection, int line) const
 	{
 		return getLine(fileBuffer+((U32)hSection), line);
 	}
+
+	virtual void FinalizeInterfaces(){
+		RegisterInterface("IProfileParser", "IProfileParser",
+						  static_cast<IProfileParser*>(this));
+
+		RegisterInterface("IProfileParser", IID_IProfileParser,
+						  static_cast<IProfileParser*>(this));
+	}
+
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(ProfileParser);
 
 //--------------------------------------------------------------------------//
 //
-struct DACOM_NO_VTABLE ProfileParser2 : public IProfileParser2, ProfileParser
+struct DACOM_NO_VTABLE ProfileParser2 : IProfileParser2, ProfileParser
 {
 	//
 	// interface mapping
 	//
-	BEGIN_DACOM_MAP_INBOUND(ProfileParser2)
-	DACOM_INTERFACE_ENTRY(IProfileParser2)
-	DACOM_INTERFACE_ENTRY(IProfileParser)
-	DACOM_INTERFACE_ENTRY2(IID_IProfileParser2,IProfileParser2)
-	DACOM_INTERFACE_ENTRY2(IID_IProfileParser,IProfileParser)
-	END_DACOM_MAP()
-
-
 	GENRESULT init (PROFPARSEDESC2 * info) { return GR_OK; }
 
 	/* IProfileParser methods */
@@ -156,6 +155,15 @@ struct DACOM_NO_VTABLE ProfileParser2 : public IProfileParser2, ProfileParser
 	virtual BOOL32 __stdcall EnumerateSections (IProfileCallback * callback, void *context);
 
 	virtual BOOL32 __stdcall EnumerateKeys (IProfileCallback * callback, HANDLE hSection, void *context);
+
+
+	void FinalizeInterfaces() override {
+		RegisterInterface("IProfileParser", "IProfileParser", static_cast<IProfileParser*>(this));
+		RegisterInterface("IProfileParser", IID_IProfileParser,static_cast<IProfileParser*>(this));
+		RegisterInterface("IProfileParser2", "IProfileParser2",static_cast<IProfileParser2*>(this));
+		RegisterInterface("IProfileParser2", IID_IProfileParser2,static_cast<IProfileParser2*>(this));
+	}
+
 };
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -169,6 +177,7 @@ void ProfileParser::free (void)
 //
 GENRESULT ProfileParser::Initialize (const C8 *fileName, ACCESS access)
 {
+	FinalizeInterfaces();
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	GENRESULT result = GR_FILE_ERROR;
 	U32 dwAccess = GENERIC_READ;
@@ -601,11 +610,11 @@ U32 ProfileParser::ReadKeyValue (HANDLE hSection, const C8 * keyName, C8 * buffe
 //
 IComponentFactory * CreateProfileParserFactory2 (void)
 {
-	return new DAComponentFactory2<DAComponentAggregate<ProfileParser2>, PROFPARSEDESC2> ("IProfileParser2");
+	return new DAComponentFactorySafe2<DAComponentAggregateSafe<ProfileParser2>, PROFPARSEDESC2> ("IProfileParser2");
 }
 IComponentFactory * CreateProfileParserFactory (void)
 {
-	return new DAComponentFactory2<DAComponentAggregate<ProfileParser>, PROFPARSEDESC> ("IProfileParser");
+	return new DAComponentFactorySafe2<DAComponentAggregateSafe<ProfileParser>, PROFPARSEDESC> ("IProfileParser");
 }
 
 //--------------------------------------------------------------------------//

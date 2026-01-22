@@ -356,7 +356,7 @@ public:	// Interface
 	GENRESULT init(AGGDESC *desc);
 	GENRESULT init(RPUL_DACOMDESC *desc);
 
-	void RegisterInterfaces2() {
+	void FinalizeInterfaces() {
 		RegisterInterface("IRenderPipeline", IID_IRenderPipeline,
 						 static_cast<IRenderPipeline*>(this));
 		RegisterInterface("IRenderPrimitive", IID_IRenderPrimitive,
@@ -371,7 +371,6 @@ public:	// Interface
 #endif
 		RegisterInterface("IAggregateComponent", IID_IAggregateComponent,
 						 static_cast<IAggregateComponent*>(this));
-		interfaces_registered = true;
 	}
 
 protected:	// Interface
@@ -826,8 +825,7 @@ Direct3D_RenderPipeline::~Direct3D_RenderPipeline(void)
 //
 GENRESULT Direct3D_RenderPipeline::init( AGGDESC *desc )
 {
-	if (!interfaces_registered)
-		this->RegisterInterfaces2();
+	FinalizeInterfaces();
 	if( desc->description!=NULL && strlen( desc->description ) > 0 ) {
 		strcpy( ini_device_profile, desc->description );
 	}
