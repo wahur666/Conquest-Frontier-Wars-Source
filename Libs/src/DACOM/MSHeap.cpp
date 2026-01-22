@@ -16,7 +16,6 @@
 
 #include "BaseHeap.h"
 #include "FDump.h"
-// #include "TComponent.h"
 #include "Malloc.h"
 #include "TComponentSafe.h"
 

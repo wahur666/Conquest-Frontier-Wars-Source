@@ -17,7 +17,6 @@
 #include <string>
 #include <iostream>
 #include "IProfileParser.h"
-// #include "TComponent.h"
 #include "HeapObj.h"
 #include <da_heap_utility.h>
 

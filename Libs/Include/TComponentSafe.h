@@ -109,15 +109,15 @@
 
 
 #include <vector>
-#include <string>
 #include <functional>
-#include <typeinfo>
+
+#include "tempstr.h"
 
 #ifndef DACOM_H
 #include "DACOM.h"
 #endif
 
-#include "TComponent.h"
+#include "TComponentx.h"
 
 
 //--------------------------------------------------------------------------//

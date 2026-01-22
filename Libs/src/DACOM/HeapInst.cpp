@@ -17,7 +17,7 @@
 #include <windows.h>
 
 #include "BaseHeap.h"
-#include "TComponent.h"
+#include "TComponentx.h"
 #include "fdump.h"
 
 // NOTE: HeapInstances are now allocated from within their own heap,
