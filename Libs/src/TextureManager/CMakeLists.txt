@@ -28,7 +28,6 @@ target_compile_definitions(TextureManager PRIVATE
 target_link_libraries(TextureManager PRIVATE
         DACOM
         MathLib
-        $<$<CONFIG:Release>:opends60.lib>
 )
 
 

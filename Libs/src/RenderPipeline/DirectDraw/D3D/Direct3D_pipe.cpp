@@ -48,6 +48,7 @@
 #include "IVideoStreamControl.h"
 #include "IRenderDebugger.h"
 #include "RPUL.h"
+#include "TComponentSafe.h"
 
 #include "../../../include/handlemap.h"
 #include "../../../include/Tfuncs.h"
@@ -182,7 +183,8 @@ struct Direct3D_RenderPipeline: IRenderPipeline,
 #if RP_RD_DEBUG
 								IRenderDebugger,
 #endif
-								IAggregateComponent
+								IAggregateComponent,
+								DAComponentSafe<IDAComponent>
 
 {
 public: // Data
@@ -205,10 +207,6 @@ public:	// Interface
 
 	// IRenderPipeline interface
 	//
-
-	static void *operator new(size_t size);
-
-	static void operator delete(void *ptr);
 
 	ID3DXEffect** load_effect(const char * filename, IComponentFactory * DIR);
 	GENRESULT COMAPI create_cube_texture_from_file(const char* filename, IComponentFactory * DIR,U32 &out_htexture);
@@ -353,8 +351,28 @@ public:	// Interface
 	//
 	Direct3D_RenderPipeline(void);
 	~Direct3D_RenderPipeline(void);
+	static void *operator new(size_t size);
+	static void operator delete(void *ptr);
 	GENRESULT init(AGGDESC *desc);
 	GENRESULT init(RPUL_DACOMDESC *desc);
+
+	void RegisterInterfaces2() {
+		RegisterInterface("IRenderPipeline", IID_IRenderPipeline,
+						 static_cast<IRenderPipeline*>(this));
+		RegisterInterface("IRenderPrimitive", IID_IRenderPrimitive,
+						 static_cast<IRenderPrimitive*>(this));
+		RegisterInterface("IDDBackDoor", IID_IDDBackDoor,
+						 static_cast<IDDBackDoor*>(this));
+		RegisterInterface("IGammaControl", IID_IGammaControl,
+						 static_cast<IGammaControl*>(this));
+#if RP_RD_DEBUG
+		RegisterInterface("IRenderDebugger", IID_IRenderDebugger,
+						 static_cast<IRenderDebugger*>(this));
+#endif
+		RegisterInterface("IAggregateComponent", IID_IAggregateComponent,
+						 static_cast<IAggregateComponent*>(this));
+		interfaces_registered = true;
+	}
 
 protected:	// Interface
 
@@ -754,13 +772,13 @@ Direct3D_RenderPipeline::Direct3D_RenderPipeline(void)
 	ini_device_profile[0] = 0;
 	current_device_profile[0] = 0;
 
-	memset( &current_device_info, 0, sizeof(current_device_info) );
+	memset(&current_device_info, 0, sizeof(current_device_info));
 
-//	directdraw = NULL;
-//	directdraw_color_buffers[0] = NULL;
-//	directdraw_color_buffers[1] = NULL;
+	//	directdraw = NULL;
+	//	directdraw_color_buffers[0] = NULL;
+	//	directdraw_color_buffers[1] = NULL;
 	direct3d_device = NULL;
-//	direct3d_depth_buffer = NULL;
+	//	direct3d_depth_buffer = NULL;
 
 	rprd_device_flags = 0;
 	rprd_buffers_flags = 0;
@@ -773,22 +791,22 @@ Direct3D_RenderPipeline::Direct3D_RenderPipeline(void)
 
 	// these are in order of "preference" in case one fails
 	//
-	
-//	device_types.push_back( D3DRPDEVICETYPE( "T&L", "Hardware",		&IID_IDirect3DTnLHalDevice,	0,					DirectXDllName	) );
-//	device_types.push_back( D3DRPDEVICETYPE( "HAL", "Old-Hardware",	&IID_IDirect3DHALDevice,	0,					DirectXDllName	) );
-//	device_types.push_back( D3DRPDEVICETYPE( "SFT", "Software",		&IID_IDirect3DBladeDevice,	D3DRP_DTF_SOFTWARE, BladeDllName	) );
-//	device_types.push_back( D3DRPDEVICETYPE( "MMX", "MMX-Software",	&IID_IDirect3DMMXDevice,	D3DRP_DTF_SOFTWARE, DirectXDllName	) );
-//	device_types.push_back( D3DRPDEVICETYPE( "RGB", "RGB-Software",	&IID_IDirect3DRGBDevice,	D3DRP_DTF_SOFTWARE, DirectXDllName	) );
-//	device_types.push_back( D3DRPDEVICETYPE( "REF", "Reference",	&IID_IDirect3DRefDevice,	D3DRP_DTF_SOFTWARE, DirectXDllName	) );
-//	device_types.push_back( D3DRPDEVICETYPE( "NUL", "Null",			&IID_IDirect3DNullDevice,	D3DRP_DTF_SOFTWARE, DirectXDllName	) );
 
-	
-	//current_device_type = device_types.end(); 
+	//	device_types.push_back( D3DRPDEVICETYPE( "T&L", "Hardware",		&IID_IDirect3DTnLHalDevice,	0,					DirectXDllName	) );
+	//	device_types.push_back( D3DRPDEVICETYPE( "HAL", "Old-Hardware",	&IID_IDirect3DHALDevice,	0,					DirectXDllName	) );
+	//	device_types.push_back( D3DRPDEVICETYPE( "SFT", "Software",		&IID_IDirect3DBladeDevice,	D3DRP_DTF_SOFTWARE, BladeDllName	) );
+	//	device_types.push_back( D3DRPDEVICETYPE( "MMX", "MMX-Software",	&IID_IDirect3DMMXDevice,	D3DRP_DTF_SOFTWARE, DirectXDllName	) );
+	//	device_types.push_back( D3DRPDEVICETYPE( "RGB", "RGB-Software",	&IID_IDirect3DRGBDevice,	D3DRP_DTF_SOFTWARE, DirectXDllName	) );
+	//	device_types.push_back( D3DRPDEVICETYPE( "REF", "Reference",	&IID_IDirect3DRefDevice,	D3DRP_DTF_SOFTWARE, DirectXDllName	) );
+	//	device_types.push_back( D3DRPDEVICETYPE( "NUL", "Null",			&IID_IDirect3DNullDevice,	D3DRP_DTF_SOFTWARE, DirectXDllName	) );
+
+
+	//current_device_type = device_types.end();
 
 	internal_reset_all_caches();
 
-	
-	d3drp_f_flags |= D3DRP_F_CHECK_STARTUP|D3DRP_F_CHECK_CREATE_BUFFERS;
+
+	d3drp_f_flags |= D3DRP_F_CHECK_STARTUP | D3DRP_F_CHECK_CREATE_BUFFERS;
 }
 
 //
@@ -807,7 +825,9 @@ Direct3D_RenderPipeline::~Direct3D_RenderPipeline(void)
 // This is called during normal use.  We are an aggregate.
 //
 GENRESULT Direct3D_RenderPipeline::init( AGGDESC *desc )
-{ 
+{
+	if (!interfaces_registered)
+		this->RegisterInterfaces2();
 	if( desc->description!=NULL && strlen( desc->description ) > 0 ) {
 		strcpy( ini_device_profile, desc->description );
 	}
@@ -4466,17 +4486,17 @@ BOOL COMAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 				break;
 			}
 
-			if( (server1 = new DAComponentFactory2<DAComponentAggregate<Direct3D_RenderPipeline>, AGGDESC>( CLSID_D3D_RenderPipeline )) != NULL ) {
+			if( (server1 = new DAComponentFactorySafe2<DAComponentAggregateSafe<Direct3D_RenderPipeline>, AGGDESC>( CLSID_D3D_RenderPipeline )) != NULL ) {
 				DACOM->RegisterComponent( server1, CLSID_D3D_RenderPipeline, DACOM_LOW_PRIORITY );
 				server1->Release();
 			}
 
-			if( (server1 = new DAComponentFactory2<DAComponentAggregate<Direct3D_RenderPipeline>, AGGDESC>( CLSID_IRenderPipeline )) != NULL ) {
+			if( (server1 = new DAComponentFactorySafe2<DAComponentAggregateSafe<Direct3D_RenderPipeline>, AGGDESC>( CLSID_IRenderPipeline )) != NULL ) {
 				DACOM->RegisterComponent( server1, CLSID_IRenderPipeline, DACOM_LOW_PRIORITY );
 				server1->Release();
 			}
 
-			if( (server1 = new DAComponentFactory<DAComponent<Direct3D_RenderPipeline>, RPUL_DACOMDESC>( "IDAComponent" )) != NULL ) {
+			if( (server1 = new DAComponentFactorySafe<DAComponentSafe<Direct3D_RenderPipeline>, RPUL_DACOMDESC>( "IDAComponent" )) != NULL ) {
 				DACOM->RegisterComponent( server1, "IDAComponent", DACOM_LOW_PRIORITY );
 				server1->Release();
 			}

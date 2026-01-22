@@ -1,0 +1,531 @@
+﻿#ifndef TCOMPONENT_SAFE_H
+#define TCOMPONENT_SAFE_H
+
+#include <vector>
+#include <string>
+#include <functional>
+#include <typeinfo>
+
+#ifndef DACOM_H
+#include "DACOM.h"
+#endif
+
+//--------------------------------------------------------------------------//
+// New Type-Safe Interface Entry System
+//--------------------------------------------------------------------------//
+
+struct DaComInterfaceEntry
+{
+    const char* interface_name;
+    const char* interface_id;
+    std::function<IDAComponent*()> getter;  // Returns properly cast interface pointer
+};
+
+//--------------------------------------------------------------------------//
+// Macro helpers for safe registration (replaces BEGIN_DACOM_MAP_INBOUND, etc.)
+//--------------------------------------------------------------------------//
+
+#define BEGIN_DACOM_MAP_INBOUND_SAFE() \
+    void RegisterInterfaces() override \
+    {
+
+#define DACOM_INTERFACE_ENTRY_SAFE(iface_id, iface_type) \
+    RegisterInterface(#iface_type, iface_id, static_cast<iface_type*>(this));
+
+#define END_DACOM_MAP_SAFE() \
+    }
+
+//--------------------------------------------------------------------------//
+// Base for new-style components - keeps old system intact
+//--------------------------------------------------------------------------//
+
+template <class Type, class Base = IDAComponent>
+struct DAComponentInnerSafe;
+
+template <class Base>
+struct DAComponentSafe : public Base
+{
+    U32 ref_count;
+    bool interfaces_registered;
+
+    // 🔴 NEW: optional delegate (inner component)
+    DAComponentInnerSafe<void>* delegate_inner = nullptr;
+
+    std::vector<DaComInterfaceEntry> interface_registry;
+
+    DAComponentSafe()
+        : ref_count(1), interfaces_registered(false)
+    {}
+
+    virtual ~DAComponentSafe() = default;
+
+    virtual void RegisterInterfaces()
+    {
+        interfaces_registered = true;
+    }
+
+    void FinalizeInterfaces()
+    {
+        if (!interfaces_registered)
+            RegisterInterfaces();
+    }
+
+    template<typename InterfaceType>
+    void RegisterInterface(const char* name,
+                           const char* iid,
+                           InterfaceType* ptr)
+    {
+        if (delegate_inner)
+        {
+            delegate_inner->RegisterInterface(name, iid, ptr);
+            return;
+        }
+
+        interface_registry.push_back({
+            name,
+            iid,
+            [ptr]() -> IDAComponent* {
+                return static_cast<IDAComponent*>(ptr);
+            }
+        });
+    }
+
+    void SetDelegateInner(void* inner)
+    {
+        delegate_inner = static_cast<DAComponentInnerSafe<void>*>(inner);
+    }
+
+    /* IDAComponent */
+
+    DEFMETHOD(QueryInterface)(const C8* name, void** out) override
+    {
+        if (!name || !out) return GR_INVALID_PARAM;
+
+        for (auto& e : interface_registry)
+        {
+            if (strcmp(e.interface_name, name) == 0)
+            {
+                auto* r = e.getter();
+                r->AddRef();
+                *out = r;
+                return GR_OK;
+            }
+        }
+
+        *out = nullptr;
+        return GR_INTERFACE_UNSUPPORTED;
+    }
+
+    DEFMETHOD(QueryInterface2)(const C8* id, void** out)
+    {
+        if (!id || !out) return GR_INVALID_PARAM;
+
+        for (auto& e : interface_registry)
+        {
+            if (strcmp(e.interface_id, id) == 0)
+            {
+                auto* r = e.getter();
+                r->AddRef();
+                *out = r;
+                return GR_OK;
+            }
+        }
+
+        *out = nullptr;
+        return GR_INTERFACE_UNSUPPORTED;
+    }
+
+    DEFMETHOD_(U32,AddRef)(void) override { return ++ref_count; }
+
+    DEFMETHOD_(U32,Release)(void) override
+    {
+        if (--ref_count == 0)
+        {
+            ref_count++;
+            delete this;
+            return 0;
+        }
+        return ref_count;
+    }
+
+    static const _DACOM_INTMAP_ENTRY* __stdcall _GetEntriesIn()
+    {
+        static const _DACOM_INTMAP_ENTRY e[] = { { nullptr, 0 } };
+        return e;
+    }
+};
+
+
+//--------------------------------------------------------------------------//
+// Debug version of Safe Component
+//--------------------------------------------------------------------------//
+
+template <class Base>
+struct DADebugComponentSafe : public DAComponentSafe<Base>
+{
+    DEFMETHOD_(U32,AddRef)(void)
+    {
+        U32 ret = DAComponentSafe<Base>::AddRef();
+        GENERAL_TRACE_1(TempStr("AddRef %d\n", ret));
+        return ret;
+    }
+
+    DEFMETHOD_(U32,Release)(void)
+    {
+        U32 ret = DAComponentSafe<Base>::Release();
+        GENERAL_TRACE_1(TempStr("Release %d\n", ret));
+        return ret;
+    }
+};
+
+//--------------------------------------------------------------------------//
+// Safe Component Factory Base
+//--------------------------------------------------------------------------//
+
+template <class ClassType, class DescType>
+struct DACOM_NO_VTABLE DAComponentFactoryBaseSafe : public IComponentFactory
+{
+    U32 ref_count;
+    const char* className;
+
+    DAComponentFactoryBaseSafe(const char* _className)
+        : ref_count(1), className(_className)
+    {
+        if (className == nullptr)
+            className = "IDAComponent";
+    }
+
+    virtual ~DAComponentFactoryBaseSafe(void) = default;
+
+    DEFMETHOD(QueryInterface) (const C8 *interface_name, void **instance);
+    DEFMETHOD_(U32,AddRef)           (void);
+    DEFMETHOD_(U32,Release)          (void);
+};
+
+//--------------------------------------------------------------------------//
+
+template <class ClassType, class DescType>
+GENRESULT DAComponentFactoryBaseSafe<ClassType,DescType>::QueryInterface(const C8 *interface_name, void **instance)
+{
+    if (!interface_name || !instance)
+        return GR_INVALID_PARAM;
+
+    *instance = nullptr;
+    if (strcmp(interface_name, "IComponentFactory") != 0)
+        return GR_INTERFACE_UNSUPPORTED;
+
+    *instance = this;
+    AddRef();
+    return GR_OK;
+}
+
+template <class ClassType, class DescType>
+U32 DAComponentFactoryBaseSafe<ClassType,DescType>::AddRef(void)
+{
+    return ++ref_count;
+}
+
+template <class ClassType, class DescType>
+U32 DAComponentFactoryBaseSafe<ClassType,DescType>::Release(void)
+{
+    if (ref_count > 0)
+        ref_count--;
+
+    if (ref_count == 0)
+    {
+        ref_count++;  // prevent infinite loops
+        delete this;
+        return 0;
+    }
+
+    return ref_count;
+}
+
+//--------------------------------------------------------------------------//
+// Safe Aggregate Component Implementation
+//--------------------------------------------------------------------------//
+
+template <class Type, class Base>
+struct DAComponentInnerSafe : public Base
+{
+    U32 ref_count;
+    Type* owner;
+    std::vector<DaComInterfaceEntry> interface_registry;
+    bool interfaces_registered;
+
+    DAComponentInnerSafe(Type* _owner)
+        : ref_count(1), owner(_owner), interfaces_registered(false)
+    {
+        // Don't call RegisterInterfaces here
+    }
+
+    virtual ~DAComponentInnerSafe(void) = default;
+
+    virtual void RegisterInterfaces(void)
+    {
+        // Derived classes populate interface_registry
+        interfaces_registered = true;
+    }
+
+    // Call this after owner is fully initialized
+    void FinalizeInterfaces()
+    {
+        if (!interfaces_registered && owner)
+        {
+            owner->RegisterInterfaces();
+        }
+    }
+
+    DEFMETHOD(QueryInterface) (const C8 *interface_name, void **instance);
+    DEFMETHOD_(U32,AddRef)           (void);
+    DEFMETHOD_(U32,Release)          (void);
+
+    // Legacy support for factories
+    static const _DACOM_INTMAP_ENTRY* __stdcall _GetEntriesIn()
+    {
+        static const _DACOM_INTMAP_ENTRY _entries[] = { {nullptr, 0} };
+        return _entries;
+    }
+
+    template<typename InterfaceType>
+    void RegisterInterface(const char* iface_name, const char* iface_id, InterfaceType* ptr)
+    {
+        interface_registry.push_back({
+            iface_name,
+            iface_id,
+            [ptr]() -> IDAComponent* {
+                return static_cast<IDAComponent*>(ptr);
+            }
+        });
+    }
+};
+
+template <class Type, class Base>
+GENRESULT DAComponentInnerSafe<Type, Base>::QueryInterface(
+    const C8* interface_name, void** instance)
+{
+    if (!interface_name || !instance)
+        return GR_INVALID_PARAM;
+
+    for (const auto& entry : interface_registry)
+    {
+        if (entry.interface_id &&
+            strcmp(entry.interface_id, interface_name) == 0)
+        {
+            IDAComponent* result = entry.getter();
+            if (result)
+            {
+                result->AddRef();
+                *instance = result;
+                return GR_OK;
+            }
+        }
+    }
+
+    *instance = nullptr;
+    return GR_INTERFACE_UNSUPPORTED;
+}
+
+template <class Type, class Base>
+U32 DAComponentInnerSafe<Type, Base>::AddRef(void)
+{
+    return ++ref_count;
+}
+
+template <class Type, class Base>
+U32 DAComponentInnerSafe<Type, Base>::Release(void)
+{
+    if (ref_count > 0)
+        ref_count--;
+
+    if (ref_count == 0)
+    {
+        ref_count++;   // prevent recursion
+        delete owner;
+        return 0;
+    }
+
+    return ref_count;
+}
+
+//--------------------------------------------------------------------------//
+// Safe Aggregate Component - replaces DAComponentAggregate
+//--------------------------------------------------------------------------//
+
+template <class Base>
+struct DAComponentAggregateSafe : public Base
+{
+    IDAComponent* outerComponent;
+    DAComponentInnerSafe<DAComponentAggregateSafe<Base>> innerComponent;
+
+    DAComponentAggregateSafe(AGGDESC* desc)
+        : innerComponent(this)
+    {
+        if ((outerComponent = desc->outer) == nullptr)
+            outerComponent = &innerComponent;
+        else if (desc->inner)
+            *desc->inner = &innerComponent;
+
+        static_cast<DAComponentAggregateSafe<Base>*>(this)
+            ->SetDelegateInner(&innerComponent);
+
+    }
+
+    DAComponentAggregateSafe()
+        : innerComponent(this), outerComponent(&innerComponent)
+    {
+    }
+
+    virtual ~DAComponentAggregateSafe() = default;
+
+    // Derived class override
+    virtual void RegisterInterfaces() {}
+
+    // QI always routed to inner
+    DEFMETHOD(QueryInterface)(const C8* n, void** i) override
+    {
+        return outerComponent->QueryInterface(n, i);
+    }
+
+    DEFMETHOD_(U32,AddRef)(void) override
+    {
+        return outerComponent->AddRef();
+    }
+
+    DEFMETHOD_(U32,Release)(void) override
+    {
+        return outerComponent->Release();
+    }
+
+    template<typename InterfaceType>
+    void RegisterInterface(const char* name,
+                           const char* iid,
+                           InterfaceType* ptr)
+    {
+        innerComponent.RegisterInterface(name, iid, ptr);
+    }
+
+    static const _DACOM_INTMAP_ENTRY* __stdcall _GetEntriesIn()
+    {
+        static const _DACOM_INTMAP_ENTRY e[] = { { nullptr, 0 } };
+        return e;
+    }
+};
+
+//--------------------------------------------------------------------------//
+// Safe Component Factory - replaces DAComponentFactory
+// For ClassType that has a parameterless constructor
+//--------------------------------------------------------------------------//
+
+template <class ClassType, class DescType>
+struct DAComponentFactorySafe : public DAComponentFactoryBaseSafe<ClassType,DescType>
+{
+    DAComponentFactorySafe(const char* _className)
+        : DAComponentFactoryBaseSafe<ClassType,DescType>(_className)
+    {
+    }
+
+    DEFMETHOD(CreateInstance) (DACOMDESC *descriptor, void **instance);
+};
+
+template <class ClassType, class DescType>
+GENRESULT DAComponentFactorySafe<ClassType,DescType>::CreateInstance(DACOMDESC *descriptor, void **instance)
+{
+    GENRESULT result = GR_OK;
+    ClassType *pNewInstance = nullptr;
+    DescType *lpDesc = (DescType *)descriptor;
+
+    if (!descriptor || !instance)
+    {
+        if (instance)
+            *instance = nullptr;
+        return GR_INVALID_PARAM;
+    }
+
+    // Verify descriptor
+    if ((lpDesc->size != sizeof(*lpDesc)) || strcmp(lpDesc->interface_name, this->className) != 0)
+    {
+        result = GR_INTERFACE_UNSUPPORTED;
+        goto Done;
+    }
+
+    // Create instance
+    pNewInstance = new ClassType();
+    if (pNewInstance == nullptr)
+    {
+        result = GR_OUT_OF_MEMORY;
+        goto Done;
+    }
+
+    // Initialize
+    if ((result = pNewInstance->init(lpDesc)) != GR_OK)
+    {
+        delete pNewInstance;
+        pNewInstance = nullptr;
+    }
+
+Done:
+    *instance = pNewInstance;
+    return result;
+}
+
+//--------------------------------------------------------------------------//
+// Safe Component Factory 2 - replaces DAComponentFactory2
+// For ClassType that requires a DescType parameter in constructor
+//--------------------------------------------------------------------------//
+
+template <class ClassType, class DescType>
+struct DAComponentFactorySafe2 : public DAComponentFactoryBaseSafe<ClassType,DescType>
+{
+    DAComponentFactorySafe2(const char* _className)
+        : DAComponentFactoryBaseSafe<ClassType,DescType>(_className)
+    {
+    }
+
+    DEFMETHOD(CreateInstance) (DACOMDESC *descriptor, void **instance);
+};
+
+template <class ClassType, class DescType>
+GENRESULT DAComponentFactorySafe2<ClassType,DescType>::CreateInstance(DACOMDESC *descriptor, void **instance)
+{
+    GENRESULT result = GR_OK;
+    ClassType *pNewInstance = nullptr;
+    DescType *lpDesc = (DescType *)descriptor;
+
+    if (!descriptor || !instance)
+    {
+        if (instance)
+            *instance = nullptr;
+        return GR_INVALID_PARMS;
+    }
+
+    // Verify descriptor
+    if ((lpDesc->size != sizeof(*lpDesc)) || strcmp(lpDesc->interface_name, this->className) != 0)
+    {
+        result = GR_INTERFACE_UNSUPPORTED;
+        goto Done;
+    }
+
+    // Create instance with descriptor parameter
+    pNewInstance = new ClassType(lpDesc);
+    if (pNewInstance == nullptr)
+    {
+        result = GR_OUT_OF_MEMORY;
+        goto Done;
+    }
+
+    // Initialize
+    if ((result = pNewInstance->init(lpDesc)) != GR_OK)
+    {
+        if (lpDesc->inner)
+            *(lpDesc->inner) = nullptr;
+        delete pNewInstance;
+        pNewInstance = nullptr;
+    }
+
+Done:
+    *instance = pNewInstance;
+    return result;
+}
+
+#endif // TCOMPONENT_SAFE_H

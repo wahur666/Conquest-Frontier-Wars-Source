@@ -45,6 +45,22 @@ if (WIN32)
     )
 endif()
 
+# ========== ADD CORROSION HERE ==========
+#include(FetchContent)
+#FetchContent_Declare(
+#        Corrosion
+#        GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
+#        GIT_TAG v0.6
+#)
+#FetchContent_MakeAvailable(Corrosion)
+
+# Import Rust components
+#corrosion_import_crate(
+#        MANIFEST_PATH "${CMAKE_CURRENT_SOURCE_DIR}/rust-components/com-rom-rs/Cargo.toml"
+#        CRATES com_rom_rs
+#)
+# ========== END CORROSION ==========
+
 # -----------------------------
 # Tier 0 — Low-level / Core
 # -----------------------------
@@ -53,6 +69,10 @@ add_subdirectory(src/x86Math/mathlib)  # SIMD/x86 intrinsics
 add_subdirectory(src/DACOM)            # messaging / COM wrappers
 add_subdirectory(src/System)           # OS utilities
 add_subdirectory(src/DOSFile)          # File I/O
+
+# ========== LINK DACOM TO RUST HERE ==========
+#corrosion_link_libraries(com_rom_rs DACOM)
+# ========== END DACOM LINKING ==========
 
 # -----------------------------
 # Tier 1 — Engine Components

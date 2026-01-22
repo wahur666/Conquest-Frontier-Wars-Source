@@ -475,8 +475,6 @@ struct AGGDESC : public DACOMDESC
 
 struct DACOM_NO_VTABLE IDAComponent
 {
-	virtual ~IDAComponent() = default;
-
 	DEFMETHOD(QueryInterface)(const C8 *interface_name, void **instance) = 0;
 	
 	DEFMETHOD_(U32,AddRef)           (void) = 0;

@@ -35,7 +35,7 @@ public: // Interface
 
 	EngineCameraArchetype();
 	EngineCameraArchetype( const EngineCameraArchetype &ra );
-	~EngineCameraArchetype() override;
+	~EngineCameraArchetype();
 	EngineCameraArchetype &operator=( const EngineCameraArchetype &ra );
 
 	bool load_from_filesystem( IFileSystem *ifs );
