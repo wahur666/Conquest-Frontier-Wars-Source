@@ -70,6 +70,7 @@ add_subdirectory(src/RenderPipeline)     # renderer manager
 add_subdirectory(src/RenderBatcher)     # render batcher
 add_subdirectory(src/Engine)           # core engine
 add_subdirectory(src/MeshManager) # Mesh manager
+add_subdirectory(src/Streamer) # Streamer
 #add_subdirectory(src/VertexBufferManager) # GPU buffer management
 #add_subdirectory(src/SoundManager)     # audio system
 #add_subdirectory(src/EngComps/Physics/ODE/Euler)      # ODE physics, unused
