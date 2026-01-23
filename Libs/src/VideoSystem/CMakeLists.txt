@@ -19,7 +19,7 @@ target_link_libraries(VideoSystem PRIVATE
         DACOM
         odbc32
         odbccp32
-#        binkw32 # this is missing, since it is propitiatory 
+#        binkw32 # this is missing, since it is propitiatory
         $<$<CONFIG:Release>:Strmiids>
 )
 

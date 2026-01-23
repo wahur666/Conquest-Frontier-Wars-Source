@@ -246,8 +246,7 @@ public:
 		return scale_by_reciprocal(s);
 	}
 
-	inline const bool operator == (const Vector & v)
-	{
+	bool operator ==(const Vector &v) const {
 		return (x == v.x && y == v.y && z == v.z);
 	}
 

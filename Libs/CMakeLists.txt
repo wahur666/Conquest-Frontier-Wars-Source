@@ -73,7 +73,6 @@ add_subdirectory(src/MeshManager) # Mesh manager
 add_subdirectory(src/Streamer) # Streamer
 add_subdirectory(src/StringTable) # string table
 add_subdirectory(src/VertexBufferManager) # GPU buffer management
-#add_subdirectory(src/SoundManager)     # audio system
 #add_subdirectory(src/EngComps/Physics/ODE/Euler)      # ODE physics, unused
 #add_subdirectory(src/EngComps/Physics/ODE/RK4)      #  ODE physics, unused
 add_subdirectory(src/EngComps/Physics/ODE/Trap)      # ODE physics
@@ -98,32 +97,9 @@ add_subdirectory(src/TextureManager)
 # -----------------------------
 add_subdirectory(src/Viewer/Docuview)          # viewer/debugger
 add_subdirectory(src/Tools/ObjView)            # model viewer
-#add_subdirectory(src/Tools/HotkeyEditor)      # hotkey editor
-#add_subdirectory(src/Tools/ParticleEditor)    # particle editor
-#add_subdirectory(src/Tools/ResTool)           # resource tool
 add_subdirectory(src/Tools/adb)               # internal tools
-#add_subdirectory(src/Tools/PropEdit)          # property editor
-#add_subdirectory(src/Tools/TreeView)          # GUI helper
-#add_subdirectory(src/Tools/ViewUTF)           # UTF test app
-#add_subdirectory(src/Tools/utftool)           # UTF tools
-#add_subdirectory(src/Tools/dainfo)            # misc tools
-#add_subdirectory(src/Tools/dbgtee)            # logging tools
-#add_subdirectory(src/Tools/mergeanm)          # animation merging
-#add_subdirectory(src/Tools/Pack)              # missing, packaging tool
-#add_subdirectory(src/Tools/ParticleEditor)    # duplicated, can remove if already added
 add_subdirectory(src/DAHOTKEY)                 # missing, core hotkey library
-#add_subdirectory(src/Tools/txmlib)            # missing, XML library
-#add_subdirectory(src/Tools/asciiexp)          # missing, 3DS exporter
-
-# -----------------------------
-# Legacy / Missing / Discard
-# -----------------------------
-# add_subdirectory(src/char)     # missing, DeformView
-# add_subdirectory(src/movielib) # missing, movie utilities
-# add_subdirectory(src/msgbuffer) # missing, networking
-# add_subdirectory(src/sockets)   # missing, networking
-# add_subdirectory(src/ui)        # missing, GUI
-# add_subdirectory(src/wavlib)    # missing, audio utils
+add_subdirectory(src/ParticleEffect)    # particle effects
 
 add_executable(CFW_Rebuild
         main.cpp
