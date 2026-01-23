@@ -72,7 +72,7 @@ add_subdirectory(src/Engine)           # core engine
 add_subdirectory(src/MeshManager) # Mesh manager
 add_subdirectory(src/Streamer) # Streamer
 add_subdirectory(src/StringTable) # string table
-#add_subdirectory(src/VertexBufferManager) # GPU buffer management
+add_subdirectory(src/VertexBufferManager) # GPU buffer management
 #add_subdirectory(src/SoundManager)     # audio system
 #add_subdirectory(src/EngComps/Physics/ODE/Euler)      # ODE physics, unused
 #add_subdirectory(src/EngComps/Physics/ODE/RK4)      #  ODE physics, unused
