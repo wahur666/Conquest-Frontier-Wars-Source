@@ -4,14 +4,7 @@ project(CFW_Rebuild LANGUAGES CXX)
 
 # ---- Global toolchain policy ----
 if (MSVC)
-    # No MFC, no COM heap hacks, no legacy nonsense
     set(CMAKE_MFC_FLAG 0)
-
-#    # Single, consistent CRT
-#    set(CMAKE_MSVC_RUNTIME_LIBRARY
-#            "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-#    )
-
     add_compile_options(
             /permissive-
             /Zc:__cplusplus
