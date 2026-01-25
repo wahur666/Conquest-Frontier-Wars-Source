@@ -16,7 +16,7 @@
 
 #include "SearchPath.h"
 #include "FileSys.h"
-#include "TComponent.h"
+#include "TComponentSafe.h"
 #include "TSmartPointer.h"
 
 #include "da_heap_utility.h"
@@ -26,14 +26,8 @@ extern ICOManager *DACOM;
 //----------------------SearchPath implementation---------------------------//
 //--------------------------------------------------------------------------//
 //
-struct DACOM_NO_VTABLE DAPath : public ISearchPath
+struct DACOM_NO_VTABLE DAPath : public ISearchPath, DAComponentSafe<IDAComponent>
 {
-	BEGIN_DACOM_MAP_INBOUND(DAPath)
-	DACOM_INTERFACE_ENTRY(ISearchPath)
-	DACOM_INTERFACE_ENTRY(IComponentFactory)
-	DACOM_INTERFACE_ENTRY2(IID_ISearchPath,ISearchPath)
-	DACOM_INTERFACE_ENTRY2(IID_IComponentFactory,IComponentFactory)
-	END_DACOM_MAP()
 
 	//--------------------------
 	// data items
@@ -50,6 +44,7 @@ struct DACOM_NO_VTABLE DAPath : public ISearchPath
 
 	GENRESULT init (SEARCHPATHDESC * desc)
 	{
+		FinalizeInterfaces();
 		return GR_OK;
 	}
 
@@ -80,6 +75,19 @@ static bool createFileSystem (IComponentFactory * factory, char * buffer, IFileS
 
 static int __stdcall parse (char * buffer, COMPTR<IFileSystem> * & ptrs, int recurseCount=0);
 
+	void FinalizeInterfaces()
+	{
+		RegisterInterface("DAPath", "ISearchPath",
+						  static_cast<ISearchPath*>(this));
+
+		RegisterInterface("DAPath", "IComponentFactory",
+						  static_cast<IComponentFactory*>(this));
+		RegisterInterface("DAPath", IID_ISearchPath,
+						  static_cast<ISearchPath*>(this));
+
+		RegisterInterface("DAPath", IID_IComponentFactory,
+						  static_cast<IComponentFactory*>(this));
+	}
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(DAPath);
@@ -223,7 +231,7 @@ U32 DAPath::GetPath (C8 *buffer, U32 bufferSize) const
 //
 IComponentFactory * CreateSearchPathFactory (void)
 {
-	return new DAComponentFactory<DAComponent<DAPath>, SEARCHPATHDESC> ("ISearchPath");
+	return new DAComponentFactorySafe<DAComponentSafe<DAPath>, SEARCHPATHDESC> ("ISearchPath");
 }
 //----------------------------------------------------------------------------//
 //-------------------------------End SearchPath.cpp---------------------------//

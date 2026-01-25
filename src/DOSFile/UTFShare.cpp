@@ -94,15 +94,6 @@ struct DACOM_NO_VTABLE SharedUTF : public BaseUTF, IUTFWriter
 	// "hint" members that can be adjusted by user
 	U32					UTF_EXTRA_ENTRIES, UTF_EXTRA_NAME_SPACE;
 
-	//
-	// interface map
-	//
-	BEGIN_DACOM_MAP_INBOUND(SharedUTF)
-	DACOM_INTERFACE_ENTRY(IFileSystem)
-	DACOM_INTERFACE_ENTRY2(IID_IFileSystem,IFileSystem)
-	DACOM_INTERFACE_ENTRY(IUTFWriter)
-	DACOM_INTERFACE_ENTRY2(IID_IUTFWriter,IUTFWriter)
-	END_DACOM_MAP()
 
 	//---------------------------
 	// public methods
@@ -293,6 +284,22 @@ struct DACOM_NO_VTABLE SharedUTF : public BaseUTF, IUTFWriter
 	UTF_SHARED_FF * __fastcall GetFF (HANDLE handle);
 	
 	BOOL32 __fastcall isValidHandle (HANDLE handle);
+
+	bool initialized = false;
+	void FinalizeInterfaces()
+	{
+		if (initialized) return;
+		RegisterInterface("SharedUTF", "IFileSystem",
+						  static_cast<IFileSystem*>(this));
+		RegisterInterface("SharedUTF", IID_IFileSystem,
+						  static_cast<IFileSystem*>(this));
+		RegisterInterface("SharedUTF", "IUTFWriter",
+								  static_cast<IUTFWriter*>(this));
+		RegisterInterface("SharedUTF", IID_IUTFWriter,
+						  static_cast<IUTFWriter*>(this));
+		initialized = true;
+	}
+
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(SharedUTF)
@@ -399,6 +406,7 @@ Error:
 //
 BOOL SharedUTF::init (DAFILEDESC *lpDesc)
 {
+	FinalizeInterfaces();
 	UTF_HEADER header;
 	DWORD dwRead;
 	BOOL result=0;
@@ -2495,7 +2503,7 @@ LONG SharedUTF::AddNameSpace_S (LPVOID lpContext)
 //
 BaseUTF * CreateSharedUTF (DWORD dwSharing)
 { 
-	SharedUTF * result = new DAComponent<SharedUTF>;
+	SharedUTF * result = new DAComponentSafe<SharedUTF>;
 
 	if (result)
 		result->locker.setSharing(dwSharing);

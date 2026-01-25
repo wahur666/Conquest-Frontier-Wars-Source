@@ -11,11 +11,13 @@
 */
 //--------------------------------------------------------------------------//
 
+/// This file is not used anywhere?
+
 #include <windows.h>
 
 #include "DACOM.h"
 #include "FileSys.h"
-#include "TComponent.h"
+#include "TComponentSafe.h"
 
 //--------------------------------------------------------------------------//
 //-----------------------GLOBAL DATA & MEMBERS OF FILE SYSTEM---------------//

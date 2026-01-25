@@ -1383,8 +1383,10 @@ const char * UTF::getNameBuffer (void)
 //--------------------------------------------------------------------------//
 //
 BaseUTF * CreateUTF (void)
-{ 
-	return new DAComponent<UTF>;
+{
+	auto baseUtf = new DAComponentSafe<UTF>;
+	baseUtf->FinalizeInterfaces();
+	return baseUtf;
 }
 //--------------------------------------------------------------------------//
 //

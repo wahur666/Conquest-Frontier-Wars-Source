@@ -12,8 +12,8 @@
 #include "FileSys.h"
 #endif
 
-#ifndef TCOMPONENT_H
-#include "TComponent.h"
+#ifndef TCOMPONENT_SAFE_H
+#include "TComponentSafe.h"
 #endif
 
 #ifndef __da_heap_utility_h__
@@ -160,7 +160,7 @@ struct UTF_WRITE_STRUCT
 // define the basic version of UTF implementation
 //-------------------------------------
 
-struct DACOM_NO_VTABLE BaseUTF : public IFileSystem
+struct DACOM_NO_VTABLE BaseUTF : public IFileSystem, DAComponentSafe<IDAComponent>
 {
 	char   			szFilename[MAX_PATH+4];
 	DWORD			dwAccess;            // The mode for the file
@@ -175,15 +175,7 @@ struct DACOM_NO_VTABLE BaseUTF : public IFileSystem
 	//
 	BaseUTF * pParentUTF;                // may be NULL if parent if not UTF instance
 	UTF_DIR_ENTRY * pBaseDirEntry;       // will be valid only if pParentUTF is valid
-                                         // points to current directory 
-	
-	//
-	// interface map
-	//
-	BEGIN_DACOM_MAP_INBOUND(BaseUTF)
-	DACOM_INTERFACE_ENTRY(IFileSystem)
-	DACOM_INTERFACE_ENTRY2(IID_IFileSystem,IFileSystem)
-	END_DACOM_MAP()
+                                         // points to current directory
 
 	static void *operator new(size_t size);
 
@@ -346,6 +338,22 @@ struct DACOM_NO_VTABLE BaseUTF : public IFileSystem
 	virtual UTF_DIR_ENTRY * getDirectoryEntryForChild (LPCSTR lpFileName, UTF_DIR_ENTRY *pRootDir=0, HANDLE hFindFirst=INVALID_HANDLE_VALUE);
 
 	virtual const char * getNameBuffer (void);
+
+	//
+	// interface map
+	//
+	bool initialized = false;
+	void FinalizeInterfaces()
+	{
+		if (initialized) return;
+		RegisterInterface("IFileSystem", "IFileSystem",
+						  static_cast<IFileSystem*>(this));
+
+		RegisterInterface("IFileSystem", IID_IFileSystem,
+						  static_cast<IFileSystem*>(this));
+		initialized = false;
+	}
+
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(BaseUTF)

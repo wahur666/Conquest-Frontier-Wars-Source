@@ -16,7 +16,7 @@
 
 #include "MemFile.h"
 #include "FileSys.h"
-#include "TComponent.h"
+#include "TComponentSafe.h"
 #include "TSmartPointer.h"
 
 #include "da_heap_utility.h"
@@ -34,12 +34,8 @@ extern LONG __stdcall DOS__SerialCall (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC
 
 //--------------------------------------------------------------------------//
 //
-struct DACOM_NO_VTABLE MemoryFile : public IFileSystem
+struct DACOM_NO_VTABLE MemoryFile : public IFileSystem, DAComponentSafe<IDAComponent>
 {
-	BEGIN_DACOM_MAP_INBOUND(MemoryFile)
-	DACOM_INTERFACE_ENTRY(IFileSystem)
-	DACOM_INTERFACE_ENTRY2(IID_IFileSystem,IFileSystem)
-	END_DACOM_MAP()
 
 	//--------------------------
 	
@@ -182,6 +178,18 @@ struct DACOM_NO_VTABLE MemoryFile : public IFileSystem
 	// *** MemoryFile methods ***
 
 	GENRESULT init (MEMFILEDESC * lpDesc);
+
+	bool initialized = false;
+	void FinalizeInterfaces()
+	{
+		if (initialized) return;
+		RegisterInterface("MemoryFile", "IFileSystem",
+						  static_cast<IFileSystem*>(this));
+
+		RegisterInterface("MemoryFile", IID_IFileSystem,
+						  static_cast<IFileSystem*>(this));
+		initialized = true;
+	}
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(MemoryFile)
@@ -688,6 +696,7 @@ BOOL MemoryFile::GetAbsolutePath (char *lpOutput, LPCTSTR lpInput, LONG lSize)
 //
 GENRESULT MemoryFile::init (MEMFILEDESC * lpDesc)
 {
+	FinalizeInterfaces();
 	GENRESULT result = GR_INVALID_PARMS;
 
 	if (lpDesc->lpParent)
@@ -754,7 +763,7 @@ Done:
 //
 IComponentFactory * CreateMemFileFactory (void)
 {
-	return new DAComponentFactory<DAComponent<MemoryFile>, MEMFILEDESC> ("IFileSystem");
+	return new DAComponentFactorySafe<DAComponentSafe<MemoryFile>, MEMFILEDESC> ("IFileSystem");
 }
 //----------------------------------------------------------------------------//
 //-------------------------------End MemFile.cpp------------------------------//

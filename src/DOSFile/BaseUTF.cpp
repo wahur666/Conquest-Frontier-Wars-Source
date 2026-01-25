@@ -109,8 +109,9 @@ GENRESULT BaseUTF::CreateInstance (DACOMDESC *descriptor, void  **instance)
   		  //
 			DWORD dwAttribs;
 			UTF_DIR_ENTRY * pNewBaseDirEntry = 0;
-
-			if ((pNewSystem = new DAComponent<BaseUTF>) == 0)
+			pNewSystem = new DAComponentSafe<BaseUTF>;
+			pNewSystem->FinalizeInterfaces();
+			if (pNewSystem == 0)
 			{
 				result = GR_OUT_OF_MEMORY;
 				goto Done;
@@ -247,7 +248,7 @@ GENRESULT BaseUTF::CreateInstance (DACOMDESC *descriptor, void  **instance)
 			// prevent releasing resources we didn't take over
 			lpInfo->lpParent->AddRef();
 			pNewSystem->hParentFile = INVALID_HANDLE_VALUE;
-			pNewSystem->Release();
+			static_cast<IFileSystem*>(pNewSystem)->Release();
 			pNewSystem = 0;
 			result = GR_FILE_ERROR;
 		}
@@ -309,7 +310,7 @@ GENRESULT BaseUTF::CreateInstance (DACOMDESC *descriptor, void  **instance)
 
 		if (pNewSystem->init(lpInfo) == 0)
 		{
-			pNewSystem->Release();
+			static_cast<IFileSystem*>(pNewSystem)->Release();
 			pNewSystem = 0;
 			result = GR_FILE_ERROR;
 		}
@@ -334,8 +335,9 @@ GENRESULT BaseUTF::CreateInstance (DACOMDESC *descriptor, void  **instance)
   		  //
 			DWORD dwAttribs;
 			UTF_DIR_ENTRY * pNewBaseDirEntry = 0;
-
-			if ((pNewSystem = new DAComponent<BaseUTF>) == 0)
+			pNewSystem = new DAComponentSafe<BaseUTF>;
+			pNewSystem->FinalizeInterfaces();
+			if (pNewSystem == 0)
 			{
 				result = GR_OUT_OF_MEMORY;
 				goto Done;
@@ -387,7 +389,7 @@ GENRESULT BaseUTF::CreateInstance (DACOMDESC *descriptor, void  **instance)
 			pNewSystem->hParentFile = handle;
 			pNewSystem->pParent = this;
 			pNewSystem->dwAccess = dwAccess & lpInfo->dwDesiredAccess;
-			AddRef();
+			static_cast<IFileSystem*>(this)->AddRef();
 			// only if we are a read-only UTF file will the following work
 			if ((pNewSystem->pBaseDirEntry = pNewBaseDirEntry) != 0)
 				pNewSystem->pParentUTF = this;
@@ -401,10 +403,10 @@ GENRESULT BaseUTF::CreateInstance (DACOMDESC *descriptor, void  **instance)
 
 			lpInfo->lpParent = this;
 			lpInfo->hParent   = handle;
-			AddRef();			// child file system will now reference us 
+			static_cast<IFileSystem*>(this)->AddRef();			// child file system will now reference us
 			if ((result = DACOM->CreateInstance(lpInfo, (void **) &pNewSystem)) != GR_OK)
 			{
-				Release();
+				static_cast<IFileSystem*>(this)->Release();
 				CloseHandle(handle);
 				lpInfo->lpParent = 0;
 				lpInfo->hParent   = 0;
@@ -426,6 +428,7 @@ Done:
 //
 BOOL BaseUTF::init (DAFILEDESC *lpDesc)
 {
+	FinalizeInterfaces();
 	return 1;
 }
 //--------------------------------------------------------------------------//
@@ -1481,7 +1484,9 @@ bool BaseUTF::TestValid (LPCTSTR lpFileName)
 //
 IFileSystem * CreateBaseUTF (void)
 {
-	return new DAComponent<BaseUTF>;
+	auto baseUtf = new DAComponentSafe<BaseUTF>;
+	baseUtf->FinalizeInterfaces();
+	return baseUtf;
 }
 
 //--------------------------------------------------------------------------//

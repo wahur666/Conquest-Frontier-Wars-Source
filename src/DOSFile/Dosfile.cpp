@@ -17,7 +17,7 @@ $Header: /Libs/dev/Src/DOSFile/Dosfile.cpp 20    2/17/00 9:23a Jasony $
 #include "DACOM.h"
 #include "FileSys.h"
 #include "da_heap_utility.h"
-#include "TComponent.h"
+#include "TComponentSafe.h"
 #include "FDump.h"
 
 //--------------------------------------------------------------------------//
@@ -140,7 +140,7 @@ struct READWRITE_STRUCT : public SERIAL_STRUCT
 QueueNode * pMessageList;
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
-struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem
+struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem, DAComponentSafe<IDAComponent>
 {
 	char			debugTag[9];		// "DOSFile: "
 	char			szFilename[MAX_PATH+4];
@@ -156,13 +156,7 @@ struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem
 	READWRITE_STRUCT	operations[MAX_OVERLAPPED_OPS];
 	CRITICAL_SECTION	criticalSection;
 	int					numOperations;		// current number of read/write operations in progress
-	
-	
-	BEGIN_DACOM_MAP_INBOUND(DOSFileSystem)
-		DACOM_INTERFACE_ENTRY(IFileSystem)
-		DACOM_INTERFACE_ENTRY2(IID_IFileSystem,IFileSystem)
-	END_DACOM_MAP()
-		
+
 		//---------------------------
 		// public methods
 		//---------------------------
@@ -320,6 +314,18 @@ struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem
 	SERIALMETHOD(ReadWrite_S);
 	
 	SERIALMETHOD(CloseAllHandles_S);
+
+	bool initialized = false;
+	void FinalizeInterfaces()
+	{
+		if (initialized) return;
+		RegisterInterface("DOSFileSystem", "IFileSystem",
+						  static_cast<IFileSystem*>(this));
+
+		RegisterInterface("DOSFileSystem", IID_IFileSystem,
+						  static_cast<IFileSystem*>(this));
+		initialized = true;
+	}
 };
 //--------------------------------------------------------------------------//
 //
@@ -477,8 +483,9 @@ GENRESULT DOSFileSystem::CreateInstance (DACOMDESC *descriptor,  //)
 			// See if	file is really a directory
 			//
 			DWORD dwAttribs;
-			
-			if ((pNewSystem = new DAComponent<DOSFileSystem>) == 0)
+			pNewSystem = new DAComponentSafe<DOSFileSystem>;
+			pNewSystem->FinalizeInterfaces();
+			if (pNewSystem == 0)
 			{
 				result = GR_GENERIC;
 				goto Done;
@@ -525,10 +532,10 @@ GENRESULT DOSFileSystem::CreateInstance (DACOMDESC *descriptor,  //)
 			
 			lpInfo->lpParent = this;
 			lpInfo->hParent   = handle;
-			AddRef();			// child file system will now reference us
+			static_cast<IFileSystem*>(this)->AddRef();			// child file system will now reference us
 			if ((result = DACOM->CreateInstance(lpInfo, (void **) &pNewSystem)) != GR_OK)
 			{
-				Release();
+				static_cast<IFileSystem*>(this)->Release();
 				CloseHandle(handle);
 				lpInfo->lpParent = 0;
 				lpInfo->hParent   = 0;
@@ -543,8 +550,9 @@ GENRESULT DOSFileSystem::CreateInstance (DACOMDESC *descriptor,  //)
 		// 
 		// else create a new instance of DOSFileSystem
 		//
-		
-		if ((pNewSystem = new DAComponent<DOSFileSystem>) == 0)
+		pNewSystem = new DAComponentSafe<DOSFileSystem>;
+		pNewSystem->FinalizeInterfaces();
+		if (pNewSystem == 0)
 		{
 			result = GR_GENERIC;
 			goto Done;
@@ -563,8 +571,9 @@ GENRESULT DOSFileSystem::CreateInstance (DACOMDESC *descriptor,  //)
 	//
 	// Attempt to create new file system instance
 	//
-	
-	if ((pNewSystem = new DAComponent<DOSFileSystem>) == NULL)
+	pNewSystem = new DAComponentSafe<DOSFileSystem>;
+	pNewSystem->FinalizeInterfaces();
+	if (pNewSystem == NULL)
 	{
 		result = GR_GENERIC;
 		goto Done;
@@ -2201,12 +2210,12 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,
 			startupUTF();		// create a critical section
 			if (StartUpFileSystem() == 0)
 				return 0;
-			pFirstSystem = new DAComponent<DOSFileSystem>;
-			if ((pFirstSystem != NULL) && (DACOM = DACOM_Acquire()) != NULL)
+			pFirstSystem = new DAComponentSafe<DOSFileSystem>;
+			pFirstSystem->FinalizeInterfaces();
+			if ((pFirstSystem != nullptr) && (DACOM = DACOM_Acquire()) != NULL)
 			{
 				DACOM->RegisterComponent(pFirstSystem, interface_name, DACOM_LOW_PRIORITY);
-				auto a = reinterpret_cast<DACOManager*>(DACOM);
-				pFirstSystem->Release();
+				static_cast<IFileSystem*>(pFirstSystem)->Release();
 			}
 			if (DACOM)
 			{
