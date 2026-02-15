@@ -97,9 +97,9 @@ if(MSVC)
 
     # Entry point for specific configs
     target_link_options(Globals PRIVATE
-            $<$<CONFIG:Debug>:/ENTRY:>
+            $<$<CONFIG:Debug>:/ENTRY:DllMain>
             $<$<CONFIG:DEMO_Debug>:/ENTRY:DllMain>
-            $<$<CONFIG:Release>:/ENTRY:>
+            $<$<CONFIG:Release>:/ENTRY:DllMain>
             $<$<CONFIG:DEMO_Final>:/ENTRY:DllMain>
             $<$<CONFIG:Final>:/ENTRY:DllMain>
     )

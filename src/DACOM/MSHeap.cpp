@@ -94,10 +94,12 @@ struct MSHeap : public IHeap, DAComponentSafe<IDAComponent>
 	virtual void * __stdcall realloc_pass_through (const C8 * msg);
 	virtual void * __stdcall calloc_pass_through (const C8 * msg);
 
-	void FinalizeInterfaces()
-	{
+	bool registered = false;
+	void FinalizeInterfaces() {
+		if (registered) return;
 		RegisterInterface("IHeap", "IHeap", static_cast<IHeap*>(this));
 		RegisterInterface("IHeap", IID_IHeap, static_cast<IHeap*>(this));
+		registered = true;
 	}
 
 };
@@ -257,9 +259,8 @@ BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 		{
 			hInstance = hinstDLL;
 
-			HEAP = g_pMSHeap = new DAComponentSafe<MSHeap>;
-			const auto a = dynamic_cast<MSHeap*>(HEAP);
-			a->FinalizeInterfaces();
+			auto heap = new DAComponentSafe<MSHeap>();
+			HEAP = g_pMSHeap = heap;
 			// Setup the standard error report function.
 			FDUMP = STANDARD_DUMP;
 		}

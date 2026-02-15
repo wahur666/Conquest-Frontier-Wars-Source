@@ -19,6 +19,7 @@
 //--------------------------------------------------------------------------//
 
 #include <TManager.h>
+#include "VFX.H"
 
 #undef CQEXTERN
 #ifdef BUILD_GLOBALS
