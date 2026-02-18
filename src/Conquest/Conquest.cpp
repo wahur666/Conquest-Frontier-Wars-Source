@@ -679,27 +679,27 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	//link up extra images
 #ifdef _DEBUG
-	CQIMAGE->LoadSymTable(GetModuleHandle("Channel.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("DAHotkey.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("Docuview.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("DOSFile.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("Anim.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("Engine.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("PolyMesh.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("RenderMgr.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("x86math.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("optics.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("Hardpoint.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("Streamer.dll")); -
-	CQIMAGE->LoadSymTable(GetModuleHandle("LightManager.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("VertexBufferManager.dll")); -
-	CQIMAGE->LoadSymTable(GetModuleHandle("StringTable.dll")); -
-	CQIMAGE->LoadSymTable(GetModuleHandle("VideoSystem.dll")); -
-	CQIMAGE->LoadSymTable(GetModuleHandle("MaterialManager.dll")); -
-	CQIMAGE->LoadSymTable(GetModuleHandle("ParticleEffect.dll")); -
-	CQIMAGE->LoadSymTable(GetModuleHandle("MeshManager.dll")); -
-	CQIMAGE->LoadSymTable(GetModuleHandle("D3DRenderPipe.dll")); +
-	CQIMAGE->LoadSymTable(GetModuleHandle("TextureManager.dll")); -
+	CQIMAGE->LoadSymTable(GetModuleHandle("Channel.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("DAHotkey.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("Docuview.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("DOSFile.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("Anim.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("Engine.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("PolyMesh.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("RenderMgr.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("x86math.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("optics.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("Hardpoint.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("Streamer.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("LightManager.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("VertexBufferManager.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("StringTable.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("VideoSystem.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("MaterialManager.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("ParticleEffect.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("MeshManager.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("D3DRenderPipe.dll"));
+	CQIMAGE->LoadSymTable(GetModuleHandle("TextureManager.dll"));
 
 #endif
 

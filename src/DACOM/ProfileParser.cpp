@@ -19,8 +19,9 @@
 #include "IProfileParser.h"
 #include "HeapObj.h"
 #include <da_heap_utility.h>
+#include <span>
 
-#include "TComponentSafe.h"
+#include "TComponent2.h"
 
 #ifdef PROFILE_PARSER_IS_CASE_SENSITIVE
 #define compare strcmp
@@ -34,11 +35,16 @@
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
-struct DACOM_NO_VTABLE ProfileParser : IProfileParser,  DAComponentSafe<IDAComponent>
+struct DACOM_NO_VTABLE ProfileParser : IProfileParser
 {
 	//
 	// interface mapping
 	//
+
+	// BEGIN_DACOM_MAP_INBOUND(ProfileParser)
+	// DACOM_INTERFACE_ENTRY(IProfileParser)
+	// DACOM_INTERFACE_ENTRY2(IID_IProfileParser,IProfileParser)
+	// END_DACOM_MAP()
 
 	//
 	// data items
@@ -73,7 +79,7 @@ struct DACOM_NO_VTABLE ProfileParser : IProfileParser,  DAComponentSafe<IDACompo
 	DEFMETHOD(Initialize) (const C8 *fileName, ACCESS access = READ_ACCESS );
 
 	DEFMETHOD_(BOOL32,EnumerateSections) (ENUM_PROC proc = 0, void *context=0);
-	
+
 	DEFMETHOD_(HANDLE,CreateSection) (const C8 *sectionName, CREATE_MODE mode = PP_OPENEXISTING);
 
 	DEFMETHOD_(BOOL32,CloseSection) (HANDLE hSection);
@@ -99,12 +105,16 @@ struct DACOM_NO_VTABLE ProfileParser : IProfileParser,  DAComponentSafe<IDACompo
 		return getLine(fileBuffer+((U32)hSection), line);
 	}
 
-	virtual void FinalizeInterfaces(){
-		RegisterInterface("IProfileParser", "IProfileParser",
-						  static_cast<IProfileParser*>(this));
+	static IDAComponent* GetIProfileParser(void* self) {
+		return static_cast<IProfileParser*>(self);
+	}
 
-		RegisterInterface("IProfileParser", IID_IProfileParser,
-						  static_cast<IProfileParser*>(this));
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static const DACOMInterfaceEntry2 map[] = {
+			{"IProfileParser", &GetIProfileParser},
+			{IID_IProfileParser, &GetIProfileParser},
+		};
+		return map;
 	}
 
 };
@@ -118,6 +128,13 @@ struct DACOM_NO_VTABLE ProfileParser2 : IProfileParser2, ProfileParser
 	//
 	// interface mapping
 	//
+	// BEGIN_DACOM_MAP_INBOUND(ProfileParser2)
+	// DACOM_INTERFACE_ENTRY(IProfileParser2)
+	// DACOM_INTERFACE_ENTRY(IProfileParser)
+	// DACOM_INTERFACE_ENTRY2(IID_IProfileParser2,IProfileParser2)
+	// DACOM_INTERFACE_ENTRY2(IID_IProfileParser,IProfileParser)
+	// END_DACOM_MAP()
+
 	GENRESULT init (PROFPARSEDESC2 * info) { return GR_OK; }
 
 	/* IProfileParser methods */
@@ -156,11 +173,22 @@ struct DACOM_NO_VTABLE ProfileParser2 : IProfileParser2, ProfileParser
 	virtual BOOL32 __stdcall EnumerateKeys (IProfileCallback * callback, HANDLE hSection, void *context);
 
 
-	void FinalizeInterfaces() override {
-		RegisterInterface("IProfileParser", "IProfileParser", static_cast<IProfileParser*>(this));
-		RegisterInterface("IProfileParser", IID_IProfileParser,static_cast<IProfileParser*>(this));
-		RegisterInterface("IProfileParser2", "IProfileParser2",static_cast<IProfileParser2*>(this));
-		RegisterInterface("IProfileParser2", IID_IProfileParser2,static_cast<IProfileParser2*>(this));
+	static IDAComponent* GetIProfileParser(void* self) {
+		return static_cast<IProfileParser*>(self);
+	}
+
+	static IDAComponent* GetIProfileParser2(void* self) {
+		return static_cast<IProfileParser*>(self);
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{"IProfileParser2", &GetIProfileParser2},
+			{"IProfileParser", &GetIProfileParser},
+			{IID_IProfileParser2, &GetIProfileParser2},
+			{IID_IProfileParser, &GetIProfileParser},
+		};
+		return map;
 	}
 
 };
@@ -176,7 +204,6 @@ void ProfileParser::free (void)
 //
 GENRESULT ProfileParser::Initialize (const C8 *fileName, ACCESS access)
 {
-	FinalizeInterfaces();
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	GENRESULT result = GR_FILE_ERROR;
 	U32 dwAccess = GENERIC_READ;
@@ -242,7 +269,7 @@ GENRESULT ProfileParser::Initialize (const C8 *fileName, ACCESS access)
 					}
 				}
 			} while ((oldBuffer = (C8 *) getLine(oldBuffer, 1)) != 0);
-			
+
 			result = GR_OK;
 		}
 		else
@@ -309,7 +336,7 @@ const char * ProfileParser::getLine (const char * buffer, int line)
 
 	}
 
-Done:	
+Done:
 	return buffer;
 }
 //--------------------------------------------------------------------------//
@@ -423,7 +450,7 @@ BOOL32 ProfileParser2::EnumerateKeys (IProfileCallback * callback, HANDLE hSecti
 					do
 					{	tmp3++;
 					} while (*tmp3 == ' ');
-			
+
 					if ((tmp2 = strchr(tmp3, '\n')) != 0)
 					{
 						if (tmp2[-1] == '\r')
@@ -609,11 +636,11 @@ U32 ProfileParser::ReadKeyValue (HANDLE hSection, const C8 * keyName, C8 * buffe
 //
 IComponentFactory * CreateProfileParserFactory2 (void)
 {
-	return new DAComponentFactorySafe2<DAComponentAggregateSafe<ProfileParser2>, PROFPARSEDESC2> ("IProfileParser2");
+	return new DAComponentFactoryX2<DAComponentAggregateX<ProfileParser2>, PROFPARSEDESC2> ("IProfileParser2");
 }
 IComponentFactory * CreateProfileParserFactory (void)
 {
-	return new DAComponentFactorySafe2<DAComponentAggregateSafe<ProfileParser>, PROFPARSEDESC> ("IProfileParser");
+	return new DAComponentFactoryX2<DAComponentAggregateX<ProfileParser>, PROFPARSEDESC> ("IProfileParser");
 }
 
 //--------------------------------------------------------------------------//

@@ -19,6 +19,7 @@
 #ifndef DACOM_H
 #include "DACOM.h"
 #endif
+#include <string_view>
 
 #pragma warning( push )
 
@@ -36,6 +37,11 @@ struct _DACOM_INTMAP_ENTRY
 {
 	const C8 *interface_name;
 	U32 offset;
+};
+
+struct DACOMInterfaceEntry2 {
+	std::string_view interface_name;
+	IDAComponent* (*get)(void* self);
 };
 
 //--------------------------------------------------------------------------//

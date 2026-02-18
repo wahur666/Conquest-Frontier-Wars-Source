@@ -12,12 +12,13 @@
 //--------------------------------------------------------------------------//
 
 
+#include <span>
 #include <windows.h>
 
 #include "BaseHeap.h"
 #include "FDump.h"
 #include "Malloc.h"
-#include "TComponentSafe.h"
+#include "TComponent2.h"
 
 #pragma warning (disable : 4100)		// formal parameter unused
 
@@ -35,7 +36,7 @@ int __cdecl STANDARD_DUMP (ErrorCode code, const C8 *fmt, ...);
 
 //--------------------------------------------------------------------------//
 //
-struct MSHeap : public IHeap, DAComponentSafe<IDAComponent>
+struct MSHeap : public IHeap
 {
 	//
 	// interface mapping
@@ -94,14 +95,17 @@ struct MSHeap : public IHeap, DAComponentSafe<IDAComponent>
 	virtual void * __stdcall realloc_pass_through (const C8 * msg);
 	virtual void * __stdcall calloc_pass_through (const C8 * msg);
 
-	bool registered = false;
-	void FinalizeInterfaces() {
-		if (registered) return;
-		RegisterInterface("IHeap", "IHeap", static_cast<IHeap*>(this));
-		RegisterInterface("IHeap", IID_IHeap, static_cast<IHeap*>(this));
-		registered = true;
+	static IDAComponent* GetIHeap(void* self) {
+		return static_cast<IHeap*>(self);
 	}
 
+	static const std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static const DACOMInterfaceEntry2 map[] = {
+			{"IHeap", &GetIHeap},
+			{IID_IHeap, &GetIHeap},
+		};
+		return map;
+	}
 };
 //--------------------------------------------------------------------------//
 //----------------------------MSHeap Class Methods--------------------------//
@@ -259,7 +263,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 		{
 			hInstance = hinstDLL;
 
-			auto heap = new DAComponentSafe<MSHeap>();
+			auto heap = new DAComponentX<MSHeap>();
 			HEAP = g_pMSHeap = heap;
 			// Setup the standard error report function.
 			FDUMP = STANDARD_DUMP;
