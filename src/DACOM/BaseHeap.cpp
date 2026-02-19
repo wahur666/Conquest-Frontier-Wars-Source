@@ -207,7 +207,7 @@ inline struct HeapInstance * BaseHeap::FindTheHeap (void *baseAddress)
 	for (pList=pHeapList; pList; pList=pList->pNext)
 	{
 		// single comparison range check
-		DWORD pos = (DWORD)baseAddress - (DWORD)pList->pHeapBase;
+		uintptr_t pos = reinterpret_cast<uintptr_t>(baseAddress) - reinterpret_cast<uintptr_t>(pList->pHeapBase);
 		if (pos < pList->dwHeapSize)
 			break;
 	}
@@ -482,7 +482,7 @@ DA_ERROR_HANDLER BaseHeap::GetErrorHandler (void)
 }
 //--------------------------------------------------------------------------//
 //
-BOOL32 BaseHeap::doError (DWORD dwErrorNum, DWORD dwNum1, DWORD dwNum2)
+BOOL32 BaseHeap::doError (uintptr_t dwErrorNum, uintptr_t dwNum1, uintptr_t dwNum2)
 {
 	char buffer[128];
 	BOOL32 result = 0;

@@ -23,7 +23,7 @@
 //--------------------------------------------------------------------------//
 struct BASE_BLOCK
 {
-	DWORD				dwSize;		// size in bytes of whole block
+	uintptr_t				dwSize;		// size in bytes of whole block
 	struct BASE_BLOCK *	pUpper;		// upper adjacent block
 
 	union 
@@ -106,9 +106,9 @@ inline struct FREE_BLOCK * FREE_BLOCK::getNext (void)
 
 struct BaseHeap : public IHeap
 {
-	DWORD					dwRefs;
+	uintptr_t					dwRefs;
 	DA_ERROR_HANDLER		pErrorHandler;
-	DWORD					dwFlags;
+	uintptr_t					dwFlags;
 	struct HeapInstance *	pNext;
 
 	BaseHeap (void) : dwRefs(1), pErrorHandler(nullptr), dwFlags(0), pNext(nullptr) {
@@ -172,7 +172,7 @@ struct BaseHeap : public IHeap
 
 	struct HeapInstance * __fastcall FindTheHeap (void *baseAddress);
 
-	BOOL32 doError (DWORD dwErrorNum, DWORD dwNum1=0, DWORD dwNum2=0);
+	BOOL32 doError (uintptr_t dwErrorNum, uintptr_t dwNum1=0, uintptr_t dwNum2=0);
 };
 
 //--------------------------------------------------------------------------//
@@ -183,10 +183,10 @@ struct BaseHeap : public IHeap
 struct HeapInstance : public BaseHeap
 {
 	FREE_BLOCK* pFirstFreeBlock = nullptr;
-	DWORD dwBaseBlockSize = 0;
+	uintptr_t dwBaseBlockSize = 0;
 	void* pHeapBase = nullptr;
-	DWORD dwHeapSize = 0;
-	DWORD dwGrowSize = 0;
+	uintptr_t dwHeapSize = 0;
+	uintptr_t dwGrowSize = 0;
 	CRITICAL_SECTION criticalSection;
 
 	HeapInstance() : BaseHeap()
@@ -241,7 +241,7 @@ struct HeapInstance : public BaseHeap
 
 	void __fastcall sort (FREE_BLOCK *pBlock);
 
-	BASE_BLOCK * __fastcall malloc (DWORD dwNumBytes);
+	BASE_BLOCK * __fastcall malloc (uintptr_t dwNumBytes);
 
 	BOOL __fastcall mergeWithLower (BASE_BLOCK *pBlock);
 
@@ -274,7 +274,7 @@ inline void HeapInstance::RELINK (FREE_BLOCK *pBlock)
 	if ((dwFlags & DAHEAPFLAG_NOBESTFIT) == 0)
 	{
 		FREE_BLOCK *pTmp;
-		DWORD dwSize;
+		uintptr_t dwSize;
 
 		pTmp = pStart;
 		dwSize = pBlock->dwSize;
@@ -349,7 +349,7 @@ Error:
 	if (EnumerateBlocks(0,0) == 0)
 		doError(DAHEAP_HEAP_CORRUPTED);
 	else
-		doError(DAHEAP_INVALID_PTR, (DWORD)_pBlock);
+		doError(DAHEAP_INVALID_PTR, (uintptr_t)_pBlock);
 	return 0;
 }
 //--------------------------------------------------------------------------//

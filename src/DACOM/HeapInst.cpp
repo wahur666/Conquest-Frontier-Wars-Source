@@ -417,7 +417,7 @@ void HeapInstance::sort (FREE_BLOCK *pBlock)
 }
 //--------------------------------------------------------------------------//
 //
-BASE_BLOCK * HeapInstance::malloc (DWORD dwNumBytes)
+BASE_BLOCK * HeapInstance::malloc (uintptr_t dwNumBytes)
 {
 	FREE_BLOCK *pBlock, *pStart;
 	DWORD dwRemainder;

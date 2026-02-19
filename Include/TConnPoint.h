@@ -34,12 +34,12 @@ struct CONNECTION_NODE
 template <class Base, class Type=IDAComponent> 
 struct ConnectionPoint : public IDAConnectionPoint
 {
-	CONNECTION_NODE<Type> *pClientList;
+	std::vector<Type*> clients;
 	int index;
 
-	ConnectionPoint (int i);
+	ConnectionPoint (int i) : index(i), clients() {}
 
-	~ConnectionPoint (void);
+	~ConnectionPoint (void) = default;
 	
 	/* IDAComponent members */
 
@@ -64,7 +64,6 @@ struct ConnectionPoint : public IDAConnectionPoint
 	/* ConnectionPoint members */
 
 };
-
 //--------------------------------------------------------------------------//
 //
 template <class Base, class Type>
@@ -90,31 +89,29 @@ U32 ConnectionPoint<Base,Type>::Release (void)
 //--------------------------------------------------------------------------//
 //
 template <class Base, class Type>
-U32 ConnectionPoint< Base,Type >::GetOutgoingInterface (C8 *interfaceName, U32 bufferLength)
+U32 ConnectionPoint<Base, Type>::GetOutgoingInterface(char* buffer, U32 bufferLength)
 {
-	const _DACOM_INTMAP_ENTRY *array = Base::_GetEntriesOut();
-	U32 len = strlen(array[index].interface_name) + 1;
-	
-	if (len > bufferLength)
-		len = bufferLength;
+	auto entries = Base::GetInterfaceMapOut();
+	if (index >= entries.size())
+		return 0;
 
-	memcpy(interfaceName, array[index].interface_name, len);
-
-	return (len)?len-1:0;
+	auto name = entries[index].interface_name;
+	U32 len = std::min(bufferLength - 1, static_cast<U32>(name.size()));
+	memcpy(buffer, name.data(), len);
+	buffer[len] = '\0';
+	return len;
 }
 //--------------------------------------------------------------------------//
 //
 template <class Base, class Type>
-GENRESULT ConnectionPoint< Base,Type >::GetContainer (IDAConnectionPointContainer **container)
+GENRESULT ConnectionPoint<Base, Type>::GetContainer(IDAConnectionPointContainer **container)
 {
-	const _DACOM_INTMAP_ENTRY *array = Base::_GetEntriesOut();
+	auto entries = Base::GetInterfaceMapOut();
+	if (index >= entries.size())
+		return GR_INVALID_PARAM;
 
-	*container = (IDAConnectionPointContainer *) ( ((U32)this) - array[index].offset + ((U32)
-					(static_cast<IDAConnectionPointContainer*>((Base*)8) )
-					-8) );
-
-	(*container)->AddRef();			
-
+	*container = static_cast<IDAConnectionPointContainer*>(entries[index].get(this));
+	(*container)->AddRef();
 	return GR_OK;
 }
 //--------------------------------------------------------------------------//
@@ -122,105 +119,57 @@ GENRESULT ConnectionPoint< Base,Type >::GetContainer (IDAConnectionPointContaine
 template <class Base, class Type>
 GENRESULT ConnectionPoint< Base,Type >::Advise (IDAComponent *component, U32 *handle)
 {
-	CONNECTION_NODE<Type> *pList = pClientList, *pPrev=0;
-	Type *client;
-	const _DACOM_INTMAP_ENTRY *array = Base::_GetEntriesOut();
-	// check to make sure we have the right interface pointer
+	if (!component || !handle)
+		return GR_INVALID_PARAM;
 
-	if (component->QueryInterface(array[index].interface_name, (void **) &client) != GR_OK)
+	Type* client = nullptr;
+
+	const auto map = Base::GetInterfaceMapOut();
+	const auto& entry = map[index];
+	auto iname = std::string(entry.interface_name);
+	if (component->QueryInterface(iname.c_str(), reinterpret_cast<void**>(&client)) != GR_OK)
 		return GR_GENERIC;
-	client->Release();		// release the reference early
 
-	while (pList)
-	{
-		pPrev = pList;
-		pList = pList->pNext;
-	}
+	// We only needed validation. Drop the ref immediately.
+	client->Release();
 
-	if (pPrev)
+	try
 	{
-		if ((pPrev->pNext = new CONNECTION_NODE<Type>) != 0)
-			pPrev = pPrev->pNext;
-	}
-	else
-	if ((pPrev = new CONNECTION_NODE<Type>) != 0)
-		pClientList = pPrev;
+		clients.push_back(client);
 
-	if (pPrev)
-	{
-		pPrev->pNext=0;
-		pPrev->client = client;
-		*handle = (U32) pPrev;
+		// handle = index+1 (0 reserved as invalid)
+		*handle = static_cast<U32>(clients.size());
 		return GR_OK;
 	}
-
-	return GR_OUT_OF_MEMORY;
+	catch (...)
+	{
+		return GR_OUT_OF_MEMORY;
+	}
 }
 //--------------------------------------------------------------------------//
 //
 template <class Base, class Type>
 GENRESULT ConnectionPoint< Base,Type >::Unadvise (U32 handle)
 {
-	CONNECTION_NODE<Type> *pList = pClientList, *pPrev=0;
-	CONNECTION_NODE<Type> *client = (CONNECTION_NODE<Type> *) handle;
+	if (handle == 0 || handle > clients.size())
+		return GR_GENERIC;
 
+	const size_t idx = handle - 1;
 
-	while (pList)
-	{
-		if (pList == client)
-		{
-			if (pPrev)
-				pPrev->pNext = pList->pNext;
-			else
-				pClientList = pList->pNext;
-			delete pList;
-			return GR_OK;
-		}
-		pPrev = pList;
-		pList = pList->pNext;
-	}
+	clients.erase(clients.begin() + idx);
 
-	return GR_GENERIC;
+	return GR_OK;
 }
 //--------------------------------------------------------------------------//
 //
 template <class Base, class Type>
 BOOL32 ConnectionPoint< Base,Type >::EnumerateConnections (CONNECTION_ENUM_PROC proc, void *context)
 {
-	BOOL32 result;
-	CONNECTION_NODE<Type> *pList;
-
-	result = ((pList = pClientList) != 0);
-
-	while (result && pList)
-	{
-		result = proc(this, pList->client, context);
-		pList = pList->pNext;
+	for (auto* c : clients) {
+		if (!proc(this, c, context))
+			return FALSE;
 	}
-
-	return result;
-}
-//--------------------------------------------------------------------------//
-//
-template <class Base, class Type>
-ConnectionPoint< Base,Type >::ConnectionPoint (int i)
-{
-	pClientList=0;
-	index = i;
-}
-//--------------------------------------------------------------------------//
-//
-template <class Base, class Type>
-ConnectionPoint< Base,Type >::~ConnectionPoint (void)
-{
-	CONNECTION_NODE<Type> *pNode;
-
-	while (pClientList)
-	{
-		pNode = pClientList->pNext;
-		delete pClientList;
-		pClientList = pNode;
-	}
+	return !clients.empty();
 }
 //--------------------------------------------------------------------------//
 //----------------------------End TConnPoint.h------------------------------//

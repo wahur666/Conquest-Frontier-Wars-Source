@@ -13,14 +13,9 @@
 */			    
 //--------------------------------------------------------------------------//
 
-
-#ifndef ICONNECTION_H
+#include <string_view>
 #include "IConnection.h"
-#endif
-
-#ifndef TCOMPONENT_H
-#include "TComponent.h"
-#endif
+#include "vtdump.h"
 
 
 //-----------------------------------------
@@ -39,17 +34,17 @@ GENRESULT ConnectionPointContainer<Type>::FindConnectionPoint(
 	const C8* connectionName,
 	IDAConnectionPoint** connPoint)
 {
-	const auto* array = Type::_GetEntriesOut();
+	if (!connectionName || !connPoint)
+		return GR_INVALID_PARAM;
 
-	for (int i = 0; array[i].interface_name; i++) {
-		if (strcmp(array[i].interface_name, connectionName) != 0)
+	const auto map = Type::GetInterfaceMapOut();
+	std::string_view name {connectionName};
+	for (const auto& entry : map)
+	{
+		if (entry.interface_name != name)
 			continue;
-
-		// Use std::bit_cast or just pointer arithmetic properly
-		auto* point = reinterpret_cast<IDAConnectionPoint*>(
-			reinterpret_cast<std::uintptr_t>(this) + array[i].offset
-		);
-
+		auto* self = static_cast<Type*>(this);  // adjust to Document*
+		auto* point = static_cast<IDAConnectionPoint*>(entry.get(self));
 		*connPoint = point;
 		point->AddRef();
 		return GR_OK;
@@ -61,27 +56,24 @@ GENRESULT ConnectionPointContainer<Type>::FindConnectionPoint(
 //-----------------------------------------
 //
 template <class Type>
-BOOL32 ConnectionPointContainer< Type >::EnumerateConnectionPoints (CONNCONTAINER_ENUM_PROC proc, void *context)
+BOOL32 ConnectionPointContainer<Type>::EnumerateConnectionPoints(CONNCONTAINER_ENUM_PROC proc, void* context)
 {
-	BOOL32 result=1;
-	const _DACOM_INTMAP_ENTRY *array = Type::_GetEntriesOut();
-	int i;
-	
-	for (i = 0; array[i].interface_name && result; i++)
-	{
-		IDAConnectionPoint *point;
+	if (!proc)
+		return FALSE;
 
-		point = (IDAConnectionPoint *) ( ((U32)this) + array[i].offset - ((U32)
-					(static_cast<ConnectionPointContainer<Type>*>((Type*)8) )
-					-8) );
-		
-		result = proc(this, point, context);
+	const auto map = Type::GetInterfaceMapOut();
+
+	for (const auto& entry : map)
+	{
+		auto* point =
+			static_cast<IDAConnectionPoint*>(entry.get(this));
+
+		if (!proc(this, point, context))
+			return FALSE;
 	}
 
-
-	return result;
+	return TRUE;
 }
-
 
 //--------------------------------------------------------------------------//
 //------------------------------End TConnContainer.h------------------------//

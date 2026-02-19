@@ -32,6 +32,7 @@
 
 #include <vector>
 #include <map>
+#include <span>
 #include <string>
 
 #include "dacom.h"
@@ -48,7 +49,7 @@
 #include "IVideoStreamControl.h"
 #include "IRenderDebugger.h"
 #include "RPUL.h"
-#include "TComponentSafe.h"
+#include "TComponent2.h"
 
 #include "../../../include/handlemap.h"
 #include "../../../include/Tfuncs.h"
@@ -183,8 +184,7 @@ struct Direct3D_RenderPipeline: IRenderPipeline,
 #if RP_RD_DEBUG
 								IRenderDebugger,
 #endif
-								IAggregateComponent,
-								DAComponentSafe<IDAComponent>
+								IAggregateComponent
 
 {
 public: // Data
@@ -356,21 +356,42 @@ public:	// Interface
 	GENRESULT init(AGGDESC *desc);
 	GENRESULT init(RPUL_DACOMDESC *desc);
 
-	void FinalizeInterfaces() {
-		RegisterInterface("IRenderPipeline", IID_IRenderPipeline,
-						 static_cast<IRenderPipeline*>(this));
-		RegisterInterface("IRenderPrimitive", IID_IRenderPrimitive,
-						 static_cast<IRenderPrimitive*>(this));
-		RegisterInterface("IDDBackDoor", IID_IDDBackDoor,
-						 static_cast<IDDBackDoor*>(this));
-		RegisterInterface("IGammaControl", IID_IGammaControl,
-						 static_cast<IGammaControl*>(this));
+	static IDAComponent* GetIRenderPipeline(void* self) {
+		return static_cast<IRenderPipeline*>(self);
+	}
+
+	static IDAComponent* GetIRenderPrimitive(void* self) {
+		return static_cast<IRenderPrimitive*>(self);
+	}
+
+	static IDAComponent* GetIDDBackDoor(void* self) {
+		return static_cast<IDDBackDoor*>(self);
+	}
+
+	static IDAComponent* GetIGammaControl(void* self) {
+		return static_cast<IGammaControl*>(self);
+	}
+
+	static IDAComponent* GetIRenderDebugger(void* self) {
+		return static_cast<IRenderDebugger*>(self);
+	}
+
+	static IDAComponent* GetIAggregateComponent(void* self) {
+		return static_cast<IAggregateComponent*>(self);
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{IID_IRenderPipeline, &GetIRenderPipeline},
+			{IID_IRenderPrimitive, &GetIRenderPrimitive},
+			{IID_IDDBackDoor, &GetIDDBackDoor},
+			{IID_IGammaControl, &GetIGammaControl},
 #if RP_RD_DEBUG
-		RegisterInterface("IRenderDebugger", IID_IRenderDebugger,
-						 static_cast<IRenderDebugger*>(this));
+			{IID_IRenderDebugger, &GetIRenderDebugger},
 #endif
-		RegisterInterface("IAggregateComponent", IID_IAggregateComponent,
-						 static_cast<IAggregateComponent*>(this));
+			{IID_IAggregateComponent, &GetIAggregateComponent}
+		};
+		return map;
 	}
 
 protected:	// Interface
@@ -734,10 +755,10 @@ constexpr U32 MAXLIGHTSFOUND = 4;
 	U8 ambientBytes[4];
 	get_render_state(D3DRS_AMBIENT,(U32*)ambientBytes);
 
-	float ambientColor [] = {  ambientBytes[2]/255.0, 
-							   ambientBytes[1]/255.0,
-							   ambientBytes[0]/255.0,
-							   0};
+	float ambientColor [] = {  ambientBytes[2]/255.0f,
+							   ambientBytes[1]/255.0f,
+							   ambientBytes[0]/255.0f,
+							   0.f};
 			
 	direct3d_device->SetPixelShaderConstantF(6, (float*) ambientColor, 1);
 
@@ -825,7 +846,6 @@ Direct3D_RenderPipeline::~Direct3D_RenderPipeline(void)
 //
 GENRESULT Direct3D_RenderPipeline::init( AGGDESC *desc )
 {
-	FinalizeInterfaces();
 	if( desc->description!=NULL && strlen( desc->description ) > 0 ) {
 		strcpy( ini_device_profile, desc->description );
 	}
@@ -4484,17 +4504,17 @@ BOOL COMAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 				break;
 			}
 
-			if( (server1 = new DAComponentFactorySafe2<DAComponentAggregateSafe<Direct3D_RenderPipeline>, AGGDESC>( CLSID_D3D_RenderPipeline )) != NULL ) {
+			if( (server1 = new DAComponentFactoryX2<DAComponentAggregateX<Direct3D_RenderPipeline>, AGGDESC>( CLSID_D3D_RenderPipeline )) != NULL ) {
 				DACOM->RegisterComponent( server1, CLSID_D3D_RenderPipeline, DACOM_LOW_PRIORITY );
 				server1->Release();
 			}
 
-			if( (server1 = new DAComponentFactorySafe2<DAComponentAggregateSafe<Direct3D_RenderPipeline>, AGGDESC>( CLSID_IRenderPipeline )) != NULL ) {
+			if( (server1 = new DAComponentFactoryX2<DAComponentAggregateX<Direct3D_RenderPipeline>, AGGDESC>( CLSID_IRenderPipeline )) != NULL ) {
 				DACOM->RegisterComponent( server1, CLSID_IRenderPipeline, DACOM_LOW_PRIORITY );
 				server1->Release();
 			}
 
-			if( (server1 = new DAComponentFactorySafe<DAComponentSafe<Direct3D_RenderPipeline>, RPUL_DACOMDESC>( "IDAComponent" )) != NULL ) {
+			if( (server1 = new DAComponentFactoryX<DAComponentX<Direct3D_RenderPipeline>, RPUL_DACOMDESC>( "IDAComponent" )) != NULL ) {
 				DACOM->RegisterComponent( server1, "IDAComponent", DACOM_LOW_PRIORITY );
 				server1->Release();
 			}
