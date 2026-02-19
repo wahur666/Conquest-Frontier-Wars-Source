@@ -16,12 +16,14 @@
 
 #include "MemFile.h"
 #include "FileSys.h"
-#include "TComponentSafe.h"
 #include "TSmartPointer.h"
 
 #include "da_heap_utility.h"
 
-#include <stdlib.h>
+#include <cstdlib>
+#include <span>
+
+#include "TComponent2.h"
 
 extern ICOManager *DACOM;
 extern LONG __stdcall DOS__SerialCall (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC lpProc, VOID *lpContext);
@@ -34,7 +36,7 @@ extern LONG __stdcall DOS__SerialCall (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC
 
 //--------------------------------------------------------------------------//
 //
-struct DACOM_NO_VTABLE MemoryFile : public IFileSystem, DAComponentSafe<IDAComponent>
+struct DACOM_NO_VTABLE MemoryFile : public IFileSystem
 {
 
 	//--------------------------
@@ -178,17 +180,16 @@ struct DACOM_NO_VTABLE MemoryFile : public IFileSystem, DAComponentSafe<IDACompo
 	// *** MemoryFile methods ***
 
 	GENRESULT init (MEMFILEDESC * lpDesc);
+	static IDAComponent* GetIFileSystem(void* self) {
+		return static_cast<IFileSystem*>(self);
+	}
 
-	bool initialized = false;
-	void FinalizeInterfaces()
-	{
-		if (initialized) return;
-		RegisterInterface("MemoryFile", "IFileSystem",
-						  static_cast<IFileSystem*>(this));
-
-		RegisterInterface("MemoryFile", IID_IFileSystem,
-						  static_cast<IFileSystem*>(this));
-		initialized = true;
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{"IFileSystem", &GetIFileSystem},
+			{IID_IFileSystem, &GetIFileSystem},
+		};
+		return map;
 	}
 };
 
@@ -696,7 +697,6 @@ BOOL MemoryFile::GetAbsolutePath (char *lpOutput, LPCTSTR lpInput, LONG lSize)
 //
 GENRESULT MemoryFile::init (MEMFILEDESC * lpDesc)
 {
-	FinalizeInterfaces();
 	GENRESULT result = GR_INVALID_PARMS;
 
 	if (lpDesc->lpParent)
@@ -763,7 +763,7 @@ Done:
 //
 IComponentFactory * CreateMemFileFactory (void)
 {
-	return new DAComponentFactorySafe<DAComponentSafe<MemoryFile>, MEMFILEDESC> ("IFileSystem");
+	return new DAComponentFactoryX<DAComponentX<MemoryFile>, MEMFILEDESC> ("IFileSystem");
 }
 //----------------------------------------------------------------------------//
 //-------------------------------End MemFile.cpp------------------------------//

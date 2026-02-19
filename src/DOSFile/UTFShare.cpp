@@ -17,6 +17,7 @@
 #include "UTFDMan.h"
 #include "da_heap_utility.h"
 #include "IUTFWriter.h"
+#include "TComponent2.h"
 
 #define MAX_GROUP_HANDLES   4
 
@@ -285,21 +286,23 @@ struct DACOM_NO_VTABLE SharedUTF : public BaseUTF, IUTFWriter
 	
 	BOOL32 __fastcall isValidHandle (HANDLE handle);
 
-	bool initialized = false;
-	void FinalizeInterfaces()
-	{
-		if (initialized) return;
-		RegisterInterface("SharedUTF", "IFileSystem",
-						  static_cast<IFileSystem*>(this));
-		RegisterInterface("SharedUTF", IID_IFileSystem,
-						  static_cast<IFileSystem*>(this));
-		RegisterInterface("SharedUTF", "IUTFWriter",
-								  static_cast<IUTFWriter*>(this));
-		RegisterInterface("SharedUTF", IID_IUTFWriter,
-						  static_cast<IUTFWriter*>(this));
-		initialized = true;
+	static IDAComponent* GetIFileSystem(void* self) {
+		return static_cast<IFileSystem*>(self);
 	}
 
+	static IDAComponent* GetIUTFWriter(void* self) {
+		return static_cast<IUTFWriter*>(self);
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{"IFileSystem", &GetIFileSystem},
+			{IID_IFileSystem, &GetIFileSystem},
+			{"IUTFWriter", &GetIUTFWriter},
+			{IID_IUTFWriter, &GetIUTFWriter},
+		};
+		return map;
+	}
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(SharedUTF)
@@ -406,7 +409,6 @@ Error:
 //
 BOOL SharedUTF::init (DAFILEDESC *lpDesc)
 {
-	FinalizeInterfaces();
 	UTF_HEADER header;
 	DWORD dwRead;
 	BOOL result=0;
@@ -2503,7 +2505,7 @@ LONG SharedUTF::AddNameSpace_S (LPVOID lpContext)
 //
 BaseUTF * CreateSharedUTF (DWORD dwSharing)
 { 
-	SharedUTF * result = new DAComponentSafe<SharedUTF>;
+	SharedUTF * result = new DAComponentX<SharedUTF>;
 
 	if (result)
 		result->locker.setSharing(dwSharing);

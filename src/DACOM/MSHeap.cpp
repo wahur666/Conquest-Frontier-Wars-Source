@@ -99,7 +99,7 @@ struct MSHeap : public IHeap
 		return static_cast<IHeap*>(self);
 	}
 
-	static const std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
 		static const DACOMInterfaceEntry2 map[] = {
 			{"IHeap", &GetIHeap},
 			{IID_IHeap, &GetIHeap},

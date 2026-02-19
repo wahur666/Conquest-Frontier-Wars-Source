@@ -11,6 +11,7 @@
 #include "DACOM.h"
 #include "BaseUTF.h"
 #include "FDump.h"
+#include "TComponent2.h"
 
 
 #define CHECKDESCSIZE(x)    (x->size==sizeof(DAFILEDESC)||x->size==sizeof(DAFILEDESC)-sizeof(U32))
@@ -109,8 +110,7 @@ GENRESULT BaseUTF::CreateInstance (DACOMDESC *descriptor, void  **instance)
   		  //
 			DWORD dwAttribs;
 			UTF_DIR_ENTRY * pNewBaseDirEntry = 0;
-			pNewSystem = new DAComponentSafe<BaseUTF>;
-			pNewSystem->FinalizeInterfaces();
+			pNewSystem = new DAComponentX<BaseUTF>;
 			if (pNewSystem == 0)
 			{
 				result = GR_OUT_OF_MEMORY;
@@ -335,8 +335,7 @@ GENRESULT BaseUTF::CreateInstance (DACOMDESC *descriptor, void  **instance)
   		  //
 			DWORD dwAttribs;
 			UTF_DIR_ENTRY * pNewBaseDirEntry = 0;
-			pNewSystem = new DAComponentSafe<BaseUTF>;
-			pNewSystem->FinalizeInterfaces();
+			pNewSystem = new DAComponentX<BaseUTF>;
 			if (pNewSystem == 0)
 			{
 				result = GR_OUT_OF_MEMORY;
@@ -428,7 +427,6 @@ Done:
 //
 BOOL BaseUTF::init (DAFILEDESC *lpDesc)
 {
-	FinalizeInterfaces();
 	return 1;
 }
 //--------------------------------------------------------------------------//
@@ -1484,8 +1482,7 @@ bool BaseUTF::TestValid (LPCTSTR lpFileName)
 //
 IFileSystem * CreateBaseUTF (void)
 {
-	auto baseUtf = new DAComponentSafe<BaseUTF>;
-	baseUtf->FinalizeInterfaces();
+	const auto baseUtf = new DAComponentX<BaseUTF>;
 	return baseUtf;
 }
 

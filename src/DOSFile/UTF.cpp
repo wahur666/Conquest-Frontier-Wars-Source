@@ -14,6 +14,7 @@
 
 #include "DACOM.h"
 #include "BaseUTF.h"
+#include "TComponent2.h"
 
 #define MAX_GROUP_HANDLES   4
 #define MEMORY_MAP_FLAG		0x40000000
@@ -1384,8 +1385,7 @@ const char * UTF::getNameBuffer (void)
 //
 BaseUTF * CreateUTF (void)
 {
-	auto baseUtf = new DAComponentSafe<UTF>;
-	baseUtf->FinalizeInterfaces();
+	auto baseUtf = new DAComponentX<UTF>;
 	return baseUtf;
 }
 //--------------------------------------------------------------------------//

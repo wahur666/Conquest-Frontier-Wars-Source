@@ -13,12 +13,13 @@ $Header: /Libs/dev/Src/DOSFile/Dosfile.cpp 20    2/17/00 9:23a Jasony $
 
 #include <windows.h>
 #include <process.h>
+#include <span>
 
 #include "DACOM.h"
 #include "FileSys.h"
 #include "da_heap_utility.h"
-#include "TComponentSafe.h"
 #include "FDump.h"
+#include "TComponent2.h"
 
 //--------------------------------------------------------------------------//
 //-----------------------GLOBAL DATA & MEMBERS OF FILE SYSTEM---------------//
@@ -140,7 +141,7 @@ struct READWRITE_STRUCT : public SERIAL_STRUCT
 QueueNode * pMessageList;
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
-struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem, DAComponentSafe<IDAComponent>
+struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem
 {
 	char			debugTag[9];		// "DOSFile: "
 	char			szFilename[MAX_PATH+4];
@@ -173,10 +174,6 @@ struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem, DAComponentSafe<IDACo
 
 	DOSFileSystem (void)
 	{
-	#ifdef DA_HEAP_ENABLED
-		HEAP->SetBlockMessage(this, debugTag);
-		memcpy(debugTag, "DOSFile: ", sizeof(debugTag));
-	#endif
 		szFilename[0] = '\\';
 		hFile = INVALID_HANDLE_VALUE;
 		InitializeCriticalSection(&criticalSection);
@@ -315,16 +312,16 @@ struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem, DAComponentSafe<IDACo
 	
 	SERIALMETHOD(CloseAllHandles_S);
 
-	bool initialized = false;
-	void FinalizeInterfaces()
-	{
-		if (initialized) return;
-		RegisterInterface("DOSFileSystem", "IFileSystem",
-						  static_cast<IFileSystem*>(this));
+	static IDAComponent* GetIFileSystem(void* self) {
+		return static_cast<IFileSystem*>(self);
+	}
 
-		RegisterInterface("DOSFileSystem", IID_IFileSystem,
-						  static_cast<IFileSystem*>(this));
-		initialized = true;
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{"IFileSystem", &GetIFileSystem},
+			{IID_IFileSystem, &GetIFileSystem},
+		};
+		return map;
 	}
 };
 //--------------------------------------------------------------------------//
@@ -483,8 +480,7 @@ GENRESULT DOSFileSystem::CreateInstance (DACOMDESC *descriptor,  //)
 			// See if	file is really a directory
 			//
 			DWORD dwAttribs;
-			pNewSystem = new DAComponentSafe<DOSFileSystem>;
-			pNewSystem->FinalizeInterfaces();
+			pNewSystem = new DAComponentX<DOSFileSystem>;
 			if (pNewSystem == 0)
 			{
 				result = GR_GENERIC;
@@ -550,8 +546,7 @@ GENRESULT DOSFileSystem::CreateInstance (DACOMDESC *descriptor,  //)
 		// 
 		// else create a new instance of DOSFileSystem
 		//
-		pNewSystem = new DAComponentSafe<DOSFileSystem>;
-		pNewSystem->FinalizeInterfaces();
+		pNewSystem = new DAComponentX<DOSFileSystem>;
 		if (pNewSystem == 0)
 		{
 			result = GR_GENERIC;
@@ -571,8 +566,7 @@ GENRESULT DOSFileSystem::CreateInstance (DACOMDESC *descriptor,  //)
 	//
 	// Attempt to create new file system instance
 	//
-	pNewSystem = new DAComponentSafe<DOSFileSystem>;
-	pNewSystem->FinalizeInterfaces();
+	pNewSystem = new DAComponentX<DOSFileSystem>;
 	if (pNewSystem == NULL)
 	{
 		result = GR_GENERIC;
@@ -2210,8 +2204,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,
 			startupUTF();		// create a critical section
 			if (StartUpFileSystem() == 0)
 				return 0;
-			pFirstSystem = new DAComponentSafe<DOSFileSystem>;
-			pFirstSystem->FinalizeInterfaces();
+			pFirstSystem = new DAComponentX<DOSFileSystem>;
 			if ((pFirstSystem != nullptr) && (DACOM = DACOM_Acquire()) != NULL)
 			{
 				DACOM->RegisterComponent(pFirstSystem, interface_name, DACOM_LOW_PRIORITY);

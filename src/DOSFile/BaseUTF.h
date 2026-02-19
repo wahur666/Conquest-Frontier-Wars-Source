@@ -12,9 +12,9 @@
 #include "FileSys.h"
 #endif
 
-#ifndef TCOMPONENT_SAFE_H
-#include "TComponentSafe.h"
-#endif
+#include <span>
+
+#include "TComponentx.h"
 
 #ifndef __da_heap_utility_h__
 #include "da_heap_utility.h"
@@ -160,7 +160,7 @@ struct UTF_WRITE_STRUCT
 // define the basic version of UTF implementation
 //-------------------------------------
 
-struct DACOM_NO_VTABLE BaseUTF : public IFileSystem, DAComponentSafe<IDAComponent>
+struct DACOM_NO_VTABLE BaseUTF : public IFileSystem
 {
 	char   			szFilename[MAX_PATH+4];
 	DWORD			dwAccess;            // The mode for the file
@@ -342,18 +342,18 @@ struct DACOM_NO_VTABLE BaseUTF : public IFileSystem, DAComponentSafe<IDAComponen
 	//
 	// interface map
 	//
-	bool initialized = false;
-	void FinalizeInterfaces()
-	{
-		if (initialized) return;
-		RegisterInterface("IFileSystem", "IFileSystem",
-						  static_cast<IFileSystem*>(this));
 
-		RegisterInterface("IFileSystem", IID_IFileSystem,
-						  static_cast<IFileSystem*>(this));
-		initialized = false;
+	static IDAComponent* GetIFileSystem(void* self) {
+		return static_cast<IFileSystem*>(self);
 	}
 
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static const DACOMInterfaceEntry2 map[] = {
+			{"IFileSystem", &GetIFileSystem},
+			{IID_IFileSystem, &GetIFileSystem},
+		};
+		return map;
+	}
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(BaseUTF)

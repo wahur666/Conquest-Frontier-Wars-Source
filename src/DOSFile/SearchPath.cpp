@@ -15,18 +15,21 @@
 #include <windows.h>
 
 #include "SearchPath.h"
+
+#include <span>
+
 #include "FileSys.h"
-#include "TComponentSafe.h"
 #include "TSmartPointer.h"
 
 #include "da_heap_utility.h"
+#include "TComponent2.h"
 
 extern ICOManager *DACOM;
 //--------------------------------------------------------------------------//
 //----------------------SearchPath implementation---------------------------//
 //--------------------------------------------------------------------------//
 //
-struct DACOM_NO_VTABLE DAPath : public ISearchPath, DAComponentSafe<IDAComponent>
+struct DACOM_NO_VTABLE DAPath : public ISearchPath
 {
 
 	//--------------------------
@@ -44,7 +47,6 @@ struct DACOM_NO_VTABLE DAPath : public ISearchPath, DAComponentSafe<IDAComponent
 
 	GENRESULT init (SEARCHPATHDESC * desc)
 	{
-		FinalizeInterfaces();
 		return GR_OK;
 	}
 
@@ -75,18 +77,22 @@ static bool createFileSystem (IComponentFactory * factory, char * buffer, IFileS
 
 static int __stdcall parse (char * buffer, COMPTR<IFileSystem> * & ptrs, int recurseCount=0);
 
-	void FinalizeInterfaces()
-	{
-		RegisterInterface("DAPath", "ISearchPath",
-						  static_cast<ISearchPath*>(this));
+	static IDAComponent* GetIComponentFactory(void* self) {
+		return static_cast<IComponentFactory*>(self);
+	}
 
-		RegisterInterface("DAPath", "IComponentFactory",
-						  static_cast<IComponentFactory*>(this));
-		RegisterInterface("DAPath", IID_ISearchPath,
-						  static_cast<ISearchPath*>(this));
+	static IDAComponent* GetISearchPath(void* self) {
+		return static_cast<ISearchPath*>(self);
+	}
 
-		RegisterInterface("DAPath", IID_IComponentFactory,
-						  static_cast<IComponentFactory*>(this));
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{"ISearchPath", &GetISearchPath},
+			{"IComponentFactory", &GetIComponentFactory},
+			{"IID_ISearchPath", &GetISearchPath},
+			{IID_IComponentFactory, &GetIComponentFactory},
+		};
+		return map;
 	}
 };
 
@@ -231,7 +237,7 @@ U32 DAPath::GetPath (C8 *buffer, U32 bufferSize) const
 //
 IComponentFactory * CreateSearchPathFactory (void)
 {
-	return new DAComponentFactorySafe<DAComponentSafe<DAPath>, SEARCHPATHDESC> ("ISearchPath");
+	return new DAComponentFactoryX<DAComponentX<DAPath>, SEARCHPATHDESC> ("ISearchPath");
 }
 //----------------------------------------------------------------------------//
 //-------------------------------End SearchPath.cpp---------------------------//
