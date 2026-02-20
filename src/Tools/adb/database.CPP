@@ -164,11 +164,11 @@ BOOL32 SetupParser (void)
 	
 	return result;
 }
-BOOL CALLBACK RenameDlgProc(HWND hwnd, UINT message, UINT wParam, LPARAM lParam);
+BOOL CALLBACK RenameDlgProc(HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam);
 
 //--------------------------------------------------------------------------
 //
-BOOL CALLBACK FileDlgProc(HWND hwnd, UINT message, UINT wParam, LPARAM lParam)
+BOOL CALLBACK FileDlgProc(HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_INITDIALOG)
         SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -762,7 +762,7 @@ int WINAPI WinMain (HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 //-----------------------------------------------------------------------------------------------------
 
 
-BOOL CALLBACK RenameDlgProc(HWND hwnd, UINT message, UINT wParam, LPARAM lParam)
+BOOL CALLBACK RenameDlgProc(HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_INITDIALOG)
         SetWindowLongPtr(hwnd, DWLP_USER, lParam);

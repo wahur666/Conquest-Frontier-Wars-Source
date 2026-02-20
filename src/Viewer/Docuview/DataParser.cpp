@@ -36,7 +36,8 @@
 //#include "TokenDef.h"
 
 #include <HeapObj.h>
-#include <TComponent.h>
+#include <span>
+#include <TComponent2.h>
 
 void __stdcall CreateDataParser (SYMBOL symbol, IDataParser ** pParser);
 //--------------------------------------------------------------------------//
@@ -45,12 +46,6 @@ void __stdcall CreateDataParser (SYMBOL symbol, IDataParser ** pParser);
 struct DACOM_NO_VTABLE DataParser : public IDataParser
 {
 	SYMBOL root;
-
-	BEGIN_DACOM_MAP_INBOUND(DataParser)
-	DACOM_INTERFACE_ENTRY(IDataParser)
-	DACOM_INTERFACE_ENTRY2(IID_IDataParser,IDataParser)
-	END_DACOM_MAP()
-
 
 	DataParser (void)
 	{
@@ -83,6 +78,18 @@ struct DACOM_NO_VTABLE DataParser : public IDataParser
 	IDAComponent * getBase (void)
 	{
 		return this;
+	}
+
+	static IDAComponent* GetIDataParser(void* self) {
+		return static_cast<IDataParser*>(self);
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{"IDataParser", &GetIDataParser},
+			{IID_IDataParser, &GetIDataParser},
+		};
+		return map;
 	}
 };
 //--------------------------------------------------------------------------//
@@ -186,7 +193,7 @@ void __stdcall CreateDataParser (SYMBOL symbol, IDataParser ** pParser)
 
 	if (symbol->kind == ARRAYSYM || symbol->kind == RECORDSYM)
 	{
-		DataParser * parser = new DAComponent<DataParser>;
+		DataParser * parser = new DAComponentX<DataParser>;
 		parser->init(symbol);
 		*pParser = parser;
 	}

@@ -18,9 +18,10 @@
 #include "HeapObj.h"
 #include "IConnection.h"
 #include "fdump.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 
 #include <ctype.h>
+#include <span>
 
 #include <stdlib.h>
 
@@ -37,10 +38,6 @@
 struct StringSet : public IStringSet
 {
 public:
-	BEGIN_DACOM_MAP_INBOUND(StringSet)
-	DACOM_INTERFACE_ENTRY(IStringSet)
-	END_DACOM_MAP()
-
 	struct StringHolder
 	{
 		StringHolder * next;
@@ -101,7 +98,17 @@ public:
 
 	IDAComponent * BaseComponent (void)
 	{
-		return (IDAComponent *) (daoffsetofclass(IStringSet, StringSet) + ((U32) this));
+		return static_cast<IStringSet*>(this);
+	}
+	static IDAComponent* GetIStringSet(void* self) {
+		return static_cast<IStringSet*>(self);
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static const DACOMInterfaceEntry2 map[] = {
+			{"IStringSet", &GetIStringSet},
+		};
+		return map;
 	}
 };
 
@@ -120,21 +127,23 @@ StringSet::~StringSet (void)
 //
 GENRESULT StringSet::QueryInterface (const C8 *interface_name, void **instance)
 {
-	int i;
-	const _DACOM_INTMAP_ENTRY * interfaces = _GetEntriesIn();
+	if (!interface_name || !instance)
+		return GR_INVALID_PARAM;
 
-	for (i = 0; interfaces[i].interface_name; i++)
+	std::string_view requested{interface_name};
+
+	for (const auto& e : GetInterfaceMap())
 	{
-		if (strcmp(interfaces[i].interface_name, interface_name) == 0)
+		if (e.interface_name == requested)
 		{
-			IDAComponent *result = (IDAComponent *) (((char *) this) + interfaces[i].offset);
-			result->AddRef();
-			*instance = result;
+			IDAComponent* iface = e.get(this);
+			iface->AddRef();
+			*instance = iface;
 			return GR_OK;
 		}
 	}
 
-	*instance = 0;
+	*instance = nullptr;
 	return GR_INTERFACE_UNSUPPORTED;
 }
 //--------------------------------------------------------------------------
@@ -301,7 +310,7 @@ void RegisterStringSet (ICOManager * DACOM)
 {
 	IComponentFactory * doc;
 
-	if ((doc = new DAComponentFactory<StringSet,STRINGSETDESC>("IStringSet")) != 0)
+	if ((doc = new DAComponentFactoryX<StringSet,STRINGSETDESC>("IStringSet")) != 0)
 	{
 		DACOM->RegisterComponent(doc, "IStringSet");
 		doc->Release();

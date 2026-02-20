@@ -15,6 +15,20 @@
 */
 //--------------------------------------------------------------------------//
 
+/* Example implementation
+	static IDAComponent* GetIHeap(void* self) {
+		return static_cast<IHeap*>(self); // This is not good yet, need base cast always
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static const DACOMInterfaceEntry2 map[] = {
+			{"IHeap", &GetIHeap},
+			{IID_IHeap, &GetIHeap},
+		};
+		return map;
+	}
+ */
+
 #include <vector>
 #include <string>
 #include "TComponentx.h"

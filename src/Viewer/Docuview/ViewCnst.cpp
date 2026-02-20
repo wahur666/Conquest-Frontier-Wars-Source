@@ -38,6 +38,7 @@
 #include "DataView.h"
 #include "Document.h"
 #include "TComponent.h"
+#include "TComponent2.h"
 #include "IConnection.h"
 #include "TSmartPointer.h"
 #include "HeapObj.h"
@@ -123,19 +124,19 @@ struct ViewConstructor : public IViewConstructor, IViewConstructor2, IAggregateC
 	}
 
 
-	BEGIN_DACOM_MAP_INBOUND(ViewConstructor)
-	DACOM_INTERFACE_ENTRY(IViewConstructor)
-	DACOM_INTERFACE_ENTRY(IViewConstructor2)
-	DACOM_INTERFACE_ENTRY2(IID_IViewConstructor,IViewConstructor)
-	DACOM_INTERFACE_ENTRY2(IID_IViewConstructor2,IViewConstructor2)
-	END_DACOM_MAP()
+	public: static const _DACOM_INTMAP_ENTRY* __stdcall _GetEntriesIn() { typedef ViewConstructor _DaComMapClass; static const _DACOM_INTMAP_ENTRY _entries[] = {
+	{"IViewConstructor", daoffsetofclass(IViewConstructor, _DaComMapClass)},
+	{"IViewConstructor2", daoffsetofclass(IViewConstructor2, _DaComMapClass)},
+	{"IViewConstructor" "__" "1", daoffsetofclass(IViewConstructor, _DaComMapClass)},
+	{"IViewConstructor2" "__" "1", daoffsetofclass(IViewConstructor2, _DaComMapClass)},
+	{nullptr, 0}}; return _entries;}
 
 	static IDAComponent* GetIViewConstructor(void* self) {
-		return static_cast<IViewConstructor*>(self);
+		return static_cast<IViewConstructor*>(static_cast<ViewConstructor*>(self));
 	}
 
 	static IDAComponent* GetIViewConstructor2(void* self) {
-		return static_cast<IViewConstructor2*>(self);
+		return static_cast<IViewConstructor2*>(static_cast<ViewConstructor*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
@@ -219,21 +220,41 @@ Done:
 //
 GENRESULT ViewConstructor::QueryInterface (const C8 *interface_name, void **instance)
 {
-	int i;
-	const _DACOM_INTMAP_ENTRY * interfaces = _GetEntriesIn();
 
-	for (i = 0; interfaces[i].interface_name; i++)
-	{
-		if (strcmp(interfaces[i].interface_name, interface_name) == 0)
+	if (false) {
+		const _DACOM_INTMAP_ENTRY * interfaces = _GetEntriesIn();
+
+		for (int i = 0; interfaces[i].interface_name; i++)
 		{
-			IDAComponent *result = (IDAComponent *) (((char *) this) + interfaces[i].offset);
-			result->AddRef();
-			*instance = result;
+			if (strcmp(interfaces[i].interface_name, interface_name) == 0)
+			{
+				IDAComponent *result = (IDAComponent *) (((char *) this) + interfaces[i].offset);
+				result->AddRef();
+				*instance = result;
+				return GR_OK;
+			}
+		}
+
+		*instance = 0;
+		return GR_INTERFACE_UNSUPPORTED;
+	}
+	if (!interface_name || !instance)
+		return GR_INVALID_PARAM;
+
+	std::string_view requested{interface_name};
+
+	for (const auto& e : GetInterfaceMap())
+	{
+		if (e.interface_name == requested)
+		{
+			IDAComponent* iface = e.get(this);
+			iface->AddRef();
+			*instance = iface;
 			return GR_OK;
 		}
 	}
 
-	*instance = 0;
+	*instance = nullptr;
 	return GR_INTERFACE_UNSUPPORTED;
 }
 //--------------------------------------------------------------------------//

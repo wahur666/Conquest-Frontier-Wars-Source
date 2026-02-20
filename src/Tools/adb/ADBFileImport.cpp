@@ -69,7 +69,7 @@ extern U32 IFILESYSTEM_CountNumFiles( DWORD& count, IFileSystem* file );
 // DlgProc_ADBFileImport
 //--------------------------------------------------------------------------
 
-BOOL CALLBACK DlgProc_ADBFileImport(HWND hwnd, UINT message, UINT wParam, LPARAM lParam)
+BOOL CALLBACK DlgProc_ADBFileImport(HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_INITDIALOG)
         SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -232,7 +232,7 @@ HTREEITEM SelectTypes_AddItemToTree(HWND hwndTV, LPSTR lpszItem, int nLevel)
 	return hPrev; 
 } 
 
-BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM lParam)
+BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam)
 {
 
 	if (message == WM_INITDIALOG)
@@ -247,7 +247,7 @@ BOOL CALLBACK DlgProc_SelectTypes(HWND hwnd, UINT message, UINT wParam, LPARAM l
 			that->treeView   = GetDlgItem(hwnd,IDC_TREE_BTLIST);
 			that->bSelectAll = false;
 
-			for( StringList::iterator git = fileList.begin(); git != fileList.end(); git++ )
+			for( auto git = fileList.begin(); git != fileList.end(); git++ )
 			{
 				char dirname[64];
 				char filename[128];
