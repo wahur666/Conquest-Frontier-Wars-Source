@@ -17,12 +17,11 @@
 // 4245: conversion from signed to unsigned
 // 4127: constant condition expression
 // 4355: 'this' used in member initializer
-// 4244: conversion from int to unsigned char, possible loss of data
 // 4200: zero sized struct member
 // 4710: inline function not expanded
 // 4702: unreachable code
 // 4786: truncating function name (255 chars) in browser info
-#pragma warning (disable : 4514 4201 4100 4512 4245 4127 4355 4244 4710 4702 4786)
+#pragma warning (disable : 4514 4201 4100 4512 4245 4127 4355 4710 4702 4786)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #pragma warning (disable : 4355 4201)
@@ -1318,7 +1317,7 @@ BOOL DataViewer::SetListViewHeader (void)
 }
 //----------------------------------------------------------------------------
 //
-LONG CALLBACK DataViewer::EditControlProcedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LONG_PTR CALLBACK DataViewer::EditControlProcedure(HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam)
 {
 #if !defined(_XBOX)
 	DataViewer *pParent = (DataViewer *) GetWindowLongPtr(GetParent(hwnd), DWLP_USER);
@@ -1358,7 +1357,7 @@ LONG CALLBACK DataViewer::EditControlProcedure(HWND hwnd, UINT message, UINT wPa
 }
 //--------------------------------------------------------------------------
 //
-BOOL DataViewer::MainDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+BOOL DataViewer::MainDlgProc (HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result = 0;
 
@@ -1442,7 +1441,7 @@ BOOL DataViewer::MainDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
 				{
 					RECT rect;
 
-					SendMessage(hCombo, CB_GETDROPPEDCONTROLRECT, 0, (LONG) &rect); 
+					SendMessage(hCombo, CB_GETDROPPEDCONTROLRECT, 0, (LONG_PTR) &rect);
 					MoveWindow(hCombo, 0, 0, wWidth, rect.bottom - rect.top, TRUE);
 				}
 				else
@@ -1655,7 +1654,7 @@ BOOL DataViewer::MainDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
 }
 //--------------------------------------------------------------------------
 //
-BOOL CALLBACK DataViewer::StaticDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+BOOL CALLBACK DataViewer::StaticDlgProc (HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam)
 {
 #if !defined(_XBOX)
 	if (message == WM_INITDIALOG)
@@ -2788,7 +2787,7 @@ BOOL32 DataViewer::InitCombo (void)
 
 	while (sym)
 	{
-	 	SendMessage(hCombo, CB_ADDSTRING, 0, (LONG) sym->name);
+	 	SendMessage(hCombo, CB_ADDSTRING, 0, (LONG_PTR) sym->name);
 		sym = sym->link;
 	}
 
@@ -2804,7 +2803,7 @@ BOOL32 DataViewer::InitCombo (void)
 	// hook into window procedure
 
 	if ((lpfnOldEditProcedure = (WNDPROC) GetWindowLongPtr(hCombo, GWLP_WNDPROC)) != 0)
-		SetWindowLongPtr(hCombo, GWLP_WNDPROC, (LONG) EditControlProcedure);
+		SetWindowLongPtr(hCombo, GWLP_WNDPROC, LONG_PTR(EditControlProcedure));
 
 	// remove the border style
 	if (pParentViewer)
@@ -2840,7 +2839,7 @@ BOOL32 DataViewer::UpdateCombo (void)
 		strcpy(ptr, ptr+1);
 	SetWindowText(hMainWindow, buffer);
 
-	i = SendMessage(hCombo, CB_FINDSTRINGEXACT, -1, (LONG) szDisplayName);
+	i = SendMessage(hCombo, CB_FINDSTRINGEXACT, -1, (LPARAM) szDisplayName);
 
 	if (i >= 0)
 		SendMessage(hCombo, CB_SETCURSEL, i, 0);
@@ -2964,7 +2963,7 @@ BOOL32 DataViewer::InitEdit (void)
 	// hook into window procedure
 
 	if ((lpfnOldEditProcedure = (WNDPROC) GetWindowLongPtr(hEdit, GWLP_WNDPROC)) != 0)
-		SetWindowLongPtr(hEdit, GWLP_WNDPROC, (LONG) EditControlProcedure);
+		SetWindowLongPtr(hEdit, GWLP_WNDPROC, LONG_PTR(EditControlProcedure));
 
 	bWinDataChanged = bLocalUpdated;
 
@@ -3316,10 +3315,9 @@ void main (void)
 //  
 static void SetDllHeapMsg (void)
 {
-	DWORD dwLen;
 	char buffer[260];
 	
-	dwLen = GetModuleFileName(hInstance, buffer, sizeof(buffer));
+	DWORD dwLen = GetModuleFileName(hInstance, buffer, sizeof(buffer));
  
 	while (dwLen > 0)
 	{

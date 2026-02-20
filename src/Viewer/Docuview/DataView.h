@@ -223,7 +223,7 @@ public:
 
 	/* DataViewer members */
 
-	BOOL MainDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	BOOL MainDlgProc (HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam);
 
 	BOOL32 init (void);
 
@@ -325,7 +325,7 @@ public:
 	static unsigned __int64 GetBitFieldU64 (const char *pData, int bit_offset, int bit_count);
 
 	static BOOL32 __stdcall _GetSymTypeName (SYMBOL sym, U32 modifiers, char *value);
-	static LONG CALLBACK EditControlProcedure(HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static LONG_PTR CALLBACK EditControlProcedure(HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam);
 
 	static BOOL32 GetSymValue (SYMBOL sym, U32 modifiers, const char *pData, char *value, U32 symbolSize, IStringSet * set);
 
@@ -337,7 +337,7 @@ public:
 
 	static BOOL32 __stdcall GetSymTypeName (SYMBOL sym, U32 modifiers, char *value);
 
-	static BOOL CALLBACK StaticDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static BOOL CALLBACK StaticDlgProc (HWND hwnd, UINT_PTR message, WPARAM wParam, LPARAM lParam);
 
 	static BOOL32 CopySymValue (SYMBOL src, U32 srcModifiers, const char *srcData, 
 									 SYMBOL dst, U32 dstModifiers, char *dstData);
@@ -361,7 +361,7 @@ public:
 
 	IDAComponent * BaseComponent (void)
 	{
-		return (IDAComponent *) (daoffsetofclass(IViewer, DataViewer) + ((U32) this));
+		return static_cast<IViewer*>(this);
 	}
 };
 

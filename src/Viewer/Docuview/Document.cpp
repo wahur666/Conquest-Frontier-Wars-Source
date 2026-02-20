@@ -33,10 +33,14 @@
 
 #include "TConnContainer.h"
 #include "Document.h"
+
+#include <span>
+
 #include "IDocClient.h"
 #include "TConnPoint.h"
 #include "HeapObj.h"
 #include "fdump.h"
+#include "TComponent2.h"
 
 extern HINSTANCE hInstance;
 extern ICOManager * DACOM;
@@ -69,19 +73,6 @@ struct Document : public IDocument,
 	bool bModified, bInRelease, bDeadWood;
 	DWORD dwOldUsage;
 	ConnectionPoint<Document, IDocumentClient> point;
-
-	BEGIN_DACOM_MAP_OUTBOUND(Document)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IDocumentClient", point)
-	END_DACOM_MAP()
-
-	BEGIN_DACOM_MAP_INBOUND(Document)
-	DACOM_INTERFACE_ENTRY(IDocument)
-	DACOM_INTERFACE_ENTRY(IFileSystem)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDocument,IDocument)
-	DACOM_INTERFACE_ENTRY2(IID_IFileSystem,IFileSystem)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer,IDAConnectionPointContainer)
-	END_DACOM_MAP()
 
 	Document (void) : point(0)
 	{
@@ -248,6 +239,43 @@ struct Document : public IDocument,
 	BOOL32 TempCloseFile (void);
 
 	GENRESULT init (DOCDESC *lpDesc);
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"IDocumentClient", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<Document*>(self);
+				IDAConnectionPoint* cp = &doc->point;
+				return cp;
+			}}
+		};
+		return entriesOut;
+	}
+
+	static IDAComponent* GetIDocument(void* self) {
+		return static_cast<IDocument*>(self);
+	}
+
+	static IDAComponent* GetIFileSystem(void* self) {
+		return static_cast<IFileSystem*>(self);
+	}
+
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+		return static_cast<IDAConnectionPointContainer*>(
+			static_cast<Document*>(self)
+		);
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{"IDocument", &GetIDocument},
+			{"IFileSystem", &GetIFileSystem},
+			{"IDAConnectionPointContainer", &GetIDAConnectionPointContainer},
+			{IID_IDocument, &GetIDocument},
+			{IID_IFileSystem, &GetIFileSystem},
+			{IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+		};
+		return map;
+	}
 };
 //--------------------------------------------------------------------------//
 //
@@ -338,26 +366,23 @@ Done:
 //
 GENRESULT Document::QueryInterface (const C8 *interface_name, void **instance)
 {
-	int i;
-	const _DACOM_INTMAP_ENTRY * interfaces = _GetEntriesIn();
-	std::vector<std::string> interfacess = {};
+	if (!interface_name || !instance)
+		return GR_INVALID_PARAM;
 
-	for (i = 0; interfaces[i].interface_name; i++)
+	std::string_view requested{interface_name};
+
+	for (const auto& e : GetInterfaceMap())
 	{
-		interfacess.push_back(interfaces[i].interface_name);
-	}
-	for (auto basic_string: interfacess) {
-		if (strcmp(basic_string.c_str(), interface_name) == 0)
+		if (e.interface_name == requested)
 		{
-			IDAComponent *result = (IDAComponent *) (((char *) this) + interfaces[i].offset);
-			result->AddRef();
-			*instance = result;
+			IDAComponent* iface = e.get(this);
+			iface->AddRef();
+			*instance = iface;
 			return GR_OK;
 		}
 	}
 
-
-	*instance = 0;
+	*instance = nullptr;
 	return GR_INTERFACE_UNSUPPORTED;
 }
 //--------------------------------------------------------------------------//
@@ -369,43 +394,37 @@ U32 Document::AddRef (void)
 }
 //--------------------------------------------------------------------------//
 //
-U32 Document::Release (void)
+U32 Document::Release()
 {
-	if (dwRefs > 0)
-		dwRefs--;
-	if (bInRelease==false && dwRefs == 0)
-	{
-		Document *pNext;
+	const U32 refs = --dwRefs;
 
-		bInRelease=true;
+	if (!bInRelease && refs == 0)
+	{
+		bInRelease = true;
 
 		CloseAllClients();
 
 		while (pChild)
 		{
-			pNext = pChild->pSibling;
+			Document* next = pChild->pSibling;
 			pChild->Release();
-			pChild = pNext;
+			pChild = next;
 		}
 
 		if (ReleaseUsage() && pFile)
 		{
 			pFile->Release();
-			pFile=0;
+			pFile = nullptr;
 		}
-		
-		if (dwRefs == 0)
-		{
-			delete this;
-			return 0;
-		}
-		bInRelease=false;
+
+		delete this;
+		return 0;
 	}
 
-	if (dwRefs==1 && point.pClientList==0)
+	if (refs == 1 && point.clients.empty())
 		ReleaseUsage();
 
-	return dwRefs;
+	return refs;
 }
 //--------------------------------------------------------------------------//
 //
@@ -856,23 +875,26 @@ GENRESULT Document::UpdateAllClients (const C8 *message, void *parm)
 }
 //--------------------------------------------------------------------------//
 //
-GENRESULT Document::CloseAllClients (void)
+GENRESULT Document::CloseAllClients()
 {
-	Document *node = pChild;
-		
+	Document* node = pChild;
+
 	while (node)
 	{
 		node->CloseAllClients();
 		node = node->pSibling;
 	}
 
-	while (point.pClientList)
+	while (!point.clients.empty())
 	{
-		IDocumentClient * client = point.pClientList->client;
-		point.pClientList->client->OnClose(this);
-		ASSERT(point.pClientList==0 || client != point.pClientList->client);
+		IDocumentClient* client = point.clients.front();
+		client->OnClose(this);
+
+		// ASSERT equivalent — ensure progress
+		ASSERT(point.clients.empty() ||
+			   client != point.clients.front());
 	}
-	
+
 	return GR_OK;
 }
 //--------------------------------------------------------------------------
@@ -1061,19 +1083,16 @@ U32 Document::InitChildren (void)
 }
 //--------------------------------------------------------------------------//
 //
-GENRESULT Document::LocalUpdateAllClients (Document *origDoc, const C8 *message, void *parm)
+GENRESULT Document::LocalUpdateAllClients(Document* origDoc, const C8* message, void* parm)
 {
-	CONNECTION_NODE<IDocumentClient> *node = point.pClientList;
-
-	while (node)
+	for (auto* client : point.clients)
 	{
-		node->client->OnUpdate(origDoc, message, parm);
-		node = node->pNext;
+		client->OnUpdate(origDoc, message, parm);
 	}
 
 	if (pParent)
 		pParent->LocalUpdateAllClients(origDoc, message, parm);
-	
+
 	return GR_OK;
 }
 //--------------------------------------------------------------------------
@@ -1254,7 +1273,7 @@ void RegisterDocument (ICOManager * DACOM)
 {
 	IComponentFactory * doc;
 
-	if ((doc = new DAComponentFactory<Document,DOCDESC>("IDocument")) != 0)
+	if ((doc = new DAComponentFactoryX<Document,DOCDESC>("IDocument")) != 0)
 	{
 		DACOM->RegisterComponent(doc, interface_name);
 		doc->Release();

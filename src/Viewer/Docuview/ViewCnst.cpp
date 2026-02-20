@@ -31,6 +31,9 @@
 #pragma warning (disable : 4355 4201)
 
 #include "ViewCnst.h"
+
+#include <span>
+
 #include "SymTable.h"
 #include "DataView.h"
 #include "Document.h"
@@ -58,14 +61,6 @@ struct ViewConstructor : public IViewConstructor, IViewConstructor2, IAggregateC
 	SYMBOL table;
 	IDAComponent * outer;
 
-	BEGIN_DACOM_MAP_INBOUND(ViewConstructor)
-	DACOM_INTERFACE_ENTRY(IViewConstructor)
-	DACOM_INTERFACE_ENTRY(IViewConstructor2)
-	DACOM_INTERFACE_ENTRY2(IID_IViewConstructor,IViewConstructor)
-	DACOM_INTERFACE_ENTRY2(IID_IViewConstructor2,IViewConstructor2)
-	END_DACOM_MAP()
-
-	
 	ViewConstructor (void)
 	{
 		dwRefs=1;
@@ -124,8 +119,35 @@ struct ViewConstructor : public IViewConstructor, IViewConstructor2, IAggregateC
 
 	IDAComponent * getBase (void)
 	{
-		return (IViewConstructor *)this;
+		return static_cast<IViewConstructor*>(this);
 	}
+
+
+	BEGIN_DACOM_MAP_INBOUND(ViewConstructor)
+	DACOM_INTERFACE_ENTRY(IViewConstructor)
+	DACOM_INTERFACE_ENTRY(IViewConstructor2)
+	DACOM_INTERFACE_ENTRY2(IID_IViewConstructor,IViewConstructor)
+	DACOM_INTERFACE_ENTRY2(IID_IViewConstructor2,IViewConstructor2)
+	END_DACOM_MAP()
+
+	static IDAComponent* GetIViewConstructor(void* self) {
+		return static_cast<IViewConstructor*>(self);
+	}
+
+	static IDAComponent* GetIViewConstructor2(void* self) {
+		return static_cast<IViewConstructor2*>(self);
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+		static constexpr DACOMInterfaceEntry2 map[] = {
+			{"IViewConstructor", &GetIViewConstructor},
+			{"IViewConstructor2", &GetIViewConstructor2},
+			{IID_IViewConstructor, &GetIViewConstructor},
+			{IID_IViewConstructor2, &GetIViewConstructor2},
+		};
+		return map;
+	}
+
 };
 //--------------------------------------------------------------------------//
 //
