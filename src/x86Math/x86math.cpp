@@ -42,10 +42,6 @@ const SINGLE MIN_DET = 1e-8f;
 struct x86MathEngine : public I3DMathEngine, IComponentFactory
 {
 	static ISQRT inv_sqrt_obj;
-
-//	BEGIN_DACOM_MAP_INBOUND(x86MathEngine)
-//	DACOM_INTERFACE_ENTRY(I3DMathEngine)
-//	END_DACOM_MAP()
 	
 	x86MathEngine()
       {

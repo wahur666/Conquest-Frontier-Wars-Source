@@ -41,10 +41,6 @@ struct MSHeap : public IHeap
 	//
 	// interface mapping
 	//
-	// BEGIN_DACOM_MAP_INBOUND(MSHeap)
-	// DACOM_INTERFACE_ENTRY(IHeap)
-	// DACOM_INTERFACE_ENTRY2(IID_IHeap,IHeap)
-	// END_DACOM_MAP()
 
 	DA_ERROR_HANDLER		pErrorHandler;
 

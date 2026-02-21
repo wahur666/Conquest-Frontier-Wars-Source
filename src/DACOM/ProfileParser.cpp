@@ -41,11 +41,6 @@ struct DACOM_NO_VTABLE ProfileParser : IProfileParser
 	// interface mapping
 	//
 
-	// BEGIN_DACOM_MAP_INBOUND(ProfileParser)
-	// DACOM_INTERFACE_ENTRY(IProfileParser)
-	// DACOM_INTERFACE_ENTRY2(IID_IProfileParser,IProfileParser)
-	// END_DACOM_MAP()
-
 	//
 	// data items
 	//
@@ -128,12 +123,6 @@ struct DACOM_NO_VTABLE ProfileParser2 : IProfileParser2, ProfileParser
 	//
 	// interface mapping
 	//
-	// BEGIN_DACOM_MAP_INBOUND(ProfileParser2)
-	// DACOM_INTERFACE_ENTRY(IProfileParser2)
-	// DACOM_INTERFACE_ENTRY(IProfileParser)
-	// DACOM_INTERFACE_ENTRY2(IID_IProfileParser2,IProfileParser2)
-	// DACOM_INTERFACE_ENTRY2(IID_IProfileParser,IProfileParser)
-	// END_DACOM_MAP()
 
 	GENRESULT init (PROFPARSEDESC2 * info) { return GR_OK; }
 
