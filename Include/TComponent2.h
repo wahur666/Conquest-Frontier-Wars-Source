@@ -15,19 +15,58 @@
 */
 //--------------------------------------------------------------------------//
 
-/* Example implementation
-	static IDAComponent* GetIHeap(void* self) {
-		return static_cast<IHeap*>(self); // This is not good yet, need base cast always
-	}
+//==============================================================================
+//
+//  RULE — void* casts ALWAYS require the concrete type as an intermediate
+//  -------------------------------------------------------------------------
+//  When a pointer passes through void*, all type information is lost.
+//  The compiler cannot compute base class offsets from void*.
+//  Casting void* directly to a non-first base class gives the WRONG address.
+//  It works by accident only when the target base is at offset zero (first base).
+//
+//  WRONG — works by accident if ISomething is the first base, silent bug otherwise:
+//      static IDAComponent* GetISomething(void* self) {
+//          return static_cast<ISomething*>(self);   // skips offset adjustment
+//      }
+//
+//  CORRECT — always name the concrete type to force the right offset:
+//      static IDAComponent* GetISomething(void* self) {
+//          return static_cast<ISomething*>(         // step 2: to target base
+//              static_cast<ConcreteType*>(self));   // step 1: void* -> concrete
+//      }
+//
+//  Why it breaks without step 1:
+//      struct Foo : public A, public B {};
+//      // A is at offset 0 inside Foo  — cast from void* to A* works by accident
+//      // B is at offset N inside Foo  — cast from void* to B* returns wrong address
+//      // static_cast<Foo*>(self) tells the compiler the real layout, both work
+//
+//  Decision flowchart:
+//      Is the pointer currently void*?
+//          YES -> cast to ConcreteType* first, THEN to the target base
+//          NO  -> cast directly, compiler already knows the layout
+//
+//  Copy-paste template for every interface map get() function:
+//      static IDAComponent* GetIFoo(void* self) {
+//          return static_cast<IFoo*>(
+//              static_cast<ConcreteType*>(self));  // always name the concrete type
+//      }
+//
+//==============================================================================
+//
 
+/*
+    static IDAComponent* GetIFoo(void* self) {
+         return static_cast<IFoo*>(
+             static_cast<ConcreteType*>(self));
+    }
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
 		static const DACOMInterfaceEntry2 map[] = {
-			{"IHeap", &GetIHeap},
-			{IID_IHeap, &GetIHeap},
+			{"IFoo", &GetIFoo},
 		};
 		return map;
 	}
- */
+*/
 
 #include <vector>
 #include <string>

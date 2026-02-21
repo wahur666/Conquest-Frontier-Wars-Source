@@ -287,11 +287,11 @@ struct DACOM_NO_VTABLE SharedUTF : public BaseUTF, IUTFWriter
 	BOOL32 __fastcall isValidHandle (HANDLE handle);
 
 	static IDAComponent* GetIFileSystem(void* self) {
-		return static_cast<IFileSystem*>(self);
+		return static_cast<IFileSystem*>(static_cast<SharedUTF*>(self));
 	}
 
 	static IDAComponent* GetIUTFWriter(void* self) {
-		return static_cast<IUTFWriter*>(self);
+		return static_cast<IUTFWriter*>(static_cast<SharedUTF*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {

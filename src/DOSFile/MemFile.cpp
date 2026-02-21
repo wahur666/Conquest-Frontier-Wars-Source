@@ -181,7 +181,7 @@ struct DACOM_NO_VTABLE MemoryFile : public IFileSystem
 
 	GENRESULT init (MEMFILEDESC * lpDesc);
 	static IDAComponent* GetIFileSystem(void* self) {
-		return static_cast<IFileSystem*>(self);
+		return static_cast<IFileSystem*>(static_cast<MemoryFile*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {

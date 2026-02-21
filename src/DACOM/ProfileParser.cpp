@@ -106,7 +106,7 @@ struct DACOM_NO_VTABLE ProfileParser : IProfileParser
 	}
 
 	static IDAComponent* GetIProfileParser(void* self) {
-		return static_cast<IProfileParser*>(self);
+		return static_cast<IProfileParser*>(static_cast<ProfileParser*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
@@ -174,11 +174,11 @@ struct DACOM_NO_VTABLE ProfileParser2 : IProfileParser2, ProfileParser
 
 
 	static IDAComponent* GetIProfileParser(void* self) {
-		return static_cast<IProfileParser*>(self);
+		return static_cast<IProfileParser*>(static_cast<ProfileParser2*>(self));
 	}
 
 	static IDAComponent* GetIProfileParser2(void* self) {
-		return static_cast<IProfileParser*>(self);
+		return static_cast<IProfileParser2*>(static_cast<ProfileParser2*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {

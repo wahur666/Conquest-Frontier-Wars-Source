@@ -101,7 +101,7 @@ public:
 		return static_cast<IStringSet*>(this);
 	}
 	static IDAComponent* GetIStringSet(void* self) {
-		return static_cast<IStringSet*>(self);
+		return static_cast<IStringSet*>(static_cast<StringSet*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {

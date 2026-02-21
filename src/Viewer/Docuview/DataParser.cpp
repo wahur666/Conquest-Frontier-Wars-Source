@@ -81,7 +81,7 @@ struct DACOM_NO_VTABLE DataParser : public IDataParser
 	}
 
 	static IDAComponent* GetIDataParser(void* self) {
-		return static_cast<IDataParser*>(self);
+		return static_cast<IDataParser*>(static_cast<DataParser*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {

@@ -17,6 +17,8 @@
 
 #include <vector>
 #include <string>
+
+#include "FDump.h"
 #include "TComponentx.h"
 #include "TempStr.h"
 

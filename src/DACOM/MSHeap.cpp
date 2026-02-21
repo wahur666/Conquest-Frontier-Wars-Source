@@ -96,7 +96,7 @@ struct MSHeap : public IHeap
 	virtual void * __stdcall calloc_pass_through (const C8 * msg);
 
 	static IDAComponent* GetIHeap(void* self) {
-		return static_cast<IHeap*>(self);
+		return static_cast<IHeap*>(static_cast<MSHeap*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {

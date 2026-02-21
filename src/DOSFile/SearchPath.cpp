@@ -78,11 +78,11 @@ static bool createFileSystem (IComponentFactory * factory, char * buffer, IFileS
 static int __stdcall parse (char * buffer, COMPTR<IFileSystem> * & ptrs, int recurseCount=0);
 
 	static IDAComponent* GetIComponentFactory(void* self) {
-		return static_cast<IComponentFactory*>(self);
+		return static_cast<IComponentFactory*>(static_cast<DAPath*>(self));
 	}
 
 	static IDAComponent* GetISearchPath(void* self) {
-		return static_cast<ISearchPath*>(self);
+		return static_cast<ISearchPath*>(static_cast<DAPath*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {

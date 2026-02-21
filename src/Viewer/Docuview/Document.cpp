@@ -252,11 +252,11 @@ struct Document : public IDocument,
 	}
 
 	static IDAComponent* GetIDocument(void* self) {
-		return static_cast<IDocument*>(self);
+		return static_cast<IDocument*>(static_cast<Document*>(self));
 	}
 
 	static IDAComponent* GetIFileSystem(void* self) {
-		return static_cast<IFileSystem*>(self);
+		return static_cast<IFileSystem*>(static_cast<Document*>(self));
 	}
 
 	static IDAComponent* GetIDAConnectionPointContainer(void* self) {

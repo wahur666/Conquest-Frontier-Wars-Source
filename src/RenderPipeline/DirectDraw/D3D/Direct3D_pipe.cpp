@@ -357,27 +357,27 @@ public:	// Interface
 	GENRESULT init(RPUL_DACOMDESC *desc);
 
 	static IDAComponent* GetIRenderPipeline(void* self) {
-		return static_cast<IRenderPipeline*>(self);
+		return static_cast<IRenderPipeline*>(static_cast<Direct3D_RenderPipeline*>(self));
 	}
 
 	static IDAComponent* GetIRenderPrimitive(void* self) {
-		return static_cast<IRenderPrimitive*>(self);
+		return static_cast<IRenderPrimitive*>(static_cast<Direct3D_RenderPipeline*>(self));
 	}
 
 	static IDAComponent* GetIDDBackDoor(void* self) {
-		return static_cast<IDDBackDoor*>(self);
+		return static_cast<IDDBackDoor*>(static_cast<Direct3D_RenderPipeline*>(self));
 	}
 
 	static IDAComponent* GetIGammaControl(void* self) {
-		return static_cast<IGammaControl*>(self);
+		return static_cast<IGammaControl*>(static_cast<Direct3D_RenderPipeline*>(self));
 	}
 
 	static IDAComponent* GetIRenderDebugger(void* self) {
-		return static_cast<IRenderDebugger*>(self);
+		return static_cast<IRenderDebugger*>(static_cast<Direct3D_RenderPipeline*>(self));
 	}
 
 	static IDAComponent* GetIAggregateComponent(void* self) {
-		return static_cast<IAggregateComponent*>(self);
+		return static_cast<IAggregateComponent*>(static_cast<Direct3D_RenderPipeline*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {

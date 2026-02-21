@@ -313,7 +313,7 @@ struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem
 	SERIALMETHOD(CloseAllHandles_S);
 
 	static IDAComponent* GetIFileSystem(void* self) {
-		return static_cast<IFileSystem*>(self);
+		return static_cast<IFileSystem*>(static_cast<DOSFileSystem*>(self));
 	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
