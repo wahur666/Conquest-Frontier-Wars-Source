@@ -3,22 +3,36 @@
 
 //
 
+#include <span>
+
 #include "IDeformable.h"
 #include "deform.h"
 
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "RPUL\primitivebuilder.h"
 
 //
 
 struct DEFORM : public IDeformable, public IAggregateComponent
 {
-	BEGIN_DACOM_MAP_INBOUND(DEFORM)
-	DACOM_INTERFACE_ENTRY(IDeformable)
-	DACOM_INTERFACE_ENTRY2(IID_IDeformable, IDeformable)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDeformable(void* self) {
+	    return static_cast<IDeformable*>(
+	        static_cast<DEFORM*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<DEFORM*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDeformable",           &GetIDeformable},
+	        {IID_IDeformable,         &GetIDeformable},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 	struct IDAComponent *		system;
 	struct IRenderPrimitive *	BATCH;

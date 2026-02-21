@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "dacom.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "da_heap_utility.h"
 #include "SysConsumerDesc.h"
 #include "lightman.h"
@@ -884,7 +884,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRes
 			DA_HEAP_DEFINE_HEAP_MESSAGE(hModule);
 
 		// Create and register engine-aggregate component factory.
-			IComponentFactory * server = new DAComponentFactory2<DAComponentAggregate<DEFORM>, SYSCONSUMERDESC>(interface_name); 
+			IComponentFactory * server = new DAComponentFactoryX2<DAComponentAggregateX<DEFORM>, SYSCONSUMERDESC>(interface_name);
 			if (server)
 			{
 				ICOManager * DACOM = DACOM_Acquire(); // Handle to component manager
@@ -907,7 +907,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD  ul_reason_for_call, LPVOID lpRes
 			}
 
 		// Create and register stand-alone component factory.
-			server = new DAComponentFactory<DAComponent<DEFORM>, DADEFORMDESC>(interface_name);
+			server = new DAComponentFactoryX<DAComponentX<DEFORM>, DADEFORMDESC>(interface_name);
 			if (server)
 			{
 				ICOManager * DACOM = DACOM_Acquire(); // Handle to component manager
