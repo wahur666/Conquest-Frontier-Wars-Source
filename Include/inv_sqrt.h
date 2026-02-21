@@ -30,7 +30,7 @@ typedef float SINGLE;
                                                              * 8 MSB's */
 
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 
 union _flint {
     unsigned long    i;
@@ -51,7 +51,7 @@ private:
 		for (f = 0, h = iSqrt; f < TABLE_SIZE; f++)
 		{
 			fi.i = ((EXP_BIAS-1) << EXP_POS) | (f << LOOKUP_POS);
-			fo.f = 1.0f / sqrt(fi.f);
+			fo.f = 1.0f / std::sqrt(fi.f);
 			*h++ = (unsigned char)(((fo.i + (1<<(SEED_POS-2))) >> SEED_POS) & 0xFF); /* rounding */
 		}
 		iSqrt[TABLE_SIZE / 2] = 0xFF;    /* Special case for 1.0 */

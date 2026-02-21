@@ -16,11 +16,10 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "dacom.h"						// DA component manager
 #include "da_heap_utility.h"
-#include "TComponent.h"
 #include "inv_sqrt.h"
 
 #include "3dmath.h"
@@ -95,7 +94,7 @@ struct x86MathEngine : public I3DMathEngine, IComponentFactory
 			) &&
 			(
 				info->implementation==0 ||
-				stricmp (::implementation_name, info->implementation)==0
+				_stricmp (::implementation_name, info->implementation)==0
 			)
 		)
 	   {
@@ -179,8 +178,9 @@ ISQRT x86MathEngine::inv_sqrt_obj;
 //
 // Provide main() stub and request heap resources
 //
-void main(void)
+int main(void)
 {
+	return 0;
 }
 
 //
