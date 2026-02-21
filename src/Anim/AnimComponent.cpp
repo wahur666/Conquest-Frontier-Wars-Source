@@ -9,12 +9,14 @@ database of archetypes which must be protected.
 #pragma warning (disable : 4786)
 #include "IAnim.h"
 #include "Anim.h"
-#include "TComponent.h"
 #include "SysConsumerDesc.h"
 #include "da_heap_utility.h"
 #include "tempstr.h"
 #include <map>
 #include <set>
+#include <span>
+
+#include "TComponent2.h"
 
 using namespace Animation;
 
@@ -82,18 +84,42 @@ struct AnimComponent :  public IAnimation,
 	int next_inst;
 	SINST_MAP instances;
 
-	BEGIN_DACOM_MAP_INBOUND(AnimComponent)
-	DACOM_INTERFACE_ENTRY(IAnimation)
-	DACOM_INTERFACE_ENTRY(IAnimation2)
-	DACOM_INTERFACE_ENTRY(IAnimation3)
-	DACOM_INTERFACE_ENTRY(IChannel)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAnimation,IAnimation)
-	DACOM_INTERFACE_ENTRY2(IID_IAnimation2,IAnimation2)
-	DACOM_INTERFACE_ENTRY2(IID_IAnimation3,IAnimation3)
-	DACOM_INTERFACE_ENTRY2(IID_IChannel,IChannel)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIAnimation(void* self) {
+	    return static_cast<IAnimation*>(
+	        static_cast<AnimComponent*>(self));
+	}
+	static IDAComponent* GetIAnimation2(void* self) {
+	    return static_cast<IAnimation2*>(
+	        static_cast<AnimComponent*>(self));
+	}
+	static IDAComponent* GetIAnimation3(void* self) {
+	    return static_cast<IAnimation3*>(
+	        static_cast<AnimComponent*>(self));
+	}
+	static IDAComponent* GetIChannel(void* self) {
+	    return static_cast<IChannel*>(
+	        static_cast<AnimComponent*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<AnimComponent*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IAnimation",            &GetIAnimation},
+	        {"IAnimation2",           &GetIAnimation2},
+	        {"IAnimation3",           &GetIAnimation3},
+	        {"IChannel",              &GetIChannel},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAnimation,          &GetIAnimation},
+	        {IID_IAnimation2,         &GetIAnimation2},
+	        {IID_IAnimation3,         &GetIAnimation3},
+	        {IID_IChannel,            &GetIChannel},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 	AnimComponent (void);
 	~AnimComponent (void);
@@ -1679,7 +1705,7 @@ BOOL COMAPI DllMain(HINSTANCE hinstDLL,
 			DA_HEAP_ACQUIRE_HEAP( HEAP );
 			DA_HEAP_DEFINE_HEAP_MESSAGE( hinstDLL );
 
-			IComponentFactory* server = new DAComponentFactory2<DAComponentAggregate<AnimComponent>, SYSCONSUMERDESC> ("IAnimation");
+			IComponentFactory* server = new DAComponentFactoryX2<DAComponentAggregateX<AnimComponent>, SYSCONSUMERDESC> ("IAnimation");
 
 			if (server)
 			{

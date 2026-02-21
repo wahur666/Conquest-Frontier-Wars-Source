@@ -4,7 +4,6 @@
 #include "Engine.h"
 #include "AnimTypes.h"
 #include "channel.h"
-#include "TComponent.h"
 #include "IAnim.h"
 
 #pragma warning (disable : 4786)
