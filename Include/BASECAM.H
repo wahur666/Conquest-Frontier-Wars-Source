@@ -14,10 +14,6 @@
 */
 //--------------------------------------------------------------------------//
 
-#ifndef TCOMPONENT_H
-#include "TComponent.h"
-#endif
-
 #ifndef VIEW2D_H
 #include "View2d.h"  // for ViewRect
 #endif
@@ -25,6 +21,9 @@
 #ifndef ICAMERA_H
 #include "ICamera.h"
 #endif
+#include <span>
+
+#include "TComponent2.h"
 
 #ifndef DAVARIANT_H
 #include "DAVariant.h"
@@ -119,10 +118,18 @@ struct __baseCameraImpl : public ICamera
 	// public interfaces supported
 	//
 	
-	BEGIN_DACOM_MAP_INBOUND(__baseCameraImpl)
-	DACOM_INTERFACE_ENTRY(ICamera)
-	DACOM_INTERFACE_ENTRY2(IID_ICamera,ICamera)
-	END_DACOM_MAP()
+	static IDAComponent* GetICamera(void* self) {
+	    return static_cast<ICamera*>(
+	        static_cast<__baseCameraImpl*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICamera",   &GetICamera},
+	        {IID_ICamera, &GetICamera},
+	    };
+	    return map;
+	}
 
 	//
 	// Physical viewport and "lens" attributes
@@ -500,7 +507,7 @@ struct __baseCameraImpl : public ICamera
 };
 //------------------------------------------------------------------------------
 //
-struct BaseCamera : public DAComponent<__baseCameraImpl>, IEngineInstance
+struct BaseCamera : public DAComponentX<__baseCameraImpl>, IEngineInstance
 {
 	INSTANCE_INDEX index;
 	COMPTR<IEngine> engine;

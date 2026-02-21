@@ -16,9 +16,7 @@
 #include "ILight.h"   
 #endif
 
-#ifndef TCOMPONENT_H
-#include "TComponent.h"
-#endif
+#include "TComponent2.h"
 
 #ifndef _3DMATH_H
 #include "3DMath.h"
@@ -75,10 +73,18 @@ struct __baseLightImpl : public ILight, LightSaveState
 	//
 	// Interfaces supported
 	//
-	BEGIN_DACOM_MAP_INBOUND(__baseLightImpl)
-	DACOM_INTERFACE_ENTRY(ILight)
-	DACOM_INTERFACE_ENTRY2(IID_ILight,ILight)
-	END_DACOM_MAP()
+	static IDAComponent* GetILight(void* self) {
+	    return static_cast<ILight*>(
+	        static_cast<__baseLightImpl*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ILight",   &GetILight},
+	        {IID_ILight, &GetILight},
+	    };
+	    return map;
+	}
 
 	/* ILight methods */
 	
@@ -163,7 +169,7 @@ struct __baseLightImpl : public ILight, LightSaveState
 //------------------------------------------------------------------------------
 //
 
-struct BaseLight : public DAComponent<__baseLightImpl>, IEngineInstance
+struct BaseLight : public DAComponentX<__baseLightImpl>, IEngineInstance
 {
 	/* light local variables */
 
