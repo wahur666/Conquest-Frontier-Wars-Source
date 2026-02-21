@@ -2,13 +2,15 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include "IChannel2.h"
-#include "tcomponent.h"
 #include "typedefs.h"
 #include "quat.h"
 #include <malloc.h>
+#include <span>
+
 #include "persistchannel.h"
 #include "filesys.h"
 #include "da_heap_utility.h"
+#include "TComponent2.h"
 
 struct Header
 {
@@ -24,10 +26,18 @@ struct Header
 
 struct ChannelArch : public IChannel2
 {
-	BEGIN_DACOM_MAP_INBOUND(ChannelArch)
-	DACOM_INTERFACE_ENTRY(IChannel2)
-	DACOM_INTERFACE_ENTRY2(IID_IChannel2,IChannel2)
-	END_DACOM_MAP()
+	static IDAComponent* GetIChannel2(void* self) {
+	    return static_cast<IChannel2*>(
+	        static_cast<ChannelArch*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IChannel2",   &GetIChannel2},
+	        {IID_IChannel2, &GetIChannel2},
+	    };
+	    return map;
+	}
 
 	ChannelArch (void);
 	~ChannelArch (void);
@@ -431,7 +441,7 @@ BOOL COMAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			DA_HEAP_ACQUIRE_HEAP( HEAP );
 			DA_HEAP_DEFINE_HEAP_MESSAGE( hinstDLL );
 
-			IComponentFactory* server = new DAComponentFactory<DAComponent<ChannelArch>, DACOMDESC> (IID_IChannel2);
+			IComponentFactory* server = new DAComponentFactoryX<DAComponentX<ChannelArch>, DACOMDESC> (IID_IChannel2);
 
 			if (server)
 			{
