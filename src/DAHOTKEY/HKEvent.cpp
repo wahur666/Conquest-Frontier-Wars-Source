@@ -29,10 +29,10 @@
 #include "HKeyRec.h"
 #include "EventSys2.h"
 #include "FileSys.h"
-#include "TComponent.h"
 #include "TConnContainer.h"
 #include "TConnPoint.h"
 #include "da_heap_utility.h"
+#include "TComponent2.h"
 
 
 struct Document;
@@ -158,16 +158,36 @@ struct DACOM_NO_VTABLE HotkeyEvent : public IHotkeyEvent,
 											ConnectionPointContainer<HotkeyEvent>,
 											IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(HotkeyEvent)
-	DACOM_INTERFACE_ENTRY(IHotkeyEvent)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IHotkeyEvent,IHotkeyEvent)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer,IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IEventCallback,IEventCallback)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIHotkeyEvent(void* self) {
+	    return static_cast<IHotkeyEvent*>(
+	        static_cast<HotkeyEvent*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<HotkeyEvent*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<HotkeyEvent*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<HotkeyEvent*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IHotkeyEvent",                  &GetIHotkeyEvent},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IAggregateComponent",           &GetIAggregateComponent},
+	        {IID_IHotkeyEvent,                &GetIHotkeyEvent},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	        {IID_IEventCallback,              &GetIEventCallback},
+	        {IID_IAggregateComponent,         &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 
 	//------------------------------------
@@ -1420,7 +1440,7 @@ Done:
 //
 void RegisterHotkeyEventServer (ICOManager *DACOM)
 {
-	IComponentFactory * pServer = new DAComponentFactory2<DAComponentAggregate<HotkeyEvent>, HKEVENTDESC> (interface_name);
+	IComponentFactory * pServer = new DAComponentFactoryX2<DAComponentAggregateX<HotkeyEvent>, HKEVENTDESC> (interface_name);
 
 	if (pServer)
 	{

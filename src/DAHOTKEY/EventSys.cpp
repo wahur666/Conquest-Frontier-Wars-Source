@@ -18,11 +18,11 @@
 
 #include "EventSys2.h"
 
-#include "TComponent.h"
 #include "TConnContainer.h"
 #include "TConnPoint.h"
 #include "System.h"
 #include "da_heap_utility.h"
+#include "TComponent2.h"
 
 //--------------------------------------------------------------------------//
 //---------------------------Local structures-------------------------------//
@@ -48,18 +48,42 @@ struct DACOM_NO_VTABLE EventSystem : public ISystemComponent,
 											IEventCallback,
 											ConnectionPointContainer<EventSystem>
 {
-	BEGIN_DACOM_MAP_INBOUND(EventSystem)
-	DACOM_INTERFACE_ENTRY(IEventSystem)
-	DACOM_INTERFACE_ENTRY(ISystemComponent)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IEventSystem,IEventSystem)
-	DACOM_INTERFACE_ENTRY2(IID_ISystemComponent,ISystemComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IEventCallback,IEventCallback)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer,IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventSystem(void* self) {
+	    return static_cast<IEventSystem*>(
+	        static_cast<EventSystem*>(self));
+	}
+	static IDAComponent* GetISystemComponent(void* self) {
+	    return static_cast<ISystemComponent*>(
+	        static_cast<EventSystem*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<EventSystem*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<EventSystem*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<EventSystem*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventSystem",                  &GetIEventSystem},
+	        {"ISystemComponent",              &GetISystemComponent},
+	        {"IAggregateComponent",           &GetIAggregateComponent},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IEventSystem,                &GetIEventSystem},
+	        {IID_ISystemComponent,            &GetISystemComponent},
+	        {IID_IAggregateComponent,         &GetIAggregateComponent},
+	        {IID_IEventCallback,              &GetIEventCallback},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 
 	static void *operator new(size_t size);
@@ -298,7 +322,8 @@ void EventSystem::Update (void)
 //
 void RegisterTheEventSystem (ICOManager *DACOM)
 {
-	IComponentFactory *pServer = new DAComponentFactory2<DAComponentAggregate<EventSystem>, AGGDESC> (interface_name);
+	IComponentFactory *pServer = new DAComponentFactoryX2
+	<DAComponentAggregateX<EventSystem>, AGGDESC> (interface_name);
 
 	if (pServer)
 	{

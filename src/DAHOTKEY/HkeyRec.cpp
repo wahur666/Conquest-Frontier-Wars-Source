@@ -19,15 +19,16 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <mmsystem.h>
+#include <span>
 
 #include "HKeyRec.h"
 #include "HotKey.h"
 #include "HeapObj.h"
-#include "TComponent.h"
 
 #include <stdlib.h>
 
 #include "Resource.h"
+#include "TComponent2.h"
 //--------------------------------------------------------------------------//
 //--------------------------DEFINES and Static data-------------------------//
 //--------------------------------------------------------------------------//
@@ -61,10 +62,18 @@ struct DACOM_NO_VTABLE HotkeyRecorder : public IHotkeyRecorder
 	BYTE					modifier_table[256];			// which virtual keys are modifiers
  	DWORD					LPARAM_LIST[256];
 
-	BEGIN_DACOM_MAP_INBOUND(HotkeyRecorder)
-	DACOM_INTERFACE_ENTRY(IHotkeyRecorder)
-	DACOM_INTERFACE_ENTRY2(IID_IHotkeyRecorder,IHotkeyRecorder)
-	END_DACOM_MAP()
+	static IDAComponent* GetIHotkeyRecorder(void* self) {
+	    return static_cast<IHotkeyRecorder*>(
+	        static_cast<HotkeyRecorder*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IHotkeyRecorder",   &GetIHotkeyRecorder},
+	        {IID_IHotkeyRecorder, &GetIHotkeyRecorder},
+	    };
+	    return map;
+	}
 
 	HotkeyRecorder (void);
 	~HotkeyRecorder (void);
@@ -1318,7 +1327,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstance, DWORD fdwReason, LPVOID lpvReserved)
 			
 			if ((DACOM = DACOM_Acquire()) != 0)
 			{
-				IComponentFactory * rec = new DAComponentFactory<DAComponent<HotkeyRecorder>,HKRECDESC> (interface_name);
+				IComponentFactory * rec = new DAComponentFactoryX<DAComponentX<HotkeyRecorder>,HKRECDESC> (interface_name);
 
 				if (rec)
 					DACOM->RegisterComponent(rec, interface_name);
