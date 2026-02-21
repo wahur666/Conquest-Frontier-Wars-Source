@@ -22,9 +22,12 @@
 #include <stdlib.h>
 
 #include "HKEvent.h"
+
+#include <span>
+
 #include "HotKey.h"
 #include "HKeyRec.h"
-#include "EventSys.h"
+#include "EventSys2.h"
 #include "FileSys.h"
 #include "TComponent.h"
 #include "TConnContainer.h"
@@ -32,6 +35,7 @@
 #include "da_heap_utility.h"
 
 
+struct Document;
 static char interface_name[] = "IHotkeyEvent";
 
 
@@ -165,10 +169,6 @@ struct DACOM_NO_VTABLE HotkeyEvent : public IHotkeyEvent,
 	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
 	END_DACOM_MAP()
 
-	BEGIN_DACOM_MAP_OUTBOUND(HotkeyEvent)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IEventMessageFilter", messageFilter)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IEventCallback", eventCallback)
-	END_DACOM_MAP()
 
 	//------------------------------------
 
@@ -284,6 +284,23 @@ struct DACOM_NO_VTABLE HotkeyEvent : public IHotkeyEvent,
                                  S32   message,    
                                  S32   wParam,
                                  S32   lParam);
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"IEventMessageFilter", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<HotkeyEvent*>(self);
+				IDAConnectionPoint* cp = &doc->messageFilter;
+				return cp;
+			}},
+			{"IEventCallback", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<HotkeyEvent*>(self);
+				IDAConnectionPoint* cp = &doc->eventCallback;
+				return cp;
+			}}
+		};
+		return entriesOut;
+	}
+
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(HotkeyEvent);
@@ -452,14 +469,18 @@ BOOL32 HotkeyEvent::UpdateKeyboard (DWORD dwVirtKey, BOOL bKeyPress)
 //
 inline GENRESULT HotkeyEvent::PreMessageFilter (S32 * hwnd, S32 * message, S32 * wParam, S32 * lParam)
 {
-	CONNECTION_NODE<IEventMessageFilter> *pNode = (CONNECTION_NODE<IEventMessageFilter> *) messageFilter.pClientList;
 	GENRESULT result = GR_OK;
 
-	while (pNode)
+	for (IDAComponent* baseClient : messageFilter.clients)
 	{
-		if ((result = pNode->client->PreMessageFilter(hwnd, message, wParam, lParam)) != GR_OK)
+		// cast from base class to actual interface type
+		IEventMessageFilter* client = dynamic_cast<IEventMessageFilter*>(baseClient);
+		if (!client)
+			continue; // skip if not the right interface
+
+		result = client->PreMessageFilter(hwnd, message, wParam, lParam);
+		if (result != GR_OK)
 			break;
-		pNode = pNode->pNext;
 	}
 
 	return result;
@@ -469,14 +490,18 @@ inline GENRESULT HotkeyEvent::PreMessageFilter (S32 * hwnd, S32 * message, S32 *
 //
 inline GENRESULT HotkeyEvent::PostMessageFilter (S32 hwnd, S32 message, S32 wParam, S32 lParam)
 {
-	CONNECTION_NODE<IEventMessageFilter> *pNode = (CONNECTION_NODE<IEventMessageFilter> *) messageFilter.pClientList;
 	GENRESULT result = GR_OK;
 
-	while (pNode)
+	for (IDAComponent* baseClient : messageFilter.clients)
 	{
-		if ((result = pNode->client->PostMessageFilter(hwnd, message, wParam, lParam)) != GR_OK)
+		// cast from base class to actual interface type
+		IEventMessageFilter* client = dynamic_cast<IEventMessageFilter*>(baseClient);
+		if (!client)
+			continue; // skip if not the right interface
+
+		result = client->PostMessageFilter(hwnd, message, wParam, lParam);
+		if (result != GR_OK)
 			break;
-		pNode = pNode->pNext;
 	}
 
 	return result;
@@ -1225,12 +1250,14 @@ GENRESULT HotkeyEvent::Disable (void)
 //
 void HotkeyEvent::SendEvent (U32 eventNum)
 {
-	CONNECTION_NODE<IEventCallback> *pNode = (CONNECTION_NODE<IEventCallback> *) eventCallback.pClientList;
-
-	while (pNode)
+	for (auto* baseClient : messageFilter.clients)
 	{
-		pNode->client->Notify(dwHotkeyMessage, (void *)eventNum);
-		pNode = pNode->pNext;
+		// cast from base class to actual interface type
+		IEventCallback* client = dynamic_cast<IEventCallback*>(baseClient);
+		if (!client)
+			continue; // skip if not the right interface
+
+		client->Notify(dwHotkeyMessage, (void *)eventNum);
 	}
 }
 //--------------------------------------------------------------------------//

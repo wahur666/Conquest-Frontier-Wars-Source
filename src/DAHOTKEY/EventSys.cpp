@@ -13,9 +13,10 @@
 
 
 #define WIN32_LEAN_AND_MEAN
+#include <span>
 #include <windows.h>
 
-#include "EventSys.h"
+#include "EventSys2.h"
 
 #include "TComponent.h"
 #include "TConnContainer.h"
@@ -58,10 +59,6 @@ struct DACOM_NO_VTABLE EventSystem : public ISystemComponent,
 	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
 	DACOM_INTERFACE_ENTRY2(IID_IEventCallback,IEventCallback)
 	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer,IDAConnectionPointContainer)
-	END_DACOM_MAP()
-
-	BEGIN_DACOM_MAP_OUTBOUND(EventSystem)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IEventCallback", eventCallback)
 	END_DACOM_MAP()
 
 
@@ -114,7 +111,18 @@ struct DACOM_NO_VTABLE EventSystem : public ISystemComponent,
 
 	IDAComponent * GetBase(void)
 	{
-		return (ISystemComponent *) this;
+		return static_cast<ISystemComponent *>(this);
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"IEventCallback", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<EventSystem*>(self);
+				IDAConnectionPoint* cp = &doc->eventCallback;
+				return cp;
+			}}
+		};
+		return entriesOut;
 	}
 };
 
@@ -199,19 +207,12 @@ Done:
 //
 GENRESULT EventSystem::Send (U32 message, void *param)
 {
-	CONNECTION_NODE<IEventCallback> *pList = eventCallback.pClientList, *pNext;
-	
 	//------------------------------
 	// service all of the callbacks
 	//------------------------------
-	
-	while (pList)
-	{
-		pNext = pList->pNext;
-		pList->client->Notify(message, param);
-		pList = pNext;
-	} 
-
+	for (const auto client	: eventCallback.clients) {
+		client->Notify(message, param);
+	}
 	return GR_OK;
 }
 //--------------------------------------------------------------------------//
@@ -260,24 +261,20 @@ GENRESULT EventSystem::Initialize (void)
 void EventSystem::Update (void)
 {
 	MESSAGE_NODE *pTmp = pShadowList;
-	CONNECTION_NODE<IEventCallback> *pList, *pNext;
-	
+
 	//------------------------------
 	// service all of the callbacks
 	//------------------------------
 	
-	if (eventCallback.pClientList)
-	while (pTmp)
+	if (!eventCallback.clients.empty())
 	{
-		pList = eventCallback.pClientList;
-		do
+		for (auto* tmp = pTmp; tmp; tmp = tmp->pNext)
 		{
-			pNext = pList->pNext;
-			pList->client->Notify(pTmp->message, pTmp->param);
-
-		} while ((pList = pNext) != 0);
-
-		pTmp = pTmp->pNext;
+			for (auto* client : eventCallback.clients)
+			{
+				client->Notify(tmp->message, tmp->param);
+			}
+		}
 	}
 
 	// put everyone in the message list into the free list

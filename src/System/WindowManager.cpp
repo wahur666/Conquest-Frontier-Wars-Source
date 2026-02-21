@@ -30,6 +30,9 @@
 #include "da_heap_utility.h"
 
 #include "WindowManager.h"
+
+#include <span>
+
 #include "System.h"
 
 static const char *interface_name = "IWindowManager";       // Interface name used for registration
@@ -66,10 +69,17 @@ struct WindowManager : public ISystemComponent,
 	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer,IDAConnectionPointContainer)
 	DACOM_INTERFACE_ENTRY2(IID_IWindowManager, IWindowManager)
 	END_DACOM_MAP()
-	
-	BEGIN_DACOM_MAP_OUTBOUND(WindowManager)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("ISystemEventCallback", point)
-	END_DACOM_MAP()
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"ISystemEventCallback", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<WindowManager*>(self);
+				IDAConnectionPoint* cp = &doc->point;
+				return cp;
+			}}
+		};
+		return entriesOut;
+	}
 
 	ConnectionPoint<WindowManager,ISystemEventCallback> point;
 
@@ -195,13 +205,13 @@ struct WindowManager : public ISystemComponent,
 	
 	void getWindowRects (void);
 
-	long WndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT WndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam);
 
 	static void *operator new(size_t size);
 
 	static void operator delete(void *ptr);
 
-	static LONG CALLBACK _wndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK _wndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam);
 
 	BOOL32 resizeTheWindow (S32 width, S32 height, U32 flags);
 
@@ -209,7 +219,7 @@ struct WindowManager : public ISystemComponent,
 
 	BOOL32 onClose (void);
 
-	static BOOL32 onClose (CONNECTION_NODE<ISystemEventCallback> *node);
+	static BOOL32 onClose (const std::vector<ISystemEventCallback *> &clients);
 };
 
 DA_HEAP_DEFINE_NEW_OPERATOR(WindowManager)
@@ -234,7 +244,7 @@ U32 WMInner::Release (void)
 }
 //--------------------------------------------------------------------------------------
 //
-LONG WindowManager::_wndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT WindowManager::_wndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if( GlobalWindowManagerSingleton ) {
 		return GlobalWindowManagerSingleton->WndProc(hWindow, message, wParam, lParam);
@@ -244,7 +254,7 @@ LONG WindowManager::_wndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM 
 }
 //--------------------------------------------------------------------------------------
 //
-long WindowManager::WndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT WindowManager::WndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -872,7 +882,7 @@ void WindowManager::alert_box (const C8 *caption, const C8 *fmt, ...)
 	
 	if ((fmt == NULL) || (strlen(fmt) > sizeof(work_string)))
 	{
-		strcpy(work_string, "(String missing or too large)");
+		strcpy_s(work_string, "(String missing or too large)");
 	}
 	else
 	{
@@ -906,7 +916,7 @@ void WindowManager::bomb (const C8 *caption, const C8 *fmt, ...)
 	
 	if ((fmt == NULL) || (strlen(fmt) > sizeof(work_string)))
 	{
-		strcpy(work_string, "(String missing or too large)");
+		strcpy_s(work_string, "(String missing or too large)");
 	}
 	else
 	{
@@ -940,7 +950,7 @@ void WindowManager::debug_printf (const char *fmt, ...)
 	
 	if ((fmt == NULL) || (strlen(fmt) > sizeof(work_string)))
 	{
-		strcpy(work_string, "(String missing or too large)");
+		strcpy_s(work_string, "(String missing or too large)");
 	}
 	else
 	{
@@ -962,24 +972,20 @@ void WindowManager::shutdown (void)
 //--------------------------------------------------------------------------
 // call clients in reverse order, stop when one returns non-zero.  
 //
-BOOL32 WindowManager::onClose (CONNECTION_NODE<ISystemEventCallback> *node)
+BOOL32 WindowManager::onClose (const std::vector<ISystemEventCallback *> &clients)
 {
-	BOOL32 result = 0;
-
-	if (node)
-	{
-		if ((result = onClose(node->pNext)) == 0)
-			result = node->client->OnAppClose();
+	for (auto it = clients.rbegin(); it != clients.rend(); ++it) {
+		if (const auto result = (*it)->OnAppClose(); result != 0)
+			return result;
 	}
-
-	return result;
+	return 0;
 }
 //--------------------------------------------------------------------------
 //  
-BOOL32 WindowManager::onClose (void)
-{
-	return onClose(point.pClientList);
+BOOL32 WindowManager::onClose (void) {
+	return onClose(point.clients);
 }
+
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 //

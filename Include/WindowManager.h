@@ -248,7 +248,7 @@ WM_WINAREA;
 // Function pointer types
 //
 
-typedef void (__cdecl * WMEXITCB) (int);
+typedef void (__cdecl * WMEXITCB) (WPARAM);
 typedef long LONG;
 typedef LONG HRESULT; 
 typedef void *HANDLE;

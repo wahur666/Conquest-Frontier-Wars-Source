@@ -26,7 +26,7 @@
 
 #include <commctrl.h>
 #include <DACOM.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <FileSys.h>
 #include <ViewCnst.h>
 #include <HKEvent.h>

@@ -220,24 +220,6 @@ Done:
 //
 GENRESULT ViewConstructor::QueryInterface (const C8 *interface_name, void **instance)
 {
-
-	if (false) {
-		const _DACOM_INTMAP_ENTRY * interfaces = _GetEntriesIn();
-
-		for (int i = 0; interfaces[i].interface_name; i++)
-		{
-			if (strcmp(interfaces[i].interface_name, interface_name) == 0)
-			{
-				IDAComponent *result = (IDAComponent *) (((char *) this) + interfaces[i].offset);
-				result->AddRef();
-				*instance = result;
-				return GR_OK;
-			}
-		}
-
-		*instance = 0;
-		return GR_INTERFACE_UNSUPPORTED;
-	}
 	if (!interface_name || !instance)
 		return GR_INVALID_PARAM;
 
