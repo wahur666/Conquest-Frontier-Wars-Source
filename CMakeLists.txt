@@ -70,6 +70,7 @@ add_subdirectory(src/VertexBufferManager) # GPU buffer management
 #add_subdirectory(src/EngComps/Physics/ODE/RK4)      #  ODE physics, unused
 add_subdirectory(src/EngComps/Physics/ODE/Trap)      # ODE physics
 add_subdirectory(src/VideoSystem)
+add_subdirectory(src/defcomp)
 
 # -----------------------------
 # Tier 2 — Rendering / Shading
