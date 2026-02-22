@@ -70,9 +70,9 @@
 
 struct DA3DMATHDESC : public DACOMDESC
 {
-	C8 * implementation;
+	const char *implementation;
 
-	DA3DMATHDESC(const C8 * _interface_name = IID_I3DMathEngine) : DACOMDESC(_interface_name){
+	DA3DMATHDESC(const C8 * _interface_name = IID_I3DMathEngine) : DACOMDESC(_interface_name), implementation(nullptr) {
 		size = sizeof(*this);
 	}
 };

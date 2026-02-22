@@ -42,7 +42,7 @@ const SINGLE MIN_DET = 1e-8f;
 struct x86MathEngine : public I3DMathEngine, IComponentFactory
 {
 	static ISQRT inv_sqrt_obj;
-	
+
 	x86MathEngine()
       {
 		inv_sqrt_obj.ISQRT::ISQRT();
@@ -59,12 +59,12 @@ struct x86MathEngine : public I3DMathEngine, IComponentFactory
 		*instance = 0;
 		return GR_GENERIC;
 	}
-	
+
 	DEFMETHOD_(U32,AddRef)           (void)
 	{
 		return 1;
 	}
-	
+
 	DEFMETHOD_(U32,Release)          (void)
 	{
 		return 1;
@@ -72,35 +72,31 @@ struct x86MathEngine : public I3DMathEngine, IComponentFactory
 
    // if there are bad things in the descriptor, return an error code
    // we answer any request with success, for now.
-   
-   DEFMETHOD(CreateInstance) (DACOMDESC *descriptor, void **instance)
-   {
-	   DA3DMATHDESC * info = (DA3DMATHDESC *) descriptor;
-	   
-	   *instance = 0;
-	   
-	   if (info==0 || info->interface_name==0)
-		   return GR_INVALID_PARMS;
-	   if
-		(
-			info->size == sizeof(DA3DMATHDESC) && 
-			(
-				strcmp(::interface_name, info->interface_name)==0 ||
-				strcmp(IID_I3DMathEngine, info->interface_name)==0
-			) &&
-			(
-				info->implementation==0 ||
-				_stricmp (::implementation_name, info->implementation)==0
-			)
-		)
-	   {
-		   ((I3DMathEngine *)this)->AddRef();
-		   *instance = ((I3DMathEngine *)this);
-		   return GR_OK;
-	   }
-	   
-	   return GR_INTERFACE_UNSUPPORTED;
-   }
+
+	DEFMETHOD(CreateInstance)(DACOMDESC *descriptor, void **instance) {
+		DA3DMATHDESC *info = static_cast<DA3DMATHDESC *>(descriptor);
+
+		*instance = nullptr;
+
+		if (info == nullptr || info->interface_name == nullptr)
+			return GR_INVALID_PARMS;
+
+
+		if (info->size == sizeof(DA3DMATHDESC) && (
+			    strcmp(::interface_name, info->interface_name) == 0 ||
+			    strcmp(IID_I3DMathEngine, info->interface_name) == 0
+		    ) && (
+			    info->implementation == nullptr ||
+			    _stricmp(::implementation_name, info->implementation) == 0
+		    )
+		) {
+			((I3DMathEngine *) this)->AddRef();
+			*instance = ((I3DMathEngine *) this);
+			return GR_OK;
+		}
+
+		return GR_INTERFACE_UNSUPPORTED;
+	}
 
 //
 // Matrix and Transform operations.
@@ -161,7 +157,7 @@ struct x86MathEngine : public I3DMathEngine, IComponentFactory
 //
 	DEFMETHOD(quat_slerp)	(Quaternion & dst, const Quaternion & q1, const Quaternion & q2, SINGLE t);
 
-// 
+//
 // Fast 1/sqrt(x) and sqrt(x)
 //
 	DEFMETHOD(InvSqrt)	(SINGLE & dst, const SINGLE x);
@@ -191,7 +187,7 @@ BOOL COMAPI DllMain(HINSTANCE hinstDLL,  //)
 	switch (fdwReason)
 	{
 	//
-	// DLL_PROCESS_ATTACH: Create object server component and register it 
+	// DLL_PROCESS_ATTACH: Create object server component and register it
 	// with DACOM manager
 	//
 		case DLL_PROCESS_ATTACH:
@@ -581,17 +577,17 @@ GENRESULT COMAPI x86MathEngine::transform_list(Vector * dst, const Transform & t
 				const SINGLE _x = src->x;
 				const SINGLE _y = src->y;
 				const SINGLE _z = src->z;
-				
+
 				dst->x = (t.d[0][0] * _x) +
 					(t.d[0][1] * _y) +
 					(t.d[0][2] * _z) +
 					(t.translation.x);
-				
+
 				dst->y = (t.d[1][0] * _x) +
 					(t.d[1][1] * _y) +
 					(t.d[1][2] * _z) +
 					(t.translation.y);
-				
+
 				dst->z = (t.d[2][0] * _x) +
 					(t.d[2][1] * _y) +
 					(t.d[2][2] * _z) +
@@ -611,7 +607,7 @@ GENRESULT COMAPI x86MathEngine::transform_list(Vector * dst, const Transform & t
 		return GR_OK;
 	}
 	else
-	{	
+	{
 		return transform_list(dst, static_cast<const Matrix &>(t), src, n);
 	}
 }
@@ -762,13 +758,13 @@ GENRESULT COMAPI x86MathEngine::quat_slerp(Quaternion & dst, const Quaternion & 
 // weirdness.
 	if ((1.0f + cos_omega) > Q_EPSILON)
 	{
-	// Check for case where rotations are very close, which also causes 
-	// weirdness. 
+	// Check for case where rotations are very close, which also causes
+	// weirdness.
 		if ((1.0f - cos_omega) > Q_EPSILON)
 		{
 			SINGLE omega = acos(cos_omega);
 			SINGLE sin_omega = sin(omega);
-	
+
 			s1 = sin((1.0f - t) * omega) / sin_omega;
 			s2 = sin(t * omega) / sin_omega;
 		}
