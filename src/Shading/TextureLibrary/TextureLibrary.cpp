@@ -18,12 +18,14 @@
 #include "FDump.h"
 #include "TempStr.h"
 #include "TSmartPointer.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "da_d3dtypes.h"
 #include "da_heap_utility.h"
 #include "pixel.h"
 #include "RPUL.h"
 //#include "AllocLite.h"
+#include <span>
+
 #include "FileSys_Utility.h"
 #include "IProfileParser_Utility.h"
 #include "IVideoStreamControl.h"
@@ -854,12 +856,24 @@ struct TextureLibrary : ITextureLibrary,
 						IAggregateComponent
 
 {
-	BEGIN_DACOM_MAP_INBOUND(TextureLibrary)
-	DACOM_INTERFACE_ENTRY(ITextureLibrary)
-	DACOM_INTERFACE_ENTRY2(IID_ITextureLibrary,ITextureLibrary)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetITextureLibrary(void* self) {
+	    return static_cast<ITextureLibrary*>(
+	        static_cast<TextureLibrary*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<TextureLibrary*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ITextureLibrary",       &GetITextureLibrary},
+	        {IID_ITextureLibrary,     &GetITextureLibrary},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 public:		// public interface
     
@@ -3761,7 +3775,7 @@ BOOL COMAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			IComponentFactory *server1;
 
 			// Register System aggragate factory
-			if( DACOM && (server1 = new DAComponentFactory2<DAComponentAggregate<TextureLibrary>, AGGDESC>(CLSID_TextureLibrary)) != NULL ) {
+			if( DACOM && (server1 = new DAComponentFactoryX2<DAComponentAggregateX<TextureLibrary>, AGGDESC>(CLSID_TextureLibrary)) != NULL ) {
 				DACOM->RegisterComponent( server1, CLSID_TextureLibrary, DACOM_NORMAL_PRIORITY );
 				server1->Release();
 			}
