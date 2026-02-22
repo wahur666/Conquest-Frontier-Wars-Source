@@ -13,9 +13,9 @@
 
 #include <limits>
 #include <map>
-
+#include <span>
 #include "dacom.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TSmartPointer.h"
 #include "3DMath.h"
 #include "da_heap_utility.h"
@@ -53,12 +53,24 @@ struct EngineLights : public IEngineComponent
 {
 public:	// Data
 
-	BEGIN_DACOM_MAP_INBOUND(EngineLights)
-	DACOM_INTERFACE_ENTRY(IEngineComponent)
-	DACOM_INTERFACE_ENTRY (IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IEngineComponent,IEngineComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEngineComponent(void* self) {
+	    return static_cast<IEngineComponent*>(
+	        static_cast<EngineLights*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<EngineLights*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEngineComponent",      &GetIEngineComponent},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IEngineComponent,    &GetIEngineComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 protected: // Data
 
@@ -372,7 +384,7 @@ BOOL COMAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 		DA_HEAP_ACQUIRE_HEAP(HEAP);
 		DA_HEAP_DEFINE_HEAP_MESSAGE(hinstDLL);
 		
-		if( (server = new DAComponentFactory2<DAComponentAggregate<EngineLights>, SYSCONSUMERDESC>( CLSID_EngineLights )) != NULL ) {
+		if( (server = new DAComponentFactoryX2<DAComponentAggregateX<EngineLights>, SYSCONSUMERDESC>( CLSID_EngineLights )) != NULL ) {
 			DACOM_Acquire()->RegisterComponent( server, CLSID_EngineLights, DACOM_NORMAL_PRIORITY );
 			server->Release();
 		}
