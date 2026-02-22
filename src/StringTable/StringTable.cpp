@@ -5,7 +5,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include "StringTable.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "typedefs.h"
 #include <malloc.h>
 #include "persistchannel.h"
@@ -23,20 +23,37 @@
 
 #include <list>
 #include <map>
+#include <span>
 #include <string>
 
 #define CLSID_StringTable "IStringTable"
 
 struct StringTable : public IStringTable, public ISaverLoader, public IAggregateComponent
 {
-	BEGIN_DACOM_MAP_INBOUND(StringTable)
-		DACOM_INTERFACE_ENTRY(IStringTable)
-		DACOM_INTERFACE_ENTRY2(IID_IStringTable,IStringTable)
-		DACOM_INTERFACE_ENTRY(IAggregateComponent)
-		DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-		DACOM_INTERFACE_ENTRY(ISaverLoader)
-		DACOM_INTERFACE_ENTRY2(IID_ISaverLoader,ISaverLoader)
-	END_DACOM_MAP()
+	static IDAComponent* GetIStringTable(void* self) {
+	    return static_cast<IStringTable*>(
+	        static_cast<StringTable*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<StringTable*>(self));
+	}
+	static IDAComponent* GetISaverLoader(void* self) {
+	    return static_cast<ISaverLoader*>(
+	        static_cast<StringTable*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IStringTable",          &GetIStringTable},
+	        {IID_IStringTable,        &GetIStringTable},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	        {"ISaverLoader",          &GetISaverLoader},
+	        {IID_ISaverLoader,        &GetISaverLoader},
+	    };
+	    return map;
+	}
 
 	// IAggregateComponent 
 	GENRESULT COMAPI Initialize(void) { return GR_OK; }
@@ -1475,7 +1492,7 @@ BOOL COMAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			IComponentFactory * server;
 
 			// Register System aggragate factory
-			if( DACOM && (server = new DAComponentFactory2<DAComponentAggregate<StringTable>, AGGDESC>(CLSID_StringTable)) != NULL ) 
+			if( DACOM && (server = new DAComponentFactoryX2<DAComponentAggregateX<StringTable>, AGGDESC>(CLSID_StringTable)) != NULL )
 			{
 				DACOM->RegisterComponent( server, CLSID_StringTable, DACOM_NORMAL_PRIORITY );
 				server->Release();

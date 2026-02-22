@@ -19,7 +19,7 @@
 
 #include "Streamer.h"
 
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "HeapObj.h"
 #include "FDump.h"
 #include "TSmartPointer.h"
@@ -31,6 +31,7 @@
 #include <dsound.h>
 #include <mmreg.h>
 #include <msacm.h>
+#include <span>
 
 #define CHUNK_NAME(d0,d1,d2,d3) ((long(d3)<<24)+(long(d2)<<16)+(d1<<8)+d0)
 #define CDALIGNMASK 0x7FF
@@ -907,12 +908,24 @@ void Streamer::fillDecompressionChamber (void)
 //
 struct Music : IStreamer, IAggregateComponent
 {
-	BEGIN_DACOM_MAP_INBOUND(Music)
-	DACOM_INTERFACE_ENTRY(IStreamer)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IStreamer,IStreamer)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIStreamer(void* self) {
+	    return static_cast<IStreamer*>(
+	        static_cast<Music*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<Music*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IStreamer",             &GetIStreamer},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IStreamer,           &GetIStreamer},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 	//-------------------------------
 	// data items
@@ -1652,7 +1665,7 @@ BOOL COMAPI DllMain(HINSTANCE hinstDLL,  //)
 			HEAP_Acquire();
 			SetDllHeapMsg(hinstDLL);
 
-			server = new DAComponentFactory2<DAComponentAggregate<Music>, AGGDESC> (interface_name);
+			server = new DAComponentFactoryX2<DAComponentAggregateX<Music>, AGGDESC> (interface_name);
 			DACOM_Acquire()->RegisterComponent(server, interface_name, DACOM_LOW_PRIORITY);
 			server->Release();
 
