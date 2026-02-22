@@ -5,6 +5,9 @@
 #include <stdio.h>
 
 #include "collision.h"
+
+#include <span>
+
 #include "XPrim.h"
 #include "Debugprint.h"
 #include "VBox.h"
@@ -12,9 +15,8 @@
 #include "Tfuncs.h"
 #include "da_heap_utility.h"
 #include "dacom.h"
-#include "tcomponent.h"
 #include "sysconsumerdesc.h"
-
+#include "TComponent2.h"
 
 
 HINSTANCE	hInstance;	// DLL instance handle
@@ -51,13 +53,24 @@ static	int		buffer_length;
 struct DACOM_NO_VTABLE Collision : public IAggregateComponent,
 								   public ICollision
 {
-protected:
-	BEGIN_DACOM_MAP_INBOUND(Collision)
-	DACOM_INTERFACE_ENTRY(ICollision)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_ICollision, ICollision)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetICollision(void* self) {
+	    return static_cast<ICollision*>(
+	        static_cast<Collision*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<Collision*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICollision",            &GetICollision},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_ICollision,          &GetICollision},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 public:
 	Collision();
@@ -187,7 +200,7 @@ BOOL	COMAPI	DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			DA_HEAP_ACQUIRE_HEAP(HEAP);
 			DA_HEAP_DEFINE_HEAP_MESSAGE(hinstDLL);
 
-			server = new DAComponentFactory2<DAComponentAggregate<Collision>, SYSCONSUMERDESC> (CLSID_Collision);
+			server = new DAComponentFactoryX2<DAComponentAggregateX<Collision>, SYSCONSUMERDESC> (CLSID_Collision);
 
 			if(!server)
 			{
