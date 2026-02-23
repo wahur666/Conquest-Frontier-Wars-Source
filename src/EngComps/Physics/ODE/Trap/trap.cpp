@@ -6,12 +6,13 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <math.h>
+#include <span>
 #include <stdio.h>
 
 #include "fdump.h"
 
 #include "da_heap_utility.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "ode.h"
 
 //
@@ -26,10 +27,18 @@ const C8 *implementation_name	= "Trapezoidal"; 	// Implementation name.
 
 struct DACOM_NO_VTABLE TrapezoidalSolver : public IODESolver
 {
-	BEGIN_DACOM_MAP_INBOUND(TrapezoidalSolver)
-	DACOM_INTERFACE_ENTRY(IODESolver)
-	DACOM_INTERFACE_ENTRY2(IID_IODESolver,IODESolver)
-	END_DACOM_MAP()
+	static IDAComponent* GetIODESolver(void* self) {
+	    return static_cast<IODESolver*>(
+	        static_cast<TrapezoidalSolver*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IODESolver",   &GetIODESolver},
+	        {IID_IODESolver, &GetIODESolver},
+	    };
+	    return map;
+	}
 
 	int		state_len;
 	SINGLE *guess;
@@ -237,7 +246,7 @@ GENRESULT Server::CreateInstance (DACOMDESC *descriptor, void **instance)
 	}
 	else 
 	{
-		if ((*instance = new DAComponent<TrapezoidalSolver>) != NULL)
+		if ((*instance = new DAComponentX<TrapezoidalSolver>) != NULL)
 		{
 			result = GR_OK;
 		}
