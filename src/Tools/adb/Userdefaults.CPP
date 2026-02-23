@@ -18,8 +18,10 @@
 #include "pch.h"
 
 #include <commdlg.h>               // Common dialogs
+#include <span>
+
 #include "UserDefaults.h"
-#include <TComponent.h>
+#include <TComponent2.h>
 #include "Resource.h"
 
 //-------------------------------------------------------------------------------------
@@ -57,9 +59,17 @@ struct DACOM_NO_VTABLE UserDefaults : public IUserDefaults
 	// interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(UserDefaults)
-	DACOM_INTERFACE_ENTRY(IUserDefaults)
-	END_DACOM_MAP()
+	static IDAComponent* GetIUserDefaults(void* self) {
+	    return static_cast<IUserDefaults*>(
+	        static_cast<UserDefaults*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IUserDefaults", &GetIUserDefaults},
+	    };
+	    return map;
+	}
 
 	UserDefaults (void)
 	{
@@ -726,7 +736,7 @@ void UserDefaults::SetWindowDefaults (void)
 BOOL32 CreateUserDefaults (void)
 {
 	if (DEFAULTS==0)
-		DEFAULTS = new DAComponent<UserDefaults>;
+		DEFAULTS = new DAComponentX<UserDefaults>;
 
 	return 1;
 }

@@ -32,11 +32,12 @@
 #include <DACOM.h>
 #include <TSmartPointer.h>
 #include <mmsystem.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <MemFile.h>
 #include <time.h>
 #include <string>
 #include <CommCtrl.h>
+#include <span>
 #include <vector>
 
 #include "dbtreeview.h"
@@ -70,10 +71,18 @@ std::string g_DefaultNameString;
 //
 struct DACOM_NO_VTABLE StructEnumerator : public IStructEnumerator
 {
-	BEGIN_DACOM_MAP_INBOUND(StructEnumerator)
-	DACOM_INTERFACE_ENTRY(IStructEnumerator)
-	DACOM_INTERFACE_ENTRY2(IID_IStructEnumerator, IStructEnumerator)
-	END_DACOM_MAP()
+	static IDAComponent* GetIStructEnumerator(void* self) {
+	    return static_cast<IStructEnumerator*>(
+	        static_cast<StructEnumerator*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IStructEnumerator",   &GetIStructEnumerator},
+	        {IID_IStructEnumerator, &GetIStructEnumerator},
+	    };
+	    return map;
+	}
 
 	COMPTR<IFileSystem> outFile;
 	int indent, currentPos;
@@ -206,10 +215,18 @@ struct DACOM_NO_VTABLE StructEnumerator : public IStructEnumerator
 //
 struct DACOM_NO_VTABLE TableBuilder : public IStructEnumerator
 {
-	BEGIN_DACOM_MAP_INBOUND(TableBuilder)
-	DACOM_INTERFACE_ENTRY(IStructEnumerator)
-	DACOM_INTERFACE_ENTRY2(IID_IStructEnumerator, IStructEnumerator)
-	END_DACOM_MAP()
+	static IDAComponent* GetIStructEnumerator(void* self) {
+	    return static_cast<IStructEnumerator*>(
+	        static_cast<TableBuilder*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IStructEnumerator",   &GetIStructEnumerator},
+	        {IID_IStructEnumerator, &GetIStructEnumerator},
+	    };
+	    return map;
+	}
 
 	COMPTR<IFileSystem> outFile;
 
@@ -506,9 +523,17 @@ StringSetFinder finder;
 //U32 ctblPos = 0;
 struct DocManager : DocumentClient
 {
-	BEGIN_DACOM_MAP_INBOUND(DocManager)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<DocManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDocumentClient", &GetIDocumentClient},
+	    };
+	    return map;
+	}
 
 	DEFMETHOD(OnUpdate) (struct IDocument *doc, const C8 *message = 0, void *parm = 0);
 
@@ -933,7 +958,7 @@ void InitDB()
 	U32 i;
 	USER_DEFAULTS *iggy;
 
-	docManager = new DAComponent<DocManager>;
+	docManager = new DAComponentX<DocManager>;
 
 	for (i=0;i<256;i++)
 	{
@@ -2120,7 +2145,7 @@ struct TextWritingStruct
 	COMPTR<IViewer> viewer;
 	VIEWDESC vdesc;
 //	DAComponent<StructEnumerator> structEnumerator;
-	DAComponent<TableBuilder> structEnumerator;
+	DAComponentX<TableBuilder> structEnumerator;
 	U32 numFiles, numFilesProcessed;
 
 	TextWritingStruct (void)

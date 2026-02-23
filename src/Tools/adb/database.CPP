@@ -31,7 +31,7 @@
 #include <ViewCnst.h>
 #include <HKEvent.h>
 #include <IConnection.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <stdlib.h>
 #include <mmsystem.h>
 #include <Document.h>
@@ -39,6 +39,7 @@
 #include <FDump.h>
 #include "TDocClient.h"
 #include <richedit.h>
+#include <span>
 
 // #define BUILD_AUTOBINMORPH
 
@@ -78,9 +79,17 @@ extern _STATE _state;
 
 struct DocManager : DocumentClient
 {
-	BEGIN_DACOM_MAP_INBOUND(DocManager)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<DocManager*>(self));
+	}
+
+	static span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDocumentClient", &GetIDocumentClient},
+	    };
+	    return map;
+	}
 
 	DEFMETHOD(OnUpdate) (struct IDocument *doc, const C8 *message = 0, void *parm = 0);
 
