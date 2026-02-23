@@ -12,7 +12,6 @@
 #include <stdlib.h>
 
 #include "dacom.h"
-#include "tcomponent.h"
 #include "da_heap_utility.h"
 #include "fdump.h"
 #include "filesys.h"
@@ -67,7 +66,7 @@ BOOL COMAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			DA_HEAP_ACQUIRE_HEAP(HEAP);
 			DA_HEAP_DEFINE_HEAP_MESSAGE(hinstDLL);
 
-			server = new DAComponentFactory2<DAComponentAggregate<RigidBodyPhysics>, SYSCONSUMERDESC> (interface_name);
+			server = new DAComponentFactoryX2<DAComponentAggregateX<RigidBodyPhysics>, SYSCONSUMERDESC> (interface_name);
 
 			if (server == NULL)
 			{

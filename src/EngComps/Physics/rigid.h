@@ -13,7 +13,7 @@
 
 #include "da_heap_utility.h"
 #include "dacom.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "SysConsumerDesc.h"
 #include "engcomp.h"
 #include "engine.h"
@@ -25,6 +25,8 @@
 #include "handlemap.h"
 
 //
+
+#include <span>
 
 #include "ode.h"
 #include "instance.h"
@@ -65,16 +67,35 @@ struct DACOM_NO_VTABLE RigidBodyPhysics : public IEngineComponent,
 										  public IODE
 {
 
-	BEGIN_DACOM_MAP_INBOUND(RigidBodyPhysics)
-	DACOM_INTERFACE_ENTRY(IPhysics)
-	DACOM_INTERFACE_ENTRY(IODE)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY(IEngineComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IPhysics,IPhysics)
-	DACOM_INTERFACE_ENTRY2(IID_IODE,IODE)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IEngineComponent,IEngineComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIPhysics(void* self) {
+	    return static_cast<IPhysics*>(
+	        static_cast<RigidBodyPhysics*>(self));
+	}
+	static IDAComponent* GetIODE(void* self) {
+	    return static_cast<IODE*>(static_cast<RigidBodyPhysics*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<RigidBodyPhysics*>(self));
+	}
+	static IDAComponent* GetIEngineComponent(void* self) {
+	    return static_cast<IEngineComponent*>(
+	        static_cast<RigidBodyPhysics*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IPhysics",              &GetIPhysics},
+	        {"IODE",                  &GetIODE},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {"IEngineComponent",      &GetIEngineComponent},
+	        {IID_IPhysics,            &GetIPhysics},
+	        {IID_IODE,                &GetIODE},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	        {IID_IEngineComponent,    &GetIEngineComponent},
+	    };
+	    return map;
+	}
 
 	static void *operator new(size_t size);
 

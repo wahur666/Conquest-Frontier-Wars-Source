@@ -19,7 +19,7 @@
 //
 #define IID_IODE MAKE_IID("IODE",1)
 
-struct IODE
+struct IODE : IDAComponent
 {
 // Return length of state vector.
 	virtual S32		get_y_length(void) = 0;
