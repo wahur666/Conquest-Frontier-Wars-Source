@@ -22,7 +22,7 @@
 #include <map>
 
 #include "dacom.h"                    // DA component manager
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TSmartPointer.h"
 #include "stddat.h"
 #include "FDump.h"
@@ -35,6 +35,9 @@
 #include "IProfileParser.h"
 #include "ICamera.h"
 #include "engine.h"
+
+#include <span>
+
 #include "engcomp.h"
 #include "engine2.h"
 
@@ -172,12 +175,24 @@ struct DACOM_NO_VTABLE ENGINE : public IEngine, public IEngine2
 public:
 	// Define table of interfaces accessible through QueryInterface()
 	//
-	BEGIN_DACOM_MAP_INBOUND(ENGINE)
-	DACOM_INTERFACE_ENTRY(IEngine)
-	DACOM_INTERFACE_ENTRY2(IID_IEngine,IEngine)
-	DACOM_INTERFACE_ENTRY(IEngine2)
-	DACOM_INTERFACE_ENTRY2(IID_IEngine2,IEngine2)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEngine(void* self) {
+	    return static_cast<IEngine*>(
+	        static_cast<ENGINE*>(self));
+	}
+	static IDAComponent* GetIEngine2(void* self) {
+	    return static_cast<IEngine2*>(
+	        static_cast<ENGINE*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEngine",    &GetIEngine},
+	        {IID_IEngine,  &GetIEngine},
+	        {"IEngine2",   &GetIEngine2},
+	        {IID_IEngine2, &GetIEngine2},
+	    };
+	    return map;
+	}
 
 protected:	// Data
 
@@ -1672,7 +1687,7 @@ const Vector & COMAPI ENGINE::get_angular_velocity( INSTANCE_INDEX inst_index ) 
 //
 //
 
-struct Engine_Impl : public DAComponent<ENGINE>
+struct Engine_Impl : public DAComponentX<ENGINE>
 {
 	DEFMETHOD(QueryInterface)( const C8 *interface_name, void **instance );
 };
@@ -1681,7 +1696,7 @@ struct Engine_Impl : public DAComponent<ENGINE>
 
 GENRESULT Engine_Impl::QueryInterface( const C8 *interface_name, void **instance )
 {
-	if( DAComponent<ENGINE>::QueryInterface(interface_name, instance) == GR_OK ) {
+	if( DAComponentX::QueryInterface(interface_name, instance) == GR_OK ) {
 		return GR_OK;
 	}
 
@@ -1717,7 +1732,7 @@ BOOL COMAPI DllMain( HINSTANCE hinstDLL, S32 fdwReason, LPVOID lpvReserved )
 		DA_HEAP_ACQUIRE_HEAP(HEAP);
 		DA_HEAP_DEFINE_HEAP_MESSAGE(hinstDLL);
 		
-		if( (server = new DAComponentFactory< Engine_Impl, DACOMDESC >( CLSID_Engine )) != NULL ) {
+		if( (server = new DAComponentFactoryX< Engine_Impl, DACOMDESC >( CLSID_Engine )) != NULL ) {
 			DACOM_Acquire()->RegisterComponent( server, CLSID_Engine, DACOM_LOW_PRIORITY );
 			server->Release();
 		}
