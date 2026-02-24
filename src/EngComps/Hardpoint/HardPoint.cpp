@@ -13,7 +13,7 @@
 //
 
 #include "DACOM.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "fdump.h"
 #include "tempstr.h"
 #include "Matrix.h"
@@ -32,6 +32,8 @@
 #include "Tfuncs.h"
 
 //
+
+#include <span>
 
 #include "PersistHardpoint.h"
 
@@ -67,14 +69,30 @@ struct HardPointComponent : public IHardpoint,
 							public IEngineComponent
 {
 public: // Data
-	BEGIN_DACOM_MAP_INBOUND(HardPointComponent)
-	DACOM_INTERFACE_ENTRY(IHardpoint)
-	DACOM_INTERFACE_ENTRY2(IID_IHardpoint,IHardpoint)
-	DACOM_INTERFACE_ENTRY(IEngineComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IEngineComponent,IEngineComponent)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIHardpoint(void* self) {
+	    return static_cast<IHardpoint*>(
+	        static_cast<HardPointComponent*>(self));
+	}
+	static IDAComponent* GetIEngineComponent(void* self) {
+	    return static_cast<IEngineComponent*>(
+	        static_cast<HardPointComponent*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<HardPointComponent*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IHardpoint",            &GetIHardpoint},
+	        {IID_IHardpoint,          &GetIHardpoint},
+	        {"IEngineComponent",      &GetIEngineComponent},
+	        {IID_IEngineComponent,    &GetIEngineComponent},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 
 protected: // Data
@@ -586,7 +604,7 @@ BOOL COMAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			DA_HEAP_DEFINE_HEAP_MESSAGE( hinstDLL );
 
 			IComponentFactory* server = 
-				new DAComponentFactory2<DAComponentAggregate<HardPointComponent>, SYSCONSUMERDESC> ("IHardpoint");
+				new DAComponentFactoryX2<DAComponentAggregateX<HardPointComponent>, SYSCONSUMERDESC> ("IHardpoint");
 
 			if (server)
 			{
