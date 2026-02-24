@@ -15,12 +15,14 @@
 
 //
 
+#include <span>
+
 #include "DACOM.h"
 #include "FDUMP.h"
 #include "Tempstr.h"
 #include "TSmartPointer.h"
 #include "da_heap_utility.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "IProfileParser_Utility.h"
 #include "IVertexBufferManager.h"
 
@@ -44,12 +46,24 @@ struct VertexBufferManager :	IVertexBufferManager,
 								IAggregateComponent
 
 {
-	BEGIN_DACOM_MAP_INBOUND(VertexBufferManager)
-	DACOM_INTERFACE_ENTRY(IVertexBufferManager)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IVertexBufferManager,IVertexBufferManager)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIVertexBufferManager(void* self) {
+	    return static_cast<IVertexBufferManager*>(
+	        static_cast<VertexBufferManager*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<VertexBufferManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IVertexBufferManager",   &GetIVertexBufferManager},
+	        {"IAggregateComponent",    &GetIAggregateComponent},
+	        {IID_IVertexBufferManager, &GetIVertexBufferManager},
+	        {IID_IAggregateComponent,  &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 public:		// public interface
     
@@ -517,7 +531,7 @@ BOOL COMAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			IComponentFactory *server1;
 
 			// Register System aggragate factory
-			if( DACOM && (server1 = new DAComponentFactory2<DAComponentAggregate<VertexBufferManager>, AGGDESC>(CLSID_VertexBufferManager)) != NULL ) {
+			if( DACOM && (server1 = new DAComponentFactoryX2<DAComponentAggregateX<VertexBufferManager>, AGGDESC>(CLSID_VertexBufferManager)) != NULL ) {
 				DACOM->RegisterComponent( server1, CLSID_VertexBufferManager, DACOM_NORMAL_PRIORITY );
 				server1->Release();
 			}
