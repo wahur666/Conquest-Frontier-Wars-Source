@@ -16,7 +16,7 @@
 
 #include <windows.h>
 
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TConnContainer.h"
 #include "TConnPoint.h"
 #include "System.h"
@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <d3d9.h>
+#include <span>
 
 
 //--------------------------------------------------------------------------//
@@ -67,14 +68,30 @@ struct VideoNode
 struct DACOM_NO_VTABLE VideoSystem : public ISystemComponent, 
 											IVideoSystem
 {
-	BEGIN_DACOM_MAP_INBOUND(VideoSystem)
-	DACOM_INTERFACE_ENTRY(IVideoSystem)
-	DACOM_INTERFACE_ENTRY(ISystemComponent)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IVideoSystem,IVideoSystem)
-	DACOM_INTERFACE_ENTRY2(IID_ISystemComponent,ISystemComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIVideoSystem(void* self) {
+	    return static_cast<IVideoSystem*>(
+	        static_cast<VideoSystem*>(self));
+	}
+	static IDAComponent* GetISystemComponent(void* self) {
+	    return static_cast<ISystemComponent*>(
+	        static_cast<VideoSystem*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<VideoSystem*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IVideoSystem",          &GetIVideoSystem},
+	        {"ISystemComponent",      &GetISystemComponent},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IVideoSystem,        &GetIVideoSystem},
+	        {IID_ISystemComponent,    &GetISystemComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 	static void *operator new(size_t size);
 
@@ -422,7 +439,7 @@ void VideoSystem::Update (void)
 //
 void RegisterTheVideoSystem (ICOManager *DACOM)
 {
-	IComponentFactory *pServer = new DAComponentFactory2<DAComponentAggregate<VideoSystem>, AGGDESC> (interface_name);
+	IComponentFactory *pServer = new DAComponentFactoryX2<DAComponentAggregateX<VideoSystem>, AGGDESC> (interface_name);
 
 	if (pServer)
 	{
