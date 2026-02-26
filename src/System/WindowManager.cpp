@@ -22,7 +22,7 @@
 #include <windows.h>
 #include <stdlib.h>
 
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TConnPoint.h"
 #include "TConnContainer.h"
 #include "fdump.h"
@@ -42,9 +42,9 @@ static struct WindowManager *GlobalWindowManagerSingleton;
 
 //--------------------------------------------------------------------------//
 //
-struct WMInner : public DAComponentInner<WindowManager>
+struct WMInner : public DAComponentInnerX<WindowManager>
 {
-	WMInner (WindowManager * _owner) : DAComponentInner<WindowManager>(_owner)
+	WMInner (WindowManager * _owner) : DAComponentInnerX<WindowManager>(_owner)
 	{
 	}
 	
@@ -59,16 +59,36 @@ struct WindowManager : public ISystemComponent,
 
 {
 	
-	BEGIN_DACOM_MAP_INBOUND(WindowManager)
-	DACOM_INTERFACE_ENTRY(ISystemComponent)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY(IWindowManager)
-	DACOM_INTERFACE_ENTRY2(IID_ISystemComponent,ISystemComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer,IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IWindowManager, IWindowManager)
-	END_DACOM_MAP()
+	static IDAComponent* GetISystemComponent(void* self) {
+	    return static_cast<ISystemComponent*>(
+	        static_cast<WindowManager*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<WindowManager*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<WindowManager*>(self));
+	}
+	static IDAComponent* GetIWindowManager(void* self) {
+	    return static_cast<IWindowManager*>(
+	        static_cast<WindowManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISystemComponent",              &GetISystemComponent},
+	        {"IAggregateComponent",           &GetIAggregateComponent},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {"IWindowManager",                &GetIWindowManager},
+	        {IID_ISystemComponent,            &GetISystemComponent},
+	        {IID_IAggregateComponent,         &GetIAggregateComponent},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	        {IID_IWindowManager,              &GetIWindowManager},
+	    };
+	    return map;
+	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
 		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
@@ -200,7 +220,7 @@ struct WindowManager : public ISystemComponent,
 	
 	IDAComponent * getBase (void)
 	{
-		return (IDAComponent *) ((ISystemComponent *) this);
+		return static_cast<ISystemComponent *>(this);
 	}
 	
 	void getWindowRects (void);
@@ -230,7 +250,7 @@ U32 WMInner::Release (void)
 {
 	U32 result;
 	
-	if ((result = DAComponentInner<WindowManager>::Release()) == 1)
+	if ((result = DAComponentInnerX::Release()) == 1)
 	{
 		if (owner->bInitialized)
 		{

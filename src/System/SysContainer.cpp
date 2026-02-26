@@ -15,10 +15,11 @@
 //--------------------------------------------------------------------------//
 
 #define WIN32_LEAN_AND_MEAN
+#include <span>
 #include <windows.h>
 
 #include "system.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TSmartPointer.h"
 #include "da_heap_utility.h"
 #include "IProfileParser.h"
@@ -31,9 +32,9 @@ struct SystemContainer;
 
 //--------------------------------------------------------------------------//
 //
-struct SysConInner : public DAComponentInner<SystemContainer>
+struct SysConInner : public DAComponentInnerX<SystemContainer>
 {
-	SysConInner (SystemContainer * _owner) : DAComponentInner<SystemContainer>(_owner)
+	SysConInner (SystemContainer * _owner) : DAComponentInnerX(_owner)
 	{
 	}
 	
@@ -60,16 +61,36 @@ struct SystemContainer : public ISystemContainer, IDAConnectionPointContainer
 	};
 	
 	
-	BEGIN_DACOM_MAP_INBOUND(SystemContainer)
-	DACOM_INTERFACE_ENTRY(ISystemContainer)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY(ISystemComponent)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_ISystemContainer,ISystemContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_ISystemComponent,ISystemComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer,IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetISystemContainer(void* self) {
+	    return static_cast<ISystemContainer*>(
+	        static_cast<SystemContainer*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<SystemContainer*>(self));
+	}
+	static IDAComponent* GetISystemComponent(void* self) {
+	    return static_cast<ISystemComponent*>(
+	        static_cast<SystemContainer*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<SystemContainer*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISystemContainer",              &GetISystemContainer},
+	        {"IAggregateComponent",           &GetIAggregateComponent},
+	        {"ISystemComponent",              &GetISystemComponent},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_ISystemContainer,            &GetISystemContainer},
+	        {IID_IAggregateComponent,         &GetIAggregateComponent},
+	        {IID_ISystemComponent,            &GetISystemComponent},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	ELEMENT *pList, *pLast;
 	SysConInner innerComponent;
@@ -153,7 +174,7 @@ GENRESULT SysConInner::QueryInterface (const C8 *interface_name, void **instance
 {
 	GENRESULT result;
 
-	if ((result = DAComponentInner<SystemContainer>::QueryInterface(interface_name, instance)) == GR_OK)
+	if ((result = DAComponentInnerX::QueryInterface(interface_name, instance)) == GR_OK)
 		return result;
 	
 	//
@@ -480,7 +501,7 @@ BOOL32 SystemContainer::EnumerateConnectionPoints (CONNCONTAINER_ENUM_PROC proc,
 //
 void RegisterContainerFactory (ICOManager *DACOM)
 {
-	IComponentFactory * server = new DAComponentFactory<SystemContainer, AGGDESC> ("ISystemContainer");
+	IComponentFactory * server = new DAComponentFactoryX<SystemContainer, AGGDESC> ("ISystemContainer");
 
 	if (server)
 	{
