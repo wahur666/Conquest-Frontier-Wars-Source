@@ -1,3 +1,5 @@
+// Unused
+
 // DirectShow.cpp
 //
 // DirectShow Utility functions
@@ -42,10 +44,18 @@ inline float convert_streamtime_to_seconds( STREAM_TIME stream_time )
 
 struct RPDDVIDEOSTREAM_DSHOW : public IVideoStreamControl
 {
-	BEGIN_DACOM_MAP_INBOUND(RPDDVIDEOSTREAM_DSHOW)
-	DACOM_INTERFACE_ENTRY(IVideoStreamControl)
-	DACOM_INTERFACE_ENTRY2(IID_IVideoStreamControl,IVideoStreamControl)
-	END_DACOM_MAP()
+	static IDAComponent* GetIVideoStreamControl(void* self) {
+	    return static_cast<IVideoStreamControl*>(
+	        static_cast<RPDDVIDEOSTREAM_DSHOW*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IVideoStreamControl",   &GetIVideoStreamControl},
+	        {IID_IVideoStreamControl, &GetIVideoStreamControl},
+	    };
+	    return map;
+	}
 
 
 public: // Interface
@@ -529,7 +539,7 @@ HRESULT rp_ds_vstream_control_create( LPDIRECTDRAW7 lpDD, LPDIRECTDRAWSURFACE7 t
 
 	*out_ivsc = NULL;
 
-	if( (vs = new DAComponent<RPDDVIDEOSTREAM_DSHOW>()) == NULL ) {
+	if( (vs = new DAComponentX<RPDDVIDEOSTREAM_DSHOW>()) == NULL ) {
 		return E_FAIL;
 	}
 

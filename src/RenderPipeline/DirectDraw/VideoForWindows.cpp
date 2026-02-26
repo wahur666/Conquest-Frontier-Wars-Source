@@ -12,12 +12,15 @@
 #include "dacom.h"
 #include "FDUMP.h"
 #include "TSmartPointer.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "IVideoStreamControl.h"
 
 //
 
 #include "VideoForWindows.h"
+
+#include <span>
+
 #include "DirectDraw.h"
 
 
@@ -25,10 +28,18 @@
 
 struct RPDDVIDEOSTREAM_VFW : public IVideoStreamControl
 {
-	BEGIN_DACOM_MAP_INBOUND(RPDDVIDEOSTREAM_VFW)
-	DACOM_INTERFACE_ENTRY(IVideoStreamControl)
-	DACOM_INTERFACE_ENTRY2(IID_IVideoStreamControl,IVideoStreamControl)
-	END_DACOM_MAP()
+	static IDAComponent* GetIVideoStreamControl(void* self) {
+	    return static_cast<IVideoStreamControl*>(
+	        static_cast<RPDDVIDEOSTREAM_VFW*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IVideoStreamControl",   &GetIVideoStreamControl},
+	        {IID_IVideoStreamControl, &GetIVideoStreamControl},
+	    };
+	    return map;
+	}
 
 
 public: // Interface
@@ -486,7 +497,7 @@ HRESULT rp_vfw_vstream_control_create( LPDIRECTDRAW7 lpDD, LPDIRECTDRAWSURFACE7 
 
 	*out_ivsc = NULL;
 
-	if( (vs = new DAComponent<RPDDVIDEOSTREAM_VFW>()) == NULL ) {
+	if( (vs = new DAComponentX<RPDDVIDEOSTREAM_VFW>()) == NULL ) {
 		return E_FAIL;
 	}
 
