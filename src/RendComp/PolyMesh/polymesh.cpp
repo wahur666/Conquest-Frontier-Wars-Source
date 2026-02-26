@@ -23,7 +23,7 @@
 #include <map>
 
 #include "dacom.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TSmartPointer.h"
 #include "FDUMP.h"
 #include "TempStr.h"
@@ -55,6 +55,8 @@
 
 //
 
+#include <span>
+
 #include "MeshInstance.h"
 #include "XMesh.h"
 
@@ -76,10 +78,18 @@ const char *CLSID_PolyMesh = "PolyMesh";
 struct DACOM_NO_VTABLE POLYMESH : public IRenderComponent
 {
 public:	// Data
-	BEGIN_DACOM_MAP_INBOUND(POLYMESH)
-	DACOM_INTERFACE_ENTRY2(IID_IRenderComponent,IRenderComponent)
-	DACOM_INTERFACE_ENTRY(IRenderComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIRenderComponent(void* self) {
+	    return static_cast<IRenderComponent*>(
+	        static_cast<POLYMESH*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {IID_IRenderComponent, &GetIRenderComponent},
+	        {"IRenderComponent",   &GetIRenderComponent},
+	    };
+	    return map;
+	}
 
 public:	// Interface
 
@@ -2125,7 +2135,7 @@ BOOL COMAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 	    DA_HEAP_ACQUIRE_HEAP( HEAP );
 		DA_HEAP_DEFINE_HEAP_MESSAGE( hinstDLL );
 
-		if( (server = new DAComponentFactory< DAComponent< POLYMESH >, RendCompDesc >( CLSID_PolyMesh )) == NULL ) {
+		if( (server = new DAComponentFactoryX< DAComponentX< POLYMESH >, RendCompDesc >( CLSID_PolyMesh )) == NULL ) {
 			return TRUE;
 		}
 
