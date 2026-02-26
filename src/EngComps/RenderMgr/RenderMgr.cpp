@@ -9,9 +9,10 @@
 #include <limits>
 #include <map>
 #include <list>
+#include <span>
 
 #include "dacom.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TSmartPointer.h"
 #include "3DMath.h"
 #include "FDump.h"
@@ -68,14 +69,30 @@ struct RenderMgr : public IEngineComponent,
 {
 public:	// Data
 
-	BEGIN_DACOM_MAP_INBOUND(RenderMgr)
-	DACOM_INTERFACE_ENTRY(IRenderer)
-	DACOM_INTERFACE_ENTRY(IEngineComponent)
-	DACOM_INTERFACE_ENTRY (IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IRenderer,IRenderer)
-	DACOM_INTERFACE_ENTRY2(IID_IEngineComponent,IEngineComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIRenderer(void* self) {
+	    return static_cast<IRenderer*>(
+	        static_cast<RenderMgr*>(self));
+	}
+	static IDAComponent* GetIEngineComponent(void* self) {
+	    return static_cast<IEngineComponent*>(
+	        static_cast<RenderMgr*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<RenderMgr*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IRenderer",             &GetIRenderer},
+	        {"IEngineComponent",      &GetIEngineComponent},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IRenderer,           &GetIRenderer},
+	        {IID_IEngineComponent,    &GetIEngineComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 
 protected: // Data
@@ -1679,7 +1696,7 @@ BOOL COMAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 		DA_HEAP_ACQUIRE_HEAP(HEAP);
 		DA_HEAP_DEFINE_HEAP_MESSAGE(hinstDLL);
 		
-		if( (server = new DAComponentFactory2<DAComponentAggregate<RenderMgr>, SYSCONSUMERDESC>( "IRenderer" )) != NULL ) {
+		if( (server = new DAComponentFactoryX2<DAComponentAggregateX<RenderMgr>, SYSCONSUMERDESC>( "IRenderer" )) != NULL ) {
 			DACOM_Acquire()->RegisterComponent( server, "IRenderer", DACOM_NORMAL_PRIORITY );
 			server->Release();
 		}
