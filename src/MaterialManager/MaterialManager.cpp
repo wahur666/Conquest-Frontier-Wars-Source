@@ -13,7 +13,7 @@
 
 #include "resource.h"
 
-#include <tcomponent.h>
+#include <TComponent2.h>
 #include <da_heap_utility.h>
 #include <filesys.h>
 #include <commctrl.h>
@@ -21,6 +21,7 @@
 
 #include <string>
 #include <list>
+#include <span>
 //-----------------------------------------------------------------------------------------------
 //script constants
 #define SC_BEGIN_SCRIPT "BEGIN_MAT_SCRIPT"
@@ -380,12 +381,24 @@ INT_PTR CALLBACK MaterialDialogProc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPA
 
 struct MaterialManager : IMaterialManager, public IAggregateComponent, IInternalMaterialManager
 {
-	BEGIN_DACOM_MAP_INBOUND(MaterialManager)
-		DACOM_INTERFACE_ENTRY(IMaterialManager)
-		DACOM_INTERFACE_ENTRY2(IID_IMaterialManager,IMaterialManager)
-		DACOM_INTERFACE_ENTRY(IAggregateComponent)
-		DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIMaterialManager(void* self) {
+	    return static_cast<IMaterialManager*>(
+	        static_cast<MaterialManager*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<MaterialManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IMaterialManager",      &GetIMaterialManager},
+	        {IID_IMaterialManager,    &GetIMaterialManager},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 	// IAggregateComponent 
 	GENRESULT COMAPI Initialize(void) { return GR_OK; }
@@ -576,7 +589,7 @@ GENRESULT COMAPI MaterialManager::OpenEditWindow( IMaterialCallback* _callback )
 
 	if( !hDialog )
 	{
-		hDialog = ::CreateDialogParam( g_hInstance, MAKEINTRESOURCE(IDD_DIALOG), NULL, MaterialDialogProc, (DWORD)((IInternalMaterialManager*)this) );
+		hDialog = ::CreateDialogParam( g_hInstance, MAKEINTRESOURCE(IDD_DIALOG), NULL, MaterialDialogProc, reinterpret_cast<LPARAM>((IInternalMaterialManager *) this) );
 		if( hDialog )
 		{
 			return GR_OK;
@@ -1547,7 +1560,7 @@ BOOL COMAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			InitCommonControls();
 
 			// Register System aggragate factory
-			if( DACOM && (server = new DAComponentFactory2<DAComponentAggregate<MaterialManager>, AGGDESC>(CLSID_MaterialManager)) != NULL ) 
+			if( DACOM && (server = new DAComponentFactoryX2<DAComponentAggregateX<MaterialManager>, AGGDESC>(CLSID_MaterialManager)) != NULL )
 			{
 				g_hInstance = hinstDLL;
 				DACOM->RegisterComponent( server, CLSID_MaterialManager, DACOM_NORMAL_PRIORITY );
