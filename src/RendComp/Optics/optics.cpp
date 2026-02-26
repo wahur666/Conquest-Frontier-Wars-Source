@@ -8,7 +8,7 @@
 #include "FDump.h"
 #include "TempStr.h"
 #include "dacom.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TSmartPointer.h"
 #include "View2D.h"
 #include "3dmath.h"
@@ -30,6 +30,8 @@
 
 //
 
+#include <span>
+
 #include "ParticleSystemArchetype.h"
 #include "ParticleSystemInstance.h"
 
@@ -50,9 +52,17 @@ typedef rarch_handlemap< ParticleSystemArchetype*>	rarch_map;
 //
 struct Optics : public IRenderComponent
 {
-	BEGIN_DACOM_MAP_INBOUND(Optics)
-	DACOM_INTERFACE_ENTRY2(IID_IRenderComponent,IRenderComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIRenderComponent(void* self) {
+	    return static_cast<IRenderComponent*>(
+	        static_cast<Optics*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {IID_IRenderComponent, &GetIRenderComponent},
+	    };
+	    return map;
+	}
 
 public: // Interface
 
@@ -474,7 +484,7 @@ BOOL COMAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 	    DA_HEAP_ACQUIRE_HEAP( HEAP );
 		DA_HEAP_DEFINE_HEAP_MESSAGE( hinstDLL );
 
-		if( (server = new DAComponentFactory< DAComponent< Optics >, RendCompDesc >( CLSID_Optics )) == NULL ) {
+		if( (server = new DAComponentFactoryX< DAComponentX< Optics >, RendCompDesc >( CLSID_Optics )) == NULL ) {
 			return TRUE;
 		}
 		
