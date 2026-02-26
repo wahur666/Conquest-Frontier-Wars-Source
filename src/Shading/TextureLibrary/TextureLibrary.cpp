@@ -356,7 +356,7 @@ public:  // Interface
 public:  // Data
 	char				*texture_name;
 	int					ref_count;
-	U32					rp_texture_id;			// if num_frames==1, this is the rp texture id
+	LONG_PTR			rp_texture_id;			// if num_frames==1, this is the rp texture id
 	float				frames_per_sec;			// default framerate
 
 	FRAME_VECTOR		frames;
@@ -837,14 +837,14 @@ struct ITL_TEXTUREFORMATMAP
 #define MAX_TXM_NAME 64
 
 //typedef AllocLite<ITL_TEXTUREOBJECT> ID_MAP_ALLOC;
-typedef std::map<ITL_TEXTURE_ID, ITL_TEXTUREOBJECT, std::less<ITL_TEXTURE_ID> > ID_MAP;
+typedef std::map<ITL_TEXTURE_ID, ITL_TEXTUREOBJECT> ID_MAP;
 
 //typedef AllocLite<ITL_TEXTURE_ID> NAME_MAP_ALLOC;
 typedef std::string TXM_NAME;
 typedef std::map<TXM_NAME, ITL_TEXTURE_ID, StrPred> NAME_MAP;
 
 //typedef AllocLite<ITL_TEXTUREOBJECTREF> REF_ID_MAP_ALLOC;
-typedef std::map<ITL_TEXTURE_REF_ID, ITL_TEXTUREOBJECTREF, std::less<ITL_TEXTURE_REF_ID> > REF_ID_MAP;
+typedef std::map<ITL_TEXTURE_REF_ID, ITL_TEXTUREOBJECTREF> REF_ID_MAP;
 
 // --------------------------------------------------------------------------
 // TextureLibrary
@@ -977,10 +977,10 @@ protected:	// protected interface
 
 	HRESULT get_pipe_info( void );
 
-	HRESULT load_guts (U32 uMipLevelSet, IFileSystem* IFS, ITL_TEXTUREIMAGEDATA& overrides, U32 uM, U32& rp_id);
+	HRESULT load_guts (U32 uMipLevelSet, IFileSystem *IFS, ITL_TEXTUREIMAGEDATA &overrides, U32 uM, LONG_PTR &rp_id);
 
 	//EMAURER returns true if an insertion occurred. 'boost_ref' to have ref count increased
-	bool build_normal_object (U32 rp_id, const char* tname, ITL_TEXTURE_ID& result, bool boost_ref);
+	bool build_normal_object (LONG_PTR rp_id, const char* tname, ITL_TEXTURE_ID& result, bool boost_ref);
 
 	DEFMETHOD(load_texture)( IFileSystem *IFS, const char *texture_name, ITL_TEXTURE_ID& hndl, bool boost_ref ) ;
 
@@ -1697,7 +1697,7 @@ inline void TextureLibrary::insert_name (const char* name, ITL_TEXTURE_ID hndl)
 }
 
 
-HRESULT TextureLibrary::load_guts (U32 uMipLevelSet, IFileSystem* IFS, ITL_TEXTUREIMAGEDATA& overrides, U32 uM, U32& rp_id)
+HRESULT TextureLibrary::load_guts (U32 uMipLevelSet, IFileSystem* IFS, ITL_TEXTUREIMAGEDATA& overrides, U32 uM, LONG_PTR& rp_id)
 {
 	ITL_TEXTUREIMAGEDATA *image_data = NULL;
 	if( SUCCEEDED( load_texture_image( IFS, overrides, &image_data ) ) ) {
@@ -1725,7 +1725,7 @@ HRESULT TextureLibrary::load_guts (U32 uMipLevelSet, IFileSystem* IFS, ITL_TEXTU
 	return S_OK;
 }
 
-bool TextureLibrary::build_normal_object (U32 rp_id, const char* tname, ITL_TEXTURE_ID& hndl, bool boost_ref)
+bool TextureLibrary::build_normal_object (LONG_PTR rp_id, const char* tname, ITL_TEXTURE_ID& hndl, bool boost_ref)
 {
 	bool insertion = false;
 
@@ -1802,7 +1802,7 @@ HRESULT TextureLibrary::load_texture_normal_old( IFileSystem *IFS, const char* t
 {
 	ITL_TEXTUREIMAGEDATA overrides;
 	
-	U32 rp_id = HTX_INVALID;
+	LONG_PTR rp_id = HTX_INVALID;
 
 	GENERAL_TRACE_5( "load_texture_normal_old: file containes textures in the old format, recommend re-exporting\n" );
 
@@ -1884,7 +1884,7 @@ HRESULT TextureLibrary::load_texture_normal_new( IFileSystem *IFS, const char* t
 
 	// Read all miplevels, or just the image data if no mipmaps
 	//
-	U32 uMipCount, uMipLevelRead=0, uMipLevelSet;
+	U32 uMipCount = 0, uMipLevelRead=0, uMipLevelSet = 0;
 
 	load_texture_mipmap_count( IFS, &uMipCount );
 
@@ -1913,7 +1913,7 @@ HRESULT TextureLibrary::load_texture_normal_new( IFileSystem *IFS, const char* t
 	}
 
 	//EMAURER the renderpipe id for this texture.
-	U32 rp_id = HTX_INVALID;
+	LONG_PTR rp_id = HTX_INVALID;
 
 	for( uMipLevelSet=0; (uMipLevelSet==0) || (uMipLevelRead<uMipCount); uMipLevelRead++ ) {
 
@@ -1955,7 +1955,8 @@ HRESULT TextureLibrary::load_texture_normal_new( IFileSystem *IFS, const char* t
 
 HRESULT TextureLibrary::load_texture_normal_1_6( IFileSystem *IFS, const char* tname, ITL_TEXTURE_ID& hndl, bool boost_ref)
 {
-	U32		i, uMipCount, uMipLevelRead=0, rp_id	=HTX_INVALID;
+	U32		i, uMipCount, uMipLevelRead=0;
+	LONG_PTR rp_id = HTX_INVALID;
 	char	mipTxt[6];
 	U32		width=0, height=0;	//silence compiler warnings
 
@@ -2467,7 +2468,7 @@ HRESULT TextureLibrary::load_texture_extref_animated( const char *filename,
 
 	pf.unpersist( pformat );
 
-	U32 rp_texture_id = HTX_INVALID;
+	LONG_PTR rp_texture_id = HTX_INVALID;
 
 	if( FAILED( render_pipe->create_texture( tw, th, pf, 1, flags | IRP_CTF_VIDEO_TARGET, rp_texture_id ) ) ) {
 		GENERAL_TRACE_1( "load_texture_extref_animated: unable to create renderpipe texture\n" );
@@ -3547,7 +3548,7 @@ GENRESULT TextureLibrary::get_texture_format( ITL_TEXTURE_ID texture_id, U32 fra
 {
 	GENRESULT result = GR_GENERIC;
 
-	U32 rp_id = 0;
+	LONG_PTR rp_id = 0;
 
 	ECRIT (archetype_lock);	
 

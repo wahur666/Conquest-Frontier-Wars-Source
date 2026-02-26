@@ -13,8 +13,8 @@
 struct IFileSystem;
 //
 
-typedef U32 ITL_TEXTURE_ID;
-typedef U32 ITL_TEXTURE_REF_ID;
+typedef LONG_PTR ITL_TEXTURE_ID;
+typedef LONG_PTR ITL_TEXTURE_REF_ID;
 
 const ITL_TEXTURE_ID		ITL_INVALID_ID		= 0xFFFFFFFF;	// Invalid texture id.
 const ITL_TEXTURE_REF_ID	ITL_INVALID_REF_ID	= 0xFFFFFFFF;	// Invalid texture reference id.
@@ -78,7 +78,7 @@ typedef enum
 // 
 struct ITL_TEXTUREFRAME_IRP
 {
-	U32		rp_texture_id;		// IRenderPipeline texture id.
+	LONG_PTR		rp_texture_id;		// IRenderPipeline texture id.
 	float	u0, v0;				// 
 	float	u1, v1;				// 
 };

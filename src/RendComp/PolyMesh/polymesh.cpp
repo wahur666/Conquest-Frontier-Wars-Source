@@ -1584,7 +1584,7 @@ vis_state POLYMESH::render( ICamera * camera, INSTANCE_INDEX object_index, MeshI
 			}
 		}
 
-		U32 rwm_flags;
+		U32 rwm_flags = 0;
 
 		renderpipeline->get_pipeline_state( RP_TEXTURE, &rwm_flags );
 		if( !rwm_flags ) {

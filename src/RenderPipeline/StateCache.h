@@ -387,7 +387,7 @@ struct CACHED_TEXTURESTATE
 
 struct CACHED_TEXTURE
 {
-	U32					value;		// irp texture handle
+	LONG_PTR value;		// irp texture handle
 	bool				valid;		// texture is valid
 
 	//
@@ -423,19 +423,20 @@ struct CACHED_TEXTURE
 
 	//
 
-	void set( IDirect3DDevice9 *device, U32 stage_idx, U32 new_value, bool force_to_hw = false )
+	void set( IDirect3DDevice9 *device, U32 stage_idx, LONG_PTR new_value, bool force_to_hw = false )
 	{
 		if( valid && !force_to_hw && (value == new_value) ) {
-#if !RP_DISABLE_CACHES 
+#if !RP_DISABLE_CACHES
 			return;
 #endif
 		}
 
-		HRESULT hr; 
+		auto zvalue = reinterpret_cast<IDirect3DBaseTexture9 *>(new_value);
+		HRESULT hr = device->SetTexture( stage_idx, zvalue);
 
-		if( SUCCEEDED( hr = device->SetTexture( stage_idx, (IDirect3DBaseTexture9*)new_value ) ) ) {
+		if( SUCCEEDED( hr ) ) {
 
-			rp_rd_texture( stage_idx, (IDirectDrawSurface7*)new_value );
+			rp_rd_texture( stage_idx, reinterpret_cast<IDirectDrawSurface7 *>(new_value) );
 
 			value = new_value;					
 

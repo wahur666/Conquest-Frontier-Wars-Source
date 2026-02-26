@@ -359,7 +359,7 @@ public:	// Data
 	U32 texture_stage_cnt;
 	U32 texture_stage_state[BM_NUM_STAGES][D3DTSS_MAX_STATE];
 //	U32 texture_stage_wrap[BM_NUM_STAGES];
-	U32 texture_stage_texture[BM_NUM_STAGES];
+	LONG_PTR texture_stage_texture[BM_NUM_STAGES];
 
 	U32 depth_enable;
 	U32 depth_write_enable;
@@ -1166,8 +1166,8 @@ public:		// public interface
 	GENRESULT COMAPI get_texture_stage_state( U32 stage, D3DTEXTURESTAGESTATETYPE, U32 *value ) ;
 	GENRESULT COMAPI set_sampler_state( U32 stage, D3DSAMPLERSTATETYPE, U32 value ) ;
 	GENRESULT COMAPI get_sampler_state( U32 stage, D3DSAMPLERSTATETYPE, U32 *value ) ;
-	GENRESULT COMAPI set_texture_stage_texture( U32 stage, U32 htexture ) ;
-	GENRESULT COMAPI get_texture_stage_texture( U32 stage, U32 *htexture ) ;
+	GENRESULT COMAPI set_texture_stage_texture( U32 stage, LONG_PTR htexture ) ;
+	GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *htexture ) ;
 	GENRESULT COMAPI verify_state(  void ) ;
 	GENRESULT COMAPI draw_primitive( D3DPRIMITIVETYPE type, U32 vertex_format, const void *verts, int num_verts, U32 flags ) ;
 	GENRESULT COMAPI draw_indexed_primitive( D3DPRIMITIVETYPE type, U32 vertex_format, const void *verts, int num_verts, const U16 * indices, int num_indices, U32 flags ) ;
@@ -1381,14 +1381,14 @@ DA_METHOD(  get_sampler_state,(U32 stage, D3DSAMPLERSTATETYPE ss, U32 *value ))
 
 //
 
-DA_METHOD(  set_texture_stage_texture,(U32 stage, U32 htexture ))
+DA_METHOD(  set_texture_stage_texture,(U32 stage, LONG_PTR htexture ))
 {
 	return render_pipe->set_texture_stage_texture( stage, htexture );
 }
 
 //
 
-DA_METHOD(  get_texture_stage_texture,(U32 stage, U32 *htexture ))
+DA_METHOD(  get_texture_stage_texture,(U32 stage, LONG_PTR *htexture ))
 {
 	return render_pipe->get_texture_stage_texture( stage, htexture );
 }

@@ -198,7 +198,7 @@ public:	// Interface
 	//
 
 	ID3DXEffect** load_effect(const char * filename, IComponentFactory * DIR);
-	GENRESULT COMAPI create_cube_texture_from_file(const char* filename, IComponentFactory * DIR,U32 &out_htexture);
+	GENRESULT COMAPI create_cube_texture_from_file(const char* filename, IComponentFactory * DIR,LONG_PTR &out_htexture);
 	GENRESULT COMAPI set_vs_constants(UINT StartRegister,CONST FLOAT* pConstantData,UINT RegisterCount);
 	GENRESULT COMAPI set_ps_constants(UINT StartRegister,CONST FLOAT* pConstantData,UINT RegisterCount);
 
@@ -261,8 +261,8 @@ public:	// Interface
 	GENRESULT COMAPI get_texture_stage_state( U32 stage, D3DTEXTURESTAGESTATETYPE, U32 *value  ) ;
 	GENRESULT COMAPI set_texture_stage_transform( U32 stage, Matrix4 &mat4 ) ;
 	GENRESULT COMAPI get_texture_stage_transform( U32 stage, Matrix4 &out_mat4 ) ;
-	GENRESULT COMAPI set_texture_stage_texture( U32 stage, U32 htexture  ) ;
-	GENRESULT COMAPI get_texture_stage_texture( U32 stage, U32 *htexture  ) ;
+	GENRESULT COMAPI set_texture_stage_texture( U32 stage, LONG_PTR htexture  ) ;
+	GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *htexture  ) ;
 	GENRESULT COMAPI verify_state( void ) ;
 	GENRESULT COMAPI create_state_block( D3DSTATEBLOCKTYPE type, U32*out_sbhandle ) ;
 	GENRESULT COMAPI update_state_block( U32 sbhandle ) ;
@@ -278,22 +278,22 @@ public:	// Interface
 	GENRESULT COMAPI draw_indexed_primitive_vb( D3DPRIMITIVETYPE type, IRP_VERTEXBUFFERHANDLE vbhandle, int start_vert, int num_verts,  IDirect3DIndexBuffer9* IB, int num_indices, U32 flags  ) ;
 	GENRESULT COMAPI create_index_buffer(UINT Length, IDirect3DIndexBuffer9** ppIndexBuffer);
  		
-	GENRESULT COMAPI create_texture( int width, int height, const PixelFormat &desiredformat, int num_lod, U32 irp_ctf_flags, U32 &out_htexture  ) ;
-	GENRESULT COMAPI destroy_texture( U32 htexture  ) ;
-	GENRESULT COMAPI is_texture( U32 htexture  ) ;
-	GENRESULT COMAPI lock_texture( U32 htexture, int subsurface, RPLOCKDATA *lockData  ) ;
-	GENRESULT COMAPI unlock_texture( U32 htexture, int subsurface  ) ;
-	GENRESULT COMAPI get_texture_format( U32 htexture, PixelFormat *out_pf  ) ;
-	GENRESULT COMAPI get_texture_dim( U32 htexture, U32 *out_width, U32 *out_height, U32 *out_num_lod  ) ;
-	GENRESULT COMAPI get_texture_interface( U32 htexture, const char *iid, void **out_iif  ) ;
-	GENRESULT COMAPI get_texture_dc( U32 htexture, HDC *out_hdc ) ;
-	GENRESULT COMAPI release_texture_dc( U32 htexture, HDC hdc ) ;
-	GENRESULT COMAPI set_texture_palette( U32 htexture, int start, int length, const RGB *colors  ) ;
-	GENRESULT COMAPI get_texture_palette( U32 htexture, int start, int length, RGB *colors  ) ;
-	GENRESULT COMAPI set_texture_level_data( U32 htexture, int subsurface, int src_width, int src_height, int src_stride, const PixelFormat &src_format, const void *src_pixel, const void *src_alpha, const RGB *src_palette ) ;
+	GENRESULT COMAPI create_texture(int width, int height, const PixelFormat &desiredformat, int numTextureLevels, U32 irp_cf_flags, LONG_PTR &out_htexture) ;
+	GENRESULT COMAPI destroy_texture(LONG_PTR htexture) ;
+	GENRESULT COMAPI is_texture( LONG_PTR htexture  ) ;
+	GENRESULT COMAPI lock_texture( LONG_PTR htexture, int subsurface, RPLOCKDATA *lockData  ) ;
+	GENRESULT COMAPI unlock_texture( LONG_PTR htexture, int subsurface  ) ;
+	GENRESULT COMAPI get_texture_format( LONG_PTR htexture, PixelFormat *out_pf  ) ;
+	GENRESULT COMAPI get_texture_dim( LONG_PTR htexture, U32 *out_width, U32 *out_height, U32 *out_num_lod  ) ;
+	GENRESULT COMAPI get_texture_interface( LONG_PTR htexture, const char *iid, void **out_iif  ) ;
+	GENRESULT COMAPI get_texture_dc( LONG_PTR htexture, HDC *out_hdc ) ;
+	GENRESULT COMAPI release_texture_dc( LONG_PTR htexture, HDC hdc ) ;
+	GENRESULT COMAPI set_texture_palette( LONG_PTR htexture, int start, int length, const RGB *colors  ) ;
+	GENRESULT COMAPI get_texture_palette( LONG_PTR htexture, int start, int length, RGB *colors  ) ;
+	GENRESULT COMAPI set_texture_level_data( LONG_PTR htexture, int subsurface, int src_width, int src_height, int src_stride, const PixelFormat &src_format, const void *src_pixel, const void *src_alpha, const RGB *src_palette ) ;
 	GENRESULT COMAPI blit_texture( U32 hDest, U32 dst_subsurface, RECT destRect, U32 hSrc, U32 src_subsurface, RECT srcRect  ) ;
 	GENRESULT COMAPI get_num_textures( U32 *out_num_textures  ) ;
-	GENRESULT COMAPI get_texture( U32 texture_num, U32 *out_htexture  ) ;
+	GENRESULT COMAPI get_texture( U32 texture_num, LONG_PTR *out_htexture  ) ;
 	GENRESULT COMAPI create_vertex_buffer( U32 vertex_format, int num_verts, U32 irp_vbf_flags, IRP_VERTEXBUFFERHANDLE *out_vb_handle ) ;
 	GENRESULT COMAPI destroy_vertex_buffer( IRP_VERTEXBUFFERHANDLE vb_handle ) ;
 	GENRESULT COMAPI lock_vertex_buffer( IRP_VERTEXBUFFERHANDLE vb_handle, U32 ddlock_flags, void **out_vertex_buffer, U32 *out_vertex_buffer_size ) ;
@@ -361,9 +361,11 @@ public:	// Interface
 		return static_cast<IGammaControl*>(static_cast<Direct3D_RenderPipeline*>(self));
 	}
 
+#if RP_RD_DEBUG
 	static IDAComponent* GetIRenderDebugger(void* self) {
 		return static_cast<IRenderDebugger*>(static_cast<Direct3D_RenderPipeline*>(self));
 	}
+#endif
 
 	static IDAComponent* GetIAggregateComponent(void* self) {
 		return static_cast<IAggregateComponent*>(static_cast<Direct3D_RenderPipeline*>(self));
@@ -2320,7 +2322,7 @@ DA_METHOD(  get_texture_stage_transform, ( U32 stage, Matrix4 &out_mat4 ) )
 
 //
 
-DA_METHOD(  set_texture_stage_texture,(U32 stage, U32 htexture ))
+DA_METHOD(  set_texture_stage_texture,(U32 stage, LONG_PTR htexture ))
 {
 	CHECK_CREATE_BUFFERS(set_texture_stage_texture);
 	ASSERT( direct3d_device );
@@ -2342,7 +2344,7 @@ DA_METHOD(  set_texture_stage_texture,(U32 stage, U32 htexture ))
 //
 
 
-DA_METHOD(  get_texture_stage_texture,(U32 stage, U32 *htexture ))
+DA_METHOD(  get_texture_stage_texture,(U32 stage, LONG_PTR *htexture ))
 {
 	CHECK_CREATE_BUFFERS(get_texture_stage_texture);
 
@@ -2974,7 +2976,7 @@ DA_METHOD(	get_buffer_interface,(const char *iid, void **out_iif ))
 // Textures and TextureManagement Related code
 // ------------------------------------------------------------------
 
-DA_METHOD(	get_texture_interface,(U32 htexture, const char *iid, void **out_iif ))
+DA_METHOD(	get_texture_interface,(LONG_PTR htexture, const char *iid, void **out_iif ))
 {
 	/*
 	CHECK_CREATE_BUFFERS(get_texture_interface);
@@ -3003,7 +3005,7 @@ DA_METHOD(	get_texture_interface,(U32 htexture, const char *iid, void **out_iif 
 
 //
 
-DA_METHOD(	get_texture_dc,( U32 htexture, HDC *dc ))
+DA_METHOD(	get_texture_dc,( LONG_PTR htexture, HDC *dc ))
 {
 	CHECK_CREATE_BUFFERS(get_dc);
 	ASSERT( htexture != RP_CURRENT );
@@ -3023,7 +3025,7 @@ DA_METHOD(	get_texture_dc,( U32 htexture, HDC *dc ))
 
 //
 
-DA_METHOD(	release_texture_dc,(U32 htexture, HDC dc ))
+DA_METHOD(	release_texture_dc,(LONG_PTR htexture, HDC dc ))
 {
 	CHECK_CREATE_BUFFERS(get_dc);
 	ASSERT( htexture != RP_CURRENT );
@@ -3041,7 +3043,7 @@ DA_METHOD(	release_texture_dc,(U32 htexture, HDC dc ))
 
 //
 
-DA_METHOD(	create_texture,(int width, int height, const PixelFormat &desiredformat, int numTextureLevels, U32 irp_cf_flags, U32 &out_htexture ))
+DA_METHOD(	create_texture,(int width, int height, const PixelFormat &desiredformat, int numTextureLevels, U32 irp_cf_flags, LONG_PTR &out_htexture ))
 {
 	CHECK_CREATE_BUFFERS(create_texture);
 	ASSERT( width!=0 );
@@ -3074,7 +3076,7 @@ DA_METHOD(	create_texture,(int width, int height, const PixelFormat &desiredform
 }
 
 
-DA_METHOD(create_cube_texture_from_file,(const char* filename, IComponentFactory * DIR,U32 &out_htexture))
+DA_METHOD(create_cube_texture_from_file,(const char* filename, IComponentFactory * DIR,LONG_PTR &out_htexture))
 {
 	CHECK_CREATE_BUFFERS(create_texture);
 	DAFILEDESC fdesc = filename;
@@ -3100,7 +3102,7 @@ DA_METHOD(create_cube_texture_from_file,(const char* filename, IComponentFactory
 
 //
 
-DA_METHOD(	destroy_texture,(U32 htexture ) )
+DA_METHOD(	destroy_texture,(LONG_PTR htexture ) )
 {
 	if (!htexture) return GR_OK;
 	((LPDIRECT3DTEXTURE9)htexture)->Release();
@@ -3109,7 +3111,7 @@ DA_METHOD(	destroy_texture,(U32 htexture ) )
 
 //
 
-DA_METHOD(	is_texture,	(U32 htexture ))
+DA_METHOD(	is_texture,	(LONG_PTR htexture ))
 {
 	/*
 	CHECK_CREATE_BUFFERS(is_texture);
@@ -3144,7 +3146,7 @@ DA_METHOD(	is_texture,	(U32 htexture ))
 
 //
 
-DA_METHOD(	get_texture_format,( U32 htexture, PixelFormat *out_pf ))
+DA_METHOD(	get_texture_format,( LONG_PTR htexture, PixelFormat *out_pf ))
 {
 	CHECK_CREATE_BUFFERS(get_texture_format);
 	ASSERT( htexture != RP_CURRENT );
@@ -3168,7 +3170,7 @@ DA_METHOD(	get_texture_format,( U32 htexture, PixelFormat *out_pf ))
 
 //
 
-DA_METHOD(	get_texture_dim,(U32 htexture, U32 *out_width, U32 *out_height, U32 *out_num_lod ))
+DA_METHOD(	get_texture_dim,(LONG_PTR htexture, U32 *out_width, U32 *out_height, U32 *out_num_lod ))
 {
 	if (!htexture) return GR_GENERIC;
 	CHECK_CREATE_BUFFERS(get_texture_dim);
@@ -3185,7 +3187,7 @@ DA_METHOD(	get_texture_dim,(U32 htexture, U32 *out_width, U32 *out_height, U32 *
 
 //
 
-DA_METHOD(	lock_texture,(U32 htexture, int subsurface, RPLOCKDATA *lockData ))
+DA_METHOD(	lock_texture,(LONG_PTR htexture, int subsurface, RPLOCKDATA *lockData ))
 {
 	CHECK_CREATE_BUFFERS(lock_texture);
 	ASSERT( htexture != RP_CURRENT );
@@ -3217,7 +3219,7 @@ DA_METHOD(	lock_texture,(U32 htexture, int subsurface, RPLOCKDATA *lockData ))
 }
 
 //
-DA_METHOD(	unlock_texture,(U32 htexture, int subsurface ))
+DA_METHOD(	unlock_texture,(LONG_PTR htexture, int subsurface ))
 {
 	if (!htexture) return GR_GENERIC;
 	IDirect3DTexture9 * tex = (IDirect3DTexture9*) htexture;
@@ -3227,7 +3229,7 @@ DA_METHOD(	unlock_texture,(U32 htexture, int subsurface ))
 
 //
 
-DA_METHOD(	set_texture_palette,(U32 htexture, int start, int length, const RGB *colors ))
+DA_METHOD(	set_texture_palette,(LONG_PTR htexture, int start, int length, const RGB *colors ))
 {
 	/*
 	CHECK_CREATE_BUFFERS(set_texture_palette);
@@ -3253,7 +3255,7 @@ DA_METHOD(	set_texture_palette,(U32 htexture, int start, int length, const RGB *
 }
 
 //
-DA_METHOD(	get_texture_palette,(U32 htexture, int start, int length, RGB *colors ))
+DA_METHOD(	get_texture_palette,(LONG_PTR htexture, int start, int length, RGB *colors ))
 {
 	/*
 	CHECK_CREATE_BUFFERS(get_texture_palette);
@@ -3348,13 +3350,13 @@ DA_METHOD(	blit_texture,(U32 hDest, U32 dst_subsurface, RECT destRect, U32 hSrc,
 
 //
 
-DA_METHOD(	set_texture_level_data,(U32 htexture, int subsurface, int srcWidth, int srcHeight, int srcStride, const PixelFormat &srcFormat, const void *srcPixels, const void *srcAlphaMap, const RGB *srcPalette ))
+DA_METHOD(	set_texture_level_data,(LONG_PTR htexture, int subsurface, int srcWidth, int srcHeight, int srcStride, const PixelFormat &srcFormat, const void *srcPixels, const void *srcAlphaMap, const RGB *srcPalette ))
 {
 	CHECK_CREATE_BUFFERS(set_texture_level_data);
 	ASSERT( htexture != RP_CURRENT );
-	IDirect3DTexture9 * tex = (IDirect3DTexture9*) htexture;
+	IDirect3DTexture9 * tex = reinterpret_cast<IDirect3DTexture9 *>(htexture);
 	if (!tex) return GR_GENERIC;
-	D3DLOCKED_RECT rect;
+	D3DLOCKED_RECT rect {};
 	tex->LockRect(subsurface, &rect,NULL,0);
 	U8* pTextureBuffer = static_cast<byte *>(rect.pBits);
 	LONG lTexturePitch = rect.Pitch;
@@ -3464,7 +3466,7 @@ DA_METHOD(  get_num_textures,(U32 *out_num_textures ))
 }
 
 
-DA_METHOD(  get_texture,(U32 texture_num, U32 *out_htexture ))
+DA_METHOD(  get_texture,(U32 texture_num, LONG_PTR *out_htexture ))
 {
 	CHECK_CREATE_BUFFERS(get_texture);
 
@@ -3555,8 +3557,8 @@ DA_METHOD(	clear_buffers,(U32 flag, RECT *rect ))
 								NULL,
 								// (D3DRECT*)&scissor, 
 								 cflags, 
-								 //curr_pipeline_state[RP_CLEAR_COLOR].get(), 
-								 D3DCOLOR_XRGB(0,0,0),
+								 curr_pipeline_state[RP_CLEAR_COLOR].get(),
+								 // D3DCOLOR_XRGB(0,0,0),
 								 1.0, 
 								 curr_pipeline_state[RP_CLEAR_STENCIL].get() );
 

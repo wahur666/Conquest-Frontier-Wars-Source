@@ -50,7 +50,7 @@ struct Material
 
 	U32			flags;
 
-	U32			texture_id;
+	LONG_PTR			texture_id;
 	void		*not_used_2;
 	
 //

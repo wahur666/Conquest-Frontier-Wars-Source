@@ -98,7 +98,7 @@ struct DANODE
 {
 	DANODE * pNext;
 
-	U32		textureID;
+	LONG_PTR textureID;
 	U32		resolution;
 	bool	bAlpha;
 	TManager * owner;
@@ -391,7 +391,7 @@ U32 TManager::GetPrevTexture(U32 textureID)
 //
 U32 TManager::CreateDrawAgentTexture (U32 resolution, bool bAlpha)
 {
-	U32 result=0;
+	LONG_PTR result=0;
 	PixelFormat desiredFormat(16, 5, 6-bAlpha, 5, bAlpha);		// GL_RGB5_A1
 	//DANODE * pInUseList, * pJustFreedList, *pFreedList;
 	DANODE * pNode, *pPrev;
@@ -649,7 +649,7 @@ void convertBumpmap(COLORREF * src,COLORREF * dst, int originalWidth, int origin
 
 U32 TManager::createTextureFromMemory (void *pMemory, DA::FILETYPE type, const PixelFormat &format, const char *name, IRenderPipeline * PIPE)
 {
-	U32 textureID=0;
+	LONG_PTR textureID=0;
 	COLORREF *bits = texLoadBitsA;
 	COMPTR<IImageReader> reader;
 	U32 width, height;
@@ -760,7 +760,7 @@ Done:
 //
 U32 TManager::createTextureFromFile (const char *fileName, IComponentFactory *parentFile, DA::FILETYPE type, const PixelFormat &format, IRenderPipeline * PIPE)
 {
-	U32 textureID=0;
+	LONG_PTR textureID=0;
 
 
 

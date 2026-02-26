@@ -2581,14 +2581,14 @@ void CleanUp (void)
 		TextureLib->free_library( FALSE );
 	}
 
-	DACOM_RELEASE( Camera );
+	// DACOM_RELEASE( Camera );
 	DACOM_RELEASE( RenderPrim );
 	DACOM_RELEASE( RenderPipe );
 	DACOM_RELEASE( TextureLib );
 	DACOM_RELEASE( MaterialLib );
 	DACOM_RELEASE( LightMan );
-	DACOM_RELEASE( Renderer );
-	DACOM_RELEASE( Engine );
+	// DACOM_RELEASE( Renderer );
+	// DACOM_RELEASE( Engine );
 	DACOM_RELEASE( System );
 
 	DA_HEAP_PRINT( HEAP );
@@ -2733,7 +2733,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	DA_HEAP_MARK_ALLOCATED(HEAP);
 
-	TrapFpu( false );
+	// TrapFpu( false );
 
 	ObjectList_Initialize();
 

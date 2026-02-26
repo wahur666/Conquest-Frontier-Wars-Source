@@ -530,10 +530,10 @@ struct BaseCamera : public DAComponentX<__baseCameraImpl>, IEngineInstance
 		engine->release_archetype( arch );
 	}
 
-	~BaseCamera (void) override {
-		if (index != INVALID_INSTANCE_INDEX)
-			engine->destroy_instance(index);		
-	}
+	// ~BaseCamera (void) override {
+	// 	// if (index != INVALID_INSTANCE_INDEX)
+	// 		// engine->destroy_instance(index);
+	// }
 
 
 	/* ICamera methods */

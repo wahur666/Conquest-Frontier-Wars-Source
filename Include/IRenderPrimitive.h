@@ -77,8 +77,8 @@ struct IRenderPrimitive : public IDAComponent
 	virtual GENRESULT COMAPI set_sampler_state( U32 stage, D3DSAMPLERSTATETYPE, U32 value ) = 0;
 	virtual GENRESULT COMAPI get_sampler_state( U32 stage, D3DSAMPLERSTATETYPE, U32 *value ) = 0;
 	
-	virtual GENRESULT COMAPI set_texture_stage_texture( U32 stage, U32 htexture ) = 0;
-	virtual GENRESULT COMAPI get_texture_stage_texture( U32 stage, U32 *htexture ) = 0;
+	virtual GENRESULT COMAPI set_texture_stage_texture( U32 stage, LONG_PTR htexture ) = 0;
+	virtual GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *htexture ) = 0;
 	virtual GENRESULT COMAPI verify_state(  void ) = 0;
 	
 	virtual GENRESULT COMAPI draw_primitive( D3DPRIMITIVETYPE type, U32 vertex_format, const void *verts, int num_verts, U32 flags ) = 0;

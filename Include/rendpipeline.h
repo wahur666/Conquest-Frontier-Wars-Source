@@ -924,7 +924,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI set_texture_stage_texture( U32 stage, U32 htexture  ) = 0;
+	virtual GENRESULT COMAPI set_texture_stage_texture( U32 stage, LONG_PTR htexture  ) = 0;
 
 	// get_texture_stage_texture
 	//
@@ -933,7 +933,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI get_texture_stage_texture( U32 stage, U32 *htexture  ) = 0;
+	virtual GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *htexture  ) = 0;
 
 	// verify_state
 	//
@@ -1081,9 +1081,9 @@ struct IRenderPipeline : public IDAComponent
 	// and destroy_buffers calls.
 	//
 
-	virtual GENRESULT COMAPI create_cube_texture_from_file(const char* filename, IComponentFactory * DIR,U32 &out_htexture) = 0;
+	virtual GENRESULT COMAPI create_cube_texture_from_file(const char* filename, IComponentFactory * DIR,LONG_PTR &out_htexture) = 0;
 
-	virtual GENRESULT COMAPI create_texture( int width, int height, const PixelFormat &desiredformat, int num_lod, U32 irp_ctf_flags, U32 &out_htexture  ) = 0;
+	virtual GENRESULT COMAPI create_texture( int width, int height, const PixelFormat &desiredformat, int num_lod, U32 irp_ctf_flags, LONG_PTR &out_htexture  ) = 0;
 
 	// destroy_texture
 	//
@@ -1094,7 +1094,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI destroy_texture( U32 htexture  ) = 0;
+	virtual GENRESULT COMAPI destroy_texture( LONG_PTR htexture  ) = 0;
 
 	// is_texture
 	//
@@ -1105,7 +1105,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI is_texture( U32 htexture  ) = 0;
+	virtual GENRESULT COMAPI is_texture( LONG_PTR htexture  ) = 0;
 
 	// lock_texture
 	//
@@ -1115,7 +1115,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI lock_texture( U32 htexture, int level, RPLOCKDATA *lockData  ) = 0;
+	virtual GENRESULT COMAPI lock_texture( LONG_PTR htexture, int level, RPLOCKDATA *lockData  ) = 0;
 
 	// unlock_texture
 	//
@@ -1124,7 +1124,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI unlock_texture( U32 htexture, int level  ) = 0;
+	virtual GENRESULT COMAPI unlock_texture( LONG_PTR htexture, int level  ) = 0;
 
 	// get_texture_format
 	//
@@ -1133,7 +1133,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI get_texture_format( U32 htexture, PixelFormat *out_pf  ) = 0;
+	virtual GENRESULT COMAPI get_texture_format( LONG_PTR htexture, PixelFormat *out_pf  ) = 0;
 
 	// get_texture_dim
 	//
@@ -1142,7 +1142,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI get_texture_dim( U32 htexture, U32 *out_width, U32 *out_height, U32 *out_num_lod  ) = 0;
+	virtual GENRESULT COMAPI get_texture_dim( LONG_PTR htexture, U32 *out_width, U32 *out_height, U32 *out_num_lod  ) = 0;
 
 	// get_texture_interface
 	//
@@ -1151,7 +1151,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI get_texture_interface( U32 htexture, const char *iid, void **out_iif  ) = 0;
+	virtual GENRESULT COMAPI get_texture_interface( LONG_PTR htexture, const char *iid, void **out_iif  ) = 0;
 
 	// get_texture_dc
 	//
@@ -1161,7 +1161,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI get_texture_dc( U32 htexture, HDC *out_hdc ) = 0;
+	virtual GENRESULT COMAPI get_texture_dc( LONG_PTR htexture, HDC *out_hdc ) = 0;
 
 	// release_texture_dc
 	//
@@ -1170,7 +1170,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI release_texture_dc( U32 htexture, HDC hdc ) = 0;
+	virtual GENRESULT COMAPI release_texture_dc( LONG_PTR htexture, HDC hdc ) = 0;
 
 	// set_texture_palette
 	//
@@ -1180,7 +1180,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI set_texture_palette( U32 htexture, int start, int length, const RGB *colors  ) = 0;
+	virtual GENRESULT COMAPI set_texture_palette( LONG_PTR htexture, int start, int length, const RGB *colors  ) = 0;
 
 	// get_texture_palette
 	//
@@ -1190,7 +1190,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI get_texture_palette( U32 htexture, int start, int length, RGB *colors  ) = 0;
+	virtual GENRESULT COMAPI get_texture_palette( LONG_PTR htexture, int start, int length, RGB *colors  ) = 0;
 
 	// set_texture_level_data
 	//
@@ -1212,7 +1212,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI set_texture_level_data( U32 htexture, int level, int src_width, int src_height, int src_stride, const PixelFormat &src_format, const void *src_pixel, const void *src_alpha, const RGB *src_palette ) = 0;
+	virtual GENRESULT COMAPI set_texture_level_data( LONG_PTR htexture, int level, int src_width, int src_height, int src_stride, const PixelFormat &src_format, const void *src_pixel, const void *src_alpha, const RGB *src_palette ) = 0;
 
 	// blit_texture
 	//
@@ -1245,7 +1245,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI get_texture( U32 texture_num, U32 *out_htexture  ) = 0;
+	virtual GENRESULT COMAPI get_texture( U32 texture_num, LONG_PTR *out_htexture  ) = 0;
 };
 
 //

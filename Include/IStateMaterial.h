@@ -38,10 +38,10 @@ struct IStateMaterial : public IDAComponent
 	virtual GENRESULT COMAPI get_texture_stage_state( U32 stage, D3DTEXTURESTAGESTATETYPE state, U32 *out_value ) = 0;
 	
 	//
-	virtual GENRESULT COMAPI set_texture_stage_texture( U32 stage, U32 irp_texture_id ) = 0;
+	virtual GENRESULT COMAPI set_texture_stage_texture( U32 stage, LONG_PTR irp_texture_id ) = 0;
 
 	// if state is not found in the material, returns GR_GENERIC
-	virtual GENRESULT COMAPI get_texture_stage_texture( U32 stage, U32 *out_irp_texture_id ) = 0;
+	virtual GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *out_irp_texture_id ) = 0;
 };
 
 
