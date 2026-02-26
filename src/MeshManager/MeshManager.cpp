@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include <IMeshManager.h>
-#include <tcomponent.h>
+#include <TComponent2.h>
 #include <da_heap_utility.h>
 #include <TSmartPointer.h>
 #include <RendPipeline.h>
@@ -12,6 +12,7 @@
 #include "MeshArch.h"
 #include "MeshInstance.h"
 #include <IAnim.h>
+#include <span>
 
 #define CLSID_MeshManager "IMeshManager"
 
@@ -19,14 +20,30 @@ ICOManager * DACOM = NULL;
 
 struct MeshManager : IMeshManager, public ISystemComponent, IInternalMeshManager
 {
-	BEGIN_DACOM_MAP_INBOUND(MeshManager)
-		DACOM_INTERFACE_ENTRY(IMeshManager)
-		DACOM_INTERFACE_ENTRY2(IID_IMeshManager,IMeshManager)
-		DACOM_INTERFACE_ENTRY(IAggregateComponent)
-		DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-		DACOM_INTERFACE_ENTRY(ISystemComponent)
-		DACOM_INTERFACE_ENTRY2(IID_ISystemComponent,ISystemComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIMeshManager(void* self) {
+	    return static_cast<IMeshManager*>(
+	        static_cast<MeshManager*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<MeshManager*>(self));
+	}
+	static IDAComponent* GetISystemComponent(void* self) {
+	    return static_cast<ISystemComponent*>(
+	        static_cast<MeshManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IMeshManager",          &GetIMeshManager},
+	        {IID_IMeshManager,        &GetIMeshManager},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	        {"ISystemComponent",      &GetISystemComponent},
+	        {IID_ISystemComponent,    &GetISystemComponent},
+	    };
+	    return map;
+	}
 
 	// ISystemComponent 
 	virtual GENRESULT COMAPI Initialize(void);
@@ -402,7 +419,7 @@ BOOL APIENTRY DllMain( HINSTANCE hModule,
 			IComponentFactory * server;
 
 			// Register System aggragate factory
-			if( DACOM && (server = new DAComponentFactory2<DAComponentAggregate<MeshManager>, AGGDESC>(CLSID_MeshManager)) != NULL ) 
+			if( DACOM && (server = new DAComponentFactoryX2<DAComponentAggregateX<MeshManager>, AGGDESC>(CLSID_MeshManager)) != NULL )
 			{
 				DACOM->RegisterComponent( server, CLSID_MeshManager, DACOM_NORMAL_PRIORITY );
 				server->Release();
