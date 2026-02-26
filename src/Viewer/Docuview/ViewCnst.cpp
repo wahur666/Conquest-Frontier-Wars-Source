@@ -462,7 +462,7 @@ BOOL32 ViewConstructor::HasVariableSize (SYMBOL symbol)
 GENRESULT ViewConstructor::CreateViewer (VIEWDESC *lpDesc, void **instance)
 {
 	GENRESULT result = GR_GENERIC;
-	DAComponent<DataViewer> *pNewInstance = NULL;
+	DAComponentX<DataViewer> *pNewInstance = NULL;
 	SYMBOL list = 0;
 	COMPTR<IDAConnectionPoint> connection = nullptr;
 	HWND hOwnerWindow=0;
@@ -519,7 +519,7 @@ GENRESULT ViewConstructor::CreateViewer (VIEWDESC *lpDesc, void **instance)
 	{
 		if (lpDesc->doc->GetFileSize() == (DWORD) list->size || DataViewer::HasVariableSize(list))
 		{
-			if ((pNewInstance = new DAComponent<DataViewer>) == 0)
+			if ((pNewInstance = new DAComponentX<DataViewer>) == 0)
 			{
 				result = GR_OUT_OF_MEMORY;
 				goto Done;

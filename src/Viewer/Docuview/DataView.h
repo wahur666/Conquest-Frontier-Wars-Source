@@ -30,9 +30,7 @@
 #include "Symtable.h"
 #endif
 
-#ifndef TCOMPONENT_H
-#include "TComponent.h"
-#endif
+#include "TComponent2.h"
 
 #ifndef TDISPATCH_H
 #include "TDispatch.h"
@@ -54,6 +52,7 @@
 //--------------------------------------------------------------------------//
 
 #define MAX_NAME_LENGTH 128
+#include <span>
 
 
 struct DACOM_NO_VTABLE IDataViewer : public IViewer
@@ -95,14 +94,30 @@ public:
 		HEX_NUMBERS
 	};
 
-	BEGIN_DACOM_MAP_INBOUND(DataViewer)
-	DACOM_INTERFACE_ENTRY(IViewer)
-	DACOM_INTERFACE_ENTRY(IDADispatch)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	DACOM_INTERFACE_ENTRY2(IID_IViewer,IViewer)
-	DACOM_INTERFACE_ENTRY2(IID_IDADispatch,IDADispatch)
-	DACOM_INTERFACE_ENTRY2(IID_IDocumentClient,IDocumentClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIViewer(void* self) {
+	    return static_cast<IViewer*>(
+	        static_cast<DataViewer*>(self));
+	}
+	static IDAComponent* GetIDADispatch(void* self) {
+	    return static_cast<IDADispatch*>(
+	        static_cast<DataViewer*>(self));
+	}
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<DataViewer*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IViewer",           &GetIViewer},
+	        {"IDADispatch",       &GetIDADispatch},
+	        {"IDocumentClient",   &GetIDocumentClient},
+	        {IID_IViewer,         &GetIViewer},
+	        {IID_IDADispatch,     &GetIDADispatch},
+	        {IID_IDocumentClient, &GetIDocumentClient},
+	    };
+	    return map;
+	}
 
 	char szReturnString[MAX_NAME_LENGTH];
 	char szDisplayName[MAX_NAME_LENGTH];
@@ -137,28 +152,46 @@ public:
 	WNDPROC lpfnOldEditProcedure;
 #endif
 
-	BEGIN_DACOM_DISPATCH_MAP(DataViewer)
-	DACOM_DISPATCH_METHOD(set_display_state,  DAVT_BOOL32)
-	DACOM_DISPATCH_METHOD(get_display_state,  DAVT_BOOL32|DAVT_BYREF )
-	DACOM_DISPATCH_METHOD(get_class_name,     DAVT_STRING)
-	DACOM_DISPATCH_METHOD(set_instance_name,  DAVT_STRING)
-	DACOM_DISPATCH_METHOD(get_instance_name,  DAVT_STRING)
-	DACOM_DISPATCH_METHOD(get_main_window,	  DAVT_PVOID|DAVT_BYREF)
-	DACOM_DISPATCH_METHOD(set_rect,			  DAVT_PRECT)
-	DACOM_DISPATCH_METHOD(get_rect,			  DAVT_PRECT)
-	DACOM_DISPATCH_METHOD(set_read_only,	  DAVT_BOOL32)
-	DACOM_DISPATCH_METHOD(get_read_only,	  DAVT_PBOOL32)
-	DACOM_DISPATCH_METHOD(set_display_value,  DAVT_STRING)
-	DACOM_DISPATCH_METHOD(get_display_value,  DAVT_STRING)
-	DACOM_DISPATCH_METHOD(set_hex_numbers,	  DAVT_BOOL32)
-	DACOM_DISPATCH_METHOD(get_hex_numbers,	  DAVT_PBOOL32)
-	DACOM_DISPATCH_METHOD(Enumerate,		  DAVT_COMPONENT)
-	DACOM_DISPATCH_METHOD(Update,			  DAVT_COMPONENT)
-	DACOM_DISPATCH_METHOD(set_spelling_list,  DAVT_COMPONENT)
-	DACOM_DISPATCH_METHOD(set_viewer_path,    DAVT_STRING)
-	DACOM_DISPATCH_MEMBER_PROPERTY("auto_close", bAutoClose, DAVT_BOOL32)
-	DACOM_DISPATCH_MEMBER_PROPERTY("top_most", bTopMost, DAVT_BOOL32)
-	END_DACOM_DISPATCH_MAP()
+public:
+	const static _DACOM_DISPATCH_ENTRY * __stdcall _GetAutomationEntries() {
+		typedef DataViewer _DaComMapClass;
+		static const _DACOM_DISPATCH_ENTRY _entries[] = {
+			{"set_display_state", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_BOOL32, ((DA_PROC) &DataViewer::set_display_state)},
+			{
+				"get_display_state", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_BOOL32 | DAVT_BYREF,
+				((DA_PROC) &DataViewer::get_display_state)
+			},
+			{"get_class_name", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_STRING, ((DA_PROC) &DataViewer::get_class_name)},
+			{"set_instance_name", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_STRING, ((DA_PROC) &DataViewer::set_instance_name)},
+			{"get_instance_name", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_STRING, ((DA_PROC) &DataViewer::get_instance_name)},
+			{
+				"get_main_window", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_PVOID | DAVT_BYREF,
+				((DA_PROC) &DataViewer::get_main_window)
+			},
+			{"set_rect", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_PRECT, ((DA_PROC) &DataViewer::set_rect)},
+			{"get_rect", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_PRECT, ((DA_PROC) &DataViewer::get_rect)},
+			{"set_read_only", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_BOOL32, reinterpret_cast<DA_PROC>(&DataViewer::set_read_only)},
+			{"get_read_only", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_PBOOL32, ((DA_PROC) &DataViewer::get_read_only)},
+			{"set_display_value", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_STRING, ((DA_PROC) &DataViewer::set_display_value)},
+			{"get_display_value", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_STRING, ((DA_PROC) &DataViewer::get_display_value)},
+			{"set_hex_numbers", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_BOOL32, ((DA_PROC) &DataViewer::set_hex_numbers)},
+			{"get_hex_numbers", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_PBOOL32, ((DA_PROC) &DataViewer::get_hex_numbers)},
+			{"Enumerate", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_COMPONENT, ((DA_PROC) &DataViewer::Enumerate)},
+			{"Update", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_COMPONENT, ((DA_PROC) &DataViewer::Update)},
+			{"set_spelling_list", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_COMPONENT, ((DA_PROC) &DataViewer::set_spelling_list)},
+			{"set_viewer_path", 0, 0, _DACOM_PROPTYPE_METHOD, (U16) DAVT_STRING, ((DA_PROC) &DataViewer::set_viewer_path)},
+			{
+				"auto_close", daoffsetofmember(_DaComMapClass, bAutoClose), dasizeofmember(_DaComMapClass, bAutoClose),
+				_DACOM_PROPTYPE_OFFSET, (U16) DAVT_BOOL32, 0
+			},
+			{
+				"top_most", daoffsetofmember(_DaComMapClass, bTopMost), dasizeofmember(_DaComMapClass, bTopMost),
+				_DACOM_PROPTYPE_OFFSET, (U16) DAVT_BOOL32, 0
+			},
+			{0, 0, 0, 0, (U16) DAVT_EMPTY, 0}
+		};
+		return _entries;
+	}
 
 
 	//----------------------------------------------------------

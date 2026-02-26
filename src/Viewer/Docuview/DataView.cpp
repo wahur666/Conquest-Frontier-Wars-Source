@@ -1038,14 +1038,14 @@ BOOL32 DataViewer::initArray (void)
 	{
 		if (last)
 		{
-			if ((last->pNext = new DAComponent<DataViewer>) == 0)
+			if ((last->pNext = new DAComponentX<DataViewer>) == 0)
 				break;
 			last = last->pNext;
 			i++;
 		}
 		else
 		{
-			if ((pViewerList = last = new DAComponent<DataViewer>) == 0)
+			if ((pViewerList = last = new DAComponentX<DataViewer>) == 0)
 				break;
 		}
 		goalSize -= symbol->datatype->size;
@@ -1077,7 +1077,7 @@ BOOL32 DataViewer::initRecord (void)
 
 	if (sym)
 	{
-		pViewerList = last = new DAComponent<DataViewer>;
+		pViewerList = last = new DAComponentX<DataViewer>;
 		if (last)
 		while (1)
 		{
@@ -1097,7 +1097,7 @@ BOOL32 DataViewer::initRecord (void)
 
 			if ((sym = sym->link) == 0)
 				break;
-			if ((last->pNext = new DAComponent<DataViewer>) == 0)
+			if ((last->pNext = new DAComponentX<DataViewer>) == 0)
 				break;
 			last = last->pNext;
 		}
@@ -1133,7 +1133,7 @@ BOOL32 DataViewer::initPointer (void)
 
 	if (symbol->datatype)
 	{
-		if ((pViewerList = new DAComponent<DataViewer>) != 0)
+		if ((pViewerList = new DAComponentX<DataViewer>) != 0)
 		{
 			pViewerList->szInstanceName[0] = '*';
 			strcpy(pViewerList->szInstanceName+1, szInstanceName);
@@ -2519,9 +2519,17 @@ struct EraseSymbols : IStructEnumerator
 {
 	DWORD dwRefs;
 
-	BEGIN_DACOM_MAP_INBOUND(EraseSymbols)
-		DACOM_INTERFACE_ENTRY(IStructEnumerator)
-	END_DACOM_MAP()
+	static IDAComponent* GetIStructEnumerator(void* self) {
+	    return static_cast<IStructEnumerator*>(
+	        static_cast<EraseSymbols*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IStructEnumerator", &GetIStructEnumerator},
+	    };
+	    return map;
+	}
 
 	int level;
 
@@ -2598,21 +2606,23 @@ struct EraseSymbols : IStructEnumerator
 
 	virtual GENRESULT COMAPI QueryInterface (const C8 *interface_name, void **instance)
 	{
-		int i;
-		const _DACOM_INTMAP_ENTRY * interfaces = _GetEntriesIn();
+		if (!interface_name || !instance)
+			return GR_INVALID_PARAM;
 
-		for (i = 0; interfaces[i].interface_name; i++)
+		std::string_view requested{interface_name};
+
+		for (const auto& e : GetInterfaceMap())
 		{
-			if (strcmp(interfaces[i].interface_name, interface_name) == 0)
+			if (e.interface_name == requested)
 			{
-				IDAComponent *result = (IDAComponent *) (((char *) this) + interfaces[i].offset);
-				result->AddRef();
-				*instance = result;
+				IDAComponent* iface = e.get(this);
+				iface->AddRef();
+				*instance = iface;
 				return GR_OK;
 			}
 		}
 
-		*instance = 0;
+		*instance = nullptr;
 		return GR_INTERFACE_UNSUPPORTED;
 	}
 	virtual U32 COMAPI AddRef (void)
