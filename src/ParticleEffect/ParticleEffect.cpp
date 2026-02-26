@@ -6,8 +6,9 @@
 #include <IParticleManager.h>
 #include "ParticleSystem.h"
 #include "ParticleParamFunctions.h"
-#include <tcomponent.h>
+#include <TComponent2.h>
 #include <da_heap_utility.h>
+#include <span>
 
 #define CLSID_ParticleManager "IParticleManager"
 
@@ -22,12 +23,24 @@ void destroyParticleProgramer(IParticleProgramer * inst);
 
 struct ParticleManager : IParticleManager, public IAggregateComponent, IInternalParticleManager
 {
-	BEGIN_DACOM_MAP_INBOUND(ParticleManager)
-		DACOM_INTERFACE_ENTRY(IParticleManager)
-		DACOM_INTERFACE_ENTRY2(IID_IParticleManager,IParticleManager)
-		DACOM_INTERFACE_ENTRY(IAggregateComponent)
-		DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIParticleManager(void* self) {
+	    return static_cast<IParticleManager*>(
+	        static_cast<ParticleManager*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<ParticleManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IParticleManager",      &GetIParticleManager},
+	        {IID_IParticleManager,    &GetIParticleManager},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 	// IAggregateComponent 
 	GENRESULT COMAPI Initialize(void);
@@ -556,7 +569,7 @@ BOOL APIENTRY DllMain( HINSTANCE hModule,
 			IComponentFactory * server;
 
 			// Register System aggragate factory
-			if( DACOM && (server = new DAComponentFactory2<DAComponentAggregate<ParticleManager>, AGGDESC>(CLSID_ParticleManager)) != NULL ) 
+			if( DACOM && (server = new DAComponentFactoryX2<DAComponentAggregateX<ParticleManager>, AGGDESC>(CLSID_ParticleManager)) != NULL )
 			{
 				DACOM->RegisterComponent( server, CLSID_ParticleManager, DACOM_NORMAL_PRIORITY );
 				server->Release();
