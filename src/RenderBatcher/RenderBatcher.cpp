@@ -9,10 +9,11 @@
 #include <stdio.h>
 #include <assert.h>
 #include <ddraw.h>
+#include <span>
 
 #include "dacom.h"
 #include "TSmartPointer.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "FDump.h"
 #include "TempStr.h"
 #include "FVF.h"
@@ -1115,12 +1116,24 @@ struct RenderBatcher : 	IRenderPrimitive,
 						IAggregateComponent
 
 {
-	BEGIN_DACOM_MAP_INBOUND(RenderBatcher)
-	DACOM_INTERFACE_ENTRY(IRenderPrimitive)
-	DACOM_INTERFACE_ENTRY2(IID_IRenderPrimitive,IRenderPrimitive)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIRenderPrimitive(void* self) {
+	    return static_cast<IRenderPrimitive*>(
+	        static_cast<RenderBatcher*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<RenderBatcher*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IRenderPrimitive",      &GetIRenderPrimitive},
+	        {IID_IRenderPrimitive,    &GetIRenderPrimitive},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 public:		// public interface
     
@@ -1636,7 +1649,7 @@ BOOL COMAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 			ICOManager *DACOM = DACOM_Acquire();
 			IComponentFactory *server1;
-			if( DACOM && (server1 = new DAComponentFactory2<DAComponentAggregate<RenderBatcher>, AGGDESC>("IRenderPrimitive")) != NULL ) {
+			if( DACOM && (server1 = new DAComponentFactoryX2<DAComponentAggregateX<RenderBatcher>, AGGDESC>("IRenderPrimitive")) != NULL ) {
 				DACOM->RegisterComponent( server1, "IRenderPrimitive", DACOM_HIGH_PRIORITY );
 				server1->Release();
 			}
