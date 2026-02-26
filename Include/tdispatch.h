@@ -147,9 +147,7 @@ GENRESULT Dispatch<Type, Base>::Invoke(const C8 *methodName, DACOM_VARIANT parm1
 {
 	U32 i;
 	const _DACOM_DISPATCH_ENTRY * properties = Type::_GetAutomationEntries();
-	void *instance = (void *) ( ((U32)this) - ((U32)
-				(static_cast<Dispatch<Type, Base>*>((Type*)8) )
-				-8) );
+	void *instance = static_cast<Type*>(this);
 
 	for (i = 0; properties[i].name; i++)
 	{
