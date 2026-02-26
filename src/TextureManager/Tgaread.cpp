@@ -15,8 +15,9 @@
 #include <vfx.h>
 #include <pixel.h>
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <HeapObj.h>
+#include <span>
 
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -51,9 +52,17 @@ struct TGAHEADER
 
 struct DACOM_NO_VTABLE TGAREADER : IImageReader
 {
-	BEGIN_DACOM_MAP_INBOUND(TGAREADER)
-  	DACOM_INTERFACE_ENTRY(IImageReader)
-  	END_DACOM_MAP()
+	static IDAComponent* GetIImageReader(void* self) {
+	    return static_cast<IImageReader*>(
+	        static_cast<TGAREADER*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IImageReader", &GetIImageReader},
+	    };
+	    return map;
+	}
 		
   	//------------------------------
   	// data members
@@ -773,7 +782,7 @@ void TGAREADER::getIndexFormat (U8 *buffer, const RECT * rect) const
 //
 void __stdcall CreateTGAReader (struct IImageReader ** reader)
 {
-	*reader = new DAComponent<TGAREADER>;
+	*reader = new DAComponentX<TGAREADER>;
 }
 //-------------------------------------------------------------------------//
 //----------------------------END TGAREAD.CPP------------------------------//

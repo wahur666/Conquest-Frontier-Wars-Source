@@ -18,8 +18,9 @@
 #include <TSmartPointer.h>
 #include <HeapObj.h>
 #include <RendPipeline.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <da_heap_utility.h>
+#include <span>
 
 struct TManager;
 
@@ -121,14 +122,30 @@ struct DANODE
 
 struct DACOM_NO_VTABLE TManager : public ITManager, ISystemComponent
 {
-	BEGIN_DACOM_MAP_INBOUND(TManager)
-	DACOM_INTERFACE_ENTRY(ITManager)
-	DACOM_INTERFACE_ENTRY2(IID_ITManager,ITManager)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	DACOM_INTERFACE_ENTRY(ISystemComponent)
-	DACOM_INTERFACE_ENTRY2(IID_ISystemComponent,ISystemComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetITManager(void* self) {
+	    return static_cast<ITManager*>(
+	        static_cast<TManager*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<TManager*>(self));
+	}
+	static IDAComponent* GetISystemComponent(void* self) {
+	    return static_cast<ISystemComponent*>(
+	        static_cast<TManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ITManager",             &GetITManager},
+	        {IID_ITManager,           &GetITManager},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	        {"ISystemComponent",      &GetISystemComponent},
+	        {IID_ISystemComponent,    &GetISystemComponent},
+	    };
+	    return map;
+	}
 
  	//------------------------
 
@@ -898,7 +915,7 @@ BOOL APIENTRY DllMain( HINSTANCE hModule,
 			IComponentFactory * server;
 
 			// Register System aggragate factory
-			if( DACOM && (server = new DAComponentFactory2<DAComponentAggregate<TManager>, AGGDESC>(CLSID_ITManager)) != NULL ) 
+			if( DACOM && (server = new DAComponentFactoryX2<DAComponentAggregateX<TManager>, AGGDESC>(CLSID_ITManager)) != NULL )
 			{
 				DACOM->RegisterComponent( server, CLSID_ITManager, DACOM_NORMAL_PRIORITY );
 				server->Release();

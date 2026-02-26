@@ -15,9 +15,10 @@
 #include "IImageReader.h"
 #include <vfx.h>
 #include <pixel.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 
 #include <malloc.h>
+#include <span>
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
@@ -26,9 +27,17 @@
 
 struct DACOM_NO_VTABLE BMP_READER : IImageReader
 {
-	BEGIN_DACOM_MAP_INBOUND(BMP_READER)
-  	DACOM_INTERFACE_ENTRY(IImageReader)
-  	END_DACOM_MAP()
+	static IDAComponent* GetIImageReader(void* self) {
+	    return static_cast<IImageReader*>(
+	        static_cast<BMP_READER*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IImageReader", &GetIImageReader},
+	    };
+	    return map;
+	}
 		
   	//------------------------------
   	// data members
@@ -641,7 +650,7 @@ void BMP_READER::getIndexFormat (U8 *buffer, const RECT * rect) const
 //
 void __stdcall CreateBMPReader (struct IImageReader ** reader)
 {
-	*reader = new DAComponent<BMP_READER>;
+	*reader = new DAComponentX<BMP_READER>;
 }
 //-------------------------------------------------------------------------//
 //----------------------------END BmpRead.CPP------------------------------//
