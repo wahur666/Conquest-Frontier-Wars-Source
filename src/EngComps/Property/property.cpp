@@ -34,7 +34,7 @@
 #include "da_heap_utility.h"
 #include "engcomp.h"
 #include "SysConsumerDesc.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "TSmartPointer.h"
 #include "IProperties.h"
 #include "3dmath.h"
@@ -45,6 +45,8 @@
 #include "handlemap.h"
 
 //
+
+#include <span>
 
 #include "hashtable.h"
 
@@ -118,12 +120,24 @@ struct PropertyTable : public HashTable {
 
 struct LocalProperty : public IProperty, public ISetProperty
 {
-	BEGIN_DACOM_MAP_INBOUND(LocalProperty)
-	DACOM_INTERFACE_ENTRY(IProperty)
-	DACOM_INTERFACE_ENTRY2(IID_IProperty,IProperty)
-	DACOM_INTERFACE_ENTRY(ISetProperty)
-	DACOM_INTERFACE_ENTRY2(IID_ISetProperty,ISetProperty)
-	END_DACOM_MAP()
+	static IDAComponent* GetIProperty(void* self) {
+	    return static_cast<IProperty*>(
+	        static_cast<LocalProperty*>(self));
+	}
+	static IDAComponent* GetISetProperty(void* self) {
+	    return static_cast<ISetProperty*>(
+	        static_cast<LocalProperty*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IProperty",      &GetIProperty},
+	        {IID_IProperty,    &GetIProperty},
+	        {"ISetProperty",   &GetISetProperty},
+	        {IID_ISetProperty, &GetISetProperty},
+	    };
+	    return map;
+	}
 
 	PROP_TYPE                   type;
 	union
@@ -395,14 +409,30 @@ struct LocalProperty : public IProperty, public ISetProperty
 
 struct DACOM_NO_VTABLE PropertyComp : public IEngineComponent, public IProperties
 {
-	BEGIN_DACOM_MAP_INBOUND(PropertyComp)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY(IEngineComponent)
-	DACOM_INTERFACE_ENTRY(IProperties)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IEngineComponent,IEngineComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IProperties,IProperties)
-	END_DACOM_MAP()
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<PropertyComp*>(self));
+	}
+	static IDAComponent* GetIEngineComponent(void* self) {
+	    return static_cast<IEngineComponent*>(
+	        static_cast<PropertyComp*>(self));
+	}
+	static IDAComponent* GetIProperties(void* self) {
+	    return static_cast<IProperties*>(
+	        static_cast<PropertyComp*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {"IEngineComponent",      &GetIEngineComponent},
+	        {"IProperties",           &GetIProperties},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	        {IID_IEngineComponent,    &GetIEngineComponent},
+	        {IID_IProperties,         &GetIProperties},
+	    };
+	    return map;
+	}
 
 //
 // Implementation-specific stuff.
@@ -465,7 +495,7 @@ struct DACOM_NO_VTABLE PropertyComp : public IEngineComponent, public IPropertie
 				char *data = record + p->nameLen;
 				PROP_TYPE type = (PROP_TYPE) p->propType;
 
-				LocalProperty *value = new DAComponent<LocalProperty>;
+				LocalProperty *value = new DAComponentX<LocalProperty>;
 				bool valid = true;
 
 				switch (type)
@@ -1309,7 +1339,7 @@ BOOL COMAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 		// Create a factory for the IProperties component
 
-			server = new DAComponentFactory2<DAComponentAggregate<PropertyComp>, SYSCONSUMERDESC> (interface_name);
+			server = new DAComponentFactoryX2<DAComponentAggregateX<PropertyComp>, SYSCONSUMERDESC> (interface_name);
 
 			if (server == NULL)
 			{
@@ -1328,7 +1358,7 @@ BOOL COMAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 		// Create a factory for IProperty components
 
-			server = new DAComponentFactory<DAComponent<LocalProperty>, DACOMDESC>(prop_interface_name);
+			server = new DAComponentFactoryX<DAComponentX<LocalProperty>, DACOMDESC>(prop_interface_name);
 
 		// Register at normal priority
 			if (DACOM != NULL)
