@@ -39,7 +39,7 @@
 #include "FDump.h"
 #include "FVF.h"
 #include "da_heap_utility.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "tsmartpointer.h"
 #include "IProfileParser_Utility.h"
 #include "rendpipeline.h"
@@ -49,7 +49,6 @@
 #include "IVideoStreamControl.h"
 #include "IRenderDebugger.h"
 #include "RPUL.h"
-#include "TComponent2.h"
 
 #include "../../../include/handlemap.h"
 #include "../../../include/Tfuncs.h"
@@ -188,16 +187,6 @@ struct Direct3D_RenderPipeline: IRenderPipeline,
 
 {
 public: // Data
-	BEGIN_DACOM_MAP_INBOUND(Direct3D_RenderPipeline)
-	DACOM_INTERFACE_ENTRY2(IID_IRenderPipeline,IRenderPipeline)
-	DACOM_INTERFACE_ENTRY2(IID_IRenderPrimitive,IRenderPrimitive)
-	DACOM_INTERFACE_ENTRY2(IID_IDDBackDoor,IDDBackDoor)
-	DACOM_INTERFACE_ENTRY2(IID_IGammaControl,IGammaControl)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-#if RP_RD_DEBUG
-	DACOM_INTERFACE_ENTRY2(IID_IRenderDebugger,IRenderDebugger)
-#endif
-	END_DACOM_MAP()
 
 public:	// Interface
 
