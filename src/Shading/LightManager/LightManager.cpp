@@ -13,10 +13,11 @@
 #pragma warning( disable: 4018 4100 4201 4244 4512 4530 4663 4688 4706 4710 4786 )
 
 #define WIN32_LEAN_AND_MEAN
+#include <span>
 #include <windows.h>
 
 #include "dacom.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "tsmartpointer.h"
 #include "fdump.h"
 #include "inv_sqrt.h"
@@ -234,12 +235,24 @@ struct LightManager : public ILightManager,
 {
 
 public:
-	BEGIN_DACOM_MAP_INBOUND(LightManager)
-	DACOM_INTERFACE_ENTRY(ILightManager)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_ILightManager,ILightManager)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	END_DACOM_MAP()
+	static IDAComponent* GetILightManager(void* self) {
+	    return static_cast<ILightManager*>(
+	        static_cast<LightManager*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<LightManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ILightManager",         &GetILightManager},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_ILightManager,       &GetILightManager},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	    };
+	    return map;
+	}
 
 	MetaList <ManagedLight>	lights;
 	int max_lights;
@@ -1393,7 +1406,7 @@ BOOL COMAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 			IComponentFactory *server1;
 
 			// Register System aggragate factory
-			if( (server1 = new DAComponentFactory2<DAComponentAggregate<LightManager>, AGGDESC>(CLSID_LightManager)) != NULL ) {
+			if( (server1 = new DAComponentFactoryX2<DAComponentAggregateX<LightManager>, AGGDESC>(CLSID_LightManager)) != NULL ) {
 				DACOM->RegisterComponent( server1, CLSID_LightManager, DACOM_NORMAL_PRIORITY );
 				server1->Release();
 			}
