@@ -29982,6 +29982,7 @@ typedef struct _ATTRIBUTES_AND_SID {
 
 
 
+
 typedef enum {
 
     WinNullSid                                  = 0,
@@ -33660,6 +33661,354 @@ typedef struct _XSTATE_CONFIGURATION {
     WORD   Spare1;
 
 } XSTATE_CONFIGURATION, *PXSTATE_CONFIGURATION;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef enum _RUNTIME_REPORT_TYPE {
+    RuntimeReportTypeDriver = 0,
+    RuntimeReportTypeMax
+} RUNTIME_REPORT_TYPE;
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef struct _RUNTIME_REPORT_PACKAGE_HEADER {
+
+    
+    
+    
+
+    UINT32 Magic;
+
+    
+    
+    
+
+    UINT16 PackageVersion;
+
+    
+    
+    
+
+    UINT16 NumberOfReports;
+
+    
+    
+    
+    
+    
+    
+    
+
+    UINT64 ReportTypesBitmap;
+
+    
+    
+    
+    
+
+    UINT32 PackageSize;
+
+    
+    
+    
+    
+    
+    
+
+    UINT16 ReportDigestType;
+
+    
+    
+    
+    
+
+    UINT16 TotalReportDigestsSize;
+
+    
+    
+    
+
+    UINT16 Reserved;
+
+    
+    
+    
+    
+    
+    
+
+    UINT16 SignatureScheme;
+
+    
+    
+    
+
+    UINT32 SignatureSize;
+
+    
+    
+    
+    
+
+    UINT32 TotalAuthenticatedReportsSize;
+
+} RUNTIME_REPORT_PACKAGE_HEADER, *PRUNTIME_REPORT_PACKAGE_HEADER;
+
+typedef struct _RUNTIME_REPORT_DIGEST_HEADER {
+
+    
+    
+    
+    
+    
+    
+
+    UINT16 ReportType;
+
+    
+    
+    
+
+    UINT16 Reserved;
+
+    
+    
+    
+    
+
+    UINT8 ReportDigest[64];
+
+} RUNTIME_REPORT_DIGEST_HEADER, *PRUNTIME_REPORT_DIGEST_HEADER;
+
+typedef struct _RUNTIME_REPORT_HEADER {
+
+    
+    
+    
+    
+    
+    
+
+    UINT16 ReportType;
+
+    
+    
+    
+
+    UINT16 Reserved;
+
+    
+    
+    
+
+    UINT32 ReportSize;
+
+} RUNTIME_REPORT_HEADER, *PRUNTIME_REPORT_HEADER;
+
+
+
+
+
+
+
+
+
+typedef struct _DRIVER_INFO_ENTRY {
+
+    
+    
+    
+
+    CHAR InternalName[32];
+
+    
+    
+    
+
+    UINT16 ImageHashAlgorithm;
+
+    
+    
+    
+    
+
+    UINT16 PublisherThumbprintHashAlgorithm;
+
+    
+    
+    
+    
+
+    UINT32 ImageHashOffset;
+
+    
+    
+    
+    
+
+    UINT32 PublisherThumbprintOffset;
+
+    
+    
+    
+
+    UINT16 LoadCount;
+
+    
+    
+    
+    
+    
+    
+
+    UINT16 OemNameSize;
+    UINT32 OemNameOffset;
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    union {
+        struct {
+            UINT16 Unloaded : 1;
+            UINT16 BootDriver : 1;
+            UINT16 HotPatch : 1;
+            UINT16 Reserved : 13;
+        };
+        UINT16 AsUInt16;
+    } Flags;
+
+    UINT16 Padding;
+} DRIVER_INFO_ENTRY, *PDRIVER_INFO_ENTRY;
+
+typedef struct _DRIVER_RUNTIME_REPORT {
+
+    
+    
+    
+
+    RUNTIME_REPORT_HEADER Header;
+
+    
+    
+    
+
+    UINT16 NumberOfDrivers;
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    union {
+        struct {
+            UINT16 ReportOverflowed : 1;
+            UINT16 PartialReport : 1;
+            UINT16 IncludeBootDrivers : 1;
+            UINT16 Reserved : 13;
+        };
+        UINT16 AsUInt16;
+    } Flags;
+
+    
+    
+    
+    
+
+    DRIVER_INFO_ENTRY DriverEntries[1];
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+} DRIVER_RUNTIME_REPORT, *PDRIVER_RUNTIME_REPORT;
 
 
 
@@ -53896,6 +54245,27 @@ GetDeveloperDriveEnablementState(
 
 #pragma endregion
 
+#pragma region Application Family or OneCore Family or Games Family
+
+
+
+
+__declspec(dllimport)
+BOOL
+__stdcall
+GetRuntimeAttestationReport(
+      UCHAR* Nonce,
+      UINT16 PackageVersion,
+      UINT64 ReportTypesBitmap,
+      PVOID ReportBuffer,
+      PUINT32 ReportBufferSize
+    );
+
+
+
+
+#pragma endregion
+
 
 }
 
@@ -66894,6 +67264,33 @@ VerifyVersionInfoW(
 
 
 #pragma once
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -144419,6 +144816,7 @@ GetThreadDesktop(
 
 
 
+
 #pragma region Desktop Family
 
 
@@ -155741,6 +156139,9 @@ typedef struct tagTouchPredictionParameters
 
 
 
+
+
+
 typedef enum tagHANDEDNESS {
     HANDEDNESS_LEFT = 0,
     HANDEDNESS_RIGHT
@@ -158591,15 +158992,20 @@ typedef struct TOUCHPAD_PARAMETERS_V1 {
 
 
 typedef struct tagTOUCHPAD_PARAMETERS_V2 : public TOUCHPAD_PARAMETERS_V1 {
-
-
-
-
     BOOL button1Supported            : 1;
     BOOL button2Supported            : 1;
     BOOL button3Supported            : 1;
     BOOL Reserved3                   : 29;
 } TOUCHPAD_PARAMETERS_V2, *PTOUCHPAD_PARAMETERS_V2;
+
+
+
+
+
+
+
+
+
 
 
 #pragma warning(pop)
@@ -159406,6 +159812,13 @@ RegisterForTooltipDismissNotification(HWND hWnd,
 
 
 
+
+
+
+__declspec(dllimport)
+BOOL
+__stdcall
+ConvertPrimaryPointerToMouseDrag(void);
 
 
 
@@ -216196,7 +216609,9 @@ __declspec(dllimport)
 BOOL
 __stdcall
 CryptStringToBinaryA(
-      LPCSTR pszString,
+    
+    
+        LPCSTR pszString,
       DWORD cchString,
       DWORD dwFlags,
       BYTE *pbBinary,
@@ -216220,7 +216635,9 @@ __declspec(dllimport)
 BOOL
 __stdcall
 CryptStringToBinaryW(
-      LPCWSTR pszString,
+    
+    
+        LPCWSTR pszString,
       DWORD cchString,
       DWORD dwFlags,
       BYTE *pbBinary,
@@ -229453,6 +229870,10 @@ DeviceDsmValidateInput (
     DWORD   Max   = 0;
     DWORD   Min   = 0;
     BOOLEAN Valid = 0;
+
+    if (Input->Size != sizeof(*Input)) {
+        goto Cleanup;
+    }
 
     if (Definition->Action != Input->Action) {
         goto Cleanup;
