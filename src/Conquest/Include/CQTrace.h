@@ -33,8 +33,6 @@ enum ErrorKind
 	ERR_PERFORMANCE,              // something could be done better
 	ERR_PARSER				     // Used by parser in Docuview.dll		
 };
-#else
-#error ErrorKind already defined!?
 #endif
 
 

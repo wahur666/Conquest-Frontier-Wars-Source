@@ -153,7 +153,7 @@ def main():
         compiler = SFXCompiler(header_dir)
         entries = compiler.parse_xmf(xmf_file)
         compiler.write_dat(entries, output_file)
-        print(f"✓ Successfully compiled {xmf_file} -> {output_file}")
+        print(f"OK: Successfully compiled {xmf_file} -> {output_file}")
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)

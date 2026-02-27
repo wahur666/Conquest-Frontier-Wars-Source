@@ -155,6 +155,9 @@ enum SeverityLevel
 // Standard error kinds, used by the libraries
 enum ErrorKind
 {
+	ERR_MISSION,
+	ERR_NETWORK,
+	ERR_RULES,
 	ERR_GENERAL = ERR_LIB_BASE,  // Catch-all error kind, unclassified
 	ERR_FILE,                    // File related errors
 	ERR_MEMORY,                  // Memory related errors

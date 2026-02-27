@@ -31,10 +31,6 @@
 #include "DMTechNode.h"
 #endif
 
-#ifdef _ADB
-#define mutable
-#endif
-
 #define MAX_ENGINE_GLOWS 6
 
 #include "Globals.h"
