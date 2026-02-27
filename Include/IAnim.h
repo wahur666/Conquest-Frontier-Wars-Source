@@ -3,8 +3,8 @@
 #ifndef __IANIM_H
 #define __IANIM_H
 
-typedef int SCRIPT_SET_ARCH;
-typedef int SCRIPT_INST;
+typedef size_t SCRIPT_SET_ARCH;
+typedef size_t SCRIPT_INST;
 
 const SCRIPT_SET_ARCH INVALID_SCRIPT_SET_ARCH = -1;
 const SCRIPT_INST INVALID_SCRIPT_INST = -1;

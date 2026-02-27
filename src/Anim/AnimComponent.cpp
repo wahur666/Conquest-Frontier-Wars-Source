@@ -502,11 +502,7 @@ void AnimComponent::enumerate_scripts (SCRIPT_ENUM_CALLBACK cbfn, SCRIPT_SET_ARC
 	if (cbfn && (arch != INVALID_SCRIPT_SET_ARCH) && (arch != 0))
 	{
 		ScriptSet const* aptr = reinterpret_cast<ScriptSet const*> (arch);
-
-		for (SCRIPT_ARCH_MAP::const_iterator sarch_it = aptr->scripts.begin ();
-			sarch_it != aptr->scripts.end ();
-			sarch_it++)
-		{
+		for (auto sarch_it = aptr->scripts.begin (); sarch_it != aptr->scripts.end (); sarch_it++) {
 			cbfn ((*sarch_it).first.c_str (), misc);
 		}
 	}
