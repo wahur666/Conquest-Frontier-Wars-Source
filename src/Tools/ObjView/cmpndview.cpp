@@ -1330,7 +1330,6 @@ void RenderObjects (void)
 	RenderPrim->set_render_state( D3DRS_ZFUNC, D3DCMP_LESS );
 	RenderPrim->set_render_state( D3DRS_CULLMODE, D3DCULL_NONE );
 
-	SkipBatch = true;
 	if(!SkipBatch)
 	{
 		RenderPrim->set_state (RPR_BATCH, true);
@@ -2773,6 +2772,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	Engine->update (0);
 
 	RenderPipe->set_pipeline_state( RP_CLEAR_COLOR, ARGB_MAKE( ((U32)(ClearRed * 255.0)), ((U32)(ClearGreen* 255.0)), ((U32)(ClearBlue* 255.0)), 255 ) );
+	RenderPipe->set_pipeline_state( RP_TEXTURE, 1 );
 	RenderPrim->set_render_state( D3DRS_ZENABLE, TRUE );
 
 #ifdef LIGHT

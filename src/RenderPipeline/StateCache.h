@@ -399,13 +399,13 @@ struct CACHED_TEXTURE
 
 	//
 
-	U32 get( IDirect3DDevice9 *device, U32 stage_idx )
+	LONG_PTR get( IDirect3DDevice9 *device, U32 stage_idx )
 	{
 		if( !valid ) {
 
 			HRESULT hr; 
 
-			if( SUCCEEDED( hr = device->GetTexture( stage_idx, (IDirect3DBaseTexture9**)&value ) ) ) {
+			if( SUCCEEDED( hr = device->GetTexture( stage_idx, reinterpret_cast<IDirect3DBaseTexture9 **>(&value) ) ) ) {
 
 				valid = true;
 

@@ -50,7 +50,7 @@ struct Material
 
 	U32			flags;
 
-	LONG_PTR			texture_id;
+	LONG_PTR	texture_id;
 	void		*not_used_2;
 	
 //
@@ -85,10 +85,10 @@ struct Material
 
 	U32			texture_flags;					// wrap and addressing modes, etc.
 
-	U32			second_diffuse_texture_id;
+	LONG_PTR	second_diffuse_texture_id;
 	U32			second_diffuse_texture_flags;	// wrap and addressing modes, etc.
 	
-	U32			emissive_texture_id;			// texture coords must be the same as first diffuse texture coords
+	LONG_PTR	emissive_texture_id;			// texture coords must be the same as first diffuse texture coords
 	U32			emissive_texture_flags;			// wrap and addressing modes, etc.
 	U8			emissive_blend;
 
