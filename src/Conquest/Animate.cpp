@@ -227,9 +227,9 @@ void Animate::InitAnimate (const ANIMATE_DATA & data, BaseHotRect * _parent, con
 	// make the bullshit texture
 	if (data.bFuzzEffect && CQFLAGS.b3DEnabled) 
 	{
-		GENDATA->CreateInstance("VFXShape!!TalkingHeadBoarder", pBase);
-		pBase->QueryInterface("IShapeLoader", loader);
-		loader->CreateDrawAgent(0, frameAgent);
+		GENDATA->CreateInstance("VFXShape!!TalkingHeadBoarder", pBase.addr());
+		pBase->QueryInterface("IShapeLoader", loader.void_addr());
+		loader->CreateDrawAgent(0, frameAgent.addr());
 		// only do fuzz texture effect if frame locking is disabled
 		if (CQFLAGS.bFrameLockEnabled == false)
 		{
@@ -477,7 +477,7 @@ AnimateFactory::~AnimateFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -486,7 +486,7 @@ void AnimateFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -504,15 +504,15 @@ HANDLE AnimateFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYPE objCla
 		COMPTR<IDAComponent> pBase;
 		COMPTR<IShapeLoader> loader;
 
-		GENDATA->CreateInstance(data->vfxType, pBase);
-		pBase->QueryInterface("IShapeLoader", loader);
+		GENDATA->CreateInstance(data->vfxType, pBase.addr());
+		pBase->QueryInterface("IShapeLoader", loader.void_addr());
 
 		U32 i;
 		U32 nCells = 0;
 		
 		for (i = 0; i < GTASHP_MAX_SHAPES; i++)
 		{
-			if (loader->CreateDrawAgent(i, result->shapes[i]) == GR_OK)
+			if (loader->CreateDrawAgent(i, result->shapes[i].addr()) == GR_OK)
 			{
 				nCells++;
 			}

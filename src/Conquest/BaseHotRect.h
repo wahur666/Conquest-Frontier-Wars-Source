@@ -26,7 +26,7 @@
 #endif
 
 #ifndef EVENTSYS_H
-#include <EventSys.h>
+#include <EventSys2.h>
 #endif
 
 #ifndef IRESOURCE_H
@@ -226,9 +226,9 @@ public:
 	{
 		if(systemComponent)
 		{
-			systemComponent->QueryOutgoingInterface("IEventCallback", parentEventConnection);
+			systemComponent->QueryOutgoingInterface("IEventCallback", parentEventConnection.addr());
 			CQASSERT(parentEventConnection!=0);
-		 	systemComponent->QueryOutgoingInterface("IKeyboardFocus", parentKeyboardFocusConnection);
+		 	systemComponent->QueryOutgoingInterface("IKeyboardFocus", parentKeyboardFocusConnection.addr());
 			initializeBaseHotRect();
 		}
 	}
@@ -239,9 +239,9 @@ public:
 		{
 			parent = _parent;
 			CQASSERT(parent);
-			parent->GetBase()->QueryOutgoingInterface("IEventCallback", parentEventConnection);
+			parent->GetBase()->QueryOutgoingInterface("IEventCallback", parentEventConnection.addr());
 			CQASSERT(parentEventConnection!=0);
-	 		parent->QueryOutgoingInterface("IKeyboardFocus", parentKeyboardFocusConnection);
+	 		parent->QueryOutgoingInterface("IKeyboardFocus", parentKeyboardFocusConnection.addr());
 			initializeBaseHotRect();
 		}
 	}
@@ -251,9 +251,9 @@ public:
 	void lateInitialize (IDAComponent * systemComponent)
 	{
 	 	CQASSERT(parentEventConnection==0);	// cannot init twice!
-	 	systemComponent->QueryOutgoingInterface("IEventCallback", parentEventConnection);
+	 	systemComponent->QueryOutgoingInterface("IEventCallback", parentEventConnection.addr());
 	 	CQASSERT(parentEventConnection!=0);
-	 	systemComponent->QueryOutgoingInterface("IKeyboardFocus", parentKeyboardFocusConnection);
+	 	systemComponent->QueryOutgoingInterface("IKeyboardFocus", parentKeyboardFocusConnection.addr());
 	 	initializeBaseHotRect();
 	}
 

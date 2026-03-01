@@ -75,11 +75,11 @@ public:
 		if (STATUS && CURSOR && HINTBOX)
 			releaseResources();
 
-		if (statusHandle && STATUS->QueryOutgoingInterface("IResourceClient", connection) == GR_OK)
+		if (statusHandle && STATUS->QueryOutgoingInterface("IResourceClient", connection.addr()) == GR_OK)
 			connection->Unadvise(statusHandle);
-		if (cursorHandle && CURSOR->QueryOutgoingInterface("IResourceClient", connection) == GR_OK)
+		if (cursorHandle && CURSOR->QueryOutgoingInterface("IResourceClient", connection.addr()) == GR_OK)
 			connection->Unadvise(cursorHandle);
-		if (hintboxHandle && HINTBOX->QueryOutgoingInterface("IResourceClient", connection) == GR_OK)
+		if (hintboxHandle && HINTBOX->QueryOutgoingInterface("IResourceClient", connection.addr()) == GR_OK)
 			connection->Unadvise(hintboxHandle);
 	}
 
@@ -87,11 +87,11 @@ public:
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (STATUS->QueryOutgoingInterface("IResourceClient", connection) == GR_OK)
+		if (STATUS->QueryOutgoingInterface("IResourceClient", connection.addr()) == GR_OK)
 			connection->Advise(this, &statusHandle);
-		if (CURSOR->QueryOutgoingInterface("IResourceClient", connection) == GR_OK)
+		if (CURSOR->QueryOutgoingInterface("IResourceClient", connection.addr()) == GR_OK)
 			connection->Advise(this, &cursorHandle);
-		if (HINTBOX->QueryOutgoingInterface("IResourceClient", connection) == GR_OK)
+		if (HINTBOX->QueryOutgoingInterface("IResourceClient", connection.addr()) == GR_OK)
 			connection->Advise(this, &hintboxHandle);
 	}
 

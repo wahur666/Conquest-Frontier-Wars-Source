@@ -88,7 +88,7 @@ enum DAVARENUM
 struct PROPERTY
 {
    const C8  *name;
-   U32        value;
+   U64        value;
    SINGLE     value2;
    DAVARENUM  type;
 };
