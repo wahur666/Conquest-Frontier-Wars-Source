@@ -1,7 +1,7 @@
 ## CRT must be consistent with DACOM
-#if (MSVC)
-#    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
-#endif()
+if (MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 project(CmpndView CXX)
 

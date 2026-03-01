@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Force Win32 like the original project
 if (MSVC)
     set(CMAKE_GENERATOR_PLATFORM Win32)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
 add_executable(adb WIN32
