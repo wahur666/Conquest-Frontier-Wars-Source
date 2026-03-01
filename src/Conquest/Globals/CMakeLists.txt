@@ -85,13 +85,7 @@ add_custom_command(
         COMMENT "Preprocessing Data.cpp -> data2.i\ndata2.i will be written to: ${DATA_I_OUTPUT}"
         VERBATIM
 )
-#add_custom_command(
-#        TARGET Globals PRE_BUILD
-#        COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/xmiff.py" -i ../../DInclude ../sfxdata.xmf ../sfxdata.dat
-#        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-#        COMMENT "Compiling sfxdata.xmf -> sfxdata.dat"
-#        DEPENDS ../sfxdata.xmf ../../DInclude/sfxid.h
-#)
+
 add_custom_command(
         TARGET Globals PRE_BUILD
         COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/../xmiff.py"

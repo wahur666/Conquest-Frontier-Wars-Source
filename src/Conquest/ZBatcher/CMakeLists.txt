@@ -1,50 +1,73 @@
 ﻿cmake_minimum_required(VERSION 3.10)
 project(ZBatcher)
 
-# Set C++ standard
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Include directories
-include_directories(
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../../DInclude
-)
-
 # Source files
-set(ZBATCHER_SOURCES
+add_library(ZBatcher SHARED
         ../BMPoolJr.cpp
         ../RenderBatcher.cpp
-)
-
-# Header files
-set(ZBATCHER_HEADERS
         ../BMPoolJr.h
         ../CQBatch.h
         ../RenderBatcher.h
 )
 
-# Create a library target (won't actually build, but enables IDE features)
-add_library(ZBatcher SHARED ${ZBATCHER_SOURCES} ${ZBATCHER_HEADERS})
-
-# Add include directories to target
+# Include directories
 target_include_directories(ZBatcher PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../../DInclude
-)
-
-# Optional: Add compile definitions from the original project
-target_compile_definitions(ZBatcher PRIVATE
-        _MBCS
-        _USRDLL
-        ZBATCHER_EXPORTS
-        WIN32
-)
-
-target_include_directories(ZBatcher PRIVATE
+        ../include
+        ../../../DInclude
+        ../../../Include
         "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include"
 )
+
 target_link_directories(ZBatcher PRIVATE
         "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x64"
+)
+
+# Preprocessor definitions
+target_compile_definitions(ZBatcher PRIVATE
+        WIN32
+        _WINDOWS
+        _USRDLL
+        ZBATCHER_EXPORTS
+        DA_ERROR_LEVEL=7
+        $<$<CONFIG:Debug>:_DEBUG>
+        $<$<CONFIG:DEMO_Debug>:_DEBUG;_DEMO_>
+        $<$<CONFIG:Release>:NDEBUG>
+        $<$<CONFIG:DEMO_Final>:NDEBUG;FINAL_RELEASE;_DEMO_>
+        $<$<CONFIG:Final>:NDEBUG;FINAL_RELEASE>
+)
+
+# Compiler options
+if (MSVC)
+    target_compile_options(ZBatcher PRIVATE
+            /W3
+            $<$<CONFIG:Debug>:/Od /Zi /MTd /RTC1>
+            $<$<CONFIG:DEMO_Debug>:/Od /Zi /MT /RTC1>
+            $<$<CONFIG:Release>:/O2 /Oi /MT>
+            $<$<CONFIG:DEMO_Final>:/O2 /Oi /MT>
+            $<$<CONFIG:Final>:/O2 /Oi /MT>
+    )
+endif()
+
+# DLL output name / no lib prefix
+set_target_properties(ZBatcher PROPERTIES
+        PREFIX ""
+        SUFFIX ".dll"
+)
+
+# Linker settings
+if (MSVC)
+    target_link_options(ZBatcher PRIVATE
+            /FORCE:MULTIPLE
+            /SUBSYSTEM:WINDOWS
+            $<$<CONFIG:DEMO_Debug>:/ENTRY:DllMain>
+            $<$<CONFIG:DEMO_Final>:/ENTRY:DllMain>
+    )
+endif()
+
+# Dependencies
+target_link_libraries(ZBatcher PRIVATE
+        Globals
+        DACOM
+        MathLib
+        Trim
 )
