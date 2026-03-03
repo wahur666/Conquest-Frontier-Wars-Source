@@ -32,7 +32,7 @@
 #include <TComponent.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 
 #include <dplobby.h>
 

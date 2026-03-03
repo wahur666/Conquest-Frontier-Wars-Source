@@ -30,7 +30,7 @@
 #include <TConnPoint.h>
 #include <TConnContainer.h>
 #include <FileSys.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <MemFile.h>
 #include <dplobby.h>
 

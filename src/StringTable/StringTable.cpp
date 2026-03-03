@@ -17,7 +17,7 @@
 
 #include <IConnection.h>
 #include <Engine.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <system.h>
 #include <FileSys.h>
 

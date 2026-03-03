@@ -30,7 +30,7 @@
 #include <TComponent.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IConnection.h>
 
 #if 0
@@ -819,7 +819,7 @@ NetPacket::NetPacket (void)
 	hdesc.heapSize = HEAP_SIZE;
 	hdesc.growSize = HEAP_SIZE;
 	hdesc.flags    = DAHEAPFLAG_PRIVATE | DAHEAPFLAG_DEBUGFILL | DAHEAPFLAG_GROWHEAP;
-	DACOM->CreateInstance(&hdesc, heap);
+	DACOM->CreateInstance(&hdesc, heap.void_addr());
 	netheap = heap;
 	netheap->SetErrorHandler(ICQImage::STANDARD_DUMP);
 	
@@ -834,7 +834,7 @@ NetPacket::~NetPacket (void)
 
 	reset();
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 }
 //--------------------------------------------------------------------------//

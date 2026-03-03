@@ -128,6 +128,16 @@ public:
 	{
 		return ptr == nullptr;
 	}
+
+	bool operator==(const COMPTR<Type>& cmp) const
+	{
+		return (ptr.get() == cmp.ptr.get());
+	}
+
+	bool operator!=(const COMPTR<Type>& cmp) const
+	{
+		return (ptr.get() != cmp.ptr.get());
+	}
 };
 
 #endif

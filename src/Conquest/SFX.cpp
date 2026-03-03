@@ -33,7 +33,7 @@
 #include <TComponent.h>
 #include <HeapObj.h>
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <FileSys.h>
 #include <3DMath.h>
 

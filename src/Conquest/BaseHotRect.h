@@ -28,6 +28,9 @@
 #ifndef EVENTSYS_H
 #include <EventSys2.h>
 #endif
+#include <span>
+
+#include "TComponent2.h"
 
 #ifndef IRESOURCE_H
 #include "IResource.h"
@@ -106,24 +109,55 @@ struct DACOM_NO_VTABLE __dummyBaseHotRect : IEventCallback, ResourceClient<>, Co
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(__dummyBaseHotRect)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
-	//
-	// outgoing interface map
-	//
-	BEGIN_DACOM_MAP_OUTBOUND(__dummyBaseHotRect)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IEventCallback", point)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IKeyboardFocus", point2)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IHotControlEvent", point3)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<__dummyBaseHotRect*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<__dummyBaseHotRect*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<__dummyBaseHotRect*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
+
 
 	ConnectionPoint2<struct BaseHotRect,IEventCallback> point;
 	ConnectionPoint<struct BaseHotRect,IKeyboardFocus> point2;
 	ConnectionPoint<struct BaseHotRect,IHotControlEvent> point3;
+
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"IEventCallback", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<__dummyBaseHotRect*>(self);
+				IDAConnectionPoint* cp = &doc->point;
+				return cp;
+			}},
+			{"IKeyboardFocus", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<__dummyBaseHotRect*>(self);
+				IDAConnectionPoint* cp = &doc->point2;
+				return cp;
+			}},
+			{"IHotControlEvent", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<__dummyBaseHotRect*>(self);
+				IDAConnectionPoint* cp = &doc->point3;
+				return cp;
+			}}
+		};
+		return entriesOut;
+	}
 
 	__dummyBaseHotRect (void) : point(0), point2(1), point3(2)
 	{
@@ -131,7 +165,7 @@ struct DACOM_NO_VTABLE __dummyBaseHotRect : IEventCallback, ResourceClient<>, Co
 };
 //---------------------------------------------------------------------------------
 //
-struct BaseHotRect : public DAComponent<__dummyBaseHotRect>
+struct BaseHotRect : public DAComponentX<__dummyBaseHotRect>
 {
 	COMPTR<IDAConnectionPoint> parentEventConnection;
 	COMPTR<IDAConnectionPoint> parentKeyboardFocusConnection;
@@ -158,12 +192,12 @@ private:
 
 	MESSAGE *pMessageList;
 	
-	GENRESULT ReverseNotifyClients (CONNECTION_NODE2<IEventCallback> * node, U32 message, void * param)
+	GENRESULT ReverseNotifyClients(U32 message, void* param)
 	{
-		if (node)
+		// notify in reverse order for end-of-frame
+		for (auto it = point.clients.rbegin(); it != point.clients.rend(); ++it)
 		{
-			ReverseNotifyClients(node->pNext, message, param);
-			node->client->Notify(message, param);
+			it->client->Notify(message, param);
 		}
 		return GR_OK;
 	}
@@ -172,16 +206,13 @@ private:
 	
 	GENRESULT NotifyClients (U32 message, void * param)
 	{
-		CONNECTION_NODE2<IEventCallback> * node = point.pClientList;
-
 		if (message == CQE_ENDFRAME)
-			return ReverseNotifyClients(node, message, param);
-		else
-		while (node)
+			return ReverseNotifyClients(message, param);
+
+		for (auto& node : point.clients)
 		{
-			if (node->client->Notify(message, param) != GR_OK)
+			if (node.client->Notify(message, param) != GR_OK)
 				return GR_GENERIC;
-			node = node->pNext;		// if this crashes, previous guy deleted himself!
 		}
 		return GR_OK;
 	}
@@ -189,17 +220,12 @@ private:
 	void removeClient (BaseHotRect *client)
 	{
 #ifdef _DEBUG
-		// verify that client is connected to us
-		CONNECTION_NODE2<IEventCallback> * node = point.pClientList;
-		
-		while (node)
-		{
-			if (node->client == client)
-				break;
-			node = node->pNext;
-		}
+		auto it = std::find_if(point.clients.begin(), point.clients.end(),
+			[client](const CONNECTION_NODE2<IEventCallback>& node) {
+				return node.client == client;
+			});
 
-		CQASSERT(node && "BaseHotrect::Cannot remove unknown client");
+		CQASSERT(it != point.clients.end() && "BaseHotrect::Cannot remove unknown client");
 #endif
 		client->Release();
 	}
@@ -401,48 +427,30 @@ public:
 
 	BOOL32 MoveToFront (struct IEventCallback * res, U32 priority)
 	{
-		CONNECTION_NODE2<IEventCallback> *node = point.pClientList, *prev=0;
+		auto it = std::find_if(point.clients.begin(), point.clients.end(),
+			[res](const CONNECTION_NODE2<IEventCallback>& node) {
+				return node.client == res;
+			});
 
-		if (node)
+		if (it == point.clients.end())
+			return 0;
+
+		// Update priority
+		it->priority = priority;
+
+		// Move to front
+		auto node = *it;
+		point.clients.erase(it);
+		point.clients.insert(point.clients.begin(), node);
+
+		// Sort from index 1 onward to find correct insertion point
+		// (descending by priority, node is at front with its new priority)
+		// Re-find after insert (it's at index 0), then bubble it to correct position
+		size_t pos = 0;
+		while (pos + 1 < point.clients.size() && point.clients[pos + 1].priority > priority)
 		{
-			if (node->client != res)
-			{
-				prev = node;
-				while ((node = node->pNext) != 0)
-				{
-					if (node->client == res)
-					{
-						prev->pNext = node->pNext;
-						node->pNext = point.pClientList;
-						point.pClientList = node;
-						break;
-					}
-					prev = node;
-				}
-				if (node == 0)
-					return 0;
-			}
-			//
-			// node is now at the front of the list
-			//
-			node->priority = priority;
-			//
-			// now we must sort the entries in decending order
-			// 
-			CONNECTION_NODE2<IEventCallback> *next = node->pNext;
-			
-			prev = 0;
-			while (next && next->priority > priority)
-			{	
-				prev = next;
-				next = next->pNext;
-			}
-			if (prev)		// if sorting is needed
-			{
-				point.pClientList = node->pNext;
-				node->pNext = prev->pNext;
-				prev->pNext = node;
-			}
+			std::swap(point.clients[pos], point.clients[pos + 1]);
+			++pos;
 		}
 
 		return 1;

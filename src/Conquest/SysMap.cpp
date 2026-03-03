@@ -59,7 +59,7 @@
 
 //#include <ITextureLibrary.h>
 #include <HKEvent.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IDocClient.h>
 #include <TComponent.h>
 #include <IConnection.h>

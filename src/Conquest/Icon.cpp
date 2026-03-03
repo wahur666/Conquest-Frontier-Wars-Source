@@ -24,7 +24,7 @@
 
 //#include "VideoSurface.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 
@@ -74,13 +74,33 @@ struct DACOM_NO_VTABLE Icon : BaseHotRect, IIcon
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Icon)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IIcon)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Icon*>(self));
+	}
+	static IDAComponent* GetIIcon(void* self) {
+	    return static_cast<IIcon*>(
+	        static_cast<Icon*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Icon*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Icon*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IIcon",                         &GetIIcon},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -154,7 +174,7 @@ void Icon::InitIcon (const ICON_DATA & data, BaseHotRect * _parent, IShapeLoader
 	U32 baseImage = data.baseImage;
 	if(baseImage == 0)
 		++baseImage;
-	loader->CreateDrawAgent(baseImage, shape);
+	loader->CreateDrawAgent(baseImage, shape.addr());
 
 	tooltip = data.tooltip;
 
@@ -251,9 +271,17 @@ struct DACOM_NO_VTABLE IconFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(IconFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<IconFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	IconFactory (void) { }
 
@@ -292,7 +320,7 @@ IconFactory::~IconFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -301,7 +329,7 @@ void IconFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -334,7 +362,7 @@ BOOL32 IconFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT IconFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	ICONTYPE * type = (ICONTYPE *) hArchetype;
-	Icon * result = new DAComponent<Icon>;
+	Icon * result = new DAComponentX<Icon>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -348,7 +376,7 @@ struct _IconFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<IconFactory>;
+		factory = new DAComponentX<IconFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

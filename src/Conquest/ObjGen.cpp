@@ -42,7 +42,7 @@
 #include <Engine.h>
 #include <HeapObj.h>
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <TComponent.h>
 #include <IConnection.h>
 #include <TConnPoint.h>

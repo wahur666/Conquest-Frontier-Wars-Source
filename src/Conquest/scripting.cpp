@@ -19,7 +19,7 @@
 
 #include "Startup.h"
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IConnection.h>
 #include <TComponent.h>
 #include <FileSys.h>

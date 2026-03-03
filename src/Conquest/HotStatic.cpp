@@ -136,8 +136,8 @@ void HotStatic::InitHotStatic (const HOTSTATIC_DATA & data, BaseHotRect * _paren
 	U32 baseImage = data.baseImage;
 	if(baseImage == 0)
 		baseImage++;
-	loader->CreateDrawAgent(baseImage, fullShape);
-	loader->CreateDrawAgent(baseImage+1, emptyShape);
+	loader->CreateDrawAgent(baseImage, fullShape.addr());
+	loader->CreateDrawAgent(baseImage+1, emptyShape.addr());
 
 	fullShape->GetDimensions(barWidth,barHeight);
 	barWidth = barWidth;
@@ -219,9 +219,9 @@ void HotStatic::init(HotStaticArchetype * archetype)
 	if (archetype->pFontType)
 	{
 		COMPTR<IDAComponent> pBase;
-		GENDATA->CreateInstance(archetype->pFontType, pBase);
+		GENDATA->CreateInstance(archetype->pFontType, pBase.addr());
 		CQASSERT(pBase!=0);
-		pBase->QueryInterface("IFontDrawAgent", pFont);
+		pBase->QueryInterface("IFontDrawAgent", pFont.void_addr());
 	}
 
 }
@@ -307,7 +307,7 @@ HotStaticFactory::~HotStaticFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -316,7 +316,7 @@ void HotStaticFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

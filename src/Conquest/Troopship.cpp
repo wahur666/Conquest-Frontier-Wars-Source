@@ -25,7 +25,7 @@
 #include <IConnection.h>
 #include <DPlatform.h>
 
-#include <EventSys.h>
+#include <EventSys2.h>
 
 #define SEND_OPERATION(x)   \
 	{	TSHIP_NET_COMMANDS command = x;   \

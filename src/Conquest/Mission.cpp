@@ -59,7 +59,7 @@
 #include <dplobby.h>
 #include "ZoneLobby.h"
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IConnection.h>
 #include <TComponent.h>
 #include <HeapObj.h>

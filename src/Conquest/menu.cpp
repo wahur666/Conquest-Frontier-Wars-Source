@@ -36,7 +36,7 @@
 #include <SearchPath.h>
 #include <IConnection.h>
 #include <HeapObj.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IConnection.h>
 #include <TComponent.h>
 #include <TSmartPointer.h>

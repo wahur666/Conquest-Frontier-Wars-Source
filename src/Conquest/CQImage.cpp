@@ -7,11 +7,9 @@
 //--------------------------------------------------------------------------//
 /*
    $Header: /Conquest/App/Src/CQImage.cpp 37    11/09/00 11:52a Jasony $
-
 */
 //--------------------------------------------------------------------------//
 
- 
 #include "pch.h"
 #include <globals.h>
 
@@ -19,7 +17,7 @@
 #include "Startup.h"
 #include "CQTrace.h"
 #include "Resource.h"
-#include "EventSys.h"
+#include "EventSys2.h"
 #include "DBHotkeys.h"
 
 #include "ObjmapIterator.h"
@@ -27,1240 +25,1039 @@
 #include <HeapObj.h>
 #include <WindowManager.h>
 #include <TSmartPointer.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 
 #include <mmsystem.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <imagehlp.h>
+#include <dbghelp.h>        // x64: replaces imagehlp.h
 #include <commctrl.h>
+#include <span>
 
 #define ERROR_SND "AppGPFault"
 #define INFO_SND  "SystemExclamation"
 
-static const char errorMsg[] =	"The program encountered an expected problem.\r\nInformation specific to this problem can be found in the \"Error.txt\" file.";
+static const char errorMsg[]   = "The program encountered an expected problem.\r\nInformation specific to this problem can be found in the \"Error.txt\" file.";
 static const char errorTitle[] = "Program Error";
 
 //--------------------------------------------------------------------------//
-//
-struct STACK_FRAME
-{
-	struct STACK_FRAME *pNext;
-	DWORD  dwRetAddr;
-};
+// x64: STACK_FRAME / manual EBP-chain walking removed entirely.
+// Stack capture is done via CaptureStackBackTrace() and StackWalk64().
 //--------------------------------------------------------------------------//
-//
+
 enum CQERROR_TYPE
 {
-	CQERR_REPORT=1,
-	CQERR_FATAL_EXCEPTION,
-	CQERR_ERROR,
-	CQERR_ASSERT,
-	CQERR_EXCEPTION,
-	CQERR_BOMB
+    CQERR_REPORT = 1,
+    CQERR_FATAL_EXCEPTION,
+    CQERR_ERROR,
+    CQERR_ASSERT,
+    CQERR_EXCEPTION,
+    CQERR_BOMB
 };
+
 //--------------------------------------------------------------------------//
-//
-template <int Size> 
+
+template <int Size>
 struct TEXT_BUFFER
 {
-	char * buffer;
-	int index;
-	CQERROR_TYPE type;
+    char *       buffer;
+    int          index;
+    CQERROR_TYPE type;
 
-	TEXT_BUFFER (void)
-	{
-		buffer = (char *) VirtualAlloc(0, Size, MEM_COMMIT, PAGE_READWRITE);
-		index = 0;
-	}
+    TEXT_BUFFER(void)
+    {
+        buffer = (char *)VirtualAlloc(0, Size, MEM_COMMIT, PAGE_READWRITE);
+        index  = 0;
+    }
 
-	~TEXT_BUFFER (void)
-	{
-		VirtualFree(buffer, 0, MEM_RELEASE);
-		buffer = 0;
-	}
+    ~TEXT_BUFFER(void)
+    {
+        VirtualFree(buffer, 0, MEM_RELEASE);
+        buffer = 0;
+    }
 
-	TEXT_BUFFER & operator = (const TEXT_BUFFER<Size> & text)
-	{
-		memcpy(buffer, text.buffer, Size);
-		index = text.index;
-		return *this;
-	}
+    TEXT_BUFFER & operator=(const TEXT_BUFFER<Size> & text)
+    {
+        memcpy(buffer, text.buffer, Size);
+        index = text.index;
+        return *this;
+    }
 
-	void addText (const char * pText, int len)
-	{
-		const int imax = Size - index - 1;
-		len = __min(imax, len);
+    void addText(const char *pText, int len)
+    {
+        const int imax = Size - index - 1;
+        len = __min(imax, len);
+        memcpy(buffer + index, pText, len);
+        index += len;
+    }
 
-		memcpy(buffer+index, pText, len);
-		index += len;
-	}
-
-	void addText (const char * pText)
-	{
-		addText(pText, strlen(pText));
-	}
+    void addText(const char *pText)
+    {
+        addText(pText, strlen(pText));
+    }
 };
 
 static bool CQImage_bEnabled = true;
 
 //--------------------------------------------------------------------------//
+// x64: Updated DbgHelp function pointer typedefs.
+//   SymLoadModule64      replaces SymLoadModule       (DWORD64 base address)
+//   SymGetLineFromAddr64 replaces SymGetLineFromAddr   (DWORD64 address)
+//   SymFromAddr          replaces SymGetSymFromAddr    (SYMBOL_INFO, PDWORD64 disp)
+//   SymGetModuleInfo64   replaces SymGetModuleInfo
+//   SymUnloadModule64    replaces SymUnloadModule      (DWORD64 base address)
+//   IMAGEHLP_LINE64      replaces IMAGEHLP_LINE
+//   SYMBOL_INFO          replaces IMAGEHLP_SYMBOL
 //--------------------------------------------------------------------------//
-//
+
 struct CQImage : public ICQImage
 {
-	BEGIN_DACOM_MAP_INBOUND(CQImage)
-	DACOM_INTERFACE_ENTRY(ICQImage)
-	END_DACOM_MAP()
+    static IDAComponent *GetICQImage(void *self)
+    {
+        return static_cast<ICQImage *>(static_cast<CQImage *>(self));
+    }
 
-	typedef BOOL  (__stdcall * SYMINIT) (IN HANDLE hProcess, IN LPSTR UserSearchPath, IN BOOL fInvadeProcess);
-	typedef BOOL  (__stdcall * SYMCLEANUP) (IN HANDLE hProcess);
-	typedef BOOL  (__stdcall * SYMLOADMODULE)  (IN  HANDLE          hProcess,
-												IN  HANDLE          hFile,
-												IN  PSTR            ImageName,
-												IN  PSTR            ModuleName,
-												IN  DWORD           BaseOfDll,
-												IN  DWORD           SizeOfDll
-												);
-	typedef BOOL  (__stdcall * SYMGETLINEFROMADDR) 
-												(IN  HANDLE                  hProcess,
-												 IN  DWORD                   dwAddr,
-												 OUT PDWORD                  pdwDisplacement,
-												 OUT PIMAGEHLP_LINE          Line
-												);
-	typedef DWORD (__stdcall * SYMSETOPTIONS) (IN DWORD   SymOptions);
+    static std::span<const DACOMInterfaceEntry2> GetInterfaceMap()
+    {
+        static const DACOMInterfaceEntry2 map[] = {
+            {"ICQImage", &GetICQImage},
+        };
+        return map;
+    }
 
-	typedef BOOL  (__stdcall * SYMGETMODULEINFO) (
-													IN  HANDLE              hProcess,
-													IN  DWORD               dwAddr,
-													OUT PIMAGEHLP_MODULE    ModuleInfo
-													);
-	typedef BOOL  (__stdcall * SYMGETSYMFROMADDR) (
-													IN  HANDLE              hProcess,
-													IN  DWORD               dwAddr,
-													OUT PDWORD              pdwDisplacement,
-													OUT PIMAGEHLP_SYMBOL    Symbol
-													);
-	typedef BOOL  (__stdcall * SYMUNLOADMODULE) (
-												IN  HANDLE          hProcess,
-												IN  DWORD           BaseOfDll
-												);
+    typedef BOOL    (__stdcall *SYMINIT)            (IN HANDLE hProcess, IN LPSTR UserSearchPath, IN BOOL fInvadeProcess);
+    typedef BOOL    (__stdcall *SYMCLEANUP)         (IN HANDLE hProcess);
 
+    // x64: base address and size are DWORD64
+    typedef DWORD64 (__stdcall *SYMLOADMODULE64)    (IN HANDLE  hProcess, IN HANDLE hFile,
+                                                     IN PSTR    ImageName, IN PSTR  ModuleName,
+                                                     IN DWORD64 BaseOfDll, IN DWORD SizeOfDll);
 
-	//------------------------
-	//
-	HANDLE hProcess;
-	SYMINIT SymInitialize;
-	SYMCLEANUP SymCleanup;
-	SYMLOADMODULE SymLoadModule;
-	SYMGETLINEFROMADDR SymGetLineFromAddr;
-	SYMSETOPTIONS SymSetOptions;
-	SYMGETMODULEINFO SymGetModuleInfo;
-	SYMGETSYMFROMADDR SymGetSymFromAddr;
-	SYMUNLOADMODULE SymUnloadModule;
-	HINSTANCE hInstance;
+    // x64: address is DWORD64, displacement is PDWORD (line byte offset, always fits 32-bit)
+    typedef BOOL    (__stdcall *SYMGETLINEFROMADDR64)(IN  HANDLE            hProcess,
+                                                      IN  DWORD64           dwAddr,
+                                                      OUT PDWORD            pdwDisplacement,
+                                                      OUT PIMAGEHLP_LINE64  Line);
 
-	CQImage (void);
+    typedef DWORD   (__stdcall *SYMSETOPTIONS)      (IN DWORD SymOptions);
 
-	~CQImage (void);
+    typedef BOOL    (__stdcall *SYMGETMODULEINFO64) (IN  HANDLE             hProcess,
+                                                     IN  DWORD64            dwAddr,
+                                                     OUT PIMAGEHLP_MODULE64 ModuleInfo);
 
-    void * operator new (size_t size)
-	{
-		return calloc(size, 1);
-	}
+    // x64: replaces SymGetSymFromAddr; displacement is PDWORD64
+    typedef BOOL    (__stdcall *SYMFROMADDR)        (IN  HANDLE       hProcess,
+                                                     IN  DWORD64      dwAddr,
+                                                     OUT PDWORD64     pdwDisplacement,
+                                                     OUT PSYMBOL_INFO Symbol);
 
-	void   operator delete (void *ptr)
-	{
-		::free(ptr);
-	}
+    // x64: base address is DWORD64
+    typedef BOOL    (__stdcall *SYMUNLOADMODULE64)  (IN HANDLE hProcess, IN DWORD64 BaseOfDll);
 
-	/* ICQImage methods */
+    //------------------------
+    HANDLE               hProcess;
+    SYMINIT              SymInitialize;
+    SYMCLEANUP           SymCleanup;
+    SYMLOADMODULE64      SymLoadModule64;
+    SYMGETLINEFROMADDR64 SymGetLineFromAddr64;
+    SYMSETOPTIONS        SymSetOptions;
+    SYMGETMODULEINFO64   SymGetModuleInfo64;
+    SYMFROMADDR          SymFromAddr;
+    SYMUNLOADMODULE64    SymUnloadModule64;
+    HINSTANCE            hInstance;
 
-	virtual void LoadSymTable (HINSTANCE hInstance);
+    CQImage(void);
+    ~CQImage(void);
 
-	virtual void UnloadSymTable (HINSTANCE hInstance);
+    void *operator new(size_t size)  { return calloc(size, 1); }
+    void  operator delete(void *ptr) { ::free(ptr); }
 
-	virtual void Report (const char * szInfo);
+    /* ICQImage methods */
+    virtual void LoadSymTable  (HINSTANCE hInstance);
+    virtual void UnloadSymTable(HINSTANCE hInstance);
+    virtual void Report        (const char *szInfo);
+    virtual void MemoryReport  (struct IHeap *heap);
+    virtual void SetMessagesEnabled(bool bSetting) { CQImage_bEnabled = bSetting; }
 
-	virtual void MemoryReport (struct IHeap * heap);
+    /* CQImage methods */
+    static long __stdcall PrintBlock(struct IHeap *pHeap, void *allocatedBlock, U32 dwFlags, void *context);
 
-	virtual void SetMessagesEnabled(bool bSetting){ CQImage_bEnabled = bSetting; }
+    IDAComponent *getBase(void) { return static_cast<ICQImage *>(this); }
 
-	/* CQImage methods */
-
-static long __stdcall PrintBlock (struct IHeap * pHeap, void *allocatedBlock, U32 dwFlags, void *context);
-
-	IDAComponent * getBase (void)
-	{
-		return static_cast<ICQImage *>(this);
-	}
-
-	void init (void);
+    void init(void);
 };
-static DAComponent<struct CQImage> image;
+
+static DAComponentX<struct CQImage> image;
+
 //--------------------------------------------------------------------------//
-//
-CQImage::CQImage (void)
+
+CQImage::CQImage(void)
 {
-	CQIMAGE = this;
-	init();
+    CQIMAGE = this;
+    init();
 }
+
 //--------------------------------------------------------------------------//
-//
-void CQImage::init (void)
+
+void CQImage::init(void)
 {
 #ifndef FINAL_RELEASE
 
-	hInstance = LoadLibrary("DbgHelp.dll");
-	if (hInstance)
-	{
-		if ((SymInitialize = (SYMINIT) GetProcAddress(hInstance, "SymInitialize")) == 0)
-			goto Done;
-		if ((SymCleanup = (SYMCLEANUP) GetProcAddress(hInstance, "SymCleanup")) == 0)
-			goto Done;
-		if ((SymLoadModule = (SYMLOADMODULE) GetProcAddress(hInstance, "SymLoadModule")) == 0)
-			goto Done;
-		if ((SymUnloadModule = (SYMUNLOADMODULE) GetProcAddress(hInstance, "SymUnloadModule")) == 0)
-			goto Done;
-		if ((SymGetLineFromAddr = (SYMGETLINEFROMADDR) GetProcAddress(hInstance, "SymGetLineFromAddr")) == 0)
-			goto Done;
-		if ((SymSetOptions = (SYMSETOPTIONS) GetProcAddress(hInstance, "SymSetOptions")) == 0)
-			goto Done;
-		if ((SymGetModuleInfo = (SYMGETMODULEINFO) GetProcAddress(hInstance, "SymGetModuleInfo")) == 0)
-			goto Done;
-		if ((SymGetSymFromAddr = (SYMGETSYMFROMADDR) GetProcAddress(hInstance, "SymGetSymFromAddr")) == 0)
-			goto Done;
-	
-//		hProcess = (HANDLE) this;
-		hProcess = (HANDLE) GetCurrentProcessId();
+    hInstance = LoadLibrary("DbgHelp.dll");
+    if (hInstance)
+    {
+        if ((SymInitialize        = (SYMINIT)              GetProcAddress(hInstance, "SymInitialize"))        == 0) goto Done;
+        if ((SymCleanup           = (SYMCLEANUP)           GetProcAddress(hInstance, "SymCleanup"))           == 0) goto Done;
+        if ((SymLoadModule64      = (SYMLOADMODULE64)      GetProcAddress(hInstance, "SymLoadModule64"))      == 0) goto Done;
+        if ((SymUnloadModule64    = (SYMUNLOADMODULE64)    GetProcAddress(hInstance, "SymUnloadModule64"))    == 0) goto Done;
+        if ((SymGetLineFromAddr64 = (SYMGETLINEFROMADDR64) GetProcAddress(hInstance, "SymGetLineFromAddr64")) == 0) goto Done;
+        if ((SymSetOptions        = (SYMSETOPTIONS)        GetProcAddress(hInstance, "SymSetOptions"))        == 0) goto Done;
+        if ((SymGetModuleInfo64   = (SYMGETMODULEINFO64)   GetProcAddress(hInstance, "SymGetModuleInfo64"))   == 0) goto Done;
+        if ((SymFromAddr          = (SYMFROMADDR)          GetProcAddress(hInstance, "SymFromAddr"))          == 0) goto Done;
 
-		char path[MAX_PATH+4];
-		GetModuleFileName(NULL, path, sizeof(path));
-		char * ptr;
+        // x64: GetCurrentProcess() returns a pseudo-handle suitable for DbgHelp.
+        // The old code used (HANDLE)GetCurrentProcessId() which passed a PID
+        // as a handle — never correct, x86 just got away with it.
+        hProcess = GetCurrentProcess();
 
-		if ((ptr = strrchr(path, '\\')) != 0)
-			*ptr = 0;		// just use the path
+        char  path[MAX_PATH + 4];
+        char *ptr;
+        GetModuleFileName(NULL, path, sizeof(path));
 
-		if (SymInitialize(hProcess, path, FALSE) == 0)
-			hProcess = 0;
-		else
-		{
-			SymSetOptions(SYMOPT_LOAD_LINES|SYMOPT_UNDNAME);	//SYMOPT_DEFERRED_LOADS);
-		}
-		GetLastError();
+        if ((ptr = strrchr(path, '\\')) != 0)
+            *ptr = 0;
 
-		if (hProcess)
-		{
-			LoadSymTable(GetModuleHandle("Conquest.exe"));
-			LoadSymTable(GetModuleHandle("Mission.dll"));
-			LoadSymTable(GetModuleHandle("Trim.dll"));
-			LoadSymTable(GetModuleHandle("ZBatcher.dll"));
-			LoadSymTable(GetModuleHandle("DACOM.dll"));
-		}
-	}
+        if (SymInitialize(hProcess, path, FALSE) == 0)
+            hProcess = 0;
+        else
+            SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
+
+        GetLastError();
+
+        if (hProcess)
+        {
+            LoadSymTable(GetModuleHandle("Conquest.exe"));
+            LoadSymTable(GetModuleHandle("Mission.dll"));
+            LoadSymTable(GetModuleHandle("Trim.dll"));
+            LoadSymTable(GetModuleHandle("ZBatcher.dll"));
+            LoadSymTable(GetModuleHandle("DACOM.dll"));
+        }
+    }
 
 Done:
-	return;
+    return;
 
-#endif  // end !FINAL_RELEASE
-
+#endif  // !FINAL_RELEASE
 }
+
 //--------------------------------------------------------------------------//
-//
-CQImage::~CQImage (void)
+
+CQImage::~CQImage(void)
 {
-	if (hProcess)
-	{
-		SymCleanup(hProcess);
-		hProcess = 0;
-	}
-	if (hInstance)
-	{
-		FreeLibrary(hInstance);
-		hInstance = 0;
-	}
+    if (hProcess)
+    {
+        SymCleanup(hProcess);
+        hProcess = 0;
+    }
+    if (hInstance)
+    {
+        FreeLibrary(hInstance);
+        hInstance = 0;
+    }
 
-	CQIMAGE = 0;
+    CQIMAGE = 0;
 }
-//--------------------------------------------------------------------------//
-//
-void CQImage::LoadSymTable (HINSTANCE hInstance)
-{
-#ifndef FINAL_RELEASE
-	if (hProcess)
-	{
-		char imageName[MAX_PATH+4];
 
-		if (GetModuleFileName(hInstance, imageName, sizeof(imageName)))
-		{
-			imageName[sizeof(imageName)-1] = 0;
-
-			SymLoadModule(hProcess, NULL, imageName, NULL, DWORD(hInstance), 0);
-		}
-	}
-#endif  // end !FINAL_RELEASE
-}
 //--------------------------------------------------------------------------//
-//
-void CQImage::UnloadSymTable (HINSTANCE hInstance)
+
+void CQImage::LoadSymTable(HINSTANCE hInstance)
 {
 #ifndef FINAL_RELEASE
-	if (hProcess)
-	{
-		SymUnloadModule(hProcess, DWORD(hInstance));
-	}
-#endif  // end !FINAL_RELEASE
+    if (hProcess)
+    {
+        char imageName[MAX_PATH + 4];
+
+        if (GetModuleFileName(hInstance, imageName, sizeof(imageName)))
+        {
+            imageName[sizeof(imageName) - 1] = 0;
+            // x64: cast through ULONG_PTR to avoid truncation warning
+            SymLoadModule64(hProcess, NULL, imageName, NULL, (DWORD64)(ULONG_PTR)hInstance, 0);
+        }
+    }
+#endif  // !FINAL_RELEASE
 }
+
+//--------------------------------------------------------------------------//
+
+void CQImage::UnloadSymTable(HINSTANCE hInstance)
+{
 #ifndef FINAL_RELEASE
-//--------------------------------------------------------------------------//
-//
-static void restorePriority (void)
-{
-	if (CQFLAGS.b3DEnabled && CQFLAGS.bNoGDI)
-		SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-	else
-		SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+    if (hProcess)
+    {
+        // x64: DWORD64 base address
+        SymUnloadModule64(hProcess, (DWORD64)(ULONG_PTR)hInstance);
+    }
+#endif  // !FINAL_RELEASE
 }
+
+#ifndef FINAL_RELEASE
+
 //--------------------------------------------------------------------------//
-//
-static void getVersion (char * buffer, U32 bufferSize)
+
+static void restorePriority(void)
 {
-	char mname[MAX_PATH+4];
-	char * tmp;
-	DWORD dwHandle, dwSize;	// unused?
-	void * versionBuffer = 0;
-	UINT numChars;
-	void * pString=0;
-	
-	*buffer = 0;
+    if (CQFLAGS.b3DEnabled && CQFLAGS.bNoGDI)
+        SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+    else
+        SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+}
 
-	::GetModuleFileName(0, mname, sizeof(mname));
-	if ((tmp = strrchr(mname, '\\')) == 0)
-		goto Done;
-	tmp++;
+//--------------------------------------------------------------------------//
 
-	if ((dwSize = GetFileVersionInfoSize(tmp, &dwHandle)) == 0)
-		goto Done;
+static void getVersion(char *buffer, U32 bufferSize)
+{
+    char   mname[MAX_PATH + 4];
+    char * tmp;
+    DWORD  dwHandle, dwSize;
+    void * versionBuffer = 0;
+    UINT   numChars;
+    void * pString = 0;
 
-	versionBuffer = malloc(dwSize);
+    *buffer = 0;
 
-	if (GetFileVersionInfo(tmp, dwHandle, dwSize, versionBuffer) == 0)
-		goto Done;
+    ::GetModuleFileName(0, mname, sizeof(mname));
+    if ((tmp = strrchr(mname, '\\')) == 0)
+        goto Done;
+    tmp++;
 
-	if (VerQueryValue(versionBuffer, const_cast<char *>(_localLoadString(IDS_BUILD_VERSION)), &pString, &numChars) == 0)
-		goto Done;
+    if ((dwSize = GetFileVersionInfoSize(tmp, &dwHandle)) == 0)
+        goto Done;
 
-	if (numChars == 0 || pString==0 || bufferSize<=2)
-		goto Done;
+    versionBuffer = malloc(dwSize);
 
-	if ((numChars+1) > bufferSize)
-		numChars = bufferSize-1;
+    if (GetFileVersionInfo(tmp, dwHandle, dwSize, versionBuffer) == 0)
+        goto Done;
 
-	memcpy(buffer, pString, numChars);
+    if (VerQueryValue(versionBuffer, const_cast<char *>(_localLoadString(IDS_BUILD_VERSION)), &pString, &numChars) == 0)
+        goto Done;
+
+    if (numChars == 0 || pString == 0 || bufferSize <= 2)
+        goto Done;
+
+    if ((numChars + 1) > bufferSize)
+        numChars = bufferSize - 1;
+
+    memcpy(buffer, pString, numChars);
 #ifdef _DEMO_
-	if (numChars+1 < bufferSize)
-	{
-		strcat(buffer, "D");
-		numChars = strlen(buffer);
-	}
+    if (numChars + 1 < bufferSize)
+    {
+        strcat(buffer, "D");
+        numChars = strlen(buffer);
+    }
 #endif
-	buffer[numChars] = 0;
+    buffer[numChars] = 0;
 
 Done:
-	::free(versionBuffer);
-	return;
+    ::free(versionBuffer);
+    return;
 }
+
 //--------------------------------------------------------------------------//
-//
-static void initStatic (HWND hwnd)
+
+static void initStatic(HWND hwnd)
 {
-	char format[128];
-	char version[128];
-	char buffer[128];
+    char format[128];
+    char version[128];
+    char buffer[128];
 
-	GetWindowText(hwnd, format, sizeof(format));
-	getVersion(version, sizeof(version));
-	sprintf(buffer, format, version);
-
-	SetWindowText(hwnd, buffer);
+    GetWindowText(hwnd, format, sizeof(format));
+    getVersion(version, sizeof(version));
+    sprintf(buffer, format, version);
+    SetWindowText(hwnd, buffer);
 }
+
 //--------------------------------------------------------------------------//
-//
-static BOOL CALLBACK dlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+
+static LONG_PTR CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LONG lParam)
 {
-	BOOL result=0;
+    BOOL result = 0;
 
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		{
-			HWND hItem;
-			const TEXT_BUFFER<4096> * pText = (const TEXT_BUFFER<4096> *) lParam;
-			//if (hMainWindow==0)
-//			SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOREDRAW | SWP_NOSIZE);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        {
+            HWND hItem;
+            const TEXT_BUFFER<4096> *pText = (const TEXT_BUFFER<4096> *)lParam;
 
-			hItem = GetDlgItem(hwnd, IDC_STATIC_VERSION);
-			initStatic(hItem);
+            hItem = GetDlgItem(hwnd, IDC_STATIC_VERSION);
+            initStatic(hItem);
 
-			switch (pText->type)
-			{
-			case CQERR_REPORT:
-				SetWindowText(hwnd, "Report");
-				EnableWindow(GetDlgItem(hwnd, IDABORT), 0);
-				EnableWindow(GetDlgItem(hwnd, IDDEBUG), 0);
-				break;
-			case CQERR_FATAL_EXCEPTION:
-				SetWindowText(hwnd, "Exception");
-				EnableWindow(GetDlgItem(hwnd, IDIGNORE), 0);
-				break;
-			case CQERR_ERROR:
-				SetWindowText(hwnd, "Recoverable Error");
-				break;
-			case CQERR_EXCEPTION:
-				SetWindowText(hwnd, "Exception");
-				break;
-			case CQERR_BOMB:
-				SetWindowText(hwnd, "Bomb");
-				break;
-			} // end switch
-			hItem = GetDlgItem(hwnd, IDC_EDIT1);
-			SetWindowText(hItem, pText->buffer);
-			SetFocus(hItem);
-		}
-		break;
-	
-	case WM_COMMAND:
-		switch (LOWORD(wParam))
-		{
-		case IDCANCEL:
-			if (IsWindowEnabled(GetDlgItem(hwnd, IDIGNORE)) == 0)
-				break;
-			else
-				wParam = IDIGNORE;
-			// fall through intentional
-		case IDDEBUG:
-		case IDABORT:
-		case IDIGNORE:
-			EndDialog(hwnd, LOWORD(wParam));
-			break;
-		}
-		break;
-	}
+            switch (pText->type)
+            {
+            case CQERR_REPORT:
+                SetWindowText(hwnd, "Report");
+                EnableWindow(GetDlgItem(hwnd, IDABORT), 0);
+                EnableWindow(GetDlgItem(hwnd, IDDEBUG), 0);
+                break;
+            case CQERR_FATAL_EXCEPTION:
+                SetWindowText(hwnd, "Exception");
+                EnableWindow(GetDlgItem(hwnd, IDIGNORE), 0);
+                break;
+            case CQERR_ERROR:
+                SetWindowText(hwnd, "Recoverable Error");
+                break;
+            case CQERR_EXCEPTION:
+                SetWindowText(hwnd, "Exception");
+                break;
+            case CQERR_BOMB:
+                SetWindowText(hwnd, "Bomb");
+                break;
+            }
 
-	return result;
+            hItem = GetDlgItem(hwnd, IDC_EDIT1);
+            SetWindowText(hItem, pText->buffer);
+            SetFocus(hItem);
+        }
+        break;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDCANCEL:
+            if (IsWindowEnabled(GetDlgItem(hwnd, IDIGNORE)) == 0)
+                break;
+            else
+                wParam = IDIGNORE;
+            // fall through intentional
+        case IDDEBUG:
+        case IDABORT:
+        case IDIGNORE:
+            EndDialog(hwnd, LOWORD(wParam));
+            break;
+        }
+        break;
+    }
+
+    return result;
 }
+
 //--------------------------------------------------------------------------//
+// x64: Shared helper — appends one frame's file / line / symbol info to text.
+// Called from Assert, Bomb, Error, and Exception to avoid duplicated loops.
 //
-#if 0
-static void writeError (const TEXT_BUFFER<4096> & text)
+//   addr    — 64-bit return address for this frame
+//   text    — output TEXT_BUFFER
+//   scratch — caller-owned 1024-byte workspace
+//--------------------------------------------------------------------------//
+
+static void AppendFrameInfo(DWORD64 addr, TEXT_BUFFER<4096> &text, char *scratch)
 {
-	HANDLE hFile = CreateFile("Error.txt", GENERIC_READ|GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    bool  bLineValid = false;
+    DWORD dwLineDisp = 0;
 
-	if (hFile != INVALID_HANDLE_VALUE)
-	{
-		DWORD dwWritten;
-		WriteFile(hFile, text.buffer, text.index, &dwWritten, NULL);
-		CloseHandle(hFile);
-	}
+    // x64: IMAGEHLP_LINE64 (was IMAGEHLP_LINE)
+    IMAGEHLP_LINE64 iLine = {};
+    iLine.SizeOfStruct = sizeof(iLine);
+
+    if (image.SymGetLineFromAddr64 &&
+        image.SymGetLineFromAddr64(image.hProcess, addr, &dwLineDisp, &iLine))
+    {
+        bLineValid       = true;
+        const char *ptr  = strrchr(iLine.FileName, '\\');
+        ptr              = ptr ? ptr + 1 : iLine.FileName;
+        text.addText(ptr);
+        sprintf(scratch, ", Line %lu", iLine.LineNumber);
+        text.addText(scratch);
+    }
+    GetLastError();
+
+    // x64: SYMBOL_INFO replaces IMAGEHLP_SYMBOL.
+    //   SizeOfStruct = sizeof(SYMBOL_INFO)  (fixed header only, NOT including Name[])
+    //   MaxNameLen   = space reserved for the trailing name string
+    // Allocate sizeof(SYMBOL_INFO) + MAX_SYM_NAME so the name always fits.
+    alignas(SYMBOL_INFO) char symBuf[sizeof(SYMBOL_INFO) + MAX_SYM_NAME];
+    SYMBOL_INFO *iSymbol = reinterpret_cast<SYMBOL_INFO *>(symBuf);
+    memset(iSymbol, 0, sizeof(symBuf));
+    iSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+    iSymbol->MaxNameLen   = MAX_SYM_NAME;   // x64: MaxNameLen, NOT MaxNameLength
+
+    DWORD64 dwSymDisp = 0;                  // x64: displacement is DWORD64
+
+    if (image.SymFromAddr &&
+        image.SymFromAddr(image.hProcess, addr, &dwSymDisp, iSymbol))
+    {
+        if (bLineValid) text.addText(", ");
+        text.addText(iSymbol->Name);
+        if (bLineValid)
+        {
+            text.addText("()\r\n");
+        }
+        else
+        {
+            sprintf(scratch, " + %llu bytes\r\n", (unsigned long long)dwSymDisp);
+            text.addText(scratch);
+        }
+    }
+    else if (!bLineValid)
+    {
+        // Neither line nor symbol resolved — print the raw address
+        sprintf(scratch, "Address=0x%016llX, ??Unknown??\r\n", (unsigned long long)addr);
+        text.addText(scratch);
+    }
 }
-#endif  // end if 0
-#endif  // end !FINAL_RELEASE
+
+#endif  // !FINAL_RELEASE
+
 //--------------------------------------------------------------------------//
-//
-void CQImage::Report (const char * szInfo)
+
+void CQImage::Report(const char *szInfo)
 {
 #ifndef FINAL_RELEASE
-	
-	TEXT_BUFFER<4096> text;
 
-	SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+    TEXT_BUFFER<4096> text;
 
-	text.type = CQERR_REPORT;
-	PlaySound(INFO_SND, NULL, SND_ALIAS | SND_ASYNC);
-	text.addText("Report: ");
-	text.addText(szInfo);
+    SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
 
-	FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), szInfo);
+    text.type = CQERR_REPORT;
+    PlaySound(INFO_SND, NULL, SND_ALIAS | SND_ASYNC);
+    text.addText("Report: ");
+    text.addText(szInfo);
 
-	FlipToGDI();
-	DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow, dlgProc, (LPARAM) &text);
-	restorePriority();
+    FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), szInfo);
 
-#endif  // end !FINAL_RELEASE
+    FlipToGDI();
+    DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow,
+                   reinterpret_cast<DLGPROC>(dlgProc), reinterpret_cast<LPARAM>(&text));
+    restorePriority();
+
+#endif  // !FINAL_RELEASE
 }
+
 //--------------------------------------------------------------------------//
-//
 
 #define OPPRINT0(exp) FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), exp)
+
 //--------------------------------------------------------------------------//
-//
-bool ICQImage::Assert (const char *exp, const char *file, unsigned line)
+
+bool ICQImage::Assert(const char *exp, const char *file, unsigned line)
 {
 #ifndef FINAL_RELEASE
 
-	if( !CQImage_bEnabled )
-	{
-		// dont take care of alert message (danger!)
-		return false;
-	}
+    if (!CQImage_bEnabled)
+        return false;
 
-	if (image.hProcess)
-	{
-		STACK_FRAME * pFrame;
-		char buffer[1024];
-		int i;
-		DWORD dwDisp;
-		TEXT_BUFFER<4096> text;
-		char version[64];
-		getVersion(version, sizeof(version));
+    if (image.hProcess)
+    {
+        char              buffer[1024];
+        TEXT_BUFFER<4096> text;
+        char              version[64];
+        getVersion(version, sizeof(version));
 
-		__asm mov DWORD ptr [pFrame], ebp
+        SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
 
-		SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+        text.type = CQERR_ASSERT;
+        if (CQFLAGS.bTraceMission != 0 && EVENTSYS)
+            EVENTSYS->Send(CQE_DEBUG_HOTKEY, (void *)IDH_PRINT_OPLIST);
+        PlaySound(ERROR_SND, NULL, SND_ALIAS | SND_ASYNC);
 
-		text.type = CQERR_ASSERT;
-		if (CQFLAGS.bTraceMission != 0 && EVENTSYS)
-			EVENTSYS->Send(CQE_DEBUG_HOTKEY, (void *) IDH_PRINT_OPLIST);		// print the op list
-		PlaySound(ERROR_SND, NULL, SND_ALIAS | SND_ASYNC);
+        sprintf(buffer, "Expression: %s [%s]\r\n", exp, version);
+        text.addText(buffer);
+        text.addText("Call Stack:\r\n");
 
-		sprintf(buffer, "Expression: %s [%s]\r\n", exp, version);
-		text.addText(buffer);
-		text.addText("Call Stack:\r\n");
+        // x64: CaptureStackBackTrace replaces manual EBP-chain walking.
+        // Skip 1 frame (this function) so the first reported frame is the
+        // caller that triggered the assert.
+        void * frames[16] = {};
+        USHORT frameCount = CaptureStackBackTrace(1, 16, frames, NULL);
 
-		for (i = 0; i < 8; i++)
-		{
-			if (IsBadReadPtr(pFrame, sizeof(STACK_FRAME)) == 0)
-			{
-				bool bLineValid=false;
-				IMAGEHLP_LINE *iLine = (IMAGEHLP_LINE *) buffer;
-				memset(iLine, 0, sizeof(*iLine));
-				iLine->SizeOfStruct = sizeof(*iLine);
-				dwDisp = 0;
+        for (USHORT i = 0; i < frameCount; i++)
+            AppendFrameInfo((DWORD64)(ULONG_PTR)frames[i], text, buffer);
 
-				if (image.SymGetLineFromAddr(image.hProcess, pFrame->dwRetAddr, &dwDisp, iLine))
-				{
-					bLineValid = true;
-					char * ptr = strrchr(iLine->FileName, '\\');
-					if (ptr)
-						ptr++;
-					else
-						ptr = iLine->FileName;
-					text.addText(ptr);
-					sprintf(buffer, ", Line %d", iLine->LineNumber);
-					text.addText(buffer);
-				}
-				GetLastError();
-				
-				
-				IMAGEHLP_SYMBOL *iSymbol = (IMAGEHLP_SYMBOL *) buffer;
-				memset(iSymbol, 0, sizeof(*iSymbol));
-				iSymbol->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
-				iSymbol->MaxNameLength = sizeof(buffer) - sizeof(IMAGEHLP_SYMBOL);
-				dwDisp = 0;
+        FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), "-------------------------------------------------\r\nAssertion Failed: \r\n");
+        FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), text.buffer);
+        int result = IDIGNORE;
 
- 				if (image.SymGetSymFromAddr(image.hProcess, pFrame->dwRetAddr, &dwDisp, iSymbol))
-				{
-					if (bLineValid)
-						text.addText(", ");
-					text.addText(iSymbol->Name);
-					if (bLineValid)
-						text.addText("()\r\n");
-					else
-					{
-						sprintf(buffer, " + %d bytes\r\n", dwDisp);
-						text.addText(buffer);
-					}
-				}
+        FlipToGDI();
+        result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow,
+                                DLGPROC(dlgProc), (LPARAM)&text);
+        restorePriority();
 
-				pFrame = pFrame->pNext;
-			}
-			else
-				break;	// stop if invalid address
-		}
+        if (result == IDABORT)
+        {
+            CQFLAGS.bNoExitConfirm = 1;
+            PostQuitMessage(-1);
+            if (WM)
+                WM->ServeMessageQueue();
+        }
+        else if (result == IDDEBUG)
+            return true;
 
-		FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), "-------------------------------------------------\r\nAssertion Failed: \r\n");
-		FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), text.buffer);
-		int result = IDIGNORE;
+        return false;
+    }
 
-		FlipToGDI();
-		result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow, dlgProc, (LPARAM) &text);
+    FDUMP(ErrorCode(ERR_ASSERT, SEV_FATAL), exp, file, line);
 
-		restorePriority();
+#endif  // !FINAL_RELEASE
 
-		if (result == IDABORT)
-		{
-			CQFLAGS.bNoExitConfirm = 1;
-			PostQuitMessage(-1);		// cannot use exit(-1) here
-			if (WM)
-				WM->ServeMessageQueue();
-		}
-		else
-		if (result == IDDEBUG)		// DEBUG chosen
-			return true;
-		
-		return false;
-	}
-
-	FDUMP(ErrorCode(ERR_ASSERT, SEV_FATAL), exp, file, line);
-
-#endif  // end !FINAL_RELEASE
-
-	return 0;
+    return false;
 }
+
 //--------------------------------------------------------------------------//
-//
-bool __cdecl ICQImage::Bomb (const char *exp, ...)
+
+bool __cdecl ICQImage::Bomb(const char *exp, ...)
 {
 #ifndef FINAL_RELEASE
 
-	if( !CQImage_bEnabled )
-	{
-		// dont take care of alert message (danger!)
-		return false;
-	}
-	
-	char buffer[1024];
+    if (!CQImage_bEnabled)
+        return false;
 
-	va_list args;
-	va_start (args, exp);
-	vsprintf (buffer, exp, args);
-	va_end (args);
+    char buffer[1024];
 
-	if (image.hProcess)
-	{
-		STACK_FRAME * pFrame;
-		int i;
-		DWORD dwDisp;
-		TEXT_BUFFER<4096> text;
-		char version[64];
-		getVersion(version, sizeof(version));
+    va_list args;
+    va_start(args, exp);
+    vsprintf(buffer, exp, args);
+    va_end(args);
 
-		__asm mov DWORD ptr [pFrame], ebp
+    if (image.hProcess)
+    {
+        TEXT_BUFFER<4096> text;
+        char              version[64];
+        getVersion(version, sizeof(version));
 
-		SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+        // x64: CaptureStackBackTrace replaces the inline asm EBP trick.
+        // On x64 the compiler routinely omits frame pointers, so the old
+        // "mov DWORD ptr [pFrame], ebp" chain walk produces garbage silently.
+        // CaptureStackBackTrace uses RtlCaptureStackBackTrace internally and
+        // is fully supported on x64.
+        void * frames[16] = {};
+        USHORT frameCount = CaptureStackBackTrace(1, 16, frames, NULL);
 
-		text.type = CQERR_BOMB;
-		if (CQFLAGS.bTraceMission != 0 && EVENTSYS)
-			EVENTSYS->Send(CQE_DEBUG_HOTKEY, (void *) IDH_PRINT_OPLIST);		// print the op list
-		PlaySound(ERROR_SND, NULL, SND_ALIAS | SND_ASYNC);
-	
-		{
-			char * ptr = buffer;
-			if (ptr[0] && ptr[1] == ':')
-				ptr += 2;
-			ptr = strchr(ptr, ':');
-			if (ptr)
-				ptr += 2;
-			else
-				ptr = buffer;
-			text.addText("Error: ");
-			text.addText(ptr);
-			sprintf(buffer, " [%s]\r\n", version);
-			text.addText(buffer);
-			text.addText("Call Stack:\r\n");
-		}
+        SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
 
-		for (i = 0; i < 8; i++)
-		{
-			if (IsBadReadPtr(pFrame, sizeof(STACK_FRAME)) == 0)
-			{
-				bool bLineValid=false;
-				IMAGEHLP_LINE *iLine = (IMAGEHLP_LINE *) buffer;
-				memset(iLine, 0, sizeof(*iLine));
-				iLine->SizeOfStruct = sizeof(*iLine);
-				dwDisp = 0;
+        text.type = CQERR_BOMB;
+        if (CQFLAGS.bTraceMission != 0 && EVENTSYS)
+            EVENTSYS->Send(CQE_DEBUG_HOTKEY, (void *)IDH_PRINT_OPLIST);
+        PlaySound(ERROR_SND, NULL, SND_ALIAS | SND_ASYNC);
 
-				if (image.SymGetLineFromAddr(image.hProcess, pFrame->dwRetAddr, &dwDisp, iLine))
-				{
-					bLineValid = true;
-					char * ptr = strrchr(iLine->FileName, '\\');
-					if (ptr)
-						ptr++;
-					else
-						ptr = iLine->FileName;
-					text.addText(ptr);
-					sprintf(buffer, ", Line %d", iLine->LineNumber);
-					text.addText(buffer);
-				}
-				GetLastError();
-				
-				
-				IMAGEHLP_SYMBOL *iSymbol = (IMAGEHLP_SYMBOL *) buffer;
-				memset(iSymbol, 0, sizeof(*iSymbol));
-				iSymbol->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
-				iSymbol->MaxNameLength = sizeof(buffer) - sizeof(IMAGEHLP_SYMBOL);
-				dwDisp = 0;
+        {
+            char *ptr = buffer;
+            if (ptr[0] && ptr[1] == ':')
+                ptr += 2;
+            ptr = strchr(ptr, ':');
+            ptr = ptr ? ptr + 2 : buffer;
+            text.addText("Error: ");
+            text.addText(ptr);
+            sprintf(buffer, " [%s]\r\n", version);
+            text.addText(buffer);
+            text.addText("Call Stack:\r\n");
+        }
 
- 				if (image.SymGetSymFromAddr(image.hProcess, pFrame->dwRetAddr, &dwDisp, iSymbol))
-				{
-					if (bLineValid)
-						text.addText(", ");
-					text.addText(iSymbol->Name);
-					if (bLineValid)
-						text.addText("()\r\n");
-					else
-					{
-						sprintf(buffer, " + %d bytes\r\n", dwDisp);
-						text.addText(buffer);
-					}
-				}
+        for (USHORT i = 0; i < frameCount; i++)
+            AppendFrameInfo((DWORD64)(ULONG_PTR)frames[i], text, buffer);
 
-				pFrame = pFrame->pNext;
-			}
-			else
-				break;	// stop if invalid address
-		}
+        FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), "-------------------------------------------------\r\nBomb: \r\n");
+        FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), text.buffer);
+        int result = IDABORT;
 
-		FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), "-------------------------------------------------\r\nBomb: \r\n");
-		FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), text.buffer);
-		int result = IDABORT;
-		
-		FlipToGDI();
-		result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow, dlgProc, (LPARAM) &text);
+        FlipToGDI();
+        result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow,
+                                DLGPROC(dlgProc), (LPARAM)&text);
+        restorePriority();
 
-		restorePriority();
+        if (result == IDABORT)
+        {
+            CQFLAGS.bNoExitConfirm = 1;
+            PostQuitMessage(-1);
+            if (WM)
+                WM->ServeMessageQueue();
+        }
+        else if (result == IDDEBUG)
+            return true;
 
-		if (result == IDABORT)
-		{
-			CQFLAGS.bNoExitConfirm = 1;
-			PostQuitMessage(-1);		// cannot use exit(-1) here
-			if (WM)
-				WM->ServeMessageQueue();
-		}
-		else
-		if (result == IDDEBUG)		// DEBUG chosen
-			return true;
-		
-		return false;
-	}
+        return false;
+    }
 
-	FDUMP(ErrorCode(ERR_GENERAL, SEV_FATAL), buffer);
+    FDUMP(ErrorCode(ERR_GENERAL, SEV_FATAL), buffer);
 
-#endif  // end !FINAL_RELEASE
-	
-	return 0;
+#endif  // !FINAL_RELEASE
+
+    return false;
 }
+
 //--------------------------------------------------------------------------//
-//
-bool __cdecl ICQImage::Error (const char *exp, ...)
+
+bool __cdecl ICQImage::Error(const char *exp, ...)
 {
 #ifndef FINAL_RELEASE
 
-	if( !CQImage_bEnabled )
-	{
-		// dont take care of alert message (danger!)
-		return false;
-	}
+    if (!CQImage_bEnabled)
+        return false;
 
-	char buffer[1024];
+    char buffer[1024];
 
-	va_list args;
-	va_start (args, exp);
-	vsprintf (buffer, exp, args);
-	va_end (args);
+    va_list args;
+    va_start(args, exp);
+    vsprintf(buffer, exp, args);
+    va_end(args);
 
-	if (image.hProcess)
-	{
-		STACK_FRAME * pFrame;
-		int i;
-		DWORD dwDisp;
-		TEXT_BUFFER<4096> text;
-		char version[64];
-		getVersion(version, sizeof(version));
+    if (image.hProcess)
+    {
+        TEXT_BUFFER<4096> text;
+        char              version[64];
+        getVersion(version, sizeof(version));
 
-		__asm mov DWORD ptr [pFrame], ebp
+        // x64: same replacement as Bomb() above
+        void * frames[16] = {};
+        USHORT frameCount = CaptureStackBackTrace(1, 16, frames, NULL);
 
-		SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+        SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
 
-		text.type = CQERR_ERROR;
-		PlaySound(INFO_SND, NULL, SND_ALIAS | SND_ASYNC);
+        text.type = CQERR_ERROR;
+        PlaySound(INFO_SND, NULL, SND_ALIAS | SND_ASYNC);
 
-		{
-			char * ptr = buffer;
-			if (ptr[0] && ptr[1] == ':')
-				ptr += 2;
-			ptr = strchr(ptr, ':');
-			if (ptr)
-				ptr += 2;
-			else
-				ptr = buffer;
-			text.addText("Error: ");
-			text.addText(ptr);
-			sprintf(buffer, " [%s]\r\n", version);
-			text.addText(buffer);
-			text.addText("Call Stack:\r\n");
-		}
+        {
+            char *ptr = buffer;
+            if (ptr[0] && ptr[1] == ':')
+                ptr += 2;
+            ptr = strchr(ptr, ':');
+            ptr = ptr ? ptr + 2 : buffer;
+            text.addText("Error: ");
+            text.addText(ptr);
+            sprintf(buffer, " [%s]\r\n", version);
+            text.addText(buffer);
+            text.addText("Call Stack:\r\n");
+        }
 
-		for (i = 0; i < 8; i++)
-		{
-			if (IsBadReadPtr(pFrame, sizeof(STACK_FRAME)) == 0)
-			{
-				bool bLineValid=false;
-				IMAGEHLP_LINE *iLine = (IMAGEHLP_LINE *) buffer;
-				memset(iLine, 0, sizeof(*iLine));
-				iLine->SizeOfStruct = sizeof(*iLine);
-				dwDisp = 0;
+        for (USHORT i = 0; i < frameCount; i++)
+            AppendFrameInfo((DWORD64)(ULONG_PTR)frames[i], text, buffer);
 
-				if (image.SymGetLineFromAddr(image.hProcess, pFrame->dwRetAddr, &dwDisp, iLine))
-				{
-					bLineValid = true;
-					char * ptr = strrchr(iLine->FileName, '\\');
-					if (ptr)
-						ptr++;
-					else
-						ptr = iLine->FileName;
-					text.addText(ptr);
-					sprintf(buffer, ", Line %d", iLine->LineNumber);
-					text.addText(buffer);
-				}
-				GetLastError();
-				
-				
-				IMAGEHLP_SYMBOL *iSymbol = (IMAGEHLP_SYMBOL *) buffer;
-				memset(iSymbol, 0, sizeof(*iSymbol));
-				iSymbol->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
-				iSymbol->MaxNameLength = sizeof(buffer) - sizeof(IMAGEHLP_SYMBOL);
-				dwDisp = 0;
+        FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), "-------------------------------------------------\r\nRecoverable Error: \r\n");
+        FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), text.buffer);
+        int result = IDIGNORE;
 
- 				if (image.SymGetSymFromAddr(image.hProcess, pFrame->dwRetAddr, &dwDisp, iSymbol))
-				{
-					if (bLineValid)
-						text.addText(", ");
-					text.addText(iSymbol->Name);
-					if (bLineValid)
-						text.addText("()\r\n");
-					else
-					{
-						sprintf(buffer, " + %d bytes\r\n", dwDisp);
-						text.addText(buffer);
-					}
-				}
+        FlipToGDI();
+        result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow,
+                                DLGPROC(dlgProc), (LPARAM)&text);
+        restorePriority();
 
-				pFrame = pFrame->pNext;
-			}
-			else
-				break;	// stop if invalid address
-		}
+        if (result == IDABORT)
+        {
+            CQFLAGS.bNoExitConfirm = 1;
+            PostQuitMessage(-1);
+            if (WM)
+                WM->ServeMessageQueue();
+        }
+        else if (result == IDDEBUG)
+            return true;
 
-		FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), "-------------------------------------------------\r\nRecoverable Error: \r\n");
-		FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), text.buffer);
-		int result = IDIGNORE;
-		
-		FlipToGDI();
-		result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow, dlgProc, (LPARAM) &text);
+        return false;
+    }
 
-		restorePriority();
+    FDUMP(ErrorCode(ERR_GENERAL, SEV_ERROR), buffer);
 
-		if (result == IDABORT)
-		{
-			CQFLAGS.bNoExitConfirm = 1;
-			PostQuitMessage(-1);		// cannot use exit(-1) here
-			if (WM)
-				WM->ServeMessageQueue();
-		}
-		else
-		if (result == IDDEBUG)		// DEBUG chosen
-			return true;
-		
-		return false;
-	}
+#endif  // !FINAL_RELEASE
 
-	FDUMP(ErrorCode(ERR_GENERAL, SEV_ERROR), buffer);
-
-#endif  // end !FINAL_RELEASE
-	
-	return 0;
+    return false;
 }
+
 //--------------------------------------------------------------------------//
-//
-int ICQImage::Exception (struct _EXCEPTION_POINTERS * exceptionInfo)
+
+int ICQImage::Exception(struct _EXCEPTION_POINTERS *exceptionInfo)
 {
 #ifndef FINAL_RELEASE
 
-	if( !CQImage_bEnabled )
-	{
-		// dont take care of alert message (danger!)
-		return false;
-	}
+    if (!CQImage_bEnabled)
+        return IDABORT;
 
-	const CONTEXT * pContext = exceptionInfo->ContextRecord;
+    const CONTEXT *pContext = exceptionInfo->ContextRecord;
 
-	if (image.hProcess && (pContext->ContextFlags & CONTEXT_CONTROL) != 0)
-	{
-		STACK_FRAME firstFrame;
-		STACK_FRAME * pFrame;
-		char buffer[1024];
-		int i;
-		DWORD dwDisp;
-		TEXT_BUFFER<4096> text;
-		bool bFatal = (exceptionInfo->ExceptionRecord->ExceptionFlags != 0);
-		char version[64];
-		getVersion(version, sizeof(version));
+    if (image.hProcess && (pContext->ContextFlags & CONTEXT_CONTROL) != 0)
+    {
+        char              buffer[1024];
+        TEXT_BUFFER<4096> text;
+        bool              bFatal = (exceptionInfo->ExceptionRecord->ExceptionFlags != 0);
+        char              version[64];
+        getVersion(version, sizeof(version));
 
-		SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+        SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+        PlaySound(ERROR_SND, NULL, SND_ALIAS | SND_ASYNC);
 
-		PlaySound(ERROR_SND, NULL, SND_ALIAS | SND_ASYNC);
+        text.type = CQERR_EXCEPTION;
+        if (bFatal)
+        {
+            text.addText("Fatal ");
+            text.type = CQERR_FATAL_EXCEPTION;
+        }
+        text.addText("Exception: ");
 
-		text.type = CQERR_EXCEPTION;
-		firstFrame.dwRetAddr = pContext->Eip;
-		firstFrame.pNext = (STACK_FRAME *) pContext->Ebp;
-	
-		pFrame = &firstFrame;
+        {
+            const char *name = "??Unknown type??";
+            switch (exceptionInfo->ExceptionRecord->ExceptionCode)
+            {
+            case EXCEPTION_ACCESS_VIOLATION:         name = "Access Violation";     break;
+            case EXCEPTION_BREAKPOINT:               name = "User Breakpoint";      break;
+            case EXCEPTION_FLT_DIVIDE_BY_ZERO:       name = "Float Div by Zero";    break;
+            case EXCEPTION_FLT_INVALID_OPERATION:    name = "Float Invalid Op";     break;
+            case EXCEPTION_FLT_DENORMAL_OPERAND:
+            case EXCEPTION_FLT_INEXACT_RESULT:
+            case EXCEPTION_FLT_OVERFLOW:
+            case EXCEPTION_FLT_STACK_CHECK:
+            case EXCEPTION_FLT_UNDERFLOW:            name = "FPU";                  break;
+            case EXCEPTION_PRIV_INSTRUCTION:
+            case EXCEPTION_ILLEGAL_INSTRUCTION:      name = "Illegal Instruction";  break;
+            case EXCEPTION_IN_PAGE_ERROR:            name = "Paging error";         break;
+            case EXCEPTION_INT_DIVIDE_BY_ZERO:       name = "Integer Div by Zero";  break;
+            case EXCEPTION_INT_OVERFLOW:             name = "Integer overflow";     break;
+            case EXCEPTION_NONCONTINUABLE_EXCEPTION: name = "Noncontinuable";       break;
+            case EXCEPTION_SINGLE_STEP:              name = "Single Step";          break;
+            case EXCEPTION_STACK_OVERFLOW:           name = "Stack overflow";       break;
+            }
+            text.addText(name);
+            sprintf(buffer, " [%s]\r\n", version);
+            text.addText(buffer);
+        }
 
-		if (bFatal)
-		{
-			text.addText("Fatal ");
-			text.type = CQERR_FATAL_EXCEPTION;
-		}
-		text.addText("Exception: ");
-		{
-			const char * name = "??Unknown type??";
+        if (DEBUG_ITERATOR)
+        {
+            text.addText("Live iterator:\r\n");
+            if (IsBadReadPtr(DEBUG_ITERATOR, sizeof(ObjMapIterator)) == 0)
+            {
+                // x64: 16-digit hex for pointers
+                sprintf(buffer, "   current [0x%016llX] -> ",
+                        (unsigned long long)(ULONG_PTR)DEBUG_ITERATOR->current);
+                text.addText(buffer);
+                if (IsBadReadPtr(DEBUG_ITERATOR->current, sizeof(ObjMapNode)) == 0)
+                {
+                    sprintf(buffer, "obj=0x%016llX, dwMissionID=0x%X, flags=0x%X, next=0x%016llX\r\n",
+                            (unsigned long long)(ULONG_PTR)DEBUG_ITERATOR->current->obj,
+                            DEBUG_ITERATOR->current->dwMissionID,
+                            DEBUG_ITERATOR->current->flags,
+                            (unsigned long long)(ULONG_PTR)DEBUG_ITERATOR->current->next);
+                    text.addText(buffer);
+                }
+                else
+                    text.addText("  ???\r\n");
+            }
+            else
+                text.addText("  ???\r\n");
+        }
 
-			switch (exceptionInfo->ExceptionRecord->ExceptionCode)
-			{
-			case EXCEPTION_ACCESS_VIOLATION:
-				name = "Access Violation";
-				break;
-			case EXCEPTION_BREAKPOINT:
-				name = "User Breakpoint";
-				break;
-			case EXCEPTION_FLT_DIVIDE_BY_ZERO:
-				name = "Float Div by Zero";
-				break;
-			case EXCEPTION_FLT_INVALID_OPERATION:
-				name = "Float Invalid Op";
-				break;
-			case EXCEPTION_FLT_DENORMAL_OPERAND:
-			case EXCEPTION_FLT_INEXACT_RESULT:
-			case EXCEPTION_FLT_OVERFLOW:
-			case EXCEPTION_FLT_STACK_CHECK:
-			case EXCEPTION_FLT_UNDERFLOW:
-				name = "FPU";
-				break;
-			case EXCEPTION_PRIV_INSTRUCTION:
-			case EXCEPTION_ILLEGAL_INSTRUCTION:
-				name = "Illegal Instruction";
-				break;
-			case EXCEPTION_IN_PAGE_ERROR:
-				name = "Paging error";
-				break;
-			case EXCEPTION_INT_DIVIDE_BY_ZERO:
-				name = "Integer Div by Zero";
-				break;
-			case EXCEPTION_INT_OVERFLOW:
-				name = "Integer overflow";
-				break;
-			case EXCEPTION_NONCONTINUABLE_EXCEPTION:
-				name = "Noncontinuable";
-				break;
-			case EXCEPTION_SINGLE_STEP:
-				name = "Single Step";
-				break;
-			case EXCEPTION_STACK_OVERFLOW:
-				name = "Stack overflow";
-				break;
-			}
-			
-			text.addText(name);
-			sprintf(buffer, " [%s]\r\n", version);
-			text.addText(buffer);
-		}
+        text.addText("Call Stack:\r\n");
 
-		//  oh no! exception during an iterator
-		if (DEBUG_ITERATOR)
-		{
-			text.addText("Live iterator:\r\n");
-			if (IsBadReadPtr(DEBUG_ITERATOR, sizeof(ObjMapIterator)) == 0)
-			{
-				sprintf(buffer, "   current [0x%08X] -> ", DEBUG_ITERATOR->current);
-				text.addText(buffer);
-				if (IsBadReadPtr(DEBUG_ITERATOR->current, sizeof(ObjMapNode)) == 0)
-				{
-					sprintf(buffer, "obj=0x%08X, dwMissionID=0x%X, flags=0x%X, next=0x%08X\r\n", 
-						DEBUG_ITERATOR->current->obj, DEBUG_ITERATOR->current->dwMissionID,
-						DEBUG_ITERATOR->current->flags, DEBUG_ITERATOR->current->next);
-					text.addText(buffer);
-				}
-				else
-					text.addText("  ???\r\n");
-			}
-			else
-				text.addText("  ???\r\n");
-		}
+        // x64: Use StackWalk64 seeded from the exception CONTEXT so we get the
+        // actual faulting call chain, not the SEH handler chain.
+        // StackWalk64 modifies the CONTEXT in-place, so we work on a copy.
+        CONTEXT ctx = *pContext;
 
-		text.addText("Call Stack:\r\n");
+        STACKFRAME64 sf  = {};
+        sf.AddrPC.Mode    = AddrModeFlat;
+        sf.AddrFrame.Mode = AddrModeFlat;
+        sf.AddrStack.Mode = AddrModeFlat;
 
-		for (i = 0; i < 8; i++)
-		{
-			if (IsBadReadPtr(pFrame, sizeof(STACK_FRAME)) == 0)
-			{
-				bool bLineValid=false;
-				bool bSymValid=false;
-				IMAGEHLP_LINE *iLine = (IMAGEHLP_LINE *) buffer;
-				memset(iLine, 0, sizeof(*iLine));
-				iLine->SizeOfStruct = sizeof(*iLine);
-				dwDisp = 0;
+#if defined(_M_X64)
+        sf.AddrPC.Offset    = ctx.Rip;
+        sf.AddrFrame.Offset = ctx.Rbp;
+        sf.AddrStack.Offset = ctx.Rsp;
+        const DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
+#elif defined(_M_IX86)
+        sf.AddrPC.Offset    = ctx.Eip;
+        sf.AddrFrame.Offset = ctx.Ebp;
+        sf.AddrStack.Offset = ctx.Esp;
+        const DWORD machineType = IMAGE_FILE_MACHINE_I386;
+#else
+#error Unsupported target architecture
+#endif
 
-				if (image.SymGetLineFromAddr(image.hProcess, pFrame->dwRetAddr, &dwDisp, iLine))
-				{
-					bLineValid = true;
-					char * ptr = strrchr(iLine->FileName, '\\');
-					if (ptr)
-						ptr++;
-					else
-						ptr = iLine->FileName;
-					text.addText(ptr);
-					sprintf(buffer, ", Line %d", iLine->LineNumber);
-					text.addText(buffer);
-				}
-				GetLastError();
-				
-				
-				IMAGEHLP_SYMBOL *iSymbol = (IMAGEHLP_SYMBOL *) buffer;
-				memset(iSymbol, 0, sizeof(*iSymbol));
-				iSymbol->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
-				iSymbol->MaxNameLength = sizeof(buffer) - sizeof(IMAGEHLP_SYMBOL);
-				dwDisp = 0;
+        for (int i = 0; i < 16; i++)
+        {
+            if (!StackWalk64(machineType,
+                             image.hProcess,
+                             GetCurrentThread(),
+                             &sf,
+                             &ctx,
+                             NULL,                      // use default ReadMemory
+                             SymFunctionTableAccess64,  // from DbgHelp.lib
+                             SymGetModuleBase64,        // from DbgHelp.lib
+                             NULL))
+                break;
 
- 				if (image.SymGetSymFromAddr(image.hProcess, pFrame->dwRetAddr, &dwDisp, iSymbol))
-				{
-					bSymValid=true;
-					if (bLineValid)
-						text.addText(", ");
-					text.addText(iSymbol->Name);
-					if (bLineValid)
-						text.addText("()\r\n");
-					else
-					{
-						sprintf(buffer, " + %d bytes\r\n", dwDisp);
-						text.addText(buffer);
-					}
-				}
+            if (sf.AddrPC.Offset == 0)
+                break;
 
-				if (bLineValid==false && bSymValid==false)
-				{
-					sprintf(buffer, "Address=0x%08X, ??Unknown??\r\n", pFrame->dwRetAddr);
-					text.addText(buffer);
+            AppendFrameInfo(sf.AddrPC.Offset, text, buffer);
+        }
 
-					// try to read the return address
-					if (i == 0 && IsBadReadPtr((void *)pContext->Esp, sizeof(U32)) == 0)
-					{
-						U32 address = ((U32 *)pContext->Esp)[0];
+        FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), "-------------------------------------------------\r\nException: \r\n");
+        FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), text.buffer);
+        int result = IDABORT;
 
-						bool bLineValid=false;
-						bool bSymValid=false;
-						IMAGEHLP_LINE *iLine = (IMAGEHLP_LINE *) buffer;
-						memset(iLine, 0, sizeof(*iLine));
-						iLine->SizeOfStruct = sizeof(*iLine);
-						dwDisp = 0;
+        FlipToGDI();
+        result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow,
+                                DLGPROC(dlgProc), (LPARAM)&text);
+        restorePriority();
 
-						text.addText("   [ESP] -> ");
+        return result;
+    }
 
-						if (image.SymGetLineFromAddr(image.hProcess, address, &dwDisp, iLine))
-						{
-							bLineValid = true;
-							char * ptr = strrchr(iLine->FileName, '\\');
-							if (ptr)
-								ptr++;
-							else
-								ptr = iLine->FileName;
-							text.addText(ptr);
-							sprintf(buffer, ", Line %d", iLine->LineNumber);
-							text.addText(buffer);
-						}
-						GetLastError();
-						
-						IMAGEHLP_SYMBOL *iSymbol = (IMAGEHLP_SYMBOL *) buffer;
-						memset(iSymbol, 0, sizeof(*iSymbol));
-						iSymbol->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
-						iSymbol->MaxNameLength = sizeof(buffer) - sizeof(IMAGEHLP_SYMBOL);
-						dwDisp = 0;
+#endif  // !FINAL_RELEASE
 
- 						if (image.SymGetSymFromAddr(image.hProcess, address, &dwDisp, iSymbol))
-						{
-							bSymValid=true;
-							if (bLineValid)
-								text.addText(", ");
-							text.addText(iSymbol->Name);
-							if (bLineValid)
-								text.addText("()\r\n");
-							else
-							{
-								sprintf(buffer, " + %d bytes\r\n", dwDisp);
-								text.addText(buffer);
-							}
-						}
-
-						if (bLineValid==false && bSymValid==false)
-						{
-							sprintf(buffer, "Address=0x%08X, ??Unknown??\r\n", address);
-							text.addText(buffer);
-						}
-					}
-				}
-	
-				pFrame = pFrame->pNext;
-			}
-			else
-				break;
-		}
-
-		FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), "-------------------------------------------------\r\nException: \r\n");
-		FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), text.buffer);
-		int result = IDABORT;
-		
-		FlipToGDI();
-		result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow, dlgProc, (LPARAM) &text);
-
-		restorePriority();
-
-		return result;
-	}
-
-#endif  // end !FINAL_RELEASE
-
-	return IDABORT;
+    return IDABORT;
 }
+
 //--------------------------------------------------------------------------//
-//
-void CQImage::MemoryReport (struct IHeap * heap)
+
+void CQImage::MemoryReport(struct IHeap *heap)
 {
 #ifndef FINAL_RELEASE
-	if (heap->GetLargestBlock() != heap->GetHeapSize())
-	{
-		TEXT_BUFFER<4096> text;
-		text.type = CQERR_REPORT;
-		text.addText("Memory Leaks Detected:\r\n");
-		int oldOffset = text.index;
+    if (heap->GetLargestBlock() != heap->GetHeapSize())
+    {
+        TEXT_BUFFER<4096> text;
+        text.type = CQERR_REPORT;
+        text.addText("Memory Leaks Detected:\r\n");
+        int oldOffset = text.index;
 
-		heap->EnumerateBlocks(PrintBlock, &text);
+        heap->EnumerateBlocks(PrintBlock, &text);
 
-		if (oldOffset != text.index)
-		{
-			SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
-			PlaySound(INFO_SND, NULL, SND_ALIAS | SND_ASYNC);
-			FlipToGDI();
-			DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow, dlgProc, (LPARAM) &text);
-			restorePriority();
-		}
-	}
-#endif  // end !FINAL_RELEASE
+        if (oldOffset != text.index)
+        {
+            SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+            PlaySound(INFO_SND, NULL, SND_ALIAS | SND_ASYNC);
+            FlipToGDI();
+            DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG13), hMainWindow,
+                           DLGPROC(dlgProc), (LPARAM)&text);
+            restorePriority();
+        }
+    }
+#endif  // !FINAL_RELEASE
 }
+
 //--------------------------------------------------------------------------//
-//
-long CQImage::PrintBlock (struct IHeap * pHeap, void *allocatedBlock, U32 dwFlags, void *context)
+
+long CQImage::PrintBlock(struct IHeap *pHeap, void *allocatedBlock, U32 dwFlags, void *context)
 {
 #ifndef FINAL_RELEASE
 
-	if (image.hProcess)
-	{
-		TEXT_BUFFER<4096> * pText = (TEXT_BUFFER<4096> *) context;
-		char buffer[1024];
-		U32 owner = pHeap->GetBlockOwner(allocatedBlock);
-		IMAGEHLP_LINE *iLine = (IMAGEHLP_LINE *) buffer;
-		int oldOffset = pText->index;
-		U32 dwDisp;
+    if (image.hProcess)
+    {
+        TEXT_BUFFER<4096> *pText = (TEXT_BUFFER<4096> *)context;
+        char               buffer[1024];
+        // x64: owner address is DWORD64
+        DWORD64 owner    = (DWORD64)(ULONG_PTR)pHeap->GetBlockOwner(allocatedBlock);
+        int     oldOffset = pText->index;
+        DWORD   dwLineDisp = 0;
 
-		if (owner == 0xFFFFFFFF)		// marked block
-			goto Done;
-		if ((dwFlags & DAHEAPFLAG_ALLOCATED_BLOCK)==0)
-			goto Done;
+        // x64: sentinel was 0xFFFFFFFF on x86; use pointer-width -1 cast
+        if (owner == (DWORD64)(ULONG_PTR)(-1))
+            goto Done;
+        if ((dwFlags & DAHEAPFLAG_ALLOCATED_BLOCK) == 0)
+            goto Done;
 
-		memset(iLine, 0, sizeof(*iLine));
-		iLine->SizeOfStruct = sizeof(*iLine);
-		dwDisp = 0;
+        {
+            // x64: IMAGEHLP_LINE64
+            IMAGEHLP_LINE64 iLine = {};
+            iLine.SizeOfStruct = sizeof(iLine);
 
-		if (image.SymGetLineFromAddr(image.hProcess, owner, &dwDisp, iLine))
-		{
-			pText->addText(iLine->FileName);
-			sprintf(buffer, "(%d) : ", iLine->LineNumber);
-			pText->addText(buffer);
-		}
-		else
-		{
-			const char *pMsg = pHeap->GetBlockMessage(allocatedBlock);
-			pText->addText("?");
+            if (image.SymGetLineFromAddr64 &&
+                image.SymGetLineFromAddr64(image.hProcess, owner, &dwLineDisp, &iLine))
+            {
+                pText->addText(iLine.FileName);
+                sprintf(buffer, "(%lu) : ", iLine.LineNumber);
+                pText->addText(buffer);
+            }
+            else
+            {
+                const char *pMsg = pHeap->GetBlockMessage(allocatedBlock);
+                pText->addText("?");
 
-			if (IsBadReadPtr(pMsg, 32) == 0)
-			{
-				if (strcmp(pMsg, "Heap control block") == 0)	// ignore heap control blocks!
-				{
-					pText->index = oldOffset;
-					goto Done;
-				}
-				pText->addText(pMsg);
-			}
-			pText->addText("(?) : ");
-		}
+                if (IsBadReadPtr(pMsg, 32) == 0)
+                {
+                    if (strcmp(pMsg, "Heap control block") == 0)
+                    {
+                        pText->index = oldOffset;
+                        goto Done;
+                    }
+                    pText->addText(pMsg);
+                }
+                pText->addText("(?) : ");
+            }
+        }
 
-		sprintf(buffer, "%d byte memory leak. [PTR=0x%08X]\r\n", pHeap->GetBlockSize(allocatedBlock), allocatedBlock);
-		pText->addText(buffer);
+        // x64: 16-digit hex pointer
+        sprintf(buffer, "%d byte memory leak. [PTR=0x%016llX]\r\n",
+                pHeap->GetBlockSize(allocatedBlock),
+                (unsigned long long)(ULONG_PTR)allocatedBlock);
+        pText->addText(buffer);
 
-
-		OutputDebugString(pText->buffer + oldOffset);
-		//	FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), pText->buffer + oldOffset);
-	}
+        OutputDebugString(pText->buffer + oldOffset);
+    }
 
 Done:
 
-#endif  // end !FINAL_RELEASE
-	
-	return 1;
+#endif  // !FINAL_RELEASE
+
+    return 1;
 }
+
 //--------------------------------------------------------------------------//
-//
-int ICQImage::STANDARD_DUMP (ErrorCode code, const C8 *fmt, ...)
+
+int ICQImage::STANDARD_DUMP(ErrorCode code, const C8 *fmt, ...)
 {
 #ifndef FINAL_RELEASE
 
-	char buffer[4096];
+    char buffer[4096];
 
-	{
-		va_list args;
-		va_start (args, fmt);
-		vsprintf (buffer, fmt, args);
-		va_end (args);
-	}
+    {
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(buffer, fmt, args);
+        va_end(args);
+    }
 
-	if (code.kind == ERR_MEMORY)
-	{
-		switch (*(((S32 *)(&fmt))+2))
-		{
-		case DAHEAP_ALLOC_ZERO:
-			// let it go...growl
-			return 0;
+    if (code.kind == ERR_MEMORY)
+    {
+        switch (*(reinterpret_cast<S32 *>(&fmt) + 2))
+        {
+        case DAHEAP_ALLOC_ZERO:
+            return 0;
 
-		case DAHEAP_VALLOC_FAILED:
-			{
-				code.severity = SEV_FATAL;
-				int len = strlen(buffer);
-				MEMORYSTATUS memoryStatus;
-				GlobalMemoryStatus(&memoryStatus);
-				sprintf(buffer+len, "\r\nPhysical Memory: %d MB, VMemory: %d MB, VAddress: %d MB, HeapSize: %d MB", memoryStatus.dwTotalPhys>>20, memoryStatus.dwAvailPageFile>>20, memoryStatus.dwAvailVirtual>>20,
-					HEAP->GetHeapSize() >> 20);
-			}
-			break;
+        case DAHEAP_VALLOC_FAILED:
+            {
+                code.severity = SEV_FATAL;
+                int len = strlen(buffer);
 
-		case DAHEAP_OUT_OF_MEMORY:
-			Bomb(buffer);
-			InitializeDAHeap(0x800000, 0x800000, DAHEAPFLAG_DEBUGFILL_SNAN|DAHEAPFLAG_NOMSGS);
-			return 1;		// retry
-			break;
-		}
-	}
+                // x64: MEMORYSTATUSEX / GlobalMemoryStatusEx replaces
+                // MEMORYSTATUS / GlobalMemoryStatus.
+                // Fields are DWORDLONG so they correctly report >4 GB.
+                MEMORYSTATUSEX memoryStatus = {};
+                memoryStatus.dwLength = sizeof(memoryStatus);
+                GlobalMemoryStatusEx(&memoryStatus);
 
-	return Bomb(buffer);
+                sprintf(buffer + len,
+                        "\r\nPhysical Memory: %llu MB, VMemory: %llu MB, VAddress: %llu MB, HeapSize: %d MB",
+                        (unsigned long long)(memoryStatus.ullTotalPhys     >> 20),
+                        (unsigned long long)(memoryStatus.ullAvailPageFile  >> 20),
+                        (unsigned long long)(memoryStatus.ullAvailVirtual   >> 20),
+                        HEAP->GetHeapSize() >> 20);
+            }
+            break;
+
+        case DAHEAP_OUT_OF_MEMORY:
+            Bomb(buffer);
+            InitializeDAHeap(0x800000, 0x800000, DAHEAPFLAG_DEBUGFILL_SNAN | DAHEAPFLAG_NOMSGS);
+            return 1;
+        }
+    }
+
+    return Bomb(buffer);
 
 #else   // FINAL_RELEASE
 
-	return 0;
+    return 0;
 
-#endif   // end FINAL_RELEASE
+#endif  // FINAL_RELEASE
 }
-//--------------------------------------------------------------------------//
-//--------------------------------------------------------------------------//
-//--------------------------------------------------------------------------//
+
 //--------------------------------------------------------------------------//
 //----------------------------End CQImage.cpp-------------------------------//
 //--------------------------------------------------------------------------//

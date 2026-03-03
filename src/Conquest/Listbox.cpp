@@ -1,4 +1,4 @@
-f//--------------------------------------------------------------------------//
+//--------------------------------------------------------------------------//
 //                                                                          //
 //                               Listbox.cpp                                //
 //                                                                          //
@@ -434,9 +434,9 @@ void Listbox::InitListbox (const LISTBOX_DATA & data, BaseHotRect * _parent)
 	}
 	else
 	{
-		GENDATA->CreateInstance(pListboxType->pFontType, pBase);
+		GENDATA->CreateInstance(pListboxType->pFontType, pBase.addr());
 		CQASSERT(pBase!=0);
-		pBase->QueryInterface("IFontDrawAgent", pFont);
+		pBase->QueryInterface("IFontDrawAgent", pFont.void_addr());
 	}
 	fontHeight = pFont->GetFontHeight();
 
@@ -468,7 +468,7 @@ void Listbox::InitListbox (const LISTBOX_DATA & data, BaseHotRect * _parent)
 
 		for (U32 i = 1; i < textLines; i++)
 		{
-			pFont->CreateDuplicate(ppFont[i]);
+			pFont->CreateDuplicate(ppFont[i].addr());
 		}
 	}
 
@@ -485,8 +485,8 @@ void Listbox::InitListbox (const LISTBOX_DATA & data, BaseHotRect * _parent)
 	{
 		if (pScrollBar == 0)
 		{
-			GENDATA->CreateInstance(pListboxType->pScrollBarType, pBase);
-			pBase->QueryInterface("IScrollBar", pScrollBar);
+			GENDATA->CreateInstance(pListboxType->pScrollBarType, pBase.addr());
+			pBase->QueryInterface("IScrollBar", pScrollBar.void_addr());
 		}
 
 		SCROLLBAR_DATA dumbData;
@@ -1626,7 +1626,7 @@ ListboxFactory::~ListboxFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -1635,7 +1635,7 @@ void ListboxFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -1667,7 +1667,7 @@ HANDLE ListboxFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYPE objCla
 		if (data->shapeFile[0])
 		{
 			BEGIN_MAPPING(INTERFACEDIR, data->shapeFile);
-				CreateDrawAgent((VFX_SHAPETABLE *) pImage, 0, result->shape);
+				CreateDrawAgent((VFX_SHAPETABLE *) pImage, 0, result->shape.addr());
 			END_MAPPING(INTERFACEDIR);
 
 			result->shape->GetDimensions(result->width, result->height);

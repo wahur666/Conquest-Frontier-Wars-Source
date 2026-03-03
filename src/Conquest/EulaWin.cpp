@@ -93,13 +93,13 @@ BOOL CALLBACK eulaDialogCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 			wcsncpy(acceptButton, _localLoadStringW(IDS_EULA_ACCEPT), sizeof(acceptButton)/sizeof(wchar_t));
 			SetWindowText(acceptHandle," ");
 			SetFocus(acceptHandle);
-			buttonProc = (WNDPROC)(GetWindowLong(acceptHandle,GWL_WNDPROC));
-			SetWindowLong(acceptHandle,GWL_WNDPROC,(LONG)(&buttonCallback));
+			buttonProc = (WNDPROC)(GetWindowLong(acceptHandle,GWLP_WNDPROC));
+			SetWindowLongPtr(acceptHandle,GWLP_WNDPROC,reinterpret_cast<LONG_PTR>(&buttonCallback));
 			
 			declineHandle = GetDlgItem(hwndDlg,IDCANCEL);
 			wcsncpy(declineButton, _localLoadStringW(IDS_EULA_DECLINE), sizeof(declineButton)/sizeof(wchar_t));
 			SetWindowText(declineHandle," ");
-			SetWindowLong(declineHandle,GWL_WNDPROC,(LONG)(&buttonCallback));
+			SetWindowLongPtr(declineHandle,GWLP_WNDPROC,reinterpret_cast<LONG_PTR>(&buttonCallback));
 
 			eulaFile = fopen(eulaFileName,"rb");
 			if(eulaFile)
@@ -107,7 +107,7 @@ BOOL CALLBACK eulaDialogCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 				EDITSTREAM streamDef;
 				streamDef.dwCookie = 0;
 				streamDef.dwError = 0;
-				streamDef.pfnCallback = eulaEditStreamCallback;
+				streamDef.pfnCallback = EDITSTREAMCALLBACK(eulaEditStreamCallback);
 				SendDlgItemMessage(hwndDlg,IDC_EULA_TEXT,EM_STREAMIN,SF_RTF,(DWORD)(&streamDef));
 				fclose(eulaFile);
 			}
@@ -160,7 +160,7 @@ bool DoEulaWin(char * eulaFile)
 	if(!bGotData || (bGotData && !data))
 	{
 		eulaFileName = eulaFile;
-		int retVal = DialogBox(hResource,MAKEINTRESOURCE(IDD_EULA_DIALOG),NULL,eulaDialogCallback) != 0;
+		int retVal = DialogBox(hResource,MAKEINTRESOURCE(IDD_EULA_DIALOG),NULL,DLGPROC(eulaDialogCallback)) != 0;
 		if(retVal == -1)
 			return true;
 		return (retVal != 0);

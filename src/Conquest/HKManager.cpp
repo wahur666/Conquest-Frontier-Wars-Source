@@ -20,7 +20,7 @@
 
 #include <FileSys.h>
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IConnection.h>
 #include <HeapObj.h>
 #include <TComponent.h>
@@ -100,10 +100,10 @@ HKManager::~HKManager (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
-	if (DBHOTKEY && DBHOTKEY->QueryOutgoingInterface("IEventMessageFilter", connection) == GR_OK)
+	if (DBHOTKEY && DBHOTKEY->QueryOutgoingInterface("IEventMessageFilter", connection.addr()) == GR_OK)
 		connection->Unadvise(filterHandle);
 }
 //--------------------------------------------------------------------------//
@@ -170,7 +170,7 @@ void HKManager::createHotkeyTable (U32 resID, U32 eventID, IHotkeyEvent ** hkeve
 				mdesc.dwBufferSize = SizeofResource(hResource, hRes);
 				mdesc.dwFlags = CMF_DONT_COPY_MEMORY;
 
-				CreateUTFMemoryFile(mdesc, pFile);
+				CreateUTFMemoryFile(mdesc, pFile.addr());
 			}
 		}
 	}
@@ -189,7 +189,7 @@ void HKManager::createHotkeyTable (U32 resID, U32 eventID, IHotkeyEvent ** hkeve
 		CQBOMB0("Could not start hotkey system");
 	}
 
-	if ((*hkevent)->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if ((*hkevent)->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		U32 handle;
 		connection->Advise(EVENTSYS, &handle);
@@ -202,7 +202,7 @@ void HKManager::init (void)
 	COMPTR<IDAConnectionPoint> connection;
 	COMPTR<IProfileParser> parser;
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &eventHandle);
 
 	createHotkeyTable(IDR_DAHOTKEY1, CQE_HOTKEY, &HOTKEY);
@@ -210,14 +210,14 @@ void HKManager::init (void)
 	AddToGlobalCleanupList(&HOTKEY);
 	AddToGlobalCleanupList(&DBHOTKEY);
 
-	if (DBHOTKEY->QueryOutgoingInterface("IEventMessageFilter", connection) == GR_OK)
+	if (DBHOTKEY->QueryOutgoingInterface("IEventMessageFilter", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &filterHandle);
 
 	if (CQFLAGS.bNoGDI==0)
 	{
 		bDebugEnabled = true;
 
-		if (DACOM->QueryInterface("IProfileParser", parser) == GR_OK)
+		if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) == GR_OK)
 		{
 			HANDLE hSection;
 

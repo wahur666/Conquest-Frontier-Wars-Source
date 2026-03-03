@@ -28,7 +28,7 @@
 #include <HeapObj.h>
 #include <MemFile.h>
 #include <Document.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 
 #include <stdlib.h>
 #include <stdio.h>

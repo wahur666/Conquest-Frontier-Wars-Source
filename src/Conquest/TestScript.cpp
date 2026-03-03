@@ -26,7 +26,7 @@
 
 #include <HeapObj.h>
 #include <FileSys.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <TSmartPointer.h>
 
 using namespace CQGAMETYPES;

@@ -131,7 +131,7 @@ bool GameProgress::setFileSystem (void)
 	
 		DAFILEDESC fdesc = buffer;
 		
-		if (DACOM->CreateInstance(&fdesc, fileSystem) != GR_OK)
+		if (DACOM->CreateInstance(&fdesc, fileSystem.void_addr()) != GR_OK)
 		{
 			return false;
 		}
@@ -169,7 +169,7 @@ bool GameProgress::loadGameProgress (void)
 		fdesc.dwShareMode = 0;  // no sharing
 		fdesc.dwCreationDistribution = OPEN_EXISTING;
 
-		if (fileSystem->CreateInstance(&fdesc, file) != GR_OK)
+		if (fileSystem->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		{
 			// will fail the first time we play our game
 			return false;
@@ -205,7 +205,7 @@ bool GameProgress::saveGameProgress (void)
 		fdesc.dwShareMode = 0;  // no sharing
 		fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-		if (fileSystem->CreateInstance(&fdesc, file) != GR_OK)
+		if (fileSystem->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		{
 			CQBOMB0("Could not create save file in GameProgress");
 			return false;

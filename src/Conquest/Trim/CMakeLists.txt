@@ -209,6 +209,7 @@ target_link_libraries(Trim PRIVATE
         winmm
         msacm32
         DXGuid
+        DbgHelp
         # Release/Final only:
         $<$<NOT:$<CONFIG:Debug>>:strmiids>
         $<$<NOT:$<CONFIG:Debug>>:amstrmid>

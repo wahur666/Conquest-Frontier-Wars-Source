@@ -39,7 +39,7 @@
 #include <ViewCnst.h>
 #include <Document.h>
 #include <IDocClient.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <MemFile.h>
 
 static char szKey[] = "Music";

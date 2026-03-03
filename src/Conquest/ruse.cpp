@@ -25,7 +25,7 @@
 
 #include <memfile.h>
 #include <HeapObj.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 #include <IConnection.h>

@@ -37,7 +37,7 @@
 #include <TComponent.h>
 #include <TSmartPointer.h>
 #include <FileSys.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 
 #define NO_PATH_DIST 8000
 #define FINAL_DIST 2000

@@ -29,7 +29,7 @@
 
 #include <HeapObj.h>
 #include <System.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <HKEvent.h>
 #include <WindowManager.h>
 #include <RendPipeline.h>

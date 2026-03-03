@@ -19,7 +19,7 @@
 #endif
 
 #ifndef EVENTSYS_H
-#include <EventSys.h>
+#include <EventSys2.h>
 #endif
 
 #ifndef TSMARTPOINTER_H

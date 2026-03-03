@@ -172,7 +172,7 @@ struct CQPipeline : IRenderPipeline
 
 	virtual GENRESULT COMAPI get_num_device_texture_formats( U32 *num_formats )
 	{
-		PIPETHROUGH ( get_num_device_texture_formats(num_formats) )
+		if (criticalSection) { GENRESULT result; EnterCriticalSection(criticalSection); result = pipe->get_num_device_texture_formats(num_formats); LeaveCriticalSection(criticalSection); return result; } else { return pipe->get_num_device_texture_formats(num_formats); }
 	}
 
 	virtual GENRESULT COMAPI get_device_texture_format( PixelFormat *texture_pf, U32 format_num )
@@ -409,12 +409,12 @@ struct CQPipeline : IRenderPipeline
 		PIPETHROUGH ( get_texture_stage_transform(stage, out_mat4) )
 	}
 
-	virtual GENRESULT COMAPI set_texture_stage_texture( U32 stage, U32 htexture  )
+	virtual GENRESULT COMAPI set_texture_stage_texture( U32 stage, LONG_PTR htexture  )
 	{
 		PIPETHROUGH ( set_texture_stage_texture(stage, htexture) )
 	}
 
-	virtual GENRESULT COMAPI get_texture_stage_texture( U32 stage, U32 *htexture  )
+	virtual GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *htexture  )
 	{
 		PIPETHROUGH ( get_texture_stage_texture(stage, htexture) )
 	}
@@ -483,14 +483,14 @@ struct CQPipeline : IRenderPipeline
 		PIPETHROUGH ( create_index_buffer(Length, ppIndexBuffer) )
 	}
  	
-	virtual GENRESULT COMAPI create_cube_texture_from_file(const char* filename, IComponentFactory * DIR,U32 &out_htexture)
+	virtual GENRESULT COMAPI create_cube_texture_from_file(const char* filename, IComponentFactory * DIR,LONG_PTR &out_htexture)
 	{
 		PIPETHROUGH ( create_cube_texture_from_file(filename,DIR,out_htexture));
 
 		// toDo: check texture size and increase TEXMEMORYUSED?
 	}
 
-	virtual GENRESULT COMAPI create_texture( int width, int height, const PixelFormat &desiredformat, int num_lod, U32 irp_ctf_flags, U32 &out_htexture  )
+	virtual GENRESULT COMAPI create_texture( int width, int height, const PixelFormat &desiredformat, int num_lod, U32 irp_ctf_flags, LONG_PTR &out_htexture  )
 	{
 		U32 amount = (width * height * 2 * 133) / 100;		// increase by 2/3 for mip levels
 		amount += TEXMEMORYUSED;
@@ -498,62 +498,62 @@ struct CQPipeline : IRenderPipeline
 		PIPETHROUGH ( create_texture(width, height, desiredformat, num_lod, irp_ctf_flags, out_htexture ) )
 	}
 
-	virtual GENRESULT COMAPI destroy_texture( U32 htexture  )
+	virtual GENRESULT COMAPI destroy_texture( LONG_PTR htexture  )
 	{
 		PIPETHROUGH ( destroy_texture(htexture) )
 	}
 
-	virtual GENRESULT COMAPI is_texture( U32 htexture  )
+	virtual GENRESULT COMAPI is_texture( LONG_PTR htexture  )
 	{
 		PIPETHROUGH ( is_texture(htexture) )
 	}
 
-	virtual GENRESULT COMAPI lock_texture( U32 htexture, int level, RPLOCKDATA *lockData  )
+	virtual GENRESULT COMAPI lock_texture( LONG_PTR htexture, int level, RPLOCKDATA *lockData  )
 	{
 		PIPETHROUGH ( lock_texture(htexture, level, lockData) )
 	}
 
-	virtual GENRESULT COMAPI unlock_texture( U32 htexture, int level  )
+	virtual GENRESULT COMAPI unlock_texture( LONG_PTR htexture, int level  )
 	{
 		PIPETHROUGH ( unlock_texture(htexture, level) )
 	}
 
-	virtual GENRESULT COMAPI get_texture_format( U32 htexture, PixelFormat *out_pf  )
+	virtual GENRESULT COMAPI get_texture_format( LONG_PTR htexture, PixelFormat *out_pf  )
 	{
 		PIPETHROUGH ( get_texture_format(htexture, out_pf) )
 	}
 
-	virtual GENRESULT COMAPI get_texture_dim( U32 htexture, U32 *out_width, U32 *out_height, U32 *out_num_lod  )
+	virtual GENRESULT COMAPI get_texture_dim( LONG_PTR htexture, U32 *out_width, U32 *out_height, U32 *out_num_lod  )
 	{
 		PIPETHROUGH ( get_texture_dim(htexture, out_width, out_height, out_num_lod) )
 	}
 
-	virtual GENRESULT COMAPI get_texture_interface( U32 htexture, const char *iid, void **out_iif  )
+	virtual GENRESULT COMAPI get_texture_interface( LONG_PTR htexture, const char *iid, void **out_iif  )
 	{
 		PIPETHROUGH ( get_texture_interface(htexture, iid, out_iif) )
 	}
 
-	virtual GENRESULT COMAPI get_texture_dc( U32 htexture, HDC *out_hdc )
+	virtual GENRESULT COMAPI get_texture_dc( LONG_PTR htexture, HDC *out_hdc )
 	{
 		PIPETHROUGH ( get_texture_dc(htexture, out_hdc) )
 	}
 
-	virtual GENRESULT COMAPI release_texture_dc( U32 htexture, HDC hdc )
+	virtual GENRESULT COMAPI release_texture_dc( LONG_PTR htexture, HDC hdc )
 	{
 		PIPETHROUGH ( release_texture_dc(htexture, hdc) )
 	}
 
-	virtual GENRESULT COMAPI set_texture_palette( U32 htexture, int start, int length, const RGB *colors  )
+	virtual GENRESULT COMAPI set_texture_palette( LONG_PTR htexture, int start, int length, const RGB *colors  )
 	{
 		PIPETHROUGH ( set_texture_palette(htexture, start, length, colors) )
 	}
 
-	virtual GENRESULT COMAPI get_texture_palette( U32 htexture, int start, int length, RGB *colors  )
+	virtual GENRESULT COMAPI get_texture_palette( LONG_PTR htexture, int start, int length, RGB *colors  )
 	{
 		PIPETHROUGH ( get_texture_palette(htexture, start, length, colors) )
 	}
 
-	virtual GENRESULT COMAPI set_texture_level_data( U32 htexture, int level, int src_width, int src_height, int src_stride, const PixelFormat &src_format, const void *src_pixel, const void *src_alpha, const RGB *src_palette )
+	virtual GENRESULT COMAPI set_texture_level_data( LONG_PTR htexture, int level, int src_width, int src_height, int src_stride, const PixelFormat &src_format, const void *src_pixel, const void *src_alpha, const RGB *src_palette )
 	{
 		PIPETHROUGH ( set_texture_level_data(htexture, level, src_width, src_height, src_stride, src_format, src_pixel, src_alpha, src_palette) )
 	}
@@ -568,7 +568,7 @@ struct CQPipeline : IRenderPipeline
 		PIPETHROUGH ( get_num_textures(out_num_textures) )
 	}
 
-	virtual GENRESULT COMAPI get_texture( U32 texture_num, U32 *out_htexture  )
+	virtual GENRESULT COMAPI get_texture( U32 texture_num, LONG_PTR *out_htexture  )
 	{
 		PIPETHROUGH ( get_texture(texture_num, out_htexture) )
 	}

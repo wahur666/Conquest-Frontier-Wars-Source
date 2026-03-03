@@ -31,7 +31,7 @@
 
 #include <RendPipeline.h>
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IConnection.h>
 #include <TComponent.h>
 #include <IConnection.h>
@@ -100,7 +100,7 @@ static void WriteScreenShot (void)
 	fdesc.dwDesiredAccess |= GENERIC_WRITE;
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (DACOM->CreateInstance(&fdesc, file) != GR_OK)
+	if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
 		CQERROR1("File create failed on %s", fdesc.lpFileName);
 		goto Done;
@@ -286,13 +286,33 @@ struct DACOM_NO_VTABLE Cursor : public Resource<Cursor,ICursorResource>,
 								  ConnectionPointContainer<Cursor>,
 								  IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(Cursor)
-	DACOM_INTERFACE_ENTRY(IResource)
-	DACOM_INTERFACE_ENTRY(ICursorResource)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResource(void* self) {
+	    return static_cast<IResource*>(
+	        static_cast<Cursor*>(self));
+	}
+	static IDAComponent* GetICursorResource(void* self) {
+	    return static_cast<ICursorResource*>(
+	        static_cast<Cursor*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Cursor*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Cursor*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResource",                     &GetIResource},
+	        {"ICursorResource",               &GetICursorResource},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	U32 handle;		// connection handle to event system
 	U32 cursorRes;
@@ -532,7 +552,7 @@ Cursor::~Cursor (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(handle);
 	}
 
@@ -790,10 +810,10 @@ BOOL32 Cursor::localLoadCursor (cursor_entry *cursor_data)
 	hotY = IDEAL2REALY(hotY);
 
 	COMPTR<IImageReader> reader;
-	CreateBMPReader(reader);
+	CreateBMPReader(reader.addr());
 	reader->LoadImage(header, 0, 0);
 
-	CreateDrawAgent(reader, drawAgent);
+	CreateDrawAgent(reader, drawAgent.addr());
 	return 1;
 }
 //--------------------------------------------------------------------------//
@@ -1106,7 +1126,7 @@ void Cursor::init (void)
 	COMPTR<IDAConnectionPoint> connection;
     HRESULT hr;
 
-	if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		connection->Advise(CURSOR, &handle);
 		FULLSCREEN->SetCallbackPriority(this, EVENT_PRIORITY_CURSOR);
@@ -1116,13 +1136,13 @@ void Cursor::init (void)
 	// now initialize DirectInput stuff
 	//
 	COMPTR<IDirectInput> pDI;
-	if( FAILED( DirectInputCreate( GetModuleHandle(0), DIRECTINPUT_VERSION, pDI, NULL ) ) ) 
+	if( FAILED( DirectInputCreate( GetModuleHandle(0), DIRECTINPUT_VERSION, pDI.addr(), NULL ) ) )
 	{
 		if (CQFLAGS.bNoGDI)
 			CQBOMB0("DirectInput failed.");
 	}
 	else
-	if( FAILED( pDI->CreateDevice( GUID_SysMouse, pMouseDevice, NULL ) ) ) 
+	if( FAILED( pDI->CreateDevice( GUID_SysMouse, pMouseDevice.addr(), NULL ) ) )
 	{
 		if (CQFLAGS.bNoGDI)
 			CQBOMB0("DirectInput failed.");
@@ -1290,7 +1310,7 @@ struct _cursor : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		CURSOR = cursor = new DAComponent<Cursor>;
+		CURSOR = cursor = new DAComponentX<Cursor>;
 		AddToGlobalCleanupList((IDAComponent **) &CURSOR);
 	}
 

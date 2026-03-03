@@ -31,7 +31,7 @@
 #include "TObjRender.h"
 #include "DQuickSave.h"
 
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <Engine.h>
 #include <ITextureLibrary.h>
 #include <TSmartPointer.h>

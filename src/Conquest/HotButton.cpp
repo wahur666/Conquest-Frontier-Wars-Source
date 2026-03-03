@@ -226,7 +226,7 @@ void HotButton::InitHotButton (const HOTBUTTON_DATA & data, BaseHotRect * _paren
 	
 	int i;
 	for (i = 0; i < GTHBSHP_MAX_SHAPES; i++)
-		loader->CreateDrawAgent(i+base, shapes[i]);
+		loader->CreateDrawAgent(i+base, shapes[i].addr());
 
 	U16 width, height;
 	if (shapes[0])
@@ -604,7 +604,7 @@ HotButtonFactory::~HotButtonFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -613,7 +613,7 @@ void HotButtonFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

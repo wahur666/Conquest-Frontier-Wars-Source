@@ -22,7 +22,4 @@
 
 #define DA_HEAP_MALLOC( heap, size, tag )	malloc( (size) )
 
-#define DA_HEAP_CALLOC( heap, size, tag )	calloc( (size),
-
-
 #endif // EOF

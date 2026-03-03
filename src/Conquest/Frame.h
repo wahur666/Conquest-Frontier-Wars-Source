@@ -30,7 +30,7 @@
 #include <ViewCnst.h>
 #include <Document.h>
 #include <IDocClient.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <WindowManager.h>
 
 //--------------------------------------------------------------------------//
@@ -220,7 +220,7 @@ struct DACOM_NO_VTABLE Frame : public BaseHotRect, DocumentClient, ISystemEventC
 		if (systemEventHandle==0)
 		{
 			COMPTR<IDAConnectionPoint> connection;
-			if (GS->QueryOutgoingInterface("ISystemEventCallback", connection) == GR_OK)
+			if (GS->QueryOutgoingInterface("ISystemEventCallback", connection.addr()) == GR_OK)
 				connection->Advise(GetBase(), &systemEventHandle);
 		}
 	}
@@ -231,7 +231,7 @@ struct DACOM_NO_VTABLE Frame : public BaseHotRect, DocumentClient, ISystemEventC
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
-			if (GS && GS->QueryOutgoingInterface("ISystemEventCallback", connection) == GR_OK)
+			if (GS && GS->QueryOutgoingInterface("ISystemEventCallback", connection.addr()) == GR_OK)
 				connection->Unadvise(systemEventHandle);
 			systemEventHandle = 0;
 		}
@@ -247,9 +247,9 @@ struct DACOM_NO_VTABLE Frame : public BaseHotRect, DocumentClient, ISystemEventC
 
 	inline void nextFocus (void);
 
-	inline void prevFocus (void);
+	size_t findPrevFocusIndex(IKeyboardFocus *pCurr);
 
-	inline CONNECTION_NODE<IKeyboardFocus> * findPrevFocus (CONNECTION_NODE<IKeyboardFocus> * pFirst, IKeyboardFocus * pCurr);
+	inline void prevFocus (void);
 
 	inline bool isNextFocusBehind (void);
 
@@ -287,9 +287,11 @@ struct DACOM_NO_VTABLE Frame : public BaseHotRect, DocumentClient, ISystemEventC
 	void setLastFocus (void)
 	{
 		// set the last possible focus in the control
-		CONNECTION_NODE<IKeyboardFocus> *node = point2.pClientList;
-		setFocus(node->client);
-		prevFocus();
+		if (!point2.clients.empty())
+		{
+			setFocus(point2.clients.front());
+			prevFocus();
+		}
 	}
 
 	bool onGroupTabPressed (void)
@@ -493,9 +495,9 @@ inline void Frame::actuallyCreateViewer (void)
 
 	COMPTR<IDocument> pDatabase;
 
-	if (viewer==0 && GENDATA->GetDataFile(pDatabase) == GR_OK)
+	if (viewer==0 && GENDATA->GetDataFile(pDatabase.addr()) == GR_OK)
 	{
-		if (pDatabase->GetChildDocument(m_szInstanceName, doc) != GR_OK)
+		if (pDatabase->GetChildDocument(m_szInstanceName, doc.addr()) != GR_OK)
 		{
 			CQBOMB0("Could not create document");
 		}
@@ -509,7 +511,7 @@ inline void Frame::actuallyCreateViewer (void)
 			vdesc.doc = doc;
 			vdesc.hOwnerWindow = hMainWindow;
 			 
-			if (PARSER->CreateInstance(&vdesc, viewer) == GR_OK)
+			if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) == GR_OK)
 			{
 				viewer->get_main_window((void **) &hwnd);
 				MoveWindow(hwnd, 100, 100, 400, 200, 1);
@@ -690,7 +692,7 @@ inline void Frame::setFocus (struct IDAComponent * component)
 	COMPTR<IKeyboardFocus> res;
 	if (component)
 	{
-		component->QueryInterface("IKeyboardFocus", res);
+		component->QueryInterface("IKeyboardFocus", res.void_addr());
 		CQASSERT(res!=0);
 	}
 
@@ -732,61 +734,51 @@ inline void Frame::setFocus (struct IDAComponent * component)
 //
 inline bool Frame::isNextFocusBehind (void)
 {
-	CONNECTION_NODE<IKeyboardFocus> *node = point2.pClientList;
+	auto& clients = point2.clients;
+	if (clients.empty())
+		return true;
 
-	//
-	// find the next control after current focus
-	//
-	while (node)
-	{
-		if (node->client == focusControl)
-		{
-			if ((node = node->pNext) == 0)
-			{
-				// we are going back, return false
-				return false;
-			}
-			break;
-		}
-		node = node->pNext;
-	}
+	auto it = std::find(clients.begin(), clients.end(), (IKeyboardFocus*)focusControl);
 
-	if (node && node->client != focusControl)
+	if (it == clients.end())
+		return true;
+
+	// advance past current
+	++it;
+	if (it == clients.end())
+		return false;  // we are going back
+
+	if (*it != (IKeyboardFocus*)focusControl)
 	{
 		focusControl->SetKeyboardFocus(false);
 
-		while (node->client != focusControl)
+		while (*it != (IKeyboardFocus*)focusControl)
 		{
-			if (node->client->SetKeyboardFocus(true))
+			if ((*it)->SetKeyboardFocus(true))
 			{
-				// undo the new focus control
 				focusControl->SetKeyboardFocus(true);
 				return true;
 			}
-
-			if ((node = node->pNext) == 0)
-			{
-				// we are going back - return false
-				return false;
-			}
+			++it;
+			if (it == clients.end())
+				return false;  // we are going back
 		}
-		focusControl->SetKeyboardFocus(true);	// failed to find another control to switch to
+		focusControl->SetKeyboardFocus(true);
 	}
 
-	// I don't think we should ever get here...
 	return true;
 }
 //----------------------------------------------------------------------------------//
 //
 inline void Frame::nextFocus (void)
 {
-	CONNECTION_NODE<IKeyboardFocus> *node = point2.pClientList;
+	auto& clients = point2.clients;
 
 	if (focusControl == 0)
 	{
-		if (node == 0)
+		if (clients.empty())
 			return;
-		focusControl = node->client;
+		focusControl = clients.front();
 		if (focusControl->SetKeyboardFocus(true))
 			onFocusChanged();
 		else
@@ -794,155 +786,117 @@ inline void Frame::nextFocus (void)
 		return;
 	}
 
-	//
-	// find the next control after current focus
-	//
-	while (node)
+	auto it = std::find(clients.begin(), clients.end(), (IKeyboardFocus*)focusControl);
+
+	if (it != clients.end())
 	{
-		if (node->client == focusControl)
-		{
-			if ((node = node->pNext) == 0)
-				node = point2.pClientList;
-			break;
-		}
-		node = node->pNext;
+		++it;
+		if (it == clients.end())
+			it = clients.begin();  // wrap around
 	}
 
-	if (node && node->client != focusControl)
+	if (it != clients.end() && *it != (IKeyboardFocus*)focusControl)
 	{
 		focusControl->SetKeyboardFocus(false);
-		while (node->client != focusControl)
+
+		while (*it != (IKeyboardFocus*)focusControl)
 		{
-			if (node->client->SetKeyboardFocus(true))
+			if ((*it)->SetKeyboardFocus(true))
 			{
-				focusControl = node->client;
+				focusControl = *it;
 				onFocusChanged();
 				return;
 			}
-
-			if ((node = node->pNext) == 0)
-				node = point2.pClientList;
+			++it;
+			if (it == clients.end())
+				it = clients.begin();  // wrap around
 		}
-		focusControl->SetKeyboardFocus(true);	// failed to find another control to switch to
+		focusControl->SetKeyboardFocus(true);
 	}
 }
 //----------------------------------------------------------------------------------//
 //
-inline CONNECTION_NODE<IKeyboardFocus> * Frame::findPrevFocus (CONNECTION_NODE<IKeyboardFocus> * pFirst, IKeyboardFocus * pCurr)
+inline size_t Frame::findPrevFocusIndex (IKeyboardFocus* pCurr)
 {
-	// go through everything in the list until pNext == pCurr
-	CONNECTION_NODE<IKeyboardFocus> *node = pFirst;
+    auto& clients = point2.clients;
 
-	if (pCurr == NULL)
-	{
-		pCurr = focusControl;
-	}
+    if (pCurr == nullptr)
+        pCurr = focusControl;
 
-	while (node)
-	{
-		if (node->pNext && (node->pNext->client == pCurr))
-		{
-			return node;
-		}
-		node = node->pNext;
-	}
+    // find the element whose next is pCurr
+    for (size_t i = 0; i + 1 < clients.size(); ++i)
+    {
+        if (clients[i + 1] == pCurr)
+            return i;
+    }
 
-	// if node was null then pick the last control in the list
-	if (node == NULL)
-	{
-		node = pFirst;
-		while (node->pNext)
-		{
-			node = node->pNext;
-		}
-	}
-
-	return node;
+    // not found - return last element
+    return clients.size() - 1;
 }
 //----------------------------------------------------------------------------------//
 //
 inline bool Frame::isPrevFocusAhead (void)
 {
-	CONNECTION_NODE<IKeyboardFocus> *node = point2.pClientList;
-	CONNECTION_NODE<IKeyboardFocus> *first = point2.pClientList;
+    auto& clients = point2.clients;
+    if (clients.empty())
+        return true;
 
-	while (node)
-	{
-		if (node->pNext && (node->pNext->client == focusControl))
-		{
-			break;
-		}
-		node = node->pNext;
-	}
+    size_t idx = findPrevFocusIndex((IKeyboardFocus*)focusControl);
 
-	// if node was null then pick the last control in the list
-	if (node == NULL)
-	{
-		// we are looking ahead
-		return false;
-	}
+    if (idx == clients.size() - 1 && clients[idx] != (IKeyboardFocus*)focusControl)
+        return false;  // we are looking ahead
 
-	if (node && node->client != focusControl)
-	{
-		focusControl->SetKeyboardFocus(false);
-		while (node->client != focusControl)
-		{
-			if (node->client->SetKeyboardFocus(true))
-			{
-				// undo the keyboard focus you just did
-				node->client->SetKeyboardFocus(false);
-				break;
-			}
+    if (clients[idx] != (IKeyboardFocus*)focusControl)
+    {
+        focusControl->SetKeyboardFocus(false);
 
-			if ((node = findPrevFocus(first, node->client)) == 0)
-			{
-				return false;
-			}
-		}
+        while (clients[idx] != (IKeyboardFocus*)focusControl)
+        {
+            if (clients[idx]->SetKeyboardFocus(true))
+            {
+                clients[idx]->SetKeyboardFocus(false);
+                break;
+            }
+            idx = findPrevFocusIndex(clients[idx]);
+            if (idx == clients.size())
+                return false;
+        }
 
-		if (node->client == focusControl)
-		{
-			// we failed to find something to give focus to
-			return false;
-		}
+        if (clients[idx] == (IKeyboardFocus*)focusControl)
+            return false;
 
-		// we've found the node that is should have previous access, but did we have to back onto the list to find it?
-		CONNECTION_NODE<IKeyboardFocus> *p = first;
-		bool bBeforeCurrent = false;
-		while (p)
-		{
-			if (p->client == node->client)
-			{
-				bBeforeCurrent = true;
-				break;
-			}
-			else if (p->client == focusControl)
-			{
-				bBeforeCurrent = false;
-				break;
-			}
+        // check if found node is before focusControl in the list
+        bool bBeforeCurrent = false;
+        for (auto* p : clients)
+        {
+            if (p == clients[idx])
+            {
+                bBeforeCurrent = true;
+                break;
+            }
+            else if (p == (IKeyboardFocus*)focusControl)
+            {
+                bBeforeCurrent = false;
+                break;
+            }
+        }
 
-			p = p->pNext;
-		}
+        focusControl->SetKeyboardFocus(true);
+        return bBeforeCurrent;
+    }
 
-		focusControl->SetKeyboardFocus(true);
-		return bBeforeCurrent;
-	}
-
-	return true;
+    return true;
 }
 //----------------------------------------------------------------------------------//
 //
-inline void Frame::prevFocus (void)
-{
-	CONNECTION_NODE<IKeyboardFocus> *node = point2.pClientList;
-	CONNECTION_NODE<IKeyboardFocus> *first = point2.pClientList;
+inline void Frame::prevFocus (void) {
+	auto& clients = point2.clients;
 
 	if (focusControl == 0)
 	{
-		if (node == 0)
+		if (clients.empty())
 			return;
-		focusControl = node->client;
+		focusControl = clients.front();
 		if (focusControl->SetKeyboardFocus(true))
 			onFocusChanged();
 		else
@@ -950,27 +904,23 @@ inline void Frame::prevFocus (void)
 		return;
 	}
 
-	//
-	// find the prev control before current focus
-	//
-	node = findPrevFocus(first, NULL);
+	size_t idx = findPrevFocusIndex(nullptr);
 
-	if (node && node->client != focusControl)
+	if (clients[idx] != (IKeyboardFocus*)focusControl)
 	{
 		focusControl->SetKeyboardFocus(false);
-		while (node->client != focusControl)
+
+		while (clients[idx] != (IKeyboardFocus*)focusControl)
 		{
-			if (node->client->SetKeyboardFocus(true))
+			if (clients[idx]->SetKeyboardFocus(true))
 			{
-				focusControl = node->client;
+				focusControl = clients[idx];
 				onFocusChanged();
 				return;
 			}
-
-			if ((node = findPrevFocus(first, node->client)) == 0)
-				node = point2.pClientList;
+			idx = findPrevFocusIndex(clients[idx]);
 		}
-		focusControl->SetKeyboardFocus(true);	// failed to find another control to switch to
+		focusControl->SetKeyboardFocus(true);
 	}
 }
 #endif

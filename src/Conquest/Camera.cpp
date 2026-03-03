@@ -45,7 +45,7 @@
 #include <ViewCnst.h>
 #include <Document.h>
 #include <IDocClient.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <HKEvent.h>
 #include <MemFile.h>
 #include <IRenderPrimitive.h>
@@ -327,7 +327,7 @@ Camera::~Camera (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -1294,7 +1294,7 @@ BOOL32 Camera::CreateViewer (void)
 	mdesc.lpBuffer = &data;
 	mdesc.dwBufferSize = sizeof(data);
 	mdesc.dwFlags = CMF_DONT_COPY_MEMORY;
-	if (DACOM->CreateInstance(&mdesc, pMemFile) != GR_OK)
+	if (DACOM->CreateInstance(&mdesc, pMemFile.void_addr()) != GR_OK)
 		return 0;
 
 	pMemFile->AddRef();
@@ -1303,7 +1303,7 @@ BOOL32 Camera::CreateViewer (void)
 	ddesc.dwCreationDistribution = CREATE_ALWAYS;
 	ddesc.lpImplementation = "DOS";
 
-	if (DACOM->CreateInstance(&ddesc, doc) == GR_OK)
+	if (DACOM->CreateInstance(&ddesc, doc.void_addr()) == GR_OK)
 	{
 		VIEWDESC vdesc;
 		HWND hwnd;
@@ -1312,7 +1312,7 @@ BOOL32 Camera::CreateViewer (void)
 		vdesc.doc = doc;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if (PARSER->CreateInstance(&vdesc, viewer) == GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
@@ -1501,7 +1501,7 @@ BOOL32 Camera::UpdateViewer (void)
 	if (pitch+fovy < 0)
 	{
 		SINGLE dist = transform.translation.z/sin((-pitch+fovy)*PI/180.0);
-		set_near_plane_distance(max(dist-12000.0,100.0));
+		set_near_plane_distance(std::max(dist-12000.0,100.0));
 		dist = transform.translation.z/sin((-pitch-fovy)*PI/180.0);
 		set_far_plane_distance(dist*1.3);
 	}
@@ -2178,14 +2178,14 @@ struct _camera : GlobalComponent
 			minfo.fMask = MIIM_ID | MIIM_TYPE;
 			minfo.fType = MFT_STRING;
 			minfo.wID = IDS_VIEWMAINCAMERA;	// info->viewerMenuID;
-			minfo.dwTypeData = "Camera";
+			minfo.dwTypeData = const_cast<LPSTR>("Camera");
 			minfo.cch = 6;	// length of string "Camera"
 			
 			if (InsertMenuItem(hMenu, 0x7FFE, 1, &minfo))
 				camera->menuID = IDS_VIEWMAINCAMERA;	// info->viewerMenuID;
 		}
 
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(camera->getBase(), &camera->eventHandle);
 
 		FULLSCREEN->SetCallbackPriority(camera,EVENT_PRIORITY_CAMERA);

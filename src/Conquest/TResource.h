@@ -20,6 +20,7 @@
 #ifndef TCONNPOINT_H
 #include <TConnPoint.h>
 #endif
+#include <span>
 
 
 //--------------------------------------------------------------------------
@@ -32,10 +33,6 @@ struct DACOM_NO_VTABLE Resource : public Base
 	U32 priority;
 	bool bNotifyNeeded;
 	ConnectionPoint<Type,IResourceClient> point;
-	
-	BEGIN_DACOM_MAP_OUTBOUND(Type)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IResourceClient", point)
-	END_DACOM_MAP()
 
 	//-------------------------------------
 
@@ -58,11 +55,18 @@ struct DACOM_NO_VTABLE Resource : public Base
 
 	Type * getBase (void)
 	{
-		Type * base = (Type *) ( ((U32)this) - ((U32)
-					(static_cast<Resource<Type,Base>*>((Type*)8) )
-					-8) );
+		return static_cast<Type*>(this);
+	}
 
-		return base;
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"IResourceClient", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<Resource*>(self);
+				IDAConnectionPoint* cp = &doc->point;
+				return cp;
+			}}
+		};
+		return entriesOut;
 	}
 
 	void updateResource (void);
@@ -123,49 +127,40 @@ GENRESULT Resource<Type, Base>::SetDefaultState (void)
 }
 //--------------------------------------------------------------------------//
 //
-template <class Type, class Base> 
+template <class Type, class Base>
 BOOL32 Resource<Type, Base>::moveToFront (struct IResourceClient * res)
 {
-	CONNECTION_NODE<IResourceClient> *node = point.pClientList, *prev=0;
+	auto it = std::find(point.clients.begin(), point.clients.end(), res);
 
-	if (node)
-	{
-		if (node->client == res)
-			return 1;
-		prev = node;
-		while ((node = node->pNext) != 0)
-		{
-			if (node->client == res)
-			{
-				prev->pNext = node->pNext;
-				node->pNext = point.pClientList;
-				point.pClientList = node;
-				return 1;
-			}
-			prev = node;
-		}
-	}
+	if (it == point.clients.end())
+		return 0;
 
-	return 0;
+	if (it == point.clients.begin())
+		return 1;
+
+	auto node = *it;
+	point.clients.erase(it);
+	point.clients.insert(point.clients.begin(), node);
+
+	return 1;
 }
 //--------------------------------------------------------------------------//
 //
-template <class Type, class Base> 
+template <class Type, class Base>
 void Resource<Type, Base>::updateResource (void)
 {
 	if (bNotifyNeeded)
 	{
-		CONNECTION_NODE<IResourceClient> *node = point.pClientList;
 		bNotifyNeeded = false;
 
-		CONNECTION_NODE<IResourceClient> *trueNext = point.pClientList;
+		// Copy list to avoid issues if a client modifies the list during notification
+		auto snapshot = point.clients;
 
-		while (node && owner==0)
+		for (auto& node : snapshot)
 		{
-			//ABSOLUTELY NECESSARY TO AVOID INFINITE LIST WALKING
-			trueNext = node->pNext;
-			node->client->Notify(this, RESMSG_RES_UNOWNED);
-			node = trueNext;
+			if (owner != 0)
+				break;
+			node->Notify(this, RESMSG_RES_UNOWNED);
 		}
 
 		if (owner == 0)
@@ -174,16 +169,12 @@ void Resource<Type, Base>::updateResource (void)
 }
 //--------------------------------------------------------------------------//
 //
-template <class Type, class Base> 
+template <class Type, class Base>
 Resource<Type, Base>::~Resource (void)
 {
-	CONNECTION_NODE<IResourceClient> *node = point.pClientList, *next;
-
-	while (node)
+	for (auto& node : point.clients)
 	{
-		next = node->pNext;
-		node->client->Notify(this, RESMSG_RES_CLOSING);
-		node = next;
+		node->Notify(this, RESMSG_RES_CLOSING);
 	}
 }
 //--------------------------------------------------------------------------//

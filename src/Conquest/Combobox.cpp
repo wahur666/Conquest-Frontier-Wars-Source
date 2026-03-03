@@ -266,7 +266,7 @@ struct DACOM_NO_VTABLE Combobox : BaseHotRect, ICombobox, IKeyboardFocus, IListb
 	{
 		COMPTR<BaseHotRect> pRect;
 		bool result = false;
-		if (pComp->QueryInterface("BaseHotRect", pRect)== GR_OK)
+		if (pComp->QueryInterface("BaseHotRect", pRect.void_addr())== GR_OK)
 		{
 			result = pRect->bAlert;
 		}
@@ -297,14 +297,14 @@ void Combobox::InitCombobox (const COMBOBOX_DATA & data, BaseHotRect * _parent)
 		// load our sub-components
 		//
 		COMPTR<IDAComponent> pComp;
-		GENDATA->CreateInstance(data.buttonData.buttonType, pComp);
-		pComp->QueryInterface("IButton2", button);
+		GENDATA->CreateInstance(data.buttonData.buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", button.void_addr());
 
-		GENDATA->CreateInstance(data.listboxData.listboxType, pComp);
-		pComp->QueryInterface("IListbox", list);
+		GENDATA->CreateInstance(data.listboxData.listboxType, pComp.addr());
+		pComp->QueryInterface("IListbox", list.void_addr());
 
-		GENDATA->CreateInstance(data.editData.editType, pComp);
-		pComp->QueryInterface("IEdit2", edit);
+		GENDATA->CreateInstance(data.editData.editType, pComp.addr());
+		pComp->QueryInterface("IEdit2", edit.void_addr());
 	}
 
 	screenRect.left   = data.screenRect.left   + parent->screenRect.left;
@@ -588,28 +588,28 @@ bool Combobox::SetKeyboardFocus (bool bEnable)
 		{
 			if (bDropped)
 			{
-				edit->QueryInterface("IKeyboardFocus", res);
+				edit->QueryInterface("IKeyboardFocus", res.void_addr());
 				res->SetKeyboardFocus(false);
-				list->QueryInterface("IKeyboardFocus", res);
+				list->QueryInterface("IKeyboardFocus", res.void_addr());
 				res->SetKeyboardFocus(true);
 			}
 			else
 			{
-				list->QueryInterface("IKeyboardFocus", res);
+				list->QueryInterface("IKeyboardFocus", res.void_addr());
 				res->SetKeyboardFocus(false);
-				edit->QueryInterface("IKeyboardFocus", res);
+				edit->QueryInterface("IKeyboardFocus", res.void_addr());
 				res->SetKeyboardFocus(true);
 			}
 			parent->SetCallbackPriority(this, HOTRECT_PRIORITY+1);	// for draw order
 		}
 		else
 		{
-			button->QueryInterface("IKeyboardFocus", res);
+			button->QueryInterface("IKeyboardFocus", res.void_addr());
 			res->SetKeyboardFocus(false);
-			list->QueryInterface("IKeyboardFocus", res);
+			list->QueryInterface("IKeyboardFocus", res.void_addr());
 			res->SetKeyboardFocus(false);
 			
-			edit->QueryInterface("IKeyboardFocus", res);
+			edit->QueryInterface("IKeyboardFocus", res.void_addr());
 			res->SetKeyboardFocus(false);
 			
 			bDropped = false;
@@ -896,7 +896,7 @@ ComboboxFactory::~ComboboxFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -905,7 +905,7 @@ void ComboboxFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

@@ -51,7 +51,7 @@
 #include <3DMath.h>
 #include <FileSys.h>
 #include <IConnection.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <stdio.h>
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//

@@ -62,7 +62,7 @@
 #include <ITextureLibrary.h>
 #include <Renderer.h>
 #include <Mesh.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 
 #include <stdlib.h>
 

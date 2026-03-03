@@ -34,7 +34,7 @@
 
 #include <DPlatform.h>
 
-#include <Eventsys.h>
+#include <EventSys2.h>
 #include <Heapobj.h>
 #include <TSmartPointer.h>
 

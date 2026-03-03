@@ -1289,8 +1289,8 @@ void Edit2::init (EDITTYPE * _pEditType)
 	COMPTR<IDAComponent> pBase;
 	pEditType = _pEditType;
 
-	GENDATA->CreateInstance(pEditType->pFontType, pBase);
-	pBase->QueryInterface("IFontDrawAgent", pFont);
+	GENDATA->CreateInstance(pEditType->pFontType, pBase.addr());
+	pBase->QueryInterface("IFontDrawAgent", pFont.void_addr());
 }
 
 //--------------------------------------------------------------------------//
@@ -1348,7 +1348,7 @@ EditFactory::~EditFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -1357,7 +1357,7 @@ void EditFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -1393,7 +1393,7 @@ HANDLE EditFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYPE objClass,
 			BEGIN_MAPPING(INTERFACEDIR, data->shapeFile);
 				int i;
 				for (i = 0; i < GTESHP_MAX_SHAPES; i++)
-					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i]);
+					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i].addr());
 			END_MAPPING(INTERFACEDIR);
 
 			result->shapes[0]->GetDimensions(result->width, result->height);

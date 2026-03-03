@@ -52,7 +52,7 @@
 #include <TSmartPointer.h>
 #include <Heapobj.h>
 #include <Viewer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <3dmath.h>
 #include <Engine.h>
 #include <MemFile.h>

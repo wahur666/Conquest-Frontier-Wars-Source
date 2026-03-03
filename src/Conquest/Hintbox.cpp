@@ -32,7 +32,7 @@
 #include <TConnPoint.h>
 #include <HeapObj.h>
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IConnection.h>
 
 
@@ -167,7 +167,7 @@ HintResource::~HintResource (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(handle);
 	}
 
@@ -406,9 +406,9 @@ void HintResource::reloadFonts (bool bLoad)
 		CQASSERT(hFont==0);
 		hFont = CQCreateFont(IDS_HINTBOX_FONT);
 
-		CreateMultilineFontDrawAgent(0,hFont, pen, background, historyNode[0].font);
+		CreateMultilineFontDrawAgent(0,hFont, pen, background, historyNode[0].font.addr());
 		for (i = 1; i < MAX_HISTORY; i++)
-			historyNode[0].font->CreateDuplicate(historyNode[i].font);
+			historyNode[0].font->CreateDuplicate(historyNode[i].font.addr());
 	}
 	else
 	{
@@ -438,7 +438,7 @@ struct _hintbox : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 	
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(HINTBOX, &hint->handle);
 			FULLSCREEN->SetCallbackPriority(hint, EVENT_PRIORITY_STATUS);

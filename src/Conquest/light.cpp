@@ -55,7 +55,7 @@
 #include <TSmartPointer.h>
 #include <Heapobj.h>
 #include <Viewer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <Quat.h>
 #include <ITextureLibrary.h>
 #include <View2D.h>

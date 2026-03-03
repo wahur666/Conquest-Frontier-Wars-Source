@@ -39,7 +39,7 @@
 #include <heapobj.h>
 #include <TComponent.h>
 #include <WindowManager.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <TSmartPointer.h>
 #include <FileSys.h>
 #include <ILight.h>

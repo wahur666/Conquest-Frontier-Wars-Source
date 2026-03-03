@@ -43,7 +43,7 @@
 #include <IConnection.h>
 #include <HeapObj.h>
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 
 #include <stdio.h>
 

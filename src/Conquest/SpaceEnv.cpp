@@ -34,7 +34,7 @@
 #include <FileSys.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <IConnection.h>
 //#include <RPUL\PrimitiveBuilder.h>
 #include <renderer.h>

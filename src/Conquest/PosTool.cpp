@@ -23,7 +23,7 @@
 
 #include <heapobj.h>
 #include <TComponent.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <stdio.h>
 
 struct PosTool : public BaseHotRect

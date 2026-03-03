@@ -14,11 +14,12 @@
 
 #include "pch.h"
 #include <globals.h>
+#include <span>
 
 #include "THashList.h"
 
 #include "FileSys.h"
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TSmartPointer.h"
 
 #include <stdlib.h>
@@ -96,10 +97,18 @@ struct LFNODE
 //
 struct DACOM_NO_VTABLE LogFile : public IFileSystem
 {
-	BEGIN_DACOM_MAP_INBOUND(LogFile)
-	DACOM_INTERFACE_ENTRY(IFileSystem)
-	DACOM_INTERFACE_ENTRY2(IID_IFileSystem,IFileSystem)
-	END_DACOM_MAP()
+	static IDAComponent* GetIFileSystem(void* self) {
+	    return static_cast<IFileSystem*>(
+	        static_cast<LogFile*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IFileSystem",   &GetIFileSystem},
+	        {IID_IFileSystem, &GetIFileSystem},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -561,7 +570,7 @@ void LogFile::shutdown (void)
 	fdesc.dwCreationDistribution = OPEN_ALWAYS;
 	fdesc.lpImplementation = "DOS";
 
-	if (DACOM->CreateInstance(&fdesc, pLog) == GR_OK)
+	if (DACOM->CreateInstance(&fdesc, pLog.void_addr()) == GR_OK)
 	{
 		U32 fileSize = pLog->GetFileSize();
 		char * buffer = (char *) malloc(fileSize + 1);
@@ -631,9 +640,9 @@ void LogFile::addNamesFromBuffer (char * buffer)
 //
 IFileSystem * __stdcall CreateLogOfFile (IFileSystem * pFile, const char *logName)
 {
-	LogFile * result = new DAComponent<LogFile> ();
+	LogFile * result = new DAComponentX<LogFile> ();
 
-	result->pFile.ptr = pFile;		// don't inc the ref count
+	result->pFile = pFile;		// don't inc the ref count
 	result->szLogName = logName;
 
 	return result;

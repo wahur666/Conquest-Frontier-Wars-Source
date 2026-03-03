@@ -21,7 +21,7 @@
 #include <DButton.h>
 #include "DrawAgent.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 
@@ -85,14 +85,38 @@ struct DACOM_NO_VTABLE Button2 : BaseHotRect, IButton2, IKeyboardFocus
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Button2)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IButton2)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IKeyboardFocus)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Button2*>(self));
+	}
+	static IDAComponent* GetIButton2(void* self) {
+	    return static_cast<IButton2*>(
+	        static_cast<Button2*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Button2*>(self));
+	}
+	static IDAComponent* GetIKeyboardFocus(void* self) {
+	    return static_cast<IKeyboardFocus*>(
+	        static_cast<Button2*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Button2*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IButton2",                      &GetIButton2},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IKeyboardFocus",                &GetIKeyboardFocus},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -881,8 +905,8 @@ void Button2::init (BUTTONTYPE * _pButtonType)
 	COMPTR<IDAComponent> pBase;
 	pButtonType = _pButtonType;
 
-	GENDATA->CreateInstance(pButtonType->pFontType, pBase);
-	pBase->QueryInterface("IFontDrawAgent", pFont);
+	GENDATA->CreateInstance(pButtonType->pFontType, pBase.addr());
+	pBase->QueryInterface("IFontDrawAgent", pFont.void_addr());
 }
 //--------------------------------------------------------------------------//
 //-----------------------Button Factory class-------------------------------//
@@ -898,9 +922,17 @@ struct DACOM_NO_VTABLE ButtonFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ButtonFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<ButtonFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	ButtonFactory (void) { }
 
@@ -939,7 +971,7 @@ ButtonFactory::~ButtonFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -948,7 +980,7 @@ void ButtonFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -989,7 +1021,7 @@ HANDLE ButtonFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYPE objClas
 			BEGIN_MAPPING(INTERFACEDIR, data->shapeFile);
 				int i;
 				for (i = 0; i < GTBSHP_MAX_SHAPES; i++)
-					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i]);
+					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i].addr());
 			END_MAPPING(INTERFACEDIR);
 
 			result->shapes[0]->GetDimensions(result->width, result->height);
@@ -1018,7 +1050,7 @@ BOOL32 ButtonFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT ButtonFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	BUTTONTYPE * type = (BUTTONTYPE *) hArchetype;
-	Button2 * result = new DAComponent<Button2>;
+	Button2 * result = new DAComponentX<Button2>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -1032,7 +1064,7 @@ struct _buttonfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<ButtonFactory>;
+		factory = new DAComponentX<ButtonFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

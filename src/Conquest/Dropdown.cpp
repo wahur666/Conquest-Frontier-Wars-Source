@@ -237,11 +237,11 @@ void Dropdown::InitDropdown (const DROPDOWN_DATA & data, BaseHotRect * _parent)
 		// load our sub-components
 		//
 		COMPTR<IDAComponent> pComp;
-		GENDATA->CreateInstance(data.buttonData.buttonType, pComp);
-		pComp->QueryInterface("IButton2", button);
+		GENDATA->CreateInstance(data.buttonData.buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", button.void_addr());
 
-		GENDATA->CreateInstance(data.listboxData.listboxType, pComp);
-		pComp->QueryInterface("IListbox", list);
+		GENDATA->CreateInstance(data.listboxData.listboxType, pComp.addr());
+		pComp->QueryInterface("IListbox", list.void_addr());
 	}
 
 	screenRect.left   = IDEAL2REALX(data.screenRect.left) + parent->screenRect.left;
@@ -518,25 +518,25 @@ bool Dropdown::SetKeyboardFocus (bool bEnable)
 		{
 			if (bDropped)
 			{
-				button->QueryInterface("IKeyboardFocus", res);
+				button->QueryInterface("IKeyboardFocus", res.void_addr());
 				res->SetKeyboardFocus(false);
-				list->QueryInterface("IKeyboardFocus", res);
+				list->QueryInterface("IKeyboardFocus", res.void_addr());
 				res->SetKeyboardFocus(true);
 			}
 			else
 			{
-				list->QueryInterface("IKeyboardFocus", res);
+				list->QueryInterface("IKeyboardFocus", res.void_addr());
 				res->SetKeyboardFocus(false);
-				button->QueryInterface("IKeyboardFocus", res);
+				button->QueryInterface("IKeyboardFocus", res.void_addr());
 				res->SetKeyboardFocus(true);
 			}
 			parent->SetCallbackPriority(this, HOTRECT_PRIORITY+1);	// for draw order
 		}
 		else
 		{
-			button->QueryInterface("IKeyboardFocus", res);
+			button->QueryInterface("IKeyboardFocus", res.void_addr());
 			res->SetKeyboardFocus(false);
-			list->QueryInterface("IKeyboardFocus", res);
+			list->QueryInterface("IKeyboardFocus", res.void_addr());
 			res->SetKeyboardFocus(false);
 			bDropped = false;
 			list->SetVisible(false);
@@ -745,7 +745,7 @@ DropdownFactory::~DropdownFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -754,7 +754,7 @@ void DropdownFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

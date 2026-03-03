@@ -86,7 +86,7 @@ void _loadfont::load (void)
 	U32 line;
 	C8 buffer[MAX_PATH];
 
-	if (DACOM->QueryInterface("IProfileParser", parser) != GR_OK)
+	if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) != GR_OK)
 		goto Done;
 
 	if ((hSection = parser->CreateSection("FONTS")) == 0)
@@ -113,7 +113,7 @@ void _loadfont::unload (void)
 	U32 line;
 	C8 buffer[MAX_PATH];
 
-	if (DACOM->QueryInterface("IProfileParser", parser) != GR_OK)
+	if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) != GR_OK)
 		goto Done;
 
 	if ((hSection = parser->CreateSection("FONTS")) == 0)

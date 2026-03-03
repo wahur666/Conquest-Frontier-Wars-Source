@@ -30,8 +30,7 @@
 #include "hotkeys.h"
 #include "Sfx.h"
 
-#include <da_vector>
-using namespace da_std;
+#include <vector>
 
 //
 //--------------------------------------------------------------------------//
@@ -227,9 +226,9 @@ struct DACOM_NO_VTABLE LineManager : public IEventCallback, ILineManager
 	DACOM_INTERFACE_ENTRY(IEventCallback)
 	END_DACOM_MAP()
 
-	typedef vector<LineBaseObj*> LINE_VEC;
+	typedef std::vector<LineBaseObj*> LINE_VEC;
 
-	LINE_VEC lines;
+	LINE_VEC lines {};
 	U32 lineIDs;
 
 	U32 handle;			// connection handle
@@ -309,7 +308,7 @@ LineManager::~LineManager (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(handle);
 	}
 }
@@ -451,7 +450,7 @@ struct _linemanager : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 	
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(LMAN->GetBase(), &LMAN->handle);
 			FULLSCREEN->SetCallbackPriority(LMAN, EVENT_PRIORITY_LINEDISPLAY);

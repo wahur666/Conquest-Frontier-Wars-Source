@@ -19,7 +19,7 @@
 #include "CQTrace.h"
 
 #include <TSmartPointer.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h>
 #include <FileSys.h>
 #include <TConnPoint.h>
@@ -27,7 +27,8 @@
 #include <HeapObj.h>
 #include <MemFile.h>
 #include <Document.h>
-#include <EventSys.h>
+#include <EventSys2.h>
+#include <span>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -86,16 +87,39 @@ struct DACOM_NO_VTABLE GenData : public IGeneralData, ConnectionPointContainer<G
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(GenData)
-	DACOM_INTERFACE_ENTRY(IGeneralData)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIGeneralData(void* self) {
+	    return static_cast<IGeneralData*>(
+	        static_cast<GenData*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<GenData*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<GenData*>(self));
+	}
 
-	BEGIN_DACOM_MAP_OUTBOUND(GenData)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("ICQFactory", point)
-	END_DACOM_MAP()
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IGeneralData",                  &GetIGeneralData},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"ICQFactory", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<GenData*>(self);
+				IDAConnectionPoint* cp = &doc->point;
+				return cp;
+			}}
+		};
+		return entriesOut;
+	}
 
 	ConnectionPoint<GenData,ICQFactory> point;
 	COMPTR<IFileSystem> pFile;
@@ -190,7 +214,7 @@ Retry:
 		}
 	}
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 }
 //-------------------------------------------------------------------
@@ -217,31 +241,33 @@ PGENTYPE GenData::LoadArchetype (const C8 *name)
 	if ((result = GetArchetype(name)) == 0)
 	{
 		ARCHDATATYPE * dataType;
-		
+
 		if ((dataType = getArchDataType(name)) != 0)
 		{
-			CONNECTION_NODE<ICQFactory> *node= point.pClientList;
-			HANDLE handle=0;
+			HANDLE handle = 0;
+			ICQFactory* winner = nullptr;
 
 			result = new GENNODE;
-			result->prev=0;
-			if ((result->next=archList) != 0)
+			result->prev = 0;
+			if ((result->next = archList) != 0)
 				archList->prev = result;
 			result->archDataType = dataType;
 			archList = result;
 
 			CURSOR->SetBusy(1);
-			
-			while (node)
+
+			for (auto* client : point.clients)
 			{
-				if ((handle = node->client->CreateArchetype(result, dataType->objData->type, dataType->objData)) != 0)
+				if ((handle = client->CreateArchetype(result, dataType->objData->type, dataType->objData)) != 0)
+				{
+					winner = client;
 					break;
-				node = node->pNext;
+				}
 			}
 
-			if (node)
+			if (winner)
 			{
-				result->factory = node->client;
+				result->factory = winner;
 				result->hArchetype = handle;
 			}
 			else
@@ -541,10 +567,10 @@ BOOL32 GenData::loadTypesData (void)
 	U32 size = 0;
 
 	fdesc.lpImplementation = "DOS";
-	if (DACOM->CreateInstance(&fdesc, file) != GR_OK)
+	if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
 		fdesc.lpFileName = "..\\DB\\GenData.db";
-		if (DACOM->CreateInstance(&fdesc, file) != GR_OK)
+		if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		{
 			CQBOMB1("Could not access '%s'", fdesc.lpFileName);
 			goto Done;
@@ -566,7 +592,7 @@ BOOL32 GenData::loadTypesData (void)
 		mdesc.dwFlags = 0;
 		mdesc.dwDesiredAccess |= GENERIC_WRITE;
 
-		if (CreateUTFMemoryFile(mdesc, pFile) != GR_OK)
+		if (CreateUTFMemoryFile(mdesc, pFile.addr()) != GR_OK)
 			CQBOMB0("Could not create memory file");
 
 		//
@@ -581,7 +607,7 @@ BOOL32 GenData::loadTypesData (void)
 		ddesc.lpParent = pFile;
 		pFile->AddRef();
 
-		if (DACOM->CreateInstance(&ddesc, pDoc) != GR_OK)
+		if (DACOM->CreateInstance(&ddesc, pDoc.void_addr()) != GR_OK)
 			CQBOMB0("Could not create document");
 
 		pMemFile = pFile;
@@ -596,7 +622,7 @@ BOOL32 GenData::loadTypesData (void)
 		mdesc.dwBufferSize = size;
 		mdesc.dwFlags = CMF_DONT_COPY_MEMORY;
 
-		if (CreateUTFMemoryFile(mdesc, pMemFile) != GR_OK)
+		if (CreateUTFMemoryFile(mdesc, pMemFile.addr()) != GR_OK)
 			CQBOMB0("Could not create memory file");
 	}
 	
@@ -658,7 +684,7 @@ GENRESULT GenData::copyOpenFile (IFileSystem *file)
 	file->SetFilePointer(0,0);
 	file->ReadFile(0,buffer,dwSize,&dwRead,0);
 
-	if ((result = CreateUTFMemoryFile(mdesc, temp)) != GR_OK)
+	if ((result = CreateUTFMemoryFile(mdesc, temp.addr())) != GR_OK)
 		return result;
 
 	temp.free();		// clears all of the sharing flags
@@ -668,14 +694,14 @@ GENRESULT GenData::copyOpenFile (IFileSystem *file)
 	fdesc.dwShareMode = 0;
 	fdesc.dwCreationDistribution = TRUNCATE_EXISTING;
 
-	if ((result = DACOM->CreateInstance(&fdesc,outFile)) == GR_OK)
+	if ((result = DACOM->CreateInstance(&fdesc,outFile.void_addr())) == GR_OK)
 	{
 		outFile->WriteFile(0,buffer,dwRead,&dwWritten,0);
 	}
 	else
 	{
 		fdesc.lpFileName = "..\\DB\\GenData.db";
-		if ((result = DACOM->CreateInstance(&fdesc,outFile)) == GR_OK)
+		if ((result = DACOM->CreateInstance(&fdesc,outFile.void_addr())) == GR_OK)
 			outFile->WriteFile(0,buffer,dwRead,&dwWritten,0);
 	}
 
@@ -694,7 +720,7 @@ struct _genlist : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		GENDATA = list = new DAComponent<GenData>;
+		GENDATA = list = new DAComponentX<GenData>;
 		AddToGlobalCleanupList((IDAComponent **) &GENDATA);
 	}
 
@@ -705,7 +731,7 @@ struct _genlist : GlobalComponent
 		if (list->loadTypesData() == 0)
 			CQBOMB0("Load failed on general database.");
 
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(list->getBase(), &list->eventHandle);
 	}
 };

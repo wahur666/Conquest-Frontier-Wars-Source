@@ -27,7 +27,7 @@
 #include <DAnimate.h>
 
 #include <TSmartPointer.h>
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <TComponent.h>
 #include <IDDBackDoor.h>
 
@@ -256,9 +256,9 @@ void IPAnim::init (void)
 	CQFLAGS.bInProgressAnimActive = 1;
 
 	// add the background image
-	if (GENDATA->CreateInstance("Static!!Progress", pComp) == GR_OK)
+	if (GENDATA->CreateInstance("Static!!Progress", pComp.addr()) == GR_OK)
 	{
-		pComp->QueryInterface("IStatic", back);
+		pComp->QueryInterface("IStatic", back.void_addr());
 
 		if (back)
 		{
@@ -272,14 +272,14 @@ void IPAnim::init (void)
 			sdata.alignment = STATIC_DATA::TENBYSIX;
 
 			back->InitStatic(sdata, this);
-			back->QueryInterface("IEventCallback", background);
+			back->QueryInterface("IEventCallback", background.void_addr());
 		}
 	}
 
 	// add the animation
-	if (GENDATA->CreateInstance(ANIMATION_TYPE, pComp) == GR_OK)
+	if (GENDATA->CreateInstance(ANIMATION_TYPE, pComp.addr()) == GR_OK)
 	{
-		pComp->QueryInterface("IAnimate", animate);
+		pComp->QueryInterface("IAnimate", animate.void_addr());
 
 		if (animate)
 		{
@@ -291,7 +291,7 @@ void IPAnim::init (void)
 			adata.bFuzzEffect = false;
 
 			animate->InitAnimate(adata, this, NULL, 0);
-			animate->QueryInterface("IEventCallback", foreground);
+			animate->QueryInterface("IEventCallback", foreground.void_addr());
 		}
 	}
 
@@ -302,12 +302,12 @@ void IPAnim::init (void)
 	penBack	 = RGB(0,0,0);	   
 
 	hFont = CQCreateFont(IDS_TOOLBAR_MONEY_FONT);
-	CreateFontDrawAgent(hFont, 1, penFront, penBack, pString);
+	CreateFontDrawAgent(hFont, 1, penFront, penBack, pString.addr());
 
 	stringX = IDEAL2REALX(270);
 	stringY = IDEAL2REALY(190);
 
-	CreateDrawAgent("progress.shp", INTERFACEDIR, DA::UNKTYPE, 0, shape);
+	CreateDrawAgent("progress.shp", INTERFACEDIR, DA::UNKTYPE, 0, shape.addr());
 	CQASSERT(shape);
 	shape->GetDimensions(barWidth, barHeight);
 

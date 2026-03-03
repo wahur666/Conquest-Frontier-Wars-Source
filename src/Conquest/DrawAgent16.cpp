@@ -531,7 +531,7 @@ void FontDrawAgent16::updateStringData (const wchar_t * string, BOOL32 bCreateAg
 
 		agent.free();
 		if (bCreateAgent)
-			CreateDrawAgentForFonts((FontDrawAgent16 *)this, agent);
+			CreateDrawAgentForFonts((FontDrawAgent16 *)this, agent.addr());
 	}
 }
 //--------------------------------------------------------------------------//
@@ -813,7 +813,7 @@ FontFactory::~FontFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -822,7 +822,7 @@ void FontFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

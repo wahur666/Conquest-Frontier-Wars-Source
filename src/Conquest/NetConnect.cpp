@@ -21,7 +21,7 @@
 #include "NetPacket.h"
 #include "CQTrace.h"
 
-#include <EventSys.h>
+#include <EventSys2.h>
 #include <TSmartPointer.h>
 #include <HeapObj.h>
 

@@ -847,7 +847,7 @@ void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parent
 	if (parentFile == 0)
 		parentFile = DACOM;
 	
-	if (parentFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (parentFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
 		CQFILENOTFOUND(fdesc.lpFileName);
 		if (strcmp(fdesc.lpFileName, "ZeroDeg.bmp") == 0)		// no infinite loops
@@ -881,15 +881,15 @@ void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parent
 	switch (type)
 	{
 	case DA::BMP:
-		CreateBMPReader(reader);
+		CreateBMPReader(reader.addr());
 		reader->LoadImage(pMemory+14, fileSize, subImage);		// +14 skip bogus header stuff
 		break;
 	case DA::VFX:
-		CreateVFXReader(reader);
+		CreateVFXReader(reader.addr());
 		reader->LoadImage(pMemory, fileSize, subImage);
 		break;
 	case DA::TGA:
-		CreateTGAReader(reader);
+		CreateTGAReader(reader.addr());
 		reader->LoadImage(pMemory, fileSize, subImage);
 		break;
 	default:
@@ -906,7 +906,7 @@ void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parent
 void __stdcall CreateDrawAgent (const VFX_SHAPETABLE * vfxShape, U32 subImage, struct IDrawAgent ** drawAgent, BOOL32 bHiRes, RECT * pRect)
 {
 	COMPTR<IImageReader> reader;
-  	CreateVFXReader(reader);
+  	CreateVFXReader(reader.addr());
  
 	if (reader->LoadImage((void *)vfxShape, 0, subImage) == GR_OK)
 		CreateDrawAgent(reader, drawAgent, bHiRes, pRect);
@@ -943,7 +943,7 @@ struct DACOM_NO_VTABLE FontDrawAgent : IDebugFontDrawAgent
 	
 	U32		 numChars;
 	TEXCOORD *texCoord;
-	U32		 textureID;
+	LONG_PTR textureID;
 
 
 	

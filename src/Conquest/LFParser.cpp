@@ -201,7 +201,7 @@ S32 LFParser::ParseFile (U32 ** ppFrameArray)
 		if (buffer[1] != ':')
 		{
 			COMPTR<IFileSystem> parent;
-			if (MSPEECHDIR->GetParentSystem(parent) == GR_OK)
+			if (MSPEECHDIR->GetParentSystem(parent.addr()) == GR_OK)
 			{
 				parent->GetFileName(buffer, sizeof(buffer));
 			}

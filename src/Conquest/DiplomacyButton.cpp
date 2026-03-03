@@ -488,7 +488,7 @@ DiplomacyButtonFactory::~DiplomacyButtonFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -497,7 +497,7 @@ void DiplomacyButtonFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -519,7 +519,7 @@ HANDLE DiplomacyButtonFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYP
 			BEGIN_MAPPING(INTERFACEDIR, data->shapeFile);
 				int i;
 				for (i = 0; i < GT_DIPL_MAX_SHAPES; i++)
-					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i]);
+					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i].addr());
 			END_MAPPING(INTERFACEDIR);
 
 			result->shapes[0]->GetDimensions(result->width, result->height);
