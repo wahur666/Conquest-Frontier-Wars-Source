@@ -94,6 +94,7 @@ add_subdirectory(src/Tools/ObjView)            # model viewer
 add_subdirectory(src/Tools/adb)               # internal tools
 add_subdirectory(src/DAHOTKEY)                 # missing, core hotkey library
 add_subdirectory(src/ParticleEffect)    # particle effects
+add_subdirectory(src/Tools/Pack)
 
 add_subdirectory(src/TestProject)
 
