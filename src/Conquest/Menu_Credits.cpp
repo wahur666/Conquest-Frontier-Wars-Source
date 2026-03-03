@@ -44,7 +44,7 @@ struct CreditText
 
 	void DuplicateFontAgent (IFontDrawAgent * pFont, U32 fontID)
 	{
-		pFont->CreateDuplicate(fontCredit);
+		pFont->CreateDuplicate(fontCredit.addr());
 
 		// create the background font
 		HFONT hFont;
@@ -53,7 +53,7 @@ struct CreditText
 		background	= RGB(0,0,0);
 		hFont = CQCreateFont(fontID);
 
-		CreateFontDrawAgent(hFont, 0, background | 0xFF000000, background, fontBack);
+		CreateFontDrawAgent(hFont, 0, background | 0xFF000000, background, fontBack.addr());
 	}
 };
 
@@ -318,8 +318,8 @@ void Menu_Credits::setStateInfo (void)
 	hFont1		= CQCreateFont(IDS_MESSAGEBOX_FONT);
 	hFont2		= CQCreateFont(IDS_OPENING_FONT);
 
-	CreateFontDrawAgent(hFont1, 1, pen1, background, fontTitleTemplate);
-	CreateFontDrawAgent(hFont2, 1, pen2, background, fontNameTemplate);
+	CreateFontDrawAgent(hFont1, 1, pen1, background, fontTitleTemplate.addr());
+	CreateFontDrawAgent(hFont2, 1, pen2, background, fontNameTemplate.addr());
 
 	yOffset = 540;
 	yClimb = 0;
@@ -500,8 +500,8 @@ void Menu_Credits::init (void)
 
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.staticBackground.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticBackground);
+	GENDATA->CreateInstance(data.staticBackground.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticBackground.void_addr());
 }
 //--------------------------------------------------------------------------//
 //

@@ -237,29 +237,29 @@ void MenuLoadSave::init (void)
 	data = 	*((GT_LOADSAVE *) GENDATA->GetArchetypeData("MenuLoadSave"));
 
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.open.buttonType, pComp);
-	pComp->QueryInterface("IButton2", open);
-	GENDATA->CreateInstance(data.cancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", cancel);
-	GENDATA->CreateInstance(data.deleteFile.buttonType, pComp);
-	pComp->QueryInterface("IButton2", deleteFile);
-	GENDATA->CreateInstance(data.save.buttonType, pComp);
-	pComp->QueryInterface("IButton2", save);
+	GENDATA->CreateInstance(data.open.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", open.void_addr());
+	GENDATA->CreateInstance(data.cancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", cancel.void_addr());
+	GENDATA->CreateInstance(data.deleteFile.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", deleteFile.void_addr());
+	GENDATA->CreateInstance(data.save.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", save.void_addr());
 	
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
-	GENDATA->CreateInstance(data.staticLoad.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticLoad);
-	GENDATA->CreateInstance(data.staticSave.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSave);
-	GENDATA->CreateInstance(data.staticFile.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticFile);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
+	GENDATA->CreateInstance(data.staticLoad.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticLoad.void_addr());
+	GENDATA->CreateInstance(data.staticSave.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSave.void_addr());
+	GENDATA->CreateInstance(data.staticFile.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticFile.void_addr());
 
-	GENDATA->CreateInstance(data.list.listboxType, pComp);
-	pComp->QueryInterface("IListbox", list);
+	GENDATA->CreateInstance(data.list.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", list.void_addr());
 	
-	GENDATA->CreateInstance(data.editFile.editType, pComp);
-	pComp->QueryInterface("IEdit2", editFile);
+	GENDATA->CreateInstance(data.editFile.editType, pComp.addr());
+	pComp->QueryInterface("IEdit2", editFile.void_addr());
 
 	editFile->SetControlID(IDS_OPEN);
 

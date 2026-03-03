@@ -27,8 +27,7 @@
 #include "MusicManager.h"
 #include "hotkeys.h"
 #include "IGameProgress.h"
-
-#include <dplay.h>
+#include "directx2007aug/dplay.h"
 #include "ZoneLobby.h"
 
 #define NAME_REG_KEY		"CQPlayerName"
@@ -571,7 +570,7 @@ bool Menu1::find3DCard (void)
 	if (DEFAULTS->GetStringFromRegistry(RENDERDEV_REG_KEY, regValue, sizeof(regValue)) == 0)
 		strcpy(regValue, "{00000000-0000-0000-0000-000000000000}");
 
-	DACOM->QueryInterface(IID_IProfileParser, parser);
+	DACOM->QueryInterface(IID_IProfileParser, parser.void_addr());
 
 	// find the first card with 3D capabilites
 	for (i = 0; i < 4; i++)
@@ -688,61 +687,61 @@ void Menu1::init (void)
 	data = 	*((GT_MENU1 *) GENDATA->GetArchetypeData("Menu1"));
 
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.opening.single.buttonType, pComp);
-	pComp->QueryInterface("IButton2", single);
+	GENDATA->CreateInstance(data.opening.single.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", single.void_addr());
 
-	GENDATA->CreateInstance(data.opening.multi.buttonType, pComp);
-	pComp->QueryInterface("IButton2", multi);
+	GENDATA->CreateInstance(data.opening.multi.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", multi.void_addr());
 
-	GENDATA->CreateInstance(data.opening.options.buttonType, pComp);
-	pComp->QueryInterface("IButton2", options);
+	GENDATA->CreateInstance(data.opening.options.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", options.void_addr());
 	
-	GENDATA->CreateInstance(data.opening.intro.buttonType, pComp);
-	pComp->QueryInterface("IButton2", intro);
+	GENDATA->CreateInstance(data.opening.intro.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", intro.void_addr());
 
-	GENDATA->CreateInstance(data.opening.help.buttonType, pComp);
-	pComp->QueryInterface("IButton2", help);
+	GENDATA->CreateInstance(data.opening.help.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", help.void_addr());
 
-	GENDATA->CreateInstance(data.opening.quit.buttonType, pComp);
-	pComp->QueryInterface("IButton2", quit);
+	GENDATA->CreateInstance(data.opening.quit.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", quit.void_addr());
 
-	GENDATA->CreateInstance(data.opening.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.opening.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.opening.staticSingle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSingle);
+	GENDATA->CreateInstance(data.opening.staticSingle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSingle.void_addr());
 
-	GENDATA->CreateInstance(data.opening.staticMulti.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMulti);
+	GENDATA->CreateInstance(data.opening.staticMulti.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMulti.void_addr());
 
-	GENDATA->CreateInstance(data.opening.staticIntro.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticIntro);
+	GENDATA->CreateInstance(data.opening.staticIntro.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticIntro.void_addr());
 
-	GENDATA->CreateInstance(data.opening.staticOptions.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticOptions);
+	GENDATA->CreateInstance(data.opening.staticOptions.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticOptions.void_addr());
 
-	GENDATA->CreateInstance(data.opening.staticHelp.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticHelp);
+	GENDATA->CreateInstance(data.opening.staticHelp.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticHelp.void_addr());
 
 #ifndef _DEMO_
-	GENDATA->CreateInstance(data.opening.animMedia.animateType, pComp);
-	pComp->QueryInterface("IAnimate", animMedia);
+	GENDATA->CreateInstance(data.opening.animMedia.animateType, pComp.addr());
+	pComp->QueryInterface("IAnimate", animMedia.void_addr());
 #endif
 
-	GENDATA->CreateInstance(data.opening.animSingle.animateType, pComp);
-	pComp->QueryInterface("IAnimate", animSingle);
+	GENDATA->CreateInstance(data.opening.animSingle.animateType, pComp.addr());
+	pComp->QueryInterface("IAnimate", animSingle.void_addr());
 
-	GENDATA->CreateInstance(data.opening.animMulti.animateType, pComp);
-	pComp->QueryInterface("IAnimate", animMulti);
+	GENDATA->CreateInstance(data.opening.animMulti.animateType, pComp.addr());
+	pComp->QueryInterface("IAnimate", animMulti.void_addr());
 
-	GENDATA->CreateInstance(data.opening.animOptions.animateType, pComp);
-	pComp->QueryInterface("IAnimate", animOptions);
+	GENDATA->CreateInstance(data.opening.animOptions.animateType, pComp.addr());
+	pComp->QueryInterface("IAnimate", animOptions.void_addr());
 
-	GENDATA->CreateInstance(data.opening.animQuestion.animateType, pComp);
-	pComp->QueryInterface("IAnimate", animQuestion);
+	GENDATA->CreateInstance(data.opening.animQuestion.animateType, pComp.addr());
+	pComp->QueryInterface("IAnimate", animQuestion.void_addr());
 
-	GENDATA->CreateInstance(data.opening.staticLegal.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticLegal);
+	GENDATA->CreateInstance(data.opening.staticLegal.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticLegal.void_addr());
 }
 //--------------------------------------------------------------------------//
 // command line switch included /lobby

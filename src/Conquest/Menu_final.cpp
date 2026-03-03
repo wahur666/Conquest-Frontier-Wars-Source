@@ -24,7 +24,7 @@
 #include "NetBuffer.h"
 #include "NetPacket.h"
 
-#include <dplay.h>
+#include "directx2007aug/dplay.h"
 #include <stdio.h>
 
 #define RESYNC_PERIOD   15000     // milliseconds
@@ -569,41 +569,41 @@ void Menu_final::init (void)
 	//
 	COMPTR<IDAComponent> pComp;
 	
-	GENDATA->CreateInstance(data.staticState.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticState);
+	GENDATA->CreateInstance(data.staticState.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticState.void_addr());
 
-	GENDATA->CreateInstance(data.staticName.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticName);
+	GENDATA->CreateInstance(data.staticName.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticName.void_addr());
 
-	GENDATA->CreateInstance(data.staticColor.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticColor);
+	GENDATA->CreateInstance(data.staticColor.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticColor.void_addr());
 
-	GENDATA->CreateInstance(data.staticRace.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticRace);
+	GENDATA->CreateInstance(data.staticRace.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticRace.void_addr());
 
-	GENDATA->CreateInstance(data.staticTeam.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticTeam);
+	GENDATA->CreateInstance(data.staticTeam.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticTeam.void_addr());
 
-	GENDATA->CreateInstance(data.staticPing.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticPing);
+	GENDATA->CreateInstance(data.staticPing.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticPing.void_addr());
 
-	GENDATA->CreateInstance(data.description.staticType, pComp);
-	pComp->QueryInterface("IStatic", description);
+	GENDATA->CreateInstance(data.description.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", description.void_addr());
 	
-	GENDATA->CreateInstance(data.staticAccept.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticAccept);
+	GENDATA->CreateInstance(data.staticAccept.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticAccept.void_addr());
 
-	GENDATA->CreateInstance(data.accept.buttonType, pComp);
-	pComp->QueryInterface("IButton2", accept);
+	GENDATA->CreateInstance(data.accept.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", accept.void_addr());
 	
-	GENDATA->CreateInstance(data.start.buttonType, pComp);
-	pComp->QueryInterface("IButton2", start);
+	GENDATA->CreateInstance(data.start.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", start.void_addr());
 	
-	GENDATA->CreateInstance(data.cancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", cancel);
+	GENDATA->CreateInstance(data.cancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", cancel.void_addr());
 
-	GENDATA->CreateInstance(data.staticCountdown.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticCountdown);
+	GENDATA->CreateInstance(data.staticCountdown.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticCountdown.void_addr());
 
 	hookSystemEvent();
 

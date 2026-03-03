@@ -218,26 +218,26 @@ void Menu_campaign::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 
-	GENDATA->CreateInstance(data.staticName.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticName);
+	GENDATA->CreateInstance(data.staticName.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticName.void_addr());
 
-	GENDATA->CreateInstance(data.buttonTerran.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonTerran);
+	GENDATA->CreateInstance(data.buttonTerran.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonTerran.void_addr());
 
-	GENDATA->CreateInstance(data.buttonMantis.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonMantis);
+	GENDATA->CreateInstance(data.buttonMantis.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonMantis.void_addr());
 
-	GENDATA->CreateInstance(data.buttonSolarian.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonSolarian);
+	GENDATA->CreateInstance(data.buttonSolarian.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonSolarian.void_addr());
 
-	GENDATA->CreateInstance(data.buttonBack.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonBack);
+	GENDATA->CreateInstance(data.buttonBack.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonBack.void_addr());
 
 	setStateInfo();
 }

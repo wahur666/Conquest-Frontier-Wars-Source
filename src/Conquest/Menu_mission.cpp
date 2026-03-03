@@ -745,56 +745,56 @@ void Menu_mission::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 
-	GENDATA->CreateInstance(data.animSystem.animateType, pComp);
-	pComp->QueryInterface("IAnimate", animSystem);
+	GENDATA->CreateInstance(data.animSystem.animateType, pComp.addr());
+	pComp->QueryInterface("IAnimate", animSystem.void_addr());
 
-	GENDATA->CreateInstance(data.list.listboxType, pComp);
-	pComp->QueryInterface("IListbox", list);
+	GENDATA->CreateInstance(data.list.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", list.void_addr());
 //remove for final release!!!!
-	GENDATA->CreateInstance(data.start.buttonType, pComp);
-	pComp->QueryInterface("IButton2", start);
+	GENDATA->CreateInstance(data.start.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", start.void_addr());
 
-	GENDATA->CreateInstance(data.buttonUnlock.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonUnlock);
+	GENDATA->CreateInstance(data.buttonUnlock.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonUnlock.void_addr());
 //
-	GENDATA->CreateInstance(data.ok.buttonType, pComp);
-	pComp->QueryInterface("IButton2", ok);
+	GENDATA->CreateInstance(data.ok.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", ok.void_addr());
 
-	GENDATA->CreateInstance(data.cancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", cancel);
+	GENDATA->CreateInstance(data.cancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", cancel.void_addr());
 
-		GENDATA->CreateInstance(data.buttonBack.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonBack);
+		GENDATA->CreateInstance(data.buttonBack.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonBack.void_addr());
 
-	GENDATA->CreateInstance(data.staticMission.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMission);
+	GENDATA->CreateInstance(data.staticMission.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMission.void_addr());
 
-	GENDATA->CreateInstance(data.staticHolder.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticHolder);
+	GENDATA->CreateInstance(data.staticHolder.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticHolder.void_addr());
 
-	GENDATA->CreateInstance(data.staticMovie.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMovieHolder);
+	GENDATA->CreateInstance(data.staticMovie.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMovieHolder.void_addr());
 
-	GENDATA->CreateInstance(data.staticMissionTitle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMissionTitle);
+	GENDATA->CreateInstance(data.staticMissionTitle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMissionTitle.void_addr());
 
 	U32 i;
 	for (i = 0; i < NUM_MISSIONS_MAX; i++)
 	{
-		GENDATA->CreateInstance(data.buttonMissions[i].buttonType, pComp);
-		pComp->QueryInterface("IButton2", buttonMissions[i]);
+		GENDATA->CreateInstance(data.buttonMissions[i].buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", buttonMissions[i].void_addr());
 	}
 	// the movie buttons
 	for (i = 0; i < NUM_MOVIES_MAX; i++)
 	{
-		GENDATA->CreateInstance(data.buttonMovies[i].buttonType, pComp);
-		pComp->QueryInterface("IButton2", buttonMovies[i]);
+		GENDATA->CreateInstance(data.buttonMovies[i].buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", buttonMovies[i].void_addr());
 	}
 
 	hsndSelection = SFXMANAGER->Open(SFX::BUTTONPRESS2);

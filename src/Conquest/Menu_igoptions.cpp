@@ -237,32 +237,32 @@ void Menu_igoptions::init (void)
 
 	COMPTR<IDAComponent> pComp;
 	
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 
-	GENDATA->CreateInstance(data.buttonSave.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonSave);
+	GENDATA->CreateInstance(data.buttonSave.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonSave.void_addr());
 
-	GENDATA->CreateInstance(data.buttonLoad.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonLoad);
+	GENDATA->CreateInstance(data.buttonLoad.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonLoad.void_addr());
 
-	GENDATA->CreateInstance(data.buttonOptions.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonOptions);
+	GENDATA->CreateInstance(data.buttonOptions.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonOptions.void_addr());
 
-	GENDATA->CreateInstance(data.buttonRestart.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonRestart);
+	GENDATA->CreateInstance(data.buttonRestart.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonRestart.void_addr());
 
-	GENDATA->CreateInstance(data.buttonResign.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonResign);
+	GENDATA->CreateInstance(data.buttonResign.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonResign.void_addr());
 
-	GENDATA->CreateInstance(data.buttonAbdicate.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonAbdicate);
+	GENDATA->CreateInstance(data.buttonAbdicate.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonAbdicate.void_addr());
 
-	GENDATA->CreateInstance(data.buttonReturn.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonReturn);
+	GENDATA->CreateInstance(data.buttonReturn.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonReturn.void_addr());
 
 	resPriority = RES_PRIORITY_HIGH;
 	cursorID = IDC_CURSOR_ARROW;

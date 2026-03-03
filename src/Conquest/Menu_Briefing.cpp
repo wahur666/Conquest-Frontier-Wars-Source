@@ -222,7 +222,7 @@ U32 MenuBriefing::PlayAnimatedMessage (const CQBRIEFINGITEM & item)
 	// get the pointer to the animation in the message
 	if (bKeepCellImage[item.slotID] && streamID[item.slotID])
 	{
-		SOUNDMANAGER->GetAnimation(streamID[item.slotID], animUser[item.slotID]);
+		SOUNDMANAGER->GetAnimation(streamID[item.slotID], animUser[item.slotID].addr());
 		animUser[item.slotID]->SetLoopingAnimation(!item.bContinueAnimating);
 	}
 
@@ -245,9 +245,9 @@ U32 MenuBriefing::PlayAnimation (const CQBRIEFINGITEM & item)
 	COMPTR<IAnimate> anim;
 	ANIMATE_DATA adata;
 
-	if (GENDATA->CreateInstance(item.szTypeName, pComp) != GR_OK)
+	if (GENDATA->CreateInstance(item.szTypeName, pComp.addr()) != GR_OK)
 		goto Done;
-	if (pComp->QueryInterface("IAnimate", anim) != GR_OK)
+	if (pComp->QueryInterface("IAnimate", anim.void_addr()) != GR_OK)
 		goto Done;
 
 	checkFreeSlot(item.slotID);
@@ -307,7 +307,7 @@ void MenuBriefing::checkFreeSlot (U32 slotID)
 	if (animUser[slotID])
 	{
 		animUser[slotID]->DeferredDestruction();
-		animUser[slotID].ptr = 0;
+		animUser[slotID] = nullptr;
 	}
 }
 //----------------------------------------------------------------------------------//
@@ -337,7 +337,7 @@ void MenuBriefing::onUpdate (U32 dt)
 					if (animUser[i])
 					{
 						animUser[i]->DeferredDestruction();
-						animUser[i].ptr = 0;
+						animUser[i] = nullptr;
 					}
 				}
 			}
@@ -345,7 +345,7 @@ void MenuBriefing::onUpdate (U32 dt)
 			{
 				// end the animation
 				animUser[i]->DeferredDestruction();
-				animUser[i].ptr = 0;
+				animUser[i] = nullptr;
 			}
 
 			animFuzz[i]->SetVisible(streamID[i] == 0 && animUser[i]==0);
@@ -473,25 +473,25 @@ void MenuBriefing::init (void)
 
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 
-	GENDATA->CreateInstance(data.start.buttonType, pComp);
-	pComp->QueryInterface("IButton2", start);
+	GENDATA->CreateInstance(data.start.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", start.void_addr());
 
-	GENDATA->CreateInstance(data.replay.buttonType, pComp);
-	pComp->QueryInterface("IButton2", replay);
+	GENDATA->CreateInstance(data.replay.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", replay.void_addr());
 
-	GENDATA->CreateInstance(data.cancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", cancel);
+	GENDATA->CreateInstance(data.cancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", cancel.void_addr());
 
 	for (int i = 0; i < 4; i++)
 	{
-		GENDATA->CreateInstance(data.animFuzz[i].animateType, pComp);
-		pComp->QueryInterface("IAnimate", animFuzz[i]);
+		GENDATA->CreateInstance(data.animFuzz[i].animateType, pComp.addr());
+		pComp->QueryInterface("IAnimate", animFuzz[i].void_addr());
 	}
 
 	resPriority = RES_PRIORITY_HIGH;

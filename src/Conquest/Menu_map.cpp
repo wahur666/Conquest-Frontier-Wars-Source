@@ -28,7 +28,7 @@
 #include "NetBuffer.h"
 
 #include <wchar.h>
-#include <dplay.h>
+#include "directx2007aug/dplay.h"
 
 #define MT_RANDOM 11001
 #define MT_MULTI  11002
@@ -680,113 +680,113 @@ void Menu_map::init (void)
 	//
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.staticSpectator.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSpectator);
+	GENDATA->CreateInstance(data.staticSpectator.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSpectator.void_addr());
 	
-	GENDATA->CreateInstance(data.staticDiplomacy.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticDiplomacy);
+	GENDATA->CreateInstance(data.staticDiplomacy.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticDiplomacy.void_addr());
 
-	GENDATA->CreateInstance(data.pushSpectator.buttonType, pComp);
-	pComp->QueryInterface("IButton2", pushSpectator);
+	GENDATA->CreateInstance(data.pushSpectator.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", pushSpectator.void_addr());
 	
-	GENDATA->CreateInstance(data.pushDiplomacy.buttonType, pComp);
-	pComp->QueryInterface("IButton2", pushDiplomacy);
+	GENDATA->CreateInstance(data.pushDiplomacy.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", pushDiplomacy.void_addr());
 
-	GENDATA->CreateInstance(data.mapType.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonMapType);
+	GENDATA->CreateInstance(data.mapType.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonMapType.void_addr());
 
-	GENDATA->CreateInstance(data.staticGameType.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticGameType);
+	GENDATA->CreateInstance(data.staticGameType.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticGameType.void_addr());
 	
-	GENDATA->CreateInstance(data.staticSpeed.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSpeed);
+	GENDATA->CreateInstance(data.staticSpeed.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSpeed.void_addr());
 	
-	GENDATA->CreateInstance(data.staticMoney.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMoney);
+	GENDATA->CreateInstance(data.staticMoney.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMoney.void_addr());
 	
-	GENDATA->CreateInstance(data.staticUnits.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticUnits);
+	GENDATA->CreateInstance(data.staticUnits.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticUnits.void_addr());
 	
-	GENDATA->CreateInstance(data.staticMapType.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMapType);
+	GENDATA->CreateInstance(data.staticMapType.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMapType.void_addr());
 	
-	GENDATA->CreateInstance(data.staticSize.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSize);
+	GENDATA->CreateInstance(data.staticSize.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSize.void_addr());
 
-	GENDATA->CreateInstance(data.staticTerrain.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticTerrain);
+	GENDATA->CreateInstance(data.staticTerrain.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticTerrain.void_addr());
 
-	GENDATA->CreateInstance(data.staticSystems.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSystems);
+	GENDATA->CreateInstance(data.staticSystems.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSystems.void_addr());
 
-	GENDATA->CreateInstance(data.staticVisibility.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticVisibility);
+	GENDATA->CreateInstance(data.staticVisibility.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticVisibility.void_addr());
 
-	GENDATA->CreateInstance(data.staticBandwidth.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticBandwidth);
+	GENDATA->CreateInstance(data.staticBandwidth.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticBandwidth.void_addr());
 
-	GENDATA->CreateInstance(data.dropGameType.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", dropGameType);
+	GENDATA->CreateInstance(data.dropGameType.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", dropGameType.void_addr());
 
-	GENDATA->CreateInstance(data.dropMoney.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", dropMoney);
+	GENDATA->CreateInstance(data.dropMoney.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", dropMoney.void_addr());
 
-	GENDATA->CreateInstance(data.dropSize.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", dropSize);
+	GENDATA->CreateInstance(data.dropSize.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", dropSize.void_addr());
 	
-	GENDATA->CreateInstance(data.dropTerrain.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", dropTerrain);
+	GENDATA->CreateInstance(data.dropTerrain.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", dropTerrain.void_addr());
 
-	GENDATA->CreateInstance(data.dropVisibility.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", dropVisibility);
+	GENDATA->CreateInstance(data.dropVisibility.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", dropVisibility.void_addr());
 
-	GENDATA->CreateInstance(data.bandWidthOption.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", bandWidthOption);
+	GENDATA->CreateInstance(data.bandWidthOption.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", bandWidthOption.void_addr());
 
-	GENDATA->CreateInstance(data.dropUnits.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", dropUnits);
+	GENDATA->CreateInstance(data.dropUnits.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", dropUnits.void_addr());
 
-	GENDATA->CreateInstance(data.dropSystems.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", dropSystems);
+	GENDATA->CreateInstance(data.dropSystems.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", dropSystems.void_addr());
 
-	GENDATA->CreateInstance(data.sliderSpeed.sliderType, pComp);
-	pComp->QueryInterface("ISlider", sliderSpeed);
+	GENDATA->CreateInstance(data.sliderSpeed.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", sliderSpeed.void_addr());
 
-	GENDATA->CreateInstance(data.sliderCmdPoints.sliderType, pComp);
-	pComp->QueryInterface("ISlider", sliderCmdPoints);
+	GENDATA->CreateInstance(data.sliderCmdPoints.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", sliderCmdPoints.void_addr());
 
-	GENDATA->CreateInstance(data.staticLockSettings.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticLockSettings);
+	GENDATA->CreateInstance(data.staticLockSettings.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticLockSettings.void_addr());
 
-	GENDATA->CreateInstance(data.pushLockSettings.buttonType, pComp);
-	pComp->QueryInterface("IButton2", pushLockSettings);
+	GENDATA->CreateInstance(data.pushLockSettings.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", pushLockSettings.void_addr());
 
-	GENDATA->CreateInstance(data.pushEasy.buttonType, pComp);
-	pComp->QueryInterface("IButton2", pushEasy);
+	GENDATA->CreateInstance(data.pushEasy.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", pushEasy.void_addr());
 
-	GENDATA->CreateInstance(data.pushAverage.buttonType, pComp);
-	pComp->QueryInterface("IButton2", pushAverage);
+	GENDATA->CreateInstance(data.pushAverage.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", pushAverage.void_addr());
 
-	GENDATA->CreateInstance(data.pushHard.buttonType, pComp);
-	pComp->QueryInterface("IButton2", pushHard);
+	GENDATA->CreateInstance(data.pushHard.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", pushHard.void_addr());
 
-	GENDATA->CreateInstance(data.staticDifficulty.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticDifficulty);	
+	GENDATA->CreateInstance(data.staticDifficulty.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticDifficulty.void_addr());
 
-	GENDATA->CreateInstance(data.staticEasy.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticEasy);
+	GENDATA->CreateInstance(data.staticEasy.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticEasy.void_addr());
 
-	GENDATA->CreateInstance(data.staticAverage.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticAverage);
+	GENDATA->CreateInstance(data.staticAverage.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticAverage.void_addr());
 
-	GENDATA->CreateInstance(data.staticHard.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticHard);
+	GENDATA->CreateInstance(data.staticHard.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticHard.void_addr());
 
-	GENDATA->CreateInstance(data.staticCmdPoints.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticCmdPoints);
+	GENDATA->CreateInstance(data.staticCmdPoints.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticCmdPoints.void_addr());
 
-	GENDATA->CreateInstance(data.staticCmdPointsDisplay.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticCmdPointsDisplay);
+	GENDATA->CreateInstance(data.staticCmdPointsDisplay.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticCmdPointsDisplay.void_addr());
 
 	setStateInfo();
 	bInitialized = true;

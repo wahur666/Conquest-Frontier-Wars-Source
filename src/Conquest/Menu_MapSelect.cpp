@@ -204,35 +204,35 @@ void Menu_MapSelect::init (void)
 	//
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.staticBackground.staticType , pComp);
-	pComp->QueryInterface("IStatic", staticBackground);
+	GENDATA->CreateInstance(data.staticBackground.staticType , pComp.addr());
+	pComp->QueryInterface("IStatic", staticBackground.void_addr());
 
-	GENDATA->CreateInstance(data.staticTitle.staticType , pComp);
-	pComp->QueryInterface("IStatic", staticTitle);
+	GENDATA->CreateInstance(data.staticTitle.staticType , pComp.addr());
+	pComp->QueryInterface("IStatic", staticTitle.void_addr());
 
-	GENDATA->CreateInstance(data.staticRandom.staticType , pComp);
-	pComp->QueryInterface("IStatic", staticRandom);	
+	GENDATA->CreateInstance(data.staticRandom.staticType , pComp.addr());
+	pComp->QueryInterface("IStatic", staticRandom.void_addr());
 
-	GENDATA->CreateInstance(data.staticSupplied.staticType , pComp);
-	pComp->QueryInterface("IStatic", staticSupplied);	
+	GENDATA->CreateInstance(data.staticSupplied.staticType , pComp.addr());
+	pComp->QueryInterface("IStatic", staticSupplied.void_addr());
 
-	GENDATA->CreateInstance(data.staticSaved.staticType , pComp);
-	pComp->QueryInterface("IStatic", staticSaved);	
+	GENDATA->CreateInstance(data.staticSaved.staticType , pComp.addr());
+	pComp->QueryInterface("IStatic", staticSaved.void_addr());
 	
-	GENDATA->CreateInstance(data.listRandom.listboxType, pComp);
-	pComp->QueryInterface("IListbox", listRandom);
+	GENDATA->CreateInstance(data.listRandom.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", listRandom.void_addr());
 
-	GENDATA->CreateInstance(data.listSupplied.listboxType, pComp);
-	pComp->QueryInterface("IListbox", listSupplied);
+	GENDATA->CreateInstance(data.listSupplied.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", listSupplied.void_addr());
 
-	GENDATA->CreateInstance(data.listSaved.listboxType, pComp);
-	pComp->QueryInterface("IListbox", listSaved);
+	GENDATA->CreateInstance(data.listSaved.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", listSaved.void_addr());
 
-	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonOk);
+	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonOk.void_addr());
 
-	GENDATA->CreateInstance(data.buttonCancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonCancel);
+	GENDATA->CreateInstance(data.buttonCancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonCancel.void_addr());
 	
 	saveLoadDir = SAVEDIR;
 	suppliedDir = MPMAPDIR;

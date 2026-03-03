@@ -182,35 +182,35 @@ void Menu_help::init (void)
 	//
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 
-	GENDATA->CreateInstance(data.staticConquest.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticConquest);
+	GENDATA->CreateInstance(data.staticConquest.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticConquest.void_addr());
 
-	GENDATA->CreateInstance(data.staticVersion.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticVersion);
+	GENDATA->CreateInstance(data.staticVersion.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticVersion.void_addr());
 
-	GENDATA->CreateInstance(data.staticNumber.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticNumber);
+	GENDATA->CreateInstance(data.staticNumber.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticNumber.void_addr());
 
-	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonOk);
+	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonOk.void_addr());
 
-	GENDATA->CreateInstance(data.staticProductID.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticProductID);
+	GENDATA->CreateInstance(data.staticProductID.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticProductID.void_addr());
 
-	GENDATA->CreateInstance(data.staticProductNumber.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticProductNumber);
+	GENDATA->CreateInstance(data.staticProductNumber.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticProductNumber.void_addr());
 
-	GENDATA->CreateInstance(data.staticLegal.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticLegal);
+	GENDATA->CreateInstance(data.staticLegal.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticLegal.void_addr());
 
-	GENDATA->CreateInstance(data.buttonCredits.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonCredits);
+	GENDATA->CreateInstance(data.buttonCredits.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonCredits.void_addr());
 
 	setStateInfo();
 }

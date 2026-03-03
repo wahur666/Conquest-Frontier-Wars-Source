@@ -218,10 +218,10 @@ struct DACOM_NO_VTABLE MenuResource : public IMenuResource,
 
 	void missingDirDialog (const char * name, bool bFatal, const char *prependName=0);
 
-	static BOOL CALLBACK EditPathDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
-	static BOOL CALLBACK NetStressDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
-	static BOOL CALLBACK GameSpeedDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
-	static BOOL CALLBACK partDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static LRESULT CALLBACK EditPathDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK NetStressDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK GameSpeedDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK partDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 //--------------------------------------------------------------------------//
 //
@@ -235,9 +235,9 @@ MenuResource::~MenuResource (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
-	if (STATUS && STATUS->QueryOutgoingInterface("IResourceClient", connection) == GR_OK)
+	if (STATUS && STATUS->QueryOutgoingInterface("IResourceClient", connection.addr()) == GR_OK)
 		connection->Unadvise(statusHandle);
 
 	pPauseDlg = 0;	// has deleted itself by this point
@@ -685,7 +685,7 @@ GENRESULT MenuResource::Notify (U32 message, void *param)
 		switch (LOWORD(msg->wParam))
 		{
 		case IDM_EDIT_PATH:
-			if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+			if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow,  DLGPROC(EditPathDlgProc), (LPARAM) this))
 			{
 				DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 				while (updateLoadPath() == 0)
@@ -695,7 +695,7 @@ GENRESULT MenuResource::Notify (U32 message, void *param)
 
 		case IDM_GAME_SPEED:
 			{
-				int result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG6), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) GameSpeedDlgProc, (LPARAM) this);
+				int result = DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG6), hMainWindow, DLGPROC(GameSpeedDlgProc), (LPARAM) this);
 
 				if (result >= 0)
 				{
@@ -706,7 +706,7 @@ GENRESULT MenuResource::Notify (U32 message, void *param)
 
 		case IDM_NET_STRESS:
 			{
-				DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG1), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) NetStressDlgProc, (LPARAM) this);
+				DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG1), hMainWindow, DLGPROC(NetStressDlgProc), (LPARAM) this);
 			}
 			break;
 			
@@ -936,18 +936,18 @@ void MenuResource::TogglePreferences (U32 id)
 }
 //-------------------------------------------------------------------
 //
-BOOL MenuResource::EditPathDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT MenuResource::EditPathDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	MenuResource * menu = (MenuResource *) GetWindowLong(hwnd, DWL_USER);
+	MenuResource * menu = (MenuResource *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 	switch (message)
 	{
 	case WM_INITDIALOG:
 		{
 			HWND hEdit = GetDlgItem(hwnd, IDC_EDIT1);
-			SetWindowLong(hwnd, DWL_USER, lParam);
-			menu = (MenuResource *) GetWindowLong(hwnd, DWL_USER);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+			menu = (MenuResource *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 			SendMessage(hEdit, EM_SETLIMITTEXT, MAX_PATH-1, 0);
 			SetWindowText(hEdit, menu->dataPath);
@@ -975,10 +975,10 @@ BOOL MenuResource::EditPathDlgProc (HWND hwnd, UINT message, UINT wParam, LONG l
 }
 //--------------------------------------------------------------------------//
 //
-BOOL MenuResource::NetStressDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT MenuResource::NetStressDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	MenuResource * menu = (MenuResource *) GetWindowLong(hwnd, DWL_USER);
+	MenuResource * menu = (MenuResource *) GetWindowLongPtr(hwnd, DWLP_USER);
 	NM_UPDOWN * pnmud;
 
 	switch (message)
@@ -986,8 +986,8 @@ BOOL MenuResource::NetStressDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 	case WM_INITDIALOG:
 		{
 			HWND hItem;
-			SetWindowLong(hwnd, DWL_USER, lParam);
-			menu = (MenuResource *) GetWindowLong(hwnd, DWL_USER);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+			menu = (MenuResource *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 			SetDlgItemInt(hwnd, IDC_EDIT1, DEFAULTS->GetDefaults()->minLatency, 0);
 			hItem = GetDlgItem(hwnd, IDC_SPIN1);
@@ -1006,7 +1006,7 @@ BOOL MenuResource::NetStressDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 		if (pnmud->hdr.code == UDN_DELTAPOS && pnmud->hdr.idFrom==IDC_SPIN1)
 		{
 			if (pnmud->iPos < 100 && pnmud->iDelta<0)
-				SetWindowLong(hwnd, DWL_MSGRESULT, 1);		// ignore this user click
+				SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 1);		// ignore this user click
 			else
 			if (pnmud->iDelta < 0)
 				pnmud->iDelta = -100;
@@ -1018,7 +1018,7 @@ BOOL MenuResource::NetStressDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 		if (pnmud->hdr.code == UDN_DELTAPOS && pnmud->hdr.idFrom==IDC_SPIN2)
 		{
 			if (pnmud->iPos < 1 && pnmud->iDelta<0)
-				SetWindowLong(hwnd, DWL_MSGRESULT, 1);		// ignore this user click
+				SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 1);		// ignore this user click
 			else
 			if (pnmud->iDelta < 0)
 				pnmud->iDelta = -1;
@@ -1030,7 +1030,7 @@ BOOL MenuResource::NetStressDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 		if (pnmud->hdr.code == UDN_DELTAPOS && pnmud->hdr.idFrom==IDC_SPIN3)
 		{
 			if (pnmud->iPos <= 1000 && pnmud->iDelta<0)
-				SetWindowLong(hwnd, DWL_MSGRESULT, 1);		// ignore this user click
+				SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 1);		// ignore this user click
 			else
 			if (pnmud->iDelta < 0)
 				pnmud->iDelta = -1000;
@@ -1064,10 +1064,10 @@ BOOL MenuResource::NetStressDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 }
 //--------------------------------------------------------------------------//
 //
-BOOL MenuResource::GameSpeedDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT MenuResource::GameSpeedDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	MenuResource * menu = (MenuResource *) GetWindowLong(hwnd, DWL_USER);
+	MenuResource * menu = (MenuResource *) GetWindowLongPtr(hwnd, DWLP_USER);
 	NM_UPDOWN * pnmud;
 
 	switch (message)
@@ -1075,8 +1075,8 @@ BOOL MenuResource::GameSpeedDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 	case WM_INITDIALOG:
 		{
 			HWND hItem;
-			SetWindowLong(hwnd, DWL_USER, lParam);
-			menu = (MenuResource *) GetWindowLong(hwnd, DWL_USER);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+			menu = (MenuResource *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 			SetDlgItemInt(hwnd, IDC_EDIT1, DEFAULTS->GetDefaults()->gameSpeed, 1);
 			hItem = GetDlgItem(hwnd, IDC_SPIN1);
@@ -1110,7 +1110,7 @@ BOOL MenuResource::GameSpeedDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 		if (pnmud->hdr.code == UDN_DELTAPOS && pnmud->hdr.idFrom==IDC_SPIN1)
 		{
 			if (pnmud->iPos <= -MAX_GAME_SPEED && pnmud->iDelta<0)
-				SetWindowLong(hwnd, DWL_MSGRESULT, 1);		// ignore this user click
+				SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 1);		// ignore this user click
 			else
 			if (pnmud->iDelta < 0)
 				pnmud->iDelta = -1;
@@ -1237,7 +1237,7 @@ bool MenuResource::updateLoadPath (void)
 
 	if (searchPath==0)
 	{
-		if (DACOM->CreateInstance(&sdesc, searchPath) != GR_OK)
+		if (DACOM->CreateInstance(&sdesc, searchPath.void_addr()) != GR_OK)
 			CQBOMB0("Could not create searchPath object");
 	}
 
@@ -1290,7 +1290,7 @@ bool MenuResource::updateLoadPath (void)
 	{
 #ifndef FINAL_RELEASE
 		missingDirDialog(buffer, false);
-		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, DLGPROC(EditPathDlgProc), (LPARAM) this))
 		{
 			DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 			goto Done;
@@ -1310,7 +1310,7 @@ bool MenuResource::updateLoadPath (void)
 	{
 #ifndef FINAL_RELEASE
 		missingDirDialog(buffer, false);
-		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, DLGPROC(EditPathDlgProc), (LPARAM) this))
 		{
 			DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 			goto Done;
@@ -1329,7 +1329,7 @@ bool MenuResource::updateLoadPath (void)
 	{
 #ifndef FINAL_RELEASE
 		missingDirDialog(buffer, false);
-		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow,  DLGPROC(EditPathDlgProc), (LPARAM) this))
 		{
 			DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 			goto Done;
@@ -1348,7 +1348,7 @@ bool MenuResource::updateLoadPath (void)
 	{
 #ifndef FINAL_RELEASE
 		missingDirDialog(buffer, false);
-		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, DLGPROC(EditPathDlgProc), (LPARAM) this))
 		{
 			DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 			goto Done;
@@ -1367,7 +1367,7 @@ bool MenuResource::updateLoadPath (void)
 	{
 #ifndef FINAL_RELEASE
 		missingDirDialog(buffer, false);
-		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+		if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, DLGPROC(EditPathDlgProc), (LPARAM) this))
 		{
 			DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 			goto Done;
@@ -1384,11 +1384,11 @@ bool MenuResource::updateLoadPath (void)
 	
 		strcpy(buffer, "Maps");
 
-		if (searchPath->CreateInstance(&fdesc, mapsDir) != GR_OK)
+		if (searchPath->CreateInstance(&fdesc, mapsDir.void_addr()) != GR_OK)
 		{
 #ifndef FINAL_RELEASE
 			missingDirDialog(buffer, false);
-			if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+			if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, DLGPROC(EditPathDlgProc), (LPARAM) this))
 			{
 				DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 				goto Done;
@@ -1404,7 +1404,7 @@ bool MenuResource::updateLoadPath (void)
 		{
 #ifndef FINAL_RELEASE
 			missingDirDialog(buffer, false, "Maps\\");
-			if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+			if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, DLGPROC(EditPathDlgProc), (LPARAM) this))
 			{
 				DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 				goto Done;
@@ -1420,7 +1420,7 @@ bool MenuResource::updateLoadPath (void)
 		{
 #ifndef FINAL_RELEASE
 			missingDirDialog(buffer, false, "Maps\\");
-			if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) EditPathDlgProc, (LPARAM) this))
+			if (DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG3), hMainWindow, DLGPROC(EditPathDlgProc), (LPARAM) this))
 			{
 				DEFAULTS->SetStringInRegistry(DATA_PATH, dataPath);
 				goto Done;
@@ -1527,9 +1527,9 @@ void MenuResource::toggleNetPause (int bPause)
 //
 //----------------------------------------------------------------------------
 //
-static LONG CALLBACK listControlProcedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
+static LONG CALLBACK listControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
- 	WNDPROC oldProc = (WNDPROC) GetWindowLong(hwnd, GWL_USERDATA);
+ 	WNDPROC oldProc = (WNDPROC) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 	switch (message)
 	{
@@ -1544,7 +1544,7 @@ static LONG CALLBACK listControlProcedure(HWND hwnd, UINT message, UINT wParam, 
 			break;
 	}
 
-	return CallWindowProc((long (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long))oldProc, hwnd, message, wParam, lParam);
+	return CallWindowProc(oldProc, hwnd, message, wParam, lParam);
 }
 //--------------------------------------------------------------------------//
 //
@@ -1557,26 +1557,26 @@ struct partDlgSaveStruct : WINDOWPLACEMENT
 };
 //--------------------------------------------------------------------------//
 //
-BOOL MenuResource::partDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT MenuResource::partDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	MenuResource * menu = (MenuResource *) GetWindowLong(hwnd, DWL_USER);
+	MenuResource * menu = (MenuResource *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 	switch (message)
 	{
 	case WM_INITDIALOG:
 		{
-			SetWindowLong(hwnd, DWL_USER, lParam);
-			menu = (MenuResource *) GetWindowLong(hwnd, DWL_USER);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+			menu = (MenuResource *) GetWindowLongPtr(hwnd, DWLP_USER);
 			
 			HWND hList = GetDlgItem(hwnd, IDC_LIST1);
 			WNDPROC oldProc;
 			partDlgSaveStruct loadStruct;
 
-			if ((oldProc = (WNDPROC) GetWindowLong(hList, GWL_WNDPROC)) != 0)
+			if ((oldProc = (WNDPROC) GetWindowLongPtr(hList, GWLP_WNDPROC)) != 0)
 			{
-				SetWindowLong(hList, GWL_USERDATA, (LONG) oldProc);
-				SetWindowLong(hList, GWL_WNDPROC, (LONG) listControlProcedure);
+				SetWindowLongPtr(hList, GWLP_USERDATA, (LONG) oldProc);
+				SetWindowLongPtr(hList, GWLP_WNDPROC, (LONG) listControlProcedure);
 			}
 
 			if (DEFAULTS->GetDataFromRegistry("partsDialog", &loadStruct, sizeof(loadStruct)) == sizeof(loadStruct))
@@ -1598,7 +1598,7 @@ BOOL MenuResource::partDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lPara
 			HMENU hMenu = (HMENU) wParam;
 			::EnableMenuItem(hMenu, SC_MAXIMIZE, MF_BYCOMMAND|MF_GRAYED); 
 			::EnableMenuItem(hMenu, SC_SIZE, MF_BYCOMMAND|MF_GRAYED); 
-			SetWindowLong(hwnd, DWL_MSGRESULT, 0);
+			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 0);
 			result = 1;
 		}
 		break;
@@ -1689,13 +1689,13 @@ struct _menu : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(MENU, &menu->eventHandle);
 			FULLSCREEN->SetCallbackPriority(menu, EVENT_PRIORITY_MENU);
 		}
 
-		if (STATUS->QueryOutgoingInterface("IResourceClient", connection) == GR_OK)
+		if (STATUS->QueryOutgoingInterface("IResourceClient", connection.addr()) == GR_OK)
 			connection->Advise(MENU, &menu->statusHandle);
 	}
 };

@@ -217,23 +217,23 @@ void Menu_CQMessageBox::init (void)
 	data = 	*((const GT_MESSAGEBOX *) GENDATA->GetArchetypeData("CQMessageBox"));
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 
-	GENDATA->CreateInstance(data.message.staticType, pComp);
-	pComp->QueryInterface("IStatic", message);
+	GENDATA->CreateInstance(data.message.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", message.void_addr());
 
-	GENDATA->CreateInstance(data.ok.buttonType, pComp);
-	pComp->QueryInterface("IButton2", ok);
+	GENDATA->CreateInstance(data.ok.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", ok.void_addr());
 
-	GENDATA->CreateInstance(data.cancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", cancel);
+	GENDATA->CreateInstance(data.cancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", cancel.void_addr());
 
-	GENDATA->CreateInstance(data.okAlone.buttonType, pComp);
-	pComp->QueryInterface("IButton2", okAlone);
+	GENDATA->CreateInstance(data.okAlone.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", okAlone.void_addr());
 }
 //--------------------------------------------------------------------------//
 //
