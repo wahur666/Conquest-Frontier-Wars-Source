@@ -61,13 +61,6 @@ private:
 	// verify that instance is allocated on the stack
 	void verify (void)
 	{
-#ifdef _DEBUG
-		U32 stack;
-
-		__asm mov stack, esp
-
-		CQASSERT(U32(this) - stack < 8196);
-#endif
 	}
 	
 	void init (IBaseObject * object)

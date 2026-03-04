@@ -29,8 +29,8 @@
 #include "MusicManager.h"
 #include "InprogressAnim.h"
 
-#include <dplay.h>
-#include <dplobby.h>
+#include <directx2007aug/dplay.h>
+#include <directx2007aug/dplobby.h>
 #include "ZoneLobby.h"
 #include <stdio.h>
 
@@ -237,7 +237,7 @@ void Menu_nl::init (void)
 	CURSOR->SetBusy(true);
 	ChangeInterfaceRes(IR_IN_GAME_RESOLUTION);
 
-	MISSION->StartProgressAnim(pIPAnim);
+	MISSION->StartProgressAnim(pIPAnim.addr());
 
 	MUSICMANAGER->PlayMusic("Battle_loading.wav", false);
 	

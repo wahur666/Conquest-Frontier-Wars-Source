@@ -28,7 +28,7 @@
 #include "UserDefaults.h"
 #include "MusicManager.h"
 
-#include <dplobby.h>
+#include <directx2007aug/dplobby.h>
 #include "ZoneLobby.h"
 
 #define MAX_PLAYER_CHAR 32
@@ -346,7 +346,7 @@ void Menu_sess::getNameFromRegistry (IEdit2 * edit, U32 id)
 	int i;
 	COMPTR<IListbox> list;
 
-	edit->QueryInterface("IListbox", list);
+	edit->QueryInterface("IListbox", list.void_addr());
 
 	for (i = 0; i < 4; i++)
 	{
@@ -430,35 +430,35 @@ void Menu_sess::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
-	GENDATA->CreateInstance(data.description.staticType, pComp);
-	pComp->QueryInterface("IStatic", description);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
+	GENDATA->CreateInstance(data.description.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", description.void_addr());
 	
-	GENDATA->CreateInstance(data.enterIP.staticType, pComp);
-	pComp->QueryInterface("IStatic", enterIP);
-	GENDATA->CreateInstance(data.enterName.staticType, pComp);
-	pComp->QueryInterface("IStatic", enterName);
+	GENDATA->CreateInstance(data.enterIP.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", enterIP.void_addr());
+	GENDATA->CreateInstance(data.enterName.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", enterName.void_addr());
 
-	GENDATA->CreateInstance(data.staticName.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticName);
-	GENDATA->CreateInstance(data.staticCreate.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticCreate);
-	GENDATA->CreateInstance(data.staticJoin.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticJoin);
+	GENDATA->CreateInstance(data.staticName.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticName.void_addr());
+	GENDATA->CreateInstance(data.staticCreate.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticCreate.void_addr());
+	GENDATA->CreateInstance(data.staticJoin.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticJoin.void_addr());
 
-	GENDATA->CreateInstance(data.comboboxIP.comboboxType, pComp);
-	pComp->QueryInterface("ICombobox", comboboxIP);
+	GENDATA->CreateInstance(data.comboboxIP.comboboxType, pComp.addr());
+	pComp->QueryInterface("ICombobox", comboboxIP.void_addr());
 
-	GENDATA->CreateInstance(data.checkJoin.buttonType, pComp);
-	pComp->QueryInterface("IButton2", checkJoin);
-	GENDATA->CreateInstance(data.checkCreate.buttonType, pComp);
-	pComp->QueryInterface("IButton2", checkCreate);
+	GENDATA->CreateInstance(data.checkJoin.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", checkJoin.void_addr());
+	GENDATA->CreateInstance(data.checkCreate.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", checkCreate.void_addr());
 
-	GENDATA->CreateInstance(data.next.buttonType, pComp);
-	pComp->QueryInterface("IButton2", next);
-	GENDATA->CreateInstance(data.back.buttonType, pComp);
-	pComp->QueryInterface("IButton2", back);
+	GENDATA->CreateInstance(data.next.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", next.void_addr());
+	GENDATA->CreateInstance(data.back.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", back.void_addr());
 
 	setStateInfo();
 

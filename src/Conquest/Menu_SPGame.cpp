@@ -213,29 +213,29 @@ void Menu_SPGame::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.staticSingle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSingle);
+	GENDATA->CreateInstance(data.staticSingle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSingle.void_addr());
 
-	GENDATA->CreateInstance(data.staticName.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticName);
+	GENDATA->CreateInstance(data.staticName.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticName.void_addr());
 
-	GENDATA->CreateInstance(data.buttonCampaign.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonCampaign);
+	GENDATA->CreateInstance(data.buttonCampaign.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonCampaign.void_addr());
 
-	GENDATA->CreateInstance(data.buttonSkirmish.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonSkirmish);
+	GENDATA->CreateInstance(data.buttonSkirmish.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonSkirmish.void_addr());
 
-	GENDATA->CreateInstance(data.buttonLoad.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonLoad);
+	GENDATA->CreateInstance(data.buttonLoad.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonLoad.void_addr());
 
-	GENDATA->CreateInstance(data.buttonQBLoad.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonQBLoad);
+	GENDATA->CreateInstance(data.buttonQBLoad.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonQBLoad.void_addr());
 
-	GENDATA->CreateInstance(data.buttonBack.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonBack);
+	GENDATA->CreateInstance(data.buttonBack.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonBack.void_addr());
 
 	setStateInfo();
 }

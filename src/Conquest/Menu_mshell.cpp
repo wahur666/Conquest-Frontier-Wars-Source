@@ -30,8 +30,8 @@
 #include "MusicManager.h"
 
 #include <stdio.h>
-#include <dplay.h>
-#include <dplobby.h>
+#include "directx2007aug/dplay.h"
+#include "directx2007aug/dplobby.h"
 #include "zonelobby.h"
 
 #define CHATMSGSIZE 128
@@ -96,7 +96,7 @@ struct GRCHAT_PACKET : GR_PACKET
 };
 //--------------------------------------------------------------------------//
 //
-struct Menu_mshell : public DAComponent<Frame>, ICQGame
+struct Menu_mshell : public DAComponentX<Frame>, ICQGame
 {
 	//
 	// data items
@@ -702,23 +702,23 @@ void Menu_mshell::init (void)
 	//
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 	
-	GENDATA->CreateInstance(data.ipaddress.staticType, pComp);
-	pComp->QueryInterface("IStatic", ipaddress);
+	GENDATA->CreateInstance(data.ipaddress.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", ipaddress.void_addr());
 
-	GENDATA->CreateInstance(data.enterChat.staticType, pComp);
-	pComp->QueryInterface("IStatic", enterChat);
+	GENDATA->CreateInstance(data.enterChat.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", enterChat.void_addr());
 
-	GENDATA->CreateInstance(data.editChat.editType, pComp);
-	pComp->QueryInterface("IEdit2", editChat);
+	GENDATA->CreateInstance(data.editChat.editType, pComp.addr());
+	pComp->QueryInterface("IEdit2", editChat.void_addr());
 
-	GENDATA->CreateInstance(data.listChat.listboxType, pComp);
-	pComp->QueryInterface("IListbox", listChat);
+	GENDATA->CreateInstance(data.listChat.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", listChat.void_addr());
 
 	editChat->SetControlID(EDIT_CHAT_ID);
 	editChat->SetMaxChars(CHATMSGSIZE);
@@ -849,7 +849,7 @@ void Menu_mshell::uploadZoneInfo (void)
 			}
 		}
 
-		ZONESCORE->SetGameOptions(0, "TODO: Make a Localized game description here!");
+		ZONESCORE->SetGameOptions(0, LPSTR("TODO: Make a Localized game description here!"));
 		ZONESCORE->SendGameOptions(DPLOBBY);
 	}
 	MISSION->SetInitialCheatState();

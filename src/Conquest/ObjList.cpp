@@ -674,11 +674,22 @@ struct DACOM_NO_VTABLE ObjectList : public IObjectList,
 	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
 	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
 	END_DACOM_MAP()
-
-	BEGIN_DACOM_MAP_OUTBOUND(ObjectList)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IEventCallback", point)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IObjectFactory", point2)
-	END_DACOM_MAP()
+	
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"IEventCallback", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<ObjectList*>(self);
+				IDAConnectionPoint* cp = &doc->point;
+				return cp;
+			}},
+			{"IObjectFactory", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<ObjectList*>(self);
+				IDAConnectionPoint* cp = &doc->point2;
+				return cp;
+			}}
+		};
+		return entriesOut;
+	}
 
 	ConnectionPoint<ObjectList,IEventCallback> point;
 	ConnectionPoint<ObjectList,IObjectFactory> point2;

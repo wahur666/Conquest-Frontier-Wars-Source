@@ -13,6 +13,10 @@
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
+#include "TSmartPointer.h"
+#include "IConnection.h"
+#include "HeapObj.h"
+
 #ifndef IRESOURCE_H
 #include "IResource.h"
 #endif

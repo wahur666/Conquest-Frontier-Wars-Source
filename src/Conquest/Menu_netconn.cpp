@@ -45,7 +45,7 @@ U32 __stdcall DoMenu_zone (Frame * parent, const GT_MENU1 & data);
 #define SESSFLAG_2PLAYER  0x00000010
 //--------------------------------------------------------------------------//
 //
-struct Menu_nc : public DAComponent<Frame>
+struct Menu_nc : public DAComponentX<Frame>
 {
 	//
 	// data items
@@ -466,29 +466,29 @@ void Menu_nc::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.description.staticType, pComp);
-	pComp->QueryInterface("IStatic", description);
+	GENDATA->CreateInstance(data.description.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", description.void_addr());
 
-	GENDATA->CreateInstance(data.list.listboxType, pComp);
-	pComp->QueryInterface("IListbox", list);
+	GENDATA->CreateInstance(data.list.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", list.void_addr());
 
-	GENDATA->CreateInstance(data.next.buttonType, pComp);
-	pComp->QueryInterface("IButton2", next);
+	GENDATA->CreateInstance(data.next.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", next.void_addr());
 
-	GENDATA->CreateInstance(data.back.buttonType, pComp);
-	pComp->QueryInterface("IButton2", back);
+	GENDATA->CreateInstance(data.back.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", back.void_addr());
 
-	GENDATA->CreateInstance(data.buttonZone.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonZone);
+	GENDATA->CreateInstance(data.buttonZone.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonZone.void_addr());
 
-	GENDATA->CreateInstance(data.buttonWeb.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonWeb);
+	GENDATA->CreateInstance(data.buttonWeb.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonWeb.void_addr());
 
-	GENDATA->CreateInstance(data.staticTitle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticTitle);
+	GENDATA->CreateInstance(data.staticTitle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticTitle.void_addr());
 
 	initNet();
 

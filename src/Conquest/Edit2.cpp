@@ -202,7 +202,7 @@ struct DACOM_NO_VTABLE Edit2 : BaseHotRect, IEdit2, IKeyboardFocus
 		bTransparent = _bTransparent;
 	}
 
-	virtual void SetIgnoreChars (wchar_t * ignoreChars)	// don't allow ignore characters to show up in edit control
+	virtual void SetIgnoreChars (const wchar_t * ignoreChars)	// don't allow ignore characters to show up in edit control
 	{
 		if (ignoreChars != NULL)
 		{
@@ -1426,7 +1426,7 @@ BOOL32 EditFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT EditFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	EDITTYPE * type = (EDITTYPE *) hArchetype;
-	Edit2 * result = new DAComponent<Edit2>;
+	Edit2 * result = new DAComponentX<Edit2>;
 
 	result->init(type);
 	*pInstance = result->getBase();

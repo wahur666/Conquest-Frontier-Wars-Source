@@ -24,7 +24,7 @@
 #include "Startup.h"
 #include "CQTrace.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
 #include <TConnPoint.h>
@@ -32,7 +32,8 @@
 #include <FileSys.h>
 #include <EventSys2.h>
 #include <MemFile.h>
-#include <dplobby.h>
+#include <span>
+#include <directx2007aug/dplobby.h>
 
 #pragma warning (disable : 4200)
 
@@ -158,16 +159,39 @@ struct DACOM_NO_VTABLE FileTransfer : public IFileTransfer,
 											 ConnectionPointContainer<FileTransfer>,
 											 IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(FileTransfer)
-	DACOM_INTERFACE_ENTRY(IFileTransfer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIFileTransfer(void* self) {
+	    return static_cast<IFileTransfer*>(
+	        static_cast<FileTransfer*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<FileTransfer*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<FileTransfer*>(self));
+	}
 
-	BEGIN_DACOM_MAP_OUTBOUND(FileTransfer)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("IFileTransferCallback", point)
-	END_DACOM_MAP()
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IFileTransfer",                 &GetIFileTransfer},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"IFileTransferCallback", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<FileTransfer*>(self);
+				IDAConnectionPoint* cp = &doc->point;
+				return cp;
+			}}
+		};
+		return entriesOut;
+	}
 
 	ConnectionPoint<FileTransfer,IFileTransferCallback> point;
 
@@ -275,7 +299,7 @@ FileTransfer::~FileTransfer (void)
 
 	reset();
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 }
 //--------------------------------------------------------------------------//
@@ -884,18 +908,15 @@ void FileTransfer::fillBuffer (FTCHANNEL * ftchannel)
 {
 	COMPTR<IFileSystem> file;
 	DAFILEDESC fdesc = ftchannel->fileName;
-	CONNECTION_NODE<IFileTransferCallback> * pNode = point.pClientList;
 	DWORD dwRead;
-
-	while (pNode)
-	{
-		if (pNode->client->RemoteFileRequest(fdesc.lpFileName, file) == GR_OK)
+	for (auto* client : point.clients) {
+		if (client->RemoteFileRequest(fdesc.lpFileName, file.addr()) == GR_OK) {
 			break;
-		pNode = pNode->pNext;
+		}
 	}
 
 	fdesc.lpImplementation = "DOS";
-	if (file != 0 || DACOM->CreateInstance(&fdesc, file) == GR_OK)
+	if (file != 0 || DACOM->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 	{
 		if ((ftchannel->fileSize = file->GetFileSize()) != 0)
 		{
@@ -957,7 +978,7 @@ void FileTransfer::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &eventHandle);
 }
 //----------------------------------------------------------------------------//
@@ -969,7 +990,7 @@ struct _netftp : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		FILETRANSFER = ftp = new DAComponent<FileTransfer>;
+		FILETRANSFER = ftp = new DAComponentX<FileTransfer>;
 		AddToGlobalCleanupList((IDAComponent **) &FILETRANSFER);
 	}
 

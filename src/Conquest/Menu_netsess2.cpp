@@ -25,7 +25,7 @@
 #include "CQGame.h"
 #include "MusicManager.h"
 
-#include <dplobby.h>
+#include <directx2007aug/dplobby.h>
 #include <stdio.h>
 
 using namespace CQGAMETYPES;
@@ -313,41 +313,41 @@ void Menu_sess2::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.description.staticType, pComp);
-	pComp->QueryInterface("IStatic", description);
+	GENDATA->CreateInstance(data.description.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", description.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 	
-	GENDATA->CreateInstance(data.version.staticType, pComp);
-	pComp->QueryInterface("IStatic", version);
+	GENDATA->CreateInstance(data.version.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", version.void_addr());
 
-	GENDATA->CreateInstance(data.list.listboxType, pComp);
-	pComp->QueryInterface("IListbox", list);
+	GENDATA->CreateInstance(data.list.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", list.void_addr());
 	
-	GENDATA->CreateInstance(data.next.buttonType, pComp);
-	pComp->QueryInterface("IButton2", next);	
+	GENDATA->CreateInstance(data.next.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", next.void_addr());
 	
-	GENDATA->CreateInstance(data.back.buttonType, pComp);
-	pComp->QueryInterface("IButton2", back);
+	GENDATA->CreateInstance(data.back.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", back.void_addr());
 
-	GENDATA->CreateInstance(data.staticGame.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticGame);
+	GENDATA->CreateInstance(data.staticGame.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticGame.void_addr());
 
-	GENDATA->CreateInstance(data.staticPlayers.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticPlayers);
+	GENDATA->CreateInstance(data.staticPlayers.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticPlayers.void_addr());
 
-	GENDATA->CreateInstance(data.staticSpeed.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSpeed);
+	GENDATA->CreateInstance(data.staticSpeed.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSpeed.void_addr());
 
-	GENDATA->CreateInstance(data.staticMap.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMap);
+	GENDATA->CreateInstance(data.staticMap.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMap.void_addr());
 
-	GENDATA->CreateInstance(data.staticResources.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticResources);
+	GENDATA->CreateInstance(data.staticResources.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticResources.void_addr());
 
 	currentSelection = -1;
 	timer = (sessionFlags & SESSFLAG_LAN) ? 1000 : 5000;		

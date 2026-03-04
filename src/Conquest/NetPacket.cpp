@@ -37,8 +37,8 @@
 #include "DBHotkeys.h"
 #endif
 
-#include <dplobby.h>
-#include <dplay.h>
+#include <directx2007aug/dplobby.h>
+#include <directx2007aug/dplay.h>
 
 #include <stdio.h>
 
@@ -2349,7 +2349,7 @@ void NetPacket::sendHostPendAck (U32 dpid)
 //
 void NetPacket::on3DEnable (bool bEnable)
 {
-	CreateDrawAgent("TurtleNet.bmp", TEXTURESDIR, DA::BMP, 0, turtleShape);
+	CreateDrawAgent("TurtleNet.bmp", TEXTURESDIR, DA::BMP, 0, turtleShape.addr());
 }
 //----------------------------------------------------------------------------------
 //
@@ -2365,7 +2365,7 @@ void NetPacket::init (void)	// called once at startup
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &eventHandle);
 }
 //----------------------------------------------------------------------------------

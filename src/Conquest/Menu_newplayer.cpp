@@ -191,23 +191,23 @@ void Menu_newplayer::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 
-	GENDATA->CreateInstance(data.staticHeading.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticHeading);
+	GENDATA->CreateInstance(data.staticHeading.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticHeading.void_addr());
 
-	GENDATA->CreateInstance(data.edit.editType, pComp);
-	pComp->QueryInterface("IEdit2", edit);
+	GENDATA->CreateInstance(data.edit.editType, pComp.addr());
+	pComp->QueryInterface("IEdit2", edit.void_addr());
 
-	GENDATA->CreateInstance(data.ok.buttonType, pComp);
-	pComp->QueryInterface("IButton2", ok);
+	GENDATA->CreateInstance(data.ok.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", ok.void_addr());
 
-	GENDATA->CreateInstance(data.cancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", cancel);
+	GENDATA->CreateInstance(data.cancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", cancel.void_addr());
 }
 //--------------------------------------------------------------------------//
 //

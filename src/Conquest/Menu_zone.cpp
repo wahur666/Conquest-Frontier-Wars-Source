@@ -22,7 +22,7 @@
 #include <DMenu1.h>
 #include "NetConnectBuffers.h"
 
-#include <dplobby.h>
+#include <directx2007aug/dplobby.h>
 #include <shellapi.h>
 
 #define ZONE_QUIT 10 //also defined in menu1.cpp
@@ -208,8 +208,8 @@ void Menu_zone::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.description.staticType, pComp);
-	pComp->QueryInterface("IStatic", description);
+	GENDATA->CreateInstance(data.description.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", description.void_addr());
 	
 	setStateInfo();
 

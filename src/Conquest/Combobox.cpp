@@ -24,7 +24,7 @@
 #include "DrawAgent.h"
 //#include "Hotkeys.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 
@@ -35,16 +35,48 @@ struct DACOM_NO_VTABLE Combobox : BaseHotRect, ICombobox, IKeyboardFocus, IListb
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Combobox)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IListbox)
-	DACOM_INTERFACE_ENTRY(ICombobox)
-	DACOM_INTERFACE_ENTRY(IEdit2)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IKeyboardFocus)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Combobox*>(self));
+	}
+	static IDAComponent* GetIListbox(void* self) {
+	    return static_cast<IListbox*>(
+	        static_cast<Combobox*>(self));
+	}
+	static IDAComponent* GetICombobox(void* self) {
+	    return static_cast<ICombobox*>(
+	        static_cast<Combobox*>(self));
+	}
+	static IDAComponent* GetIEdit2(void* self) {
+	    return static_cast<IEdit2*>(
+	        static_cast<Combobox*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Combobox*>(self));
+	}
+	static IDAComponent* GetIKeyboardFocus(void* self) {
+	    return static_cast<IKeyboardFocus*>(
+	        static_cast<Combobox*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Combobox*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IListbox",                      &GetIListbox},
+	        {"ICombobox",                     &GetICombobox},
+	        {"IEdit2",                        &GetIEdit2},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IKeyboardFocus",                &GetIKeyboardFocus},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -113,7 +145,7 @@ struct DACOM_NO_VTABLE Combobox : BaseHotRect, ICombobox, IKeyboardFocus, IListb
 		edit->SetTransparentBehavior(bTransparent);
 	}
 
-	virtual void SetIgnoreChars (wchar_t * ignoreChars)
+	virtual void SetIgnoreChars (const wchar_t * ignoreChars)
 	{
 		edit->SetIgnoreChars(ignoreChars);
 	}
@@ -855,9 +887,17 @@ struct DACOM_NO_VTABLE ComboboxFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ComboboxFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<ComboboxFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	ComboboxFactory (void) { }
 
@@ -936,7 +976,7 @@ GENRESULT ComboboxFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pI
 {
 	CQASSERT(hArchetype == (HANDLE)1);
 
-	Combobox * result = new DAComponent<Combobox>;
+	Combobox * result = new DAComponentX<Combobox>;
 
 	result->init(pArchetype);
 	*pInstance = result->getBase();
@@ -950,7 +990,7 @@ struct _ComboboxFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<ComboboxFactory>;
+		factory = new DAComponentX<ComboboxFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

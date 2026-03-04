@@ -79,55 +79,55 @@ struct CONTROL_NODE
 
 		if (pButton)
 		{
-			*ppControl = pButton.ptr;
+			*ppControl = pButton.addr();
 			pButton->AddRef();
 			goto Done;
 		}
 		if (pStatic)
 		{
-			*ppControl = pStatic.ptr;
+			*ppControl = pStatic.addr();
 			pStatic->AddRef();
 			goto Done;
 		}
 		if(pProgressStatic)
 		{
-			*ppControl = pProgressStatic.ptr;
+			*ppControl = pProgressStatic.addr();
 			pProgressStatic->AddRef();
 			goto Done;
 		}
 		if (pEdit)
 		{
-			*ppControl = pEdit.ptr;
+			*ppControl = pEdit.addr();
 			pEdit->AddRef();
 			goto Done;
 		}
 		if (pTech)
 		{
-			*ppControl = pTech.ptr;
+			*ppControl = pTech.addr();
 			pTech->AddRef();
 			goto Done;
 		}
 		if (pSil)
 		{
-			*ppControl = pSil.ptr;
+			*ppControl = pSil.addr();
 			pSil->AddRef();
 			goto Done;
 		}
 		if (pTab)
 		{
-			*ppControl = pTab.ptr;
+			*ppControl = pTab.addr();
 			pTab->AddRef();
 			goto Done;
 		}
 		if (pIcon)
 		{
-			*ppControl = pIcon.ptr;
+			*ppControl = pIcon.addr();
 			pIcon->AddRef();
 			goto Done;
 		}
 		if (pQControl)
 		{
-			*ppControl = pQControl.ptr;
+			*ppControl = pQControl.addr();
 			pQControl->AddRef();
 			goto Done;
 		}
@@ -426,37 +426,28 @@ struct Menu_context : public BaseHotRect, IToolbar
 
 	void onLeftButtonEvent (U32 controlID)
 	{
-		CONNECTION_NODE<IHotControlEvent> * node = point3.pClientList, *next;
-
-		while (node)
+		auto snapshot = point3.clients;
+		for (auto* client : snapshot)
 		{
-			next = node->pNext;
-			node->client->OnLeftButtonEvent(toolbarID, controlID);
-			node = next;
+			client->OnLeftButtonEvent(toolbarID, controlID);
 		}
 	}
 
 	void onRightButtonEvent (U32 controlID)
 	{
-		CONNECTION_NODE<IHotControlEvent> * node = point3.pClientList, *next;
-
-		while (node)
+		auto snapshot = point3.clients;
+		for (auto* client : snapshot)
 		{
-			next = node->pNext;
-			node->client->OnRightButtonEvent(toolbarID, controlID);
-			node = next;
+			client->OnRightButtonEvent(toolbarID, controlID);
 		}
 	}
 
 	void onLeftDblButtonEvent (U32 controlID)
 	{
-		CONNECTION_NODE<IHotControlEvent> * node = point3.pClientList, *next;
-
-		while (node)
+		auto snapshot = point3.clients;
+		for (auto* client : snapshot)
 		{
-			next = node->pNext;
-			node->client->OnLeftDblButtonEvent(toolbarID, controlID);
-			node = next;
+			client->OnLeftDblButtonEvent(toolbarID, controlID);
 		}
 	}
 
@@ -586,8 +577,8 @@ struct Menu_tb : public Frame, IToolbar
 					pNode->type = GBT_HOTBUTTON;
 					pNode->buttonType = HOTBUTTONTYPE::HOTBUTTON;
 
-					GENDATA->CreateInstance(pButtonType, pComp);				
-					pComp->QueryInterface("IHotButton", pNode->pButton);	
+					GENDATA->CreateInstance(pButtonType, pComp.addr());
+					pComp->QueryInterface("IHotButton", pNode->pButton.void_addr());
 				}
 			}
 			else
@@ -605,8 +596,8 @@ struct Menu_tb : public Frame, IToolbar
 					pNode->type = GBT_HOTBUTTON;
 					pNode->buttonType = HOTBUTTONTYPE::BUILD;
 
-					GENDATA->CreateInstance(pBuildButtonType, pComp);				
-					pComp->QueryInterface("IHotButton", pNode->pButton);		
+					GENDATA->CreateInstance(pBuildButtonType, pComp.addr());
+					pComp->QueryInterface("IHotButton", pNode->pButton.void_addr());
 				}
 			}
 			else
@@ -624,8 +615,8 @@ struct Menu_tb : public Frame, IToolbar
 					pNode->type = GBT_HOTBUTTON;
 					pNode->buttonType = HOTBUTTONTYPE::RESEARCH;
 
-					GENDATA->CreateInstance(pResearchButtonType, pComp);				
-					pComp->QueryInterface("IHotButton", pNode->pButton);
+					GENDATA->CreateInstance(pResearchButtonType, pComp.addr());
+					pComp->QueryInterface("IHotButton", pNode->pButton.void_addr());
 				}
 			}
 			else
@@ -640,8 +631,8 @@ struct Menu_tb : public Frame, IToolbar
 				pNode->type = GBT_HOTBUTTON;
 				pNode->buttonType = HOTBUTTONTYPE::MULTI;
 
-				GENDATA->CreateInstance(pMultiButtonType, pComp);				
-				pComp->QueryInterface("IHotButton", pNode->pButton);						
+				GENDATA->CreateInstance(pMultiButtonType, pComp.addr());
+				pComp->QueryInterface("IHotButton", pNode->pButton.void_addr());
 			}
 			else
 			if (varDesc.typeName && strcmp(varDesc.typeName, "HOTSTATIC_DATA") == 0)
@@ -654,8 +645,8 @@ struct Menu_tb : public Frame, IToolbar
 				pNode->offset = varDesc.offset + baseOffset;
 				pNode->type = GBT_HOTSTATIC;
 
-				GENDATA->CreateInstance(pHotStaticType, pComp);				
-				pComp->QueryInterface("IHotStatic", pNode->pTech);						
+				GENDATA->CreateInstance(pHotStaticType, pComp.addr());
+				pComp->QueryInterface("IHotStatic", pNode->pTech.void_addr());
 			}
 			else
 			if (varDesc.typeName && strcmp(varDesc.typeName, "STATIC_DATA") == 0)
@@ -673,8 +664,8 @@ struct Menu_tb : public Frame, IToolbar
 					CQBOMB3("Missing datatype for %s[%d].%s", (arrayVarName)?arrayVarName:"", arrayIndex, varDesc.varName);
 				}
 
-				GENDATA->CreateInstance(((STATIC_DATA *)(pBaseData+pNode->offset))->staticType, pComp);				
-				pComp->QueryInterface("IStatic", pNode->pStatic);						
+				GENDATA->CreateInstance(((STATIC_DATA *)(pBaseData+pNode->offset))->staticType, pComp.addr());
+				pComp->QueryInterface("IStatic", pNode->pStatic.void_addr());
 			}
 			else
 			if (varDesc.typeName && strcmp(varDesc.typeName, "PROGRESS_STATIC_DATA") == 0)
@@ -692,8 +683,8 @@ struct Menu_tb : public Frame, IToolbar
 					CQBOMB3("Missing datatype for %s[%d].%s", (arrayVarName)?arrayVarName:"", arrayIndex, varDesc.varName);
 				}
 
-				GENDATA->CreateInstance(((PROGRESS_STATIC_DATA *)(pBaseData+pNode->offset))->staticType, pComp);				
-				pComp->QueryInterface("IProgressStatic", pNode->pProgressStatic);						
+				GENDATA->CreateInstance(((PROGRESS_STATIC_DATA *)(pBaseData+pNode->offset))->staticType, pComp.addr());
+				pComp->QueryInterface("IProgressStatic", pNode->pProgressStatic.void_addr());
 			}
 			else
 			if (varDesc.typeName && strcmp(varDesc.typeName, "EDIT_DATA") == 0)
@@ -711,8 +702,8 @@ struct Menu_tb : public Frame, IToolbar
 					CQBOMB3("Missing datatype for %s[%d].%s", (arrayVarName)?arrayVarName:"", arrayIndex, varDesc.varName);
 				}
 
-				GENDATA->CreateInstance(((EDIT_DATA *)(pBaseData+pNode->offset))->editType, pComp);				
-				pComp->QueryInterface("IEdit2", pNode->pEdit);						
+				GENDATA->CreateInstance(((EDIT_DATA *)(pBaseData+pNode->offset))->editType, pComp.addr());
+				pComp->QueryInterface("IEdit2", pNode->pEdit.void_addr());
 			}
 			else
 			if (varDesc.typeName && strcmp(varDesc.typeName, "SHIPSILBUTTON_DATA") == 0)
@@ -725,8 +716,8 @@ struct Menu_tb : public Frame, IToolbar
 				pNode->offset = varDesc.offset + baseOffset;
 				pNode->type = GBT_SHIPSILBUTTON;
 
-				GENDATA->CreateInstance(pShipSilButtonType, pComp);				
-				pComp->QueryInterface("IShipSilButton", pNode->pSil);						
+				GENDATA->CreateInstance(pShipSilButtonType, pComp.addr());
+				pComp->QueryInterface("IShipSilButton", pNode->pSil.void_addr());
 			}
 			else
 			if (varDesc.typeName && strcmp(varDesc.typeName, "TABCONTROL_DATA") == 0)
@@ -739,8 +730,8 @@ struct Menu_tb : public Frame, IToolbar
 				pNode->offset = varDesc.offset + baseOffset;
 				pNode->type = GBT_TABCONTROL;
 
-				GENDATA->CreateInstance(pTabType, pComp);				
-				pComp->QueryInterface("ITabControl", pNode->pTab);		
+				GENDATA->CreateInstance(pTabType, pComp.addr());
+				pComp->QueryInterface("ITabControl", pNode->pTab.void_addr());
 				pLastTab = pNode->pTab;
 			}
 			else
@@ -753,8 +744,8 @@ struct Menu_tb : public Frame, IToolbar
 				pNode->offset = varDesc.offset + baseOffset;
 				pNode->type = GBT_ICON;
 
-				GENDATA->CreateInstance(pIconType, pComp);				
-				pComp->QueryInterface("IIcon", pNode->pIcon);						
+				GENDATA->CreateInstance(pIconType, pComp.addr());
+				pComp->QueryInterface("IIcon", pNode->pIcon.void_addr());
 			}
 			else
 			if(varDesc.typeName && strcmp(varDesc.typeName, "QUEUECONTROL_DATA") == 0)
@@ -766,8 +757,8 @@ struct Menu_tb : public Frame, IToolbar
 				pNode->offset = varDesc.offset + baseOffset;
 				pNode->type = GBT_QUEUECONTROL;
 
-				GENDATA->CreateInstance(pQType, pComp);				
-				pComp->QueryInterface("IQueueControl", pNode->pQControl);						
+				GENDATA->CreateInstance(pQType, pComp.addr());
+				pComp->QueryInterface("IQueueControl", pNode->pQControl.void_addr());
 			}
 			else
 			if (bRecursion==false && varDesc.kind == VARIABLEDESC::ARRAY && varDesc.varName)
@@ -1083,8 +1074,6 @@ struct Menu_tb : public Frame, IToolbar
 
 	void onLeftButtonEvent (U32 controlID)
 	{
-		CONNECTION_NODE<IHotControlEvent> * node = point3.pClientList, *next;
-
 		switch (controlID)
 		{
 		case IDS_TT_HOMEWORLDRECT:
@@ -1103,35 +1092,31 @@ struct Menu_tb : public Frame, IToolbar
 			break;
 		}
 
-		while (node)
+		auto snapshot = point3.clients;
+
+		for (auto* client : snapshot)
 		{
-			next = node->pNext;
-			node->client->OnLeftButtonEvent(toolbarID, controlID);
-			node = next;
+			client->OnLeftButtonEvent(toolbarID, controlID);
 		}
 	}
 
 	void onRightButtonEvent (U32 controlID)
 	{
-		CONNECTION_NODE<IHotControlEvent> * node = point3.pClientList, *next;
+		auto snapshot = point3.clients;
 
-		while (node)
+		for (auto* client : snapshot)
 		{
-			next = node->pNext;
-			node->client->OnRightButtonEvent(toolbarID, controlID);
-			node = next;
+			client->OnRightButtonEvent(toolbarID, controlID);
 		}
 	}
 
 	void onLeftDblButtonEvent (U32 controlID)
 	{
-		CONNECTION_NODE<IHotControlEvent> * node = point3.pClientList, *next;
+		auto snapshot = point3.clients;
 
-		while (node)
+		for (auto* client : snapshot)
 		{
-			next = node->pNext;
-			node->client->OnLeftDblButtonEvent(toolbarID, controlID);
-			node = next;
+			client->OnLeftDblButtonEvent(toolbarID, controlID);
 		}
 	}
 
@@ -1190,7 +1175,7 @@ GENRESULT Menu_tb::GetControl (const char *buttonName, void ** ppControl)
 		// else look in "common" area
 		//
 		COMPTR<IToolbar> common;
-		if (GetToolbar("common", common, M_NO_RACE) == GR_OK)
+		if (GetToolbar("common", common.addr(), M_NO_RACE) == GR_OK)
 		{
 			result = common->GetControl(buttonName, ppControl);
 		}
@@ -1441,8 +1426,8 @@ void Menu_tb::setStateInfo (void)
 
 	if (vfxShapeType[0])
 	{
-		GENDATA->CreateInstance(vfxShapeType, pComp);
-		pComp->QueryInterface("IShapeLoader", pLoader);
+		GENDATA->CreateInstance(vfxShapeType, pComp.addr());
+		pComp->QueryInterface("IShapeLoader", pLoader.void_addr());
 	}
 
 	if (menuList)
@@ -1469,7 +1454,7 @@ void Menu_tb::setStateInfo (void)
 						parent->resPriority += 12;//this 12 is so that the extitSysMap has a higher priority than the systemMap.
 						node->initControl(pData, parent, pLoader, false);
 						COMPTR<IEventCallback> event;
-						node->pButton->QueryInterface("IEventCallback", event);
+						node->pButton->QueryInterface("IEventCallback", event.void_addr());
 						parent->SetCallbackPriority(event, eventPriority+1);	// make sure restore and exitSysMap button is higher than us
 						parent->resPriority -= 12;
 					}
@@ -1503,7 +1488,7 @@ void Menu_tb::setStateInfo (void)
 						node = mNode->controlList;
 						COMPTR<BaseHotRect> baseRect;
 
-						mNode->pTabControl->GetTabMenu(count, baseRect);
+						mNode->pTabControl->GetTabMenu(count, baseRect.addr());
 						CQASSERT(baseRect!=0);
 
 						while (node)
@@ -1523,7 +1508,7 @@ void Menu_tb::setStateInfo (void)
 								node = nNode->controlList;
 								COMPTR<BaseHotRect> baseRect;
 
-								nNode->pTabControl->GetTabMenu(count, baseRect);
+								nNode->pTabControl->GetTabMenu(count, baseRect.addr());
 								CQASSERT(baseRect!=0);
 
 								while (node)
@@ -1585,14 +1570,14 @@ void Menu_tb::loadInterface (const enum M_RACE *pRace)
 	strcat(buffer, "\\");
 	strcat(buffer, "Toolbar!!Default");
 
-	PARSER->QueryInterface("IViewConstructor2", parser);
+	PARSER->QueryInterface("IViewConstructor2", parser.void_addr());
 	CQASSERT(parser != 0);
 
 	ddesc.symbol = parser->GetSymbol(0, "GT_TOOLBAR");
 	CQASSERT(ddesc.symbol!=0);
 	CQASSERT(parser->GetTypeSize(ddesc.symbol) == dwDataSize && "GenData out of sync");
 
-	parser->CreateInstance(&ddesc, dataParser);
+	parser->CreateInstance(&ddesc, dataParser.void_addr());
 	CQASSERT(dataParser!=0);
 
 	createCallback callback (GENDATA->LoadArchetype(HOTBUTTON_TYPE), 
@@ -1621,18 +1606,18 @@ void Menu_tb::loadInterface (const enum M_RACE *pRace)
 	CQASSERT(vfxShapeType);
 	CQASSERT(pContextRect);
 
-	GENDATA->CreateInstance(vfxShapeType, pComp);
-	pComp->QueryInterface("IShapeLoader", loader);
+	GENDATA->CreateInstance(vfxShapeType, pComp.addr());
+	pComp->QueryInterface("IShapeLoader", loader.void_addr());
 
-	GENDATA->CreateInstance(vfxBarShapeType[race-1], pComp);
-	pComp->QueryInterface("IShapeLoader", barLoader);
+	GENDATA->CreateInstance(vfxBarShapeType[race-1], pComp.addr());
+	pComp->QueryInterface("IShapeLoader", barLoader.void_addr());
 
-	if (barLoader==0 || barLoader->CreateImageReader(0, reader) != GR_OK)
+	if (barLoader==0 || barLoader->CreateImageReader(0, reader.addr()) != GR_OK)
 		CQBOMB1("Failed to load interface art for race #%d (zero based)", callback.commonMenu);
 
 	U16 width, height;
 	GT_VFXSHAPE * data = (GT_VFXSHAPE *)(GENDATA->GetArchetypeData(vfxBarShapeType[race-1]));
-	CreateDrawAgent(reader, shape,data->bHiRes);
+	CreateDrawAgent(reader, shape.addr(),data->bHiRes);
 	shape->GetDimensions(width, height);
 
 	realWidth = reader->GetWidth();
@@ -1648,29 +1633,29 @@ void Menu_tb::loadInterface (const enum M_RACE *pRace)
 	
 	reader->GetImage(PF_COLOR_INDEX, map, &rect);
 	
-	if (barLoader==0 || barLoader->CreateImageReader(1, reader) != GR_OK)
+	if (barLoader==0 || barLoader->CreateImageReader(1, reader.addr()) != GR_OK)
 		CQBOMB1("Failed to load interface art for race #%d (zero based)", callback.commonMenu);
-	CreateDrawAgent(reader, topShape);
+	CreateDrawAgent(reader, topShape.addr());
 	
 	topShape->GetDimensions(topWidth,topHeight);
 	
 	createViewer(buffer, "GT_TOOLBAR", IDS_VIEWTOOLBAR);
 
 	COMPTR<IToolbar> common;
-	GetToolbar("common", common, race);
+	GetToolbar("common", common.addr(), race);
 	CQASSERT(common!=0);
 
-	common->GetControl("restore", restore);
+	common->GetControl("restore", restore.void_addr());
 	CQASSERT(restore!=0);
-	common->GetControl("exitSysMap", exitSysMap);
+	common->GetControl("exitSysMap", exitSysMap.void_addr());
 	CQASSERT(exitSysMap!=0);
 	
-	common->GetControl("minimize", minimize);
+	common->GetControl("minimize", minimize.void_addr());
 	CQASSERT(minimize!=0);
 
 	SetVisible(CQFLAGS.bNoToolbar == 0);
 
-	BaseHotRect::Notify(CQE_LOAD_INTERFACE, loader.ptr);
+	BaseHotRect::Notify(CQE_LOAD_INTERFACE, loader.addr());
 	loader.free();
 	barLoader.free();
 	GENDATA->FlushUnusedArchetypes();

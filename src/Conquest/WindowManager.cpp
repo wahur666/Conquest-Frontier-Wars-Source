@@ -17,26 +17,27 @@
 #include "resource.h"
 #include <CQTrace.h>
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <TConnPoint.h>
 #include <TConnContainer.h>
 #include <fdump.h>
 #include <tempstr.h>
 #include <da_heap_utility.h>
+#include <span>
 
 #include <WindowManager.h>
 #include <System.h>
 
-static C8 *interface_name = "IWindowManager";       // Interface name used for registration
+static const char *interface_name = "IWindowManager";       // Interface name used for registration
 
 static struct WindowManager *GlobalWindowManagerSingleton;
 
 
 //--------------------------------------------------------------------------//
 //
-struct WMInner : public DAComponentInner<WindowManager>
+struct WMInner : public DAComponentInnerX<WindowManager>
 {
-	WMInner (WindowManager * _owner) : DAComponentInner<WindowManager>(_owner)
+	WMInner (WindowManager * _owner) : DAComponentInnerX<WindowManager>(_owner)
 	{
 	}
 	
@@ -50,18 +51,45 @@ struct WindowManager : public ISystemComponent,
 					   IWindowManager
 {
 	
-	BEGIN_DACOM_MAP_INBOUND(WindowManager)
-	DACOM_INTERFACE_ENTRY(ISystemComponent)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY(IWindowManager)
-	DACOM_INTERFACE_ENTRY2(IID_IWindowManager, IWindowManager)
-	END_DACOM_MAP()
+	static IDAComponent* GetISystemComponent(void* self) {
+	    return static_cast<ISystemComponent*>(
+	        static_cast<WindowManager*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<WindowManager*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<WindowManager*>(self));
+	}
+	static IDAComponent* GetIWindowManager(void* self) {
+	    return static_cast<IWindowManager*>(
+	        static_cast<WindowManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISystemComponent",              &GetISystemComponent},
+	        {"IAggregateComponent",           &GetIAggregateComponent},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	        {"IWindowManager",                &GetIWindowManager},
+	        {IID_IWindowManager,              &GetIWindowManager},
+	    };
+	    return map;
+	}
 	
-	BEGIN_DACOM_MAP_OUTBOUND(WindowManager)
-	DACOM_INTERFACE_ENTRY_AGGREGATE("ISystemEventCallback", point)
-	END_DACOM_MAP()
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
+		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
+			{"ISystemEventCallback", [](void* self) -> IDAComponent* {
+				auto* doc = static_cast<WindowManager*>(self);
+				IDAConnectionPoint* cp = &doc->point;
+				return cp;
+			}}
+		};
+		return entriesOut;
+	}
 
 	ConnectionPoint<WindowManager,ISystemEventCallback> point;
 
@@ -175,7 +203,7 @@ struct WindowManager : public ISystemComponent,
 	
 	IDAComponent * getBase (void)
 	{
-		return (IDAComponent *) ((ISystemComponent *) this);
+		return static_cast<ISystemComponent *>(this);
 	}
 	
 	void getWindowRects (void);
@@ -187,9 +215,9 @@ struct WindowManager : public ISystemComponent,
 
 	void shutdown (void);
 
-	BOOL32 onClose (void);
+	BOOL32 onClose (void) const;
 
-	static BOOL32 onClose (CONNECTION_NODE<ISystemEventCallback> *node);
+	static BOOL32 onClose (const std::vector<ISystemEventCallback *>& clients);
 };
 
 //-------------------------------------------------
@@ -198,7 +226,7 @@ U32 WMInner::Release (void)
 {
 	U32 result;
 	
-	if ((result = DAComponentInner<WindowManager>::Release()) == 1)
+	if ((result = DAComponentInnerX::Release()) == 1)
 	{
 		if (owner->bInitialized)
 		{
@@ -474,14 +502,14 @@ S32 WindowManager::Startup (HINSTANCE hInstance, const C8 *appName, WMEXITCB exi
 	{
 		wc = *pwc;
 		windowCallback = wc.lpfnWndProc;
-		wc.lpfnWndProc = _wndProc;
+		wc.lpfnWndProc = WNDPROC(_wndProc);
 	}
 	else
 	{
 		memset(&wc, 0, sizeof(wc));
 		wc.cbSize		 = sizeof(wc);
 		wc.style         = CS_HREDRAW | CS_VREDRAW;
-		wc.lpfnWndProc   = _wndProc;
+		wc.lpfnWndProc   = WNDPROC(_wndProc);
 		wc.cbClsExtra    = 0;
 		wc.cbWndExtra    = 0;
 		wc.hInstance     = hInstance;
@@ -885,23 +913,21 @@ void WindowManager::shutdown (void)
 //--------------------------------------------------------------------------
 // call clients in reverse order, stop when one returns non-zero.  
 //
-BOOL32 WindowManager::onClose (CONNECTION_NODE<ISystemEventCallback> *node)
+BOOL32 WindowManager::onClose (const std::vector<ISystemEventCallback *>& clients)
 {
 	BOOL32 result = 0;
 
-	if (node)
-	{
-		if ((result = onClose(node->pNext)) == 0)
-			result = node->client->OnAppClose();
+	for (auto* client : clients) {
+		client->OnAppClose();
 	}
 
 	return result;
 }
 //--------------------------------------------------------------------------
 //  
-BOOL32 WindowManager::onClose (void)
+BOOL32 WindowManager::onClose (void) const
 {
-	return onClose(point.pClientList);
+	return onClose(point.clients);
 }
 //---------------------------------------------------------------------
 //

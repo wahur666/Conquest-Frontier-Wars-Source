@@ -54,7 +54,7 @@ struct DACOM_NO_VTABLE IEdit2 : IDAComponent
 
 	virtual void SetTransparentBehavior (bool _bTransparent) = 0;
 
-	virtual void SetIgnoreChars (wchar_t * ignoreChars) = 0;	// don't allow ignore characters to show up in edit control
+	virtual void SetIgnoreChars (const wchar_t * ignoreChars) = 0;	// don't allow ignore characters to show up in edit control
 
 	virtual const U32 GetEditWidth (void) const = 0;
 

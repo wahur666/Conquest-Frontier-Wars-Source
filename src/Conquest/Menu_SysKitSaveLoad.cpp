@@ -174,7 +174,7 @@ void MenuSystemKitSaveLoad::setStateInfo (void)
 	if (bLoad==0)		// set edit text to current file name
 	{
 		COMPTR<IFileSystem> file;
-		if (MISSION->GetFileSystem(file) == GR_OK)
+		if (MISSION->GetFileSystem(file.addr()) == GR_OK)
 		{
 			char cmpbuffer[MAX_PATH];
 			wchar_t cmpbufferW[MAX_PATH];
@@ -207,26 +207,26 @@ void MenuSystemKitSaveLoad::init (IDocument * baseDir)
 	data = 	*((GT_SYSTEM_KIT_SAVELOAD *) GENDATA->GetArchetypeData("MenuSystemKitSaveLoad"));
 
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.open.buttonType, pComp);
-	pComp->QueryInterface("IButton2", open);
-	GENDATA->CreateInstance(data.cancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", cancel);
-	GENDATA->CreateInstance(data.save.buttonType, pComp);
-	pComp->QueryInterface("IButton2", save);
+	GENDATA->CreateInstance(data.open.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", open.void_addr());
+	GENDATA->CreateInstance(data.cancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", cancel.void_addr());
+	GENDATA->CreateInstance(data.save.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", save.void_addr());
 	
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
-	GENDATA->CreateInstance(data.staticLoad.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticLoad);
-	GENDATA->CreateInstance(data.staticSave.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticSave);
-	GENDATA->CreateInstance(data.staticFile.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticFile);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
+	GENDATA->CreateInstance(data.staticLoad.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticLoad.void_addr());
+	GENDATA->CreateInstance(data.staticSave.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticSave.void_addr());
+	GENDATA->CreateInstance(data.staticFile.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticFile.void_addr());
 
-	GENDATA->CreateInstance(data.list.listboxType, pComp);
-	pComp->QueryInterface("IListbox", list);
-	GENDATA->CreateInstance(data.editFile.editType, pComp);
-	pComp->QueryInterface("IEdit2", editFile);
+	GENDATA->CreateInstance(data.list.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", list.void_addr());
+	GENDATA->CreateInstance(data.editFile.editType, pComp.addr());
+	pComp->QueryInterface("IEdit2", editFile.void_addr());
 
 	editFile->SetControlID(IDS_OPEN);
 
@@ -242,7 +242,7 @@ void MenuSystemKitSaveLoad::init (IDocument * baseDir)
 	fdesc.dwDesiredAccess = GENERIC_READ |GENERIC_WRITE;
 	
 
-	baseDir->CreateInstance(&fdesc,saveLoadDir);
+	baseDir->CreateInstance(&fdesc,saveLoadDir.void_addr());
 
 	if (bLoad)
 	{
@@ -353,7 +353,7 @@ void MenuSystemKitSaveLoad::onSelection (const wchar_t *buffer)
 		fdesc.dwDesiredAccess = GENERIC_READ |GENERIC_WRITE;
 		fdesc.lpImplementation = "DOS";
 
-		if(saveLoadDir->CreateInstance(&fdesc,saveFile) == GR_OK)
+		if(saveLoadDir->CreateInstance(&fdesc,saveFile.void_addr()) == GR_OK)
 		{
 			GT_SYSTEM_KIT kit = SECTOR->GetSystemLightKit(SECTOR->GetCurrentSystem());
 
@@ -405,7 +405,7 @@ U32 __stdcall CreateMenuSystemKitSaveLoad (bool bLoad)
 {
 	COMPTR<IDocument> baseDir;
 
-	if (GENDATA->GetDataFile(baseDir) == GR_OK)
+	if (GENDATA->GetDataFile(baseDir.addr()) == GR_OK)
 	{
 		MenuSystemKitSaveLoad * menu = new MenuSystemKitSaveLoad(baseDir, bLoad);
 		BOOL32 bGamePaused = CQFLAGS.bGamePaused;

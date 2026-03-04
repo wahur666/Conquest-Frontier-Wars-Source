@@ -20,8 +20,8 @@
 
 #include <HeapObj.h>
 
-#include <dplobby.h>
-#include <dplay.h>
+#include <directx2007aug/dplobby.h>
+#include <directx2007aug/dplay.h>
 #include "NetConnectBuffers.h"
 
 //---------------------------------------------------------------------------

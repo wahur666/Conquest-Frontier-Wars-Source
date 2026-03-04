@@ -25,7 +25,7 @@
 #include "Mission.h"
 #include "NetBuffer.h"
 
-#include <dplay.h>
+#include <directx2007aug/dplay.h>
 
 #define DROP_SLOT_BEGIN		11200
 #define DROP_RACE_BEGIN		11300
@@ -204,9 +204,9 @@ struct Menu_slots : public DAComponent<Frame>
 	{
 		COMPTR<IDocument> pDatabase, doc;
 
-		GENDATA->GetDataFile(pDatabase);
+		GENDATA->GetDataFile(pDatabase.addr());
 
-		if (pDatabase->GetChildDocument("\\GT_MENU1\\Menu1", doc) != GR_OK)
+		if (pDatabase->GetChildDocument("\\GT_MENU1\\Menu1", doc.addr()) != GR_OK)
 			CQBOMB0("Could not create document");
 
 		DWORD dwWritten;
@@ -641,23 +641,23 @@ void Menu_slots::init (void)
 	int i;
 	for (i=0; i < MAX_PLAYERS; i++)
 	{
-		GENDATA->CreateInstance(data.dropSlots[i].dropdownType, pComp);
-		pComp->QueryInterface("IDropdown", dropSlots[i]);
+		GENDATA->CreateInstance(data.dropSlots[i].dropdownType, pComp.addr());
+		pComp->QueryInterface("IDropdown", dropSlots[i].void_addr());
 
-		GENDATA->CreateInstance(data.dropRaces[i].dropdownType, pComp);
-		pComp->QueryInterface("IDropdown", dropRaces[i]);
+		GENDATA->CreateInstance(data.dropRaces[i].dropdownType, pComp.addr());
+		pComp->QueryInterface("IDropdown", dropRaces[i].void_addr());
 
-		GENDATA->CreateInstance(data.dropPlayers[i].dropdownType, pComp);
-		pComp->QueryInterface("IDropdown", dropPlayers[i]);
+		GENDATA->CreateInstance(data.dropPlayers[i].dropdownType, pComp.addr());
+		pComp->QueryInterface("IDropdown", dropPlayers[i].void_addr());
 
-		GENDATA->CreateInstance(data.dropTeams[i].dropdownType, pComp);
-		pComp->QueryInterface("IDropdown", dropTeams[i]);
+		GENDATA->CreateInstance(data.dropTeams[i].dropdownType, pComp.addr());
+		pComp->QueryInterface("IDropdown", dropTeams[i].void_addr());
 
-		GENDATA->CreateInstance(data.staticNames[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticNames[i]);
+		GENDATA->CreateInstance(data.staticNames[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticNames[i].void_addr());
 
-		GENDATA->CreateInstance(data.staticPings[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticPings[i]);
+		GENDATA->CreateInstance(data.staticPings[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticPings[i].void_addr());
 	}
 
 	setStateInfo();

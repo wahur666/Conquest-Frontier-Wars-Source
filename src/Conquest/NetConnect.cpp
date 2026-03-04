@@ -26,8 +26,8 @@
 #include <HeapObj.h>
 
 #include <winsock2.h>
-#include <dplobby.h>
-#include <dplay.h>
+#include <directx2007aug/dplobby.h>
+#include <directx2007aug/dplay.h>
 
 #undef DEFINE_GUID
 #define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
@@ -181,7 +181,7 @@ BOOL32 StartNetConnection (BOOL32 & bLobbied)
 				}
 			}
 
-			if ((hresult = DPLOBBY->Connect(0, lpDP2, 0)) == DP_OK)
+			if ((hresult = DPLOBBY->Connect(0, lpDP2.addr(), 0)) == DP_OK)
 			{
 				if (lpDP2->QueryInterface( IID_IDirectPlay4, (LPVOID*)&DPLAY) == DP_OK)
 				{

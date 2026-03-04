@@ -520,22 +520,22 @@ void ProgressStatic::init (PROGRESS_STATICTYPE * _pProgressStaticType)
 
 	if (pProgressStaticType->pFontType)
 	{
-		GENDATA->CreateInstance(pProgressStaticType->pFontType, pBase);
+		GENDATA->CreateInstance(pProgressStaticType->pFontType, pBase.addr());
 		CQASSERT(pBase!=0);
-		pBase->QueryInterface("IFontDrawAgent", pFont);
+		pBase->QueryInterface("IFontDrawAgent", pFont.void_addr());
 		pFont->SetFontColor(RGB(pProgressStaticType->normalText.red, pProgressStaticType->normalText.green, pProgressStaticType->normalText.blue) | 0xFF000000, 0);
 
-		GENDATA->CreateInstance(pProgressStaticType->pFontType, pBase);
+		GENDATA->CreateInstance(pProgressStaticType->pFontType, pBase.addr());
 		CQASSERT(pBase!=0);
-		pBase->QueryInterface("IFontDrawAgent", pOverFont);
+		pBase->QueryInterface("IFontDrawAgent", pOverFont.void_addr());
 		pOverFont->SetFontColor(RGB(pProgressStaticType->overText.red, pProgressStaticType->overText.green, pProgressStaticType->overText.blue) | 0xFF000000, 0);
 
 		// create the background font
 		if (pProgressStaticType->bBackdraw)
 		{
-			GENDATA->CreateInstance(pProgressStaticType->pFontType, pBase);
+			GENDATA->CreateInstance(pProgressStaticType->pFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pFontBackground);
+			pBase->QueryInterface("IFontDrawAgent", pFontBackground.void_addr());
 			pFontBackground->SetFontColor(0 | 0xFF000000, 0);
 		}
 	}
@@ -599,7 +599,7 @@ ProgressStaticFactory::~ProgressStaticFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -608,7 +608,7 @@ void ProgressStaticFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -640,7 +640,7 @@ HANDLE ProgressStaticFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYPE
 		//
 		if (data->shapeFile[0])
 		{
-			CreateDrawAgent(data->shapeFile, INTERFACEDIR, DA::UNKTYPE, 0, result->shape);
+			CreateDrawAgent(data->shapeFile, INTERFACEDIR, DA::UNKTYPE, 0, result->shape.addr());
 			result->shape->GetDimensions(result->width, result->height);
 		}
 

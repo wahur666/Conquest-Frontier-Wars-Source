@@ -144,7 +144,7 @@ MManager::~MManager (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 }
@@ -487,7 +487,7 @@ BOOL32 MManager::CreateViewer (void)
 	mdesc.lpBuffer = &data;
 	mdesc.dwBufferSize = sizeof(data);
 	mdesc.dwFlags = CMF_DONT_COPY_MEMORY;
-	if (DACOM->CreateInstance(&mdesc, pMemFile) != GR_OK)
+	if (DACOM->CreateInstance(&mdesc, pMemFile.void_addr()) != GR_OK)
 		return 0;
 
 	pMemFile->AddRef();
@@ -496,7 +496,7 @@ BOOL32 MManager::CreateViewer (void)
 	ddesc.dwCreationDistribution = CREATE_ALWAYS;
 	ddesc.lpImplementation = "DOS";
 
-	if (DACOM->CreateInstance(&ddesc, doc) == GR_OK)
+	if (DACOM->CreateInstance(&ddesc, doc.void_addr()) == GR_OK)
 	{
 		VIEWDESC vdesc;
 		HWND hwnd;
@@ -505,7 +505,7 @@ BOOL32 MManager::CreateViewer (void)
 		vdesc.doc = doc;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if (PARSER->CreateInstance(&vdesc, viewer) == GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
@@ -614,13 +614,13 @@ struct _music : GlobalComponent
 		minfo.fMask = MIIM_ID | MIIM_TYPE;
 		minfo.fType = MFT_STRING;
 		minfo.wID = IDS_VIEWMUSIC;
-		minfo.dwTypeData = "Music";
+		minfo.dwTypeData = LPSTR("Music");
 		minfo.cch = 5;	// length of string "Music"
 			
 		if (InsertMenuItem(hMenu, 0x7FFE, 1, &minfo))
 			manager->menuID = IDS_VIEWMUSIC;
 
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(manager->getBase(), &manager->eventHandle);
 		FULLSCREEN->SetCallbackPriority(manager,EVENT_PRIORITY_MUSIC);
 	}

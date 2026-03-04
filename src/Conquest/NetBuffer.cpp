@@ -34,7 +34,7 @@
 #include <Heapobj.h>
 #include <EventSys2.h>
 
-#include <dplobby.h>
+#include <directx2007aug/dplobby.h>
 
 #ifdef FINAL_RELEASE
 #define SILENCE_TRACE
@@ -274,7 +274,7 @@ NetBuffer::NetBuffer (void)
 
 	hdesc.heapSize = HEAP_SIZE;
 	hdesc.flags    = DAHEAPFLAG_PRIVATE | DAHEAPFLAG_NOMSGS;
-	DACOM->CreateInstance(&hdesc, heap);
+	DACOM->CreateInstance(&hdesc, heap.void_addr());
 	PLAYER_NODE::heap = heap;
 	heap->SetErrorHandler(0);
 
@@ -1185,7 +1185,7 @@ void NetBuffer::readProfile (void)
 	HANDLE hSection;
 	C8 buffer[MAX_PATH];
 
-	if (DACOM->QueryInterface("IProfileParser", parser) != GR_OK)
+	if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) != GR_OK)
 		goto Done;
 
 	if ((hSection = parser->CreateSection("Network")) == 0)

@@ -34,11 +34,12 @@
 #include <EventSys2.h>
 #include <IConnection.h>
 #include <HeapObj.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <WindowManager.h>
 #include <HKEvent.h>
 
 #include <commctrl.h>
+#include <span>
 
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -51,11 +52,27 @@
 
 struct DACOM_NO_VTABLE MScroll : public IMouseScroll, IEventCallback, ResourceClient<>
 {
-	BEGIN_DACOM_MAP_INBOUND(MScroll)
-	DACOM_INTERFACE_ENTRY(IMouseScroll)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIMouseScroll(void* self) {
+	    return static_cast<IMouseScroll*>(
+	        static_cast<MScroll*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<MScroll*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<MScroll*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IMouseScroll",    &GetIMouseScroll},
+	        {"IResourceClient", &GetIResourceClient},
+	        {"IEventCallback",  &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	BOOL32 bActive:1;
 	BOOL32 bHasFocus:1;
@@ -113,7 +130,7 @@ MScroll::~MScroll (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 }
 //--------------------------------------------------------------------------//
@@ -407,7 +424,7 @@ struct _mscroll : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		MSCROLL = mscroll = new DAComponent<MScroll>;
+		MSCROLL = mscroll = new DAComponentX<MScroll>;
 		AddToGlobalCleanupList((IDAComponent **) &MSCROLL);
 	}
 
@@ -428,7 +445,7 @@ struct _mscroll : GlobalComponent
 
 		MSCROLL->SetArea(&inner, &outer);
 
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(MSCROLL, &mscroll->eventHandle);
 
 		mscroll->initializeResources();

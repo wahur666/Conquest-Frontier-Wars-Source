@@ -362,12 +362,12 @@ void MultiHotButton::SetState(U32 _baseImage, HBTNTXT::BUTTON_TEXT _buttonText, 
 	int i;
 	if(bSingleShape)
 	{
-		myLoader->CreateDrawAgent(base, shapes[0]);
+		myLoader->CreateDrawAgent(base, shapes[0].addr());
 	}
 	else
 	{
 		for (i = 0; i < GTHBSHP_MAX_SHAPES; i++)
-			myLoader->CreateDrawAgent(i+base, shapes[i]);
+			myLoader->CreateDrawAgent(i+base, shapes[i].addr());
 	}
 
 	U16 width, height;
@@ -835,7 +835,7 @@ MultiHotButtonFactory::~MultiHotButtonFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -844,7 +844,7 @@ void MultiHotButtonFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

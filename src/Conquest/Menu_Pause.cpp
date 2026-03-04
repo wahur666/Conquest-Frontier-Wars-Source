@@ -22,7 +22,7 @@
 #include "NetPacket.h"
 #include "DrawAgent.h"
 
-#include <Dplay.h>
+#include <directx2007aug/Dplay.h>
 
 #include <stdio.h>
 
@@ -295,13 +295,13 @@ void MenuPause::init (void)
 
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.staticTitle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticTitle);
+	GENDATA->CreateInstance(data.staticTitle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticTitle.void_addr());
 
 	for (i = 0; i < MAX_PLAYERS; i++)
 	{
-		GENDATA->CreateInstance(data.staticDescription[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticDescription[i]);
+		GENDATA->CreateInstance(data.staticDescription[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticDescription[i].void_addr());
 	}
 }
 //--------------------------------------------------------------------------//

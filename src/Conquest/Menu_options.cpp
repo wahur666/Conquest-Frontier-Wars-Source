@@ -666,7 +666,7 @@ void Menu_options::deleteInfoForPlayer (wchar_t * szFolderNameWide)
 	wsprintf(szFolderPathAnsi, "%s%s", GAME_DIR_ANSI, szFolderNameAnsi);
 
 	DAFILEDESC fdesc = szFolderPathAnsi;
-	if (DACOM->CreateInstance(&fdesc, file) == GR_OK)
+	if (DACOM->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 	{
 		RecursiveDelete(file);
 
@@ -818,8 +818,8 @@ void Menu_options::setStateInfo (void)
 	COMPTR<IDAComponent> pBase;
 	COMPTR<IShapeLoader> loader;
 
-	GENDATA->CreateInstance(TAB_VFX_OPTIONS, pBase);
-	pBase->QueryInterface("IShapeLoader", loader);
+	GENDATA->CreateInstance(TAB_VFX_OPTIONS, pBase.addr());
+	pBase->QueryInterface("IShapeLoader", loader.void_addr());
 
 	// init the tab control
 	tabControl->InitTab(data.tab, this, loader);
@@ -828,7 +828,7 @@ void Menu_options::setStateInfo (void)
 	//
 	// put everything into the player tab (tab 1)
 	//
-	tabControl->GetTabMenu(0, base);
+	tabControl->GetTabMenu(0, base.addr());
 
 	tb.staticName->InitStatic(data.staticName, base);
 	tb.listNames->InitListbox(data.listNames, base);
@@ -887,7 +887,7 @@ void Menu_options::setStateInfo (void)
 	//
 	// the second tab (Graphics)
 	//
-	tabControl->GetTabMenu(1, base);
+	tabControl->GetTabMenu(1, base.addr());
 	
 	tb.staticDevice->InitStatic(data.staticDevice, base);
 	tb.staticResolution->InitStatic(data.staticResolution, base);
@@ -933,7 +933,7 @@ void Menu_options::setStateInfo (void)
 
 	//
 	// the 3rd Tab (Sounds)
-	tabControl->GetTabMenu(2, base);
+	tabControl->GetTabMenu(2, base.addr());
   	tb.staticSound->InitStatic(data.staticSound, base);
 	tb.staticMusic->InitStatic(data.staticMusic, base);
 	tb.staticComm->InitStatic(data.staticComm, base);
@@ -1074,177 +1074,177 @@ void Menu_options::init (void)
 
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.title.staticType, pComp);
-	pComp->QueryInterface("IStatic", title);
+	GENDATA->CreateInstance(data.title.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", title.void_addr());
 
 	// tab contol stuff
-	GENDATA->CreateInstance(data.tab.tabControlType, pComp);
-	pComp->QueryInterface("ITabControl", tabControl);
+	GENDATA->CreateInstance(data.tab.tabControlType, pComp.addr());
+	pComp->QueryInterface("ITabControl", tabControl.void_addr());
 
-	GENDATA->CreateInstance(data.staticName.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticName);
+	GENDATA->CreateInstance(data.staticName.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticName.void_addr());
 
-	GENDATA->CreateInstance(data.listNames.listboxType, pComp);
-	pComp->QueryInterface("IListbox", tb.listNames);
+	GENDATA->CreateInstance(data.listNames.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", tb.listNames.void_addr());
 
-	GENDATA->CreateInstance(data.buttonNew.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.buttonNew);
+	GENDATA->CreateInstance(data.buttonNew.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.buttonNew.void_addr());
 
-	GENDATA->CreateInstance(data.buttonChange.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.buttonChange);
+	GENDATA->CreateInstance(data.buttonChange.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.buttonChange.void_addr());
 
-	GENDATA->CreateInstance(data.buttonDelete.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.buttonDelete);
+	GENDATA->CreateInstance(data.buttonDelete.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.buttonDelete.void_addr());
 
-	GENDATA->CreateInstance(data.staticDInput.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticDInput);
+	GENDATA->CreateInstance(data.staticDInput.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticDInput.void_addr());
 
-	GENDATA->CreateInstance(data.staticMouse.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticMouse);
+	GENDATA->CreateInstance(data.staticMouse.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticMouse.void_addr());
 
-	GENDATA->CreateInstance(data.staticSpeed.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticSpeed);
+	GENDATA->CreateInstance(data.staticSpeed.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticSpeed.void_addr());
 
-	GENDATA->CreateInstance(data.staticScroll.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticScroll);
+	GENDATA->CreateInstance(data.staticScroll.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticScroll.void_addr());
 
-	GENDATA->CreateInstance(data.staticStatus.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticStatus);
+	GENDATA->CreateInstance(data.staticStatus.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticStatus.void_addr());
 
-	GENDATA->CreateInstance(data.staticRollover.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticRollover);
+	GENDATA->CreateInstance(data.staticRollover.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticRollover.void_addr());
 
-	GENDATA->CreateInstance(data.staticSectorMap.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticSectorMap);
+	GENDATA->CreateInstance(data.staticSectorMap.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticSectorMap.void_addr());
 
-	GENDATA->CreateInstance(data.staticRightClick.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticRightClick);
+	GENDATA->CreateInstance(data.staticRightClick.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticRightClick.void_addr());
 
-	GENDATA->CreateInstance(data.staticSubtitles.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticSubtitles);
+	GENDATA->CreateInstance(data.staticSubtitles.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticSubtitles.void_addr());
 
-	GENDATA->CreateInstance(data.pushDInput.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushDInput);
+	GENDATA->CreateInstance(data.pushDInput.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushDInput.void_addr());
 
-	GENDATA->CreateInstance(data.sliderMouse.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderMouse);
+	GENDATA->CreateInstance(data.sliderMouse.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderMouse.void_addr());
 
-	GENDATA->CreateInstance(data.sliderSpeed.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderSpeed);
+	GENDATA->CreateInstance(data.sliderSpeed.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderSpeed.void_addr());
 
-	GENDATA->CreateInstance(data.sliderScroll.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderScroll);
+	GENDATA->CreateInstance(data.sliderScroll.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderScroll.void_addr());
 
-	GENDATA->CreateInstance(data.pushStatus.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushStatus);
+	GENDATA->CreateInstance(data.pushStatus.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushStatus.void_addr());
 
-	GENDATA->CreateInstance(data.pushRollover.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushRollover);
+	GENDATA->CreateInstance(data.pushRollover.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushRollover.void_addr());
 
-	GENDATA->CreateInstance(data.pushSectorMap.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushSectorMap);
+	GENDATA->CreateInstance(data.pushSectorMap.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushSectorMap.void_addr());
 
-	GENDATA->CreateInstance(data.pushRightClick.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushRightClick);
+	GENDATA->CreateInstance(data.pushRightClick.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushRightClick.void_addr());
 
-	GENDATA->CreateInstance(data.pushSubtitles.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushSubtitles);
+	GENDATA->CreateInstance(data.pushSubtitles.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushSubtitles.void_addr());
 
-	GENDATA->CreateInstance(data.staticDevice.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticDevice);
+	GENDATA->CreateInstance(data.staticDevice.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticDevice.void_addr());
 
-	GENDATA->CreateInstance(data.staticResolution.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticResolution);
+	GENDATA->CreateInstance(data.staticResolution.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticResolution.void_addr());
 
-	GENDATA->CreateInstance(data.staticGamma.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticGamma);
+	GENDATA->CreateInstance(data.staticGamma.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticGamma.void_addr());
 
-	GENDATA->CreateInstance(data.staticTrails.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticTrails);
+	GENDATA->CreateInstance(data.staticTrails.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticTrails.void_addr());
 
-	GENDATA->CreateInstance(data.staticEmissive.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticEmissive);
+	GENDATA->CreateInstance(data.staticEmissive.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticEmissive.void_addr());
 
-	GENDATA->CreateInstance(data.staticDetail.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticDetail);
+	GENDATA->CreateInstance(data.staticDetail.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticDetail.void_addr());
 
-	GENDATA->CreateInstance(data.staticDrawBack.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticDrawBack);
+	GENDATA->CreateInstance(data.staticDrawBack.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticDrawBack.void_addr());
 
-	GENDATA->CreateInstance(data.staticShips3D.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticShips3D);
+	GENDATA->CreateInstance(data.staticShips3D.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticShips3D.void_addr());
 
-	GENDATA->CreateInstance(data.dropDevice.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", tb.dropDevice);
+	GENDATA->CreateInstance(data.dropDevice.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", tb.dropDevice.void_addr());
 
-	GENDATA->CreateInstance(data.dropResolution.dropdownType, pComp);
-	pComp->QueryInterface("IDropdown", tb.dropResolution);
+	GENDATA->CreateInstance(data.dropResolution.dropdownType, pComp.addr());
+	pComp->QueryInterface("IDropdown", tb.dropResolution.void_addr());
 
-	GENDATA->CreateInstance(data.sliderGamma.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderGamma);
+	GENDATA->CreateInstance(data.sliderGamma.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderGamma.void_addr());
 
-	GENDATA->CreateInstance(data.pushTrails.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushTrails);
+	GENDATA->CreateInstance(data.pushTrails.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushTrails.void_addr());
 
-	GENDATA->CreateInstance(data.pushEmissive.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushEmissive);
+	GENDATA->CreateInstance(data.pushEmissive.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushEmissive.void_addr());
 
-	GENDATA->CreateInstance(data.pushDetail.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushDetail);
+	GENDATA->CreateInstance(data.pushDetail.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushDetail.void_addr());
 
-	GENDATA->CreateInstance(data.slideDrawBack.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.slideDrawBack);
+	GENDATA->CreateInstance(data.slideDrawBack.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.slideDrawBack.void_addr());
 
-	GENDATA->CreateInstance(data.sliderShips3D.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderShips3D);
+	GENDATA->CreateInstance(data.sliderShips3D.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderShips3D.void_addr());
 
-	GENDATA->CreateInstance(data.staticSound.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticSound);
+	GENDATA->CreateInstance(data.staticSound.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticSound.void_addr());
 
-	GENDATA->CreateInstance(data.staticMusic.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticMusic);
+	GENDATA->CreateInstance(data.staticMusic.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticMusic.void_addr());
 
-	GENDATA->CreateInstance(data.staticComm.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticComm);
+	GENDATA->CreateInstance(data.staticComm.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticComm.void_addr());
 
-	GENDATA->CreateInstance(data.staticChat.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.staticChat);
+	GENDATA->CreateInstance(data.staticChat.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.staticChat.void_addr());
 
-	GENDATA->CreateInstance(data.pushSound.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushSound);
+	GENDATA->CreateInstance(data.pushSound.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushSound.void_addr());
 	
-	GENDATA->CreateInstance(data.sliderSound.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderSound);
+	GENDATA->CreateInstance(data.sliderSound.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderSound.void_addr());
 
-	GENDATA->CreateInstance(data.pushMusic.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushMusic);
+	GENDATA->CreateInstance(data.pushMusic.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushMusic.void_addr());
 
-	GENDATA->CreateInstance(data.sliderMusic.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderMusic);
+	GENDATA->CreateInstance(data.sliderMusic.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderMusic.void_addr());
 
-	GENDATA->CreateInstance(data.pushComm.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.pushComm);
+	GENDATA->CreateInstance(data.pushComm.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.pushComm.void_addr());
 
-	GENDATA->CreateInstance(data.sliderComm.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderComm);
+	GENDATA->CreateInstance(data.sliderComm.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderComm.void_addr());
 
-	GENDATA->CreateInstance(data.sliderChat.sliderType, pComp);
-	pComp->QueryInterface("ISlider", tb.sliderChat);
+	GENDATA->CreateInstance(data.sliderChat.sliderType, pComp.addr());
+	pComp->QueryInterface("ISlider", tb.sliderChat.void_addr());
 
-	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonOk);
+	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonOk.void_addr());
 
-	GENDATA->CreateInstance(data.buttonCancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonCancel);
+	GENDATA->CreateInstance(data.buttonCancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonCancel.void_addr());
 
-	GENDATA->CreateInstance(data.static3DHardware.staticType, pComp);
-	pComp->QueryInterface("IStatic", tb.static3DHardware);
+	GENDATA->CreateInstance(data.static3DHardware.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", tb.static3DHardware.void_addr());
 
-	GENDATA->CreateInstance(data.push3DHardware.buttonType, pComp);
-	pComp->QueryInterface("IButton2", tb.push3DHardware);
+	GENDATA->CreateInstance(data.push3DHardware.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", tb.push3DHardware.void_addr());
 
 	DEFAULTS->StoreDefaults();		// store the current defaults
 	resPriority = RES_PRIORITY_HIGH;
@@ -1266,7 +1266,7 @@ void Menu_options::getGUIDFromIndex (int index, char * pGUID, U32 bufferSize)
 	int data = tb.dropDevice->GetDataValue(index);
 
 	COMPTR<IProfileParser> parser;
-	DACOM->QueryInterface(IID_IProfileParser, parser);
+	DACOM->QueryInterface(IID_IProfileParser, parser.void_addr());
 
 	sprintf(buffer, "Rend%d", data);
 	if ((hSection = parser->CreateSection(buffer)) != 0)
@@ -1394,7 +1394,7 @@ void Menu_options::onButtonCancel (void)
 
 	// reset the gamma value back to the default
 	COMPTR<IGammaControl> gamma;
-	GS->QueryInterface(IID_IGammaControl, gamma);
+	GS->QueryInterface(IID_IGammaControl, gamma.void_addr());
 	
 	pUserDefaults->gammaCorrection = defaultInfo.nDefaultGamma;
 	SINGLE gamma_value = SINGLE(defaultInfo.nDefaultGamma + 10)/SINGLE(10);
@@ -1732,7 +1732,7 @@ void Menu_options::onSliderPressed (U32 sliderID)
 	case SLIDER_GAMMA:
 		{
 			COMPTR<IGammaControl> gamma;
-			GS->QueryInterface(IID_IGammaControl, gamma);
+			GS->QueryInterface(IID_IGammaControl, gamma.void_addr());
 
 			S32 value = tb.sliderGamma->GetPosition();
 			SINGLE gamma_value = SINGLE(value + 10)/SINGLE(10);
@@ -1966,7 +1966,7 @@ int Menu_options::fillDeviceList (IListbox * devlist, IListbox * resList)
 	if (DEFAULTS->GetStringFromRegistry(RENDERDEV_REG_KEY, regValue, sizeof(regValue)) == 0)
 		strcpy(regValue, "{00000000-0000-0000-0000-000000000000}");
 
-	DACOM->QueryInterface(IID_IProfileParser, parser);
+	DACOM->QueryInterface(IID_IProfileParser, parser.void_addr());
 
 	for (i = 0; i < 4; i++)
 	{

@@ -147,7 +147,7 @@ void Menu_SlideShow::init (void)
 void Menu_SlideShow::loadShape(U32 newShape)
 {
 	slide.free();
-	if(slideLoader->CreateDrawAgent(newShape,slide) == GR_OK)
+	if(slideLoader->CreateDrawAgent(newShape,slide.addr()) == GR_OK)
 	{
 		timer = 0;
 		currentSlide = newShape;
@@ -182,8 +182,8 @@ U32 __stdcall DoMenu_SlideShow (const char * vfxName,SINGLE speed, bool bAllowEx
 
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(vfxName, pComp);
-	pComp->QueryInterface("IShapeLoader", loader);
+	GENDATA->CreateInstance(vfxName, pComp.addr());
+	pComp->QueryInterface("IShapeLoader", loader.void_addr());
 
 	Menu_SlideShow * dlg = new Menu_SlideShow(loader,speed, bAllowExit);
 	dlg->beginModalFocus();
@@ -207,8 +207,8 @@ U32 __stdcall DoMenu_Splash(struct SPLASHINFO& _splashInfo)
 	COMPTR<IShapeLoader> loader;
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(_splashInfo.vfxName, pComp);
-	pComp->QueryInterface("IShapeLoader", loader);
+	GENDATA->CreateInstance(_splashInfo.vfxName, pComp.addr());
+	pComp->QueryInterface("IShapeLoader", loader.void_addr());
 
 	Menu_SlideShow * dlg = new Menu_SlideShow(loader,_splashInfo.speed,_splashInfo.bAllowExit);
 	dlg->bUseSpacebar = true;
