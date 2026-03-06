@@ -1,11 +1,17 @@
 # Conquest Frontier Wars Source
-Conquest Fronter Wars Source code rebuilt for modern systems.
+Conquest Frontier Wars Source code rebuilt for modern systems.
 
 ## Required software:
 
 - MSVC 17
 - Python 3
 - CMake
+- CLion is a good to have, VS22 if you want that
+- DirectX 2010 June SDK 
+  - https://www.microsoft.com/en-us/download/details.aspx?id=6812
+  - https://archive.org/details/dxsdk_jun10
+- DirectX 2007 Aug SDK
+  - https://archive.org/details/dxsdk_aug2007
 
 ## Configurations
 
@@ -14,6 +20,5 @@ Conquest Fronter Wars Source code rebuilt for modern systems.
 
 ## How to help?
 
-- Get the source code from GOG
+- Get the source code from GOG, if you want to migrate something new
 - Copy one project part, and try to build it until it work, modernization needed
- 
