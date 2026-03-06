@@ -1,13 +1,9 @@
-﻿cmake_minimum_required(VERSION 3.10)
-project(ZBatcher)
+﻿project(ZBatcher)
 
 # Source files
 add_library(ZBatcher SHARED
         ../BMPoolJr.cpp
         ../RenderBatcher.cpp
-        ../BMPoolJr.h
-        ../CQBatch.h
-        ../RenderBatcher.h
 )
 
 # Include directories
@@ -40,11 +36,11 @@ target_compile_definitions(ZBatcher PRIVATE
 if (MSVC)
     target_compile_options(ZBatcher PRIVATE
             /W3
-            $<$<CONFIG:Debug>:/Od /Zi /MTd /RTC1>
-            $<$<CONFIG:DEMO_Debug>:/Od /Zi /MT /RTC1>
-            $<$<CONFIG:Release>:/O2 /Oi /MT>
-            $<$<CONFIG:DEMO_Final>:/O2 /Oi /MT>
-            $<$<CONFIG:Final>:/O2 /Oi /MT>
+            $<$<CONFIG:Debug>:/Od /Zi /RTC1>
+            $<$<CONFIG:DEMO_Debug>:/Od /Zi /RTC1>
+            $<$<CONFIG:Release>:/O2 /Oi>
+            $<$<CONFIG:DEMO_Final>:/O2 /Oi>
+            $<$<CONFIG:Final>:/O2 /Oi>
     )
 endif()
 

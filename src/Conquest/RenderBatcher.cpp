@@ -26,13 +26,6 @@
 
 #include "TempStr.h"
 
-#ifndef EDITOR
-	#define USE_HEAP 1
-#endif
-
-#if USE_HEAP
-#include "HeapObj.h"
-#endif
 
 
 #include "FVF.h"
@@ -57,7 +50,7 @@ static int in=0;
 #undef DA_METHOD
 #define DA_METHOD(name,params) virtual GENRESULT COMAPI name params;
 
-unsigned int delayStage=0,maxDelay=0;
+U32 delayStage=0,maxDelay=0;
 RenderBatcher *BATCHER = 0;
 
 //Vertex Buffers
@@ -133,8 +126,8 @@ public:		// public interface
 	DA_METHOD(  set_sampler_state,	(U32 stage, D3DSAMPLERSTATETYPE, U32 value ));
 	DA_METHOD(  get_sampler_state,	(U32 stage, D3DSAMPLERSTATETYPE, U32 *value ));
 	
-	DA_METHOD(  set_texture_stage_texture,	(U32 stage, U32 htexture ));
-	DA_METHOD(  get_texture_stage_texture,	(U32 stage, U32 *htexture ));
+	DA_METHOD(  set_texture_stage_texture,	(U32 stage, LONG_PTR htexture ));
+	DA_METHOD(  get_texture_stage_texture,	(U32 stage, LONG_PTR *htexture ));
 	DA_METHOD(	verify_state,				());
 	
 	DA_METHOD(	draw_primitive,				(D3DPRIMITIVETYPE type, U32 vertex_format, const void *verts, int num_verts, U32 flags ));
@@ -1600,7 +1593,7 @@ void BMPOOL::set_name( const char *_name )
 			return GR_GENERIC;
 		}
 
-		maxDelay = max(batcher->state[RPR_DELAY],maxDelay);
+		maxDelay = std::max(batcher->state[RPR_DELAY],maxDelay);
 
 	//	__int64 time1,time2;
 
@@ -2147,7 +2140,7 @@ DA_METHOD(  get_texture_stage_state,(U32 stage, D3DTEXTURESTAGESTATETYPE tss, U3
 
 //
 
-DA_METHOD(  set_texture_stage_texture,(U32 stage, U32 htexture ))
+DA_METHOD(  set_texture_stage_texture,(U32 stage, LONG_PTR htexture ))
 {
 	GENRESULT result = GR_OK;
 #ifndef _ROB
@@ -2169,7 +2162,7 @@ DA_METHOD(  set_texture_stage_texture,(U32 stage, U32 htexture ))
 
 //
 
-DA_METHOD(  get_texture_stage_texture,(U32 stage, U32 *htexture ))
+DA_METHOD(  get_texture_stage_texture,(U32 stage, LONG_PTR *htexture ))
 {
 	return PIPE->get_texture_stage_texture( stage, htexture );
 }
@@ -2402,7 +2395,7 @@ bool RenderBatcher::GetPrimBuffer (BATCHDESC *desc,bool bAllowFailure)
 	//batch only if there is a state ID
 	if (state[RPR_STATE_ID] != 0 || activeMaterialHint != U32(-1) || CQRENDERFLAGS.bSoftwareRenderer)
 	{
-		maxDelay = max(state[RPR_DELAY],maxDelay);
+		maxDelay = std::max(state[RPR_DELAY],maxDelay);
 
 		BATCHEDMATERIAL *material;
 		U32 pool;
@@ -2917,29 +2910,6 @@ void main (void)
 {
 }
 
-#if USE_HEAP
-//--------------------------------------------------------------------------
-//  
-static void SetDllHeapMsg (HINSTANCE hInstance)
-{
-	DWORD dwLen;
-	char buffer[260];
-	
-	dwLen = GetModuleFileName(hInstance, buffer, sizeof(buffer));
- 
-	while (dwLen > 0)
-	{
-		if (buffer[dwLen] == '\\')
-		{
-			dwLen++;
-			break;
-		}
-		dwLen--;
-	}
-
-	SetDefaultHeapMsg(buffer+dwLen);
-}
-#endif
 
 //--------------------------------------------------------------------------
 //  dummy proc to force an imp lib creation
@@ -2947,12 +2917,7 @@ static void SetDllHeapMsg (HINSTANCE hInstance)
 extern "C"
 __declspec(dllexport) IHeap * __stdcall GetBatchHeap (void)
 {
-#if USE_HEAP
-	return HEAP;
-	//return HEAP_Acquire()->GetHeapSize()-HEAP_Acquire()->GetAvailableMemory();
-#else
 	return NULL;
-#endif
 }
 //--------------------------------------------------------------------------
 // 
@@ -2970,22 +2935,6 @@ __declspec(dllexport) IHeap * __stdcall GetBatchHeap (void)
 	//
 		case DLL_PROCESS_ATTACH:
 		{
-#if USE_HEAP
-			HEAP = HEAP_Acquire();
-	#if defined(NDEBUG)
-			InitializeDAHeap(0x080000, 0x080000, DAHEAPFLAG_PRIVATE|DAHEAPFLAG_GROWHEAP|DAHEAPFLAG_NOMSGS);
-	#elif defined(_ROB)
-			InitializeDAHeap(0x080000, 0x080000, DAHEAPFLAG_PRIVATE|DAHEAPFLAG_DEBUGFILL_SNAN|DAHEAPFLAG_GROWHEAP|DAHEAPFLAG_NOMSGS);
-	#else
-			InitializeDAHeap(0x080000, 0x080000, DAHEAPFLAG_PRIVATE|DAHEAPFLAG_DEBUGFILL_SNAN|DAHEAPFLAG_GROWHEAP|DAHEAPFLAG_NOMSGS);
-	#endif
-			SetDllHeapMsg(hinstDLL);
-#endif
-
-#if defined(EDITOR)
-			OutputDebugString("Loading RenderBatcher for Editor\n");
-#endif
-
 			ICOManager *DACOM = DACOM_Acquire();
 			IComponentFactory *server1;
 			if( DACOM && (server1 = new DAComponentFactory2<DAComponentAggregate<RenderBatcher>, AGGDESC>("IRenderPrimitive")) != NULL ) {

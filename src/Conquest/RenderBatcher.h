@@ -112,7 +112,7 @@ struct STATE_ID
 static STATE_ID state_id_list[STATE_ID_LIST_LENGTH];
 static U32 current_state_id=0;
 
-#define GROW_SIZE 16192
+constexpr U32 GROW_SIZE = 16192;
 
 struct BATCHEDMATERIAL
 {

@@ -3,7 +3,7 @@
 #endif
 //
 extern unsigned char TheBigBuffer[];
-extern U32 TheBigPointer;
+extern uint32_t TheBigPointer;
 
 struct BMPOOLJR
 {
@@ -58,9 +58,9 @@ public:	// Interface
 	void reallocate ();
 
 	//now will return an offset from the start of it's pool, 0xFFFFFFFF is fail
-	U32 allocate( U32 size, bool set_non_empty=false );
+	uint32_t allocate( uint32_t size, bool set_non_empty=false );
 
-	void set_pool_used_cnt( U32 cnt);
+	void set_pool_used_cnt( uint32_t cnt);
 
 	void free_all();
 
