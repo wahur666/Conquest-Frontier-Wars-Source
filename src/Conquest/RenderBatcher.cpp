@@ -2393,7 +2393,7 @@ bool RenderBatcher::GetPrimBuffer (BATCHDESC *desc,bool bAllowFailure)
 	CQASSERT(in < 2 || bAllowFailure);
 
 #if (defined(_ROB) && defined(_DEBUG))
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 #endif
 	CQASSERT(state[RPR_BATCH]);
 	CQASSERT(bBufferLocked == false && "You are already batching one buffer with 0 ID");
@@ -2592,7 +2592,7 @@ bool RenderBatcher::GetPrimBuffer (BATCHDESC *desc,bool bAllowFailure)
 	return true;
 
 #if (defined(_ROB) && defined(_DEBUG))
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 #endif
 }
 
@@ -2949,7 +2949,7 @@ __declspec(dllexport) IHeap * __stdcall GetBatchHeap (void)
 {
 #if USE_HEAP
 	return HEAP;
-	//return HEAP->GetHeapSize()-HEAP->GetAvailableMemory();
+	//return HEAP_Acquire()->GetHeapSize()-HEAP_Acquire()->GetAvailableMemory();
 #else
 	return NULL;
 #endif

@@ -140,7 +140,7 @@ struct DACOM_NO_VTABLE Frame : public BaseHotRect, DocumentClient, ISystemEventC
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "Frame");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "Frame");
 	}
 
 	/* IEventCallback methods */

@@ -169,7 +169,7 @@ BOOL32 VoxCompression::SetWaveFormat(const WAVEFORMATEX* externalFormat)
 	HANDLE hSection;
 	char keyBuffer[128];
 
-	if (DACOM->QueryInterface("IProfileParser", parser) != GR_OK)
+	if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) != GR_OK)
 		return 0;
 	if ((hSection = parser->CreateSection("Sound")) == 0)
 		return 0;

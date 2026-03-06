@@ -26,6 +26,7 @@
 #include <HeapObj.h>
 
 #include <winsock2.h>
+#include <initguid.h>
 #include <directx2007aug/dplobby.h>
 #include <directx2007aug/dplay.h>
 

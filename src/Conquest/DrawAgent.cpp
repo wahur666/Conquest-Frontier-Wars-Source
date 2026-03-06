@@ -35,7 +35,7 @@
 #include <FileSys.h>
 #include <RendPipeline.h>
 //#include <RPUL\PrimitiveBuilder.h>
-
+#include "VFX_shapes.hpp"
 #include <malloc.h>
 
 #define AWKWARD_HEIGHT  40

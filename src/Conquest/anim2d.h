@@ -111,17 +111,17 @@ struct AnimInstance
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "AnimInstance");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "AnimInstance");
 	}
 
 	void * operator new[] (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "AnimInstance");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "AnimInstance");
 	}
 
 	void   operator delete (void *ptr)
 	{
-		HEAP->FreeMemory(ptr);
+		HEAP_Acquire()->FreeMemory(ptr);
 	}
 
 	void SetPosition(const Vector &_pos)

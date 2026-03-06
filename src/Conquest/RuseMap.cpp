@@ -108,7 +108,7 @@ BOOL32 __stdcall RUSELoadArchEnum::ArchetypeEnum (const char * name, void *data,
 	
 Done:
 
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 	return result;
 }
 

@@ -279,7 +279,7 @@ void ObjectTeam< Base >::SetColors (void)
 			}
 		}
 	}
-	CQASSERT(HEAP->EnumerateBlocks());*/
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());*/
 }
 //---------------------------------------------------------------------------
 //

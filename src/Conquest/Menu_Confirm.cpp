@@ -60,12 +60,12 @@ struct Menu_CQMessageBox : public DAComponent<Frame>
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "Menu_CQMessageBox");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "Menu_CQMessageBox");
 	}
 
 	void   operator delete (void *ptr)
 	{
-		HEAP->FreeMemory(ptr);
+		HEAP_Acquire()->FreeMemory(ptr);
 	}
 
 	/* IDocumentClient methods */

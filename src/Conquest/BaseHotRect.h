@@ -287,7 +287,7 @@ public:
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "BaseHotRect");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "BaseHotRect");
 	}
 
 	GENRESULT QueryOutgoingInterface (const C8 *connectionName, struct IDAConnectionPoint **connection)

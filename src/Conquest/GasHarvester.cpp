@@ -656,7 +656,7 @@ struct DACOM_NO_VTABLE GasHarvesterFactory : public IObjectFactory
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "GasHarvesterFactory");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "GasHarvesterFactory");
 	}
 
 	/* IObjectFactory methods */

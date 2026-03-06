@@ -203,7 +203,7 @@ void ShipSilButton::SetShip(IBaseObject * _ship)
 	//
 	// load the shapes
 	//
-	MPart part = ship;
+	MPart part{ship};
 	if(part.isValid())
 	{
 		int base;
@@ -212,7 +212,7 @@ void ShipSilButton::SetShip(IBaseObject * _ship)
 		
 		int i;
 		for (i = 0; i < SHIPSIL_MAX_SHAPES; i++)
-			shapeLoader->CreateDrawAgent(i+base, shapes[i]);
+			shapeLoader->CreateDrawAgent(i+base, shapes[i].addr());
 	
 		U16 width, height;
 		if (shapes[0])
@@ -325,7 +325,7 @@ GENRESULT ShipSilButton::Notify (U32 message, void *param)
 void ShipSilButton::draw (void)
 {
 	U32 state;
-	MPart part = ship;
+	MPart part{ship};
 	if(part->hullPoints < part->hullPointsMax * gtData->redYellowBreak)
 	{
 		state = SHIPSIL_RED;
@@ -365,7 +365,7 @@ void ShipSilButton::setStatus (void)
 	if (ship != 0)
 	{
 		wchar_t buffer[256];
-		MPart part = ship;
+		MPart part{ship};
 		if(part->bShowPartName)
 			_localAnsiToWide(part->partName,buffer,sizeof(buffer));
 		else
@@ -468,7 +468,7 @@ ShipSilButtonFactory::~ShipSilButtonFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -477,7 +477,7 @@ void ShipSilButtonFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

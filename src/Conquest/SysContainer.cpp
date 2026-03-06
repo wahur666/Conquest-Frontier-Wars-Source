@@ -80,10 +80,13 @@ struct SystemContainer : public ISystemContainer, IDAConnectionPointContainer
 
 	~SystemContainer (void);
 
+	static void *operator new(size_t size);
+
+	static void operator delete(void *ptr);
+
 	GENRESULT init (AGGDESC *info);
 
-	DA_HEAP_DEFINE_NEW_OPERATOR(SystemContainer);
-	
+
 	/* IDAComponent methods */
 
 	DEFMETHOD(QueryInterface) (const C8 *interface_name, void **instance)
@@ -132,6 +135,9 @@ struct SystemContainer : public ISystemContainer, IDAConnectionPointContainer
 		return static_cast<ISystemContainer *>(this);
 	}
 };
+
+DA_HEAP_DEFINE_NEW_OPERATOR(SystemContainer);
+
 
 //--------------------------------------------------------------------------//
 //
@@ -225,7 +231,7 @@ GENRESULT SystemContainer::LoadSystemComponents (void)
 		char buffer[256];
 		int line=0;
 
-		if (DACOM->QueryInterface("IProfileParser", parser) != GR_OK)
+		if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) != GR_OK)
 			goto Done;
 
 		if ((hSection = parser->CreateSection("System")) == 0)
@@ -252,7 +258,7 @@ GENRESULT SystemContainer::LoadSystemComponents (void)
 			
 			info.interface_name = ptr;
 			info.outer = getBase();
-			info.inner = element->pInner;
+			info.inner = element->pInner.addr();
 			info.description = ptr2;
 
 			//interface name sould be set later to avoid the const cast...
@@ -261,7 +267,7 @@ GENRESULT SystemContainer::LoadSystemComponents (void)
 			if ((ptr = const_cast<char*>(strchr(info.interface_name, '\t'))) != 0)
 				*ptr = 0;
 
-			char *response = "";
+			const char *response = "";
 
 			IDAComponent * pOuter;
 			if (DACOM->CreateInstance(&info, (void **) &pOuter) != GR_OK)
@@ -303,7 +309,7 @@ GENRESULT SystemContainer::LoadSystemComponents (void)
 		{
 			ELEMENT *element = new ELEMENT;
 
-			CreateCQPipeline(getBase(), element->pInner);
+			CreateCQPipeline(getBase(), element->pInner.void_addr());
 			element->pSysComp = 0;
 			element->pAggComp = 0;
 
@@ -345,7 +351,7 @@ GENRESULT SystemContainer::AddComponent (const AGGDESC * descriptor)
 	}
 
 	info->outer = getBase();
-	info->inner = element->pInner;
+	info->inner = element->pInner.addr();
 
 	IDAComponent * pOuter;
 	if ((result = DACOM->CreateInstance(info, (void **) &pOuter)) != GR_OK)
@@ -441,7 +447,7 @@ GENRESULT SystemContainer::FindConnectionPoint (const C8 *connectionName, struct
 
 	while (tmp)
 	{
-		if (tmp->pInner->QueryInterface("IDAConnectionPointContainer", container) == GR_OK)
+		if (tmp->pInner->QueryInterface("IDAConnectionPointContainer", container.void_addr()) == GR_OK)
 		{
 			if ((result = container->FindConnectionPoint(connectionName, connPoint)) == GR_OK)
 				break;
@@ -462,7 +468,7 @@ BOOL32 SystemContainer::EnumerateConnectionPoints (CONNCONTAINER_ENUM_PROC proc,
 
 	while (tmp)
 	{
-		if (tmp->pInner->QueryInterface("IDAConnectionPointContainer", container) == GR_OK)
+		if (tmp->pInner->QueryInterface("IDAConnectionPointContainer", container.void_addr()) == GR_OK)
 		{
 			if ((result = container->EnumerateConnectionPoints(proc, context)) == 0)
 				break;

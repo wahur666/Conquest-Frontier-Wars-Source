@@ -289,7 +289,7 @@ int DumpView::STANDARD_DUMP(ErrorCode code, const C8 *fmt, ...)
                             (unsigned long long)(memoryStatus.ullTotalPhys     >> 20),
                             (unsigned long long)(memoryStatus.ullAvailPageFile  >> 20),
                             (unsigned long long)(memoryStatus.ullAvailVirtual   >> 20),
-                            HEAP->GetHeapSize() >> 20);
+                            HEAP_Acquire()->GetHeapSize() >> 20);
                 }
                 break;
 
@@ -396,7 +396,7 @@ BOOL DumpView::dlgProc(HWND hwnd, UINT message, UINT wParam, LONG lParam)
 
 void __stdcall TrimResetHeap(IHeap *heap)
 {
-    HEAP = heap;
+    // HEAP = heap;
 }
 
 //--------------------------------------------------------------------------//

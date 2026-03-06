@@ -330,11 +330,11 @@ void ResearchButton::InitResearchButton (const RESEARCHBUTTON_DATA & data, BaseH
 		baseImage++;
 
 	if(data.noMoneyImage)
-		loader->CreateDrawAgent(data.noMoneyImage,noMoneyShape);
+		loader->CreateDrawAgent(data.noMoneyImage,noMoneyShape.addr());
 	
 	int i;
 	for (i = 0; i < GTHBSHP_MAX_SHAPES; i++)
-		loader->CreateDrawAgent(i+baseImage, shapes[i]);
+		loader->CreateDrawAgent(i+baseImage, shapes[i].addr());
 
 	U16 width, height;
 	if (shapes[0])
@@ -849,9 +849,9 @@ void ResearchButton::init (PGENTYPE _pArchetype, HSOUND _hSound, PGENTYPE _pFont
 	if(pFontType)
 	{
 		COMPTR<IDAComponent> pBase;
-		GENDATA->CreateInstance(pFontType, pBase);
+		GENDATA->CreateInstance(pFontType, pBase.addr());
 		CQASSERT(pBase!=0);
-		pBase->QueryInterface("IFontDrawAgent", pFont);
+		pBase->QueryInterface("IFontDrawAgent", pFont.void_addr());
 		if(pFont)
 			pFont->SetFontColor(fontColor, 0);
 
@@ -919,7 +919,7 @@ ResearchButtonFactory::~ResearchButtonFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -928,7 +928,7 @@ void ResearchButtonFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

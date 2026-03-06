@@ -141,7 +141,7 @@ struct STREAM_NODE
 			{
 				anim->PauseAnim(true);
 			}
-			anim.ptr = 0;
+			anim = nullptr;
 		}
 	}
 };
@@ -183,7 +183,7 @@ struct PENDING_NODE
 			{
 				anim->PauseAnim(true);
 			}
-			anim.ptr = 0;
+			anim = nullptr;
 		}
 	}
 };
@@ -358,9 +358,9 @@ struct DACOM_NO_VTABLE SoundMan : public ISoundManager, IEventCallback
 
 	void updatePendingList (void);
 
-	BOOL volumeDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	LRESULT volumeDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	static BOOL staticVolumeDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static LRESULT staticVolumeDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	SINGLE getCommVolume (SINGLE volume);
 
@@ -393,7 +393,7 @@ SoundMan::~SoundMan (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
 	//
@@ -543,9 +543,9 @@ U32 SoundMan::PlayAnimatedMessage (const char * filename, const char * animType,
 		char buffer[36];
 		char * ptr;
 
-		if (GENDATA->CreateInstance(animType, pComp) != GR_OK)
+		if (GENDATA->CreateInstance(animType, pComp.addr()) != GR_OK)
 			goto Done;
-		if (pComp->QueryInterface("IAnimate", anim) != GR_OK)
+		if (pComp->QueryInterface("IAnimate", anim.void_addr()) != GR_OK)
 			goto Done;
 
 		strncpy(buffer, filename, 32);
@@ -553,7 +553,7 @@ U32 SoundMan::PlayAnimatedMessage (const char * filename, const char * animType,
 		if ((ptr = strrchr(buffer, '.')) != 0)
 		{
 			strcpy(ptr+1, "txt");
-			if (CreateLFParser(pParser) == GR_OK)
+			if (CreateLFParser(pParser.addr()) == GR_OK)
 			{
 				if (pParser->Initialize(buffer))
 				{
@@ -638,10 +638,10 @@ void SoundMan::updatePendingList (void)
 				snode->soundID = node->soundID;
 				snode->type = CHAT;
 				snode->volume = node->volume;
-				snode->anim.ptr = node->anim.ptr;
+				snode->anim = node->anim;
 				snode->pParser = node->pParser;
 				snode->bOwnershipTransfered = node->bOwnershipTransfered;
-				node->anim.ptr = 0;
+				node->anim = nullptr;
 				streamList = snode;
 
 				if (node->obj)
@@ -1008,17 +1008,17 @@ GENRESULT SoundMan::Notify (U32 message, void *param)
 }
 //--------------------------------------------------------------------------//
 //
-BOOL SoundMan::staticVolumeDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT SoundMan::staticVolumeDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	SoundMan * man = (SoundMan *) GetWindowLong(hwnd, DWL_USER);
+	SoundMan * man = (SoundMan *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 	switch (message)
 	{
 	case WM_INITDIALOG:
 		{
-			SetWindowLong(hwnd, DWL_USER, lParam);
-			man = (SoundMan *) GetWindowLong(hwnd, DWL_USER);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+			man = (SoundMan *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 			man->initDialog(hwnd);
 			result = 1;
@@ -1034,7 +1034,7 @@ BOOL SoundMan::staticVolumeDlgProc (HWND hwnd, UINT message, UINT wParam, LONG l
 }
 //--------------------------------------------------------------------------//
 //
-BOOL SoundMan::volumeDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT SoundMan::volumeDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
 
@@ -1104,7 +1104,7 @@ BOOL SoundMan::volumeDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
 //
 void SoundMan::doDialog (void)
 {
-	DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG7), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) staticVolumeDlgProc, (LPARAM) this);
+	DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG7), hMainWindow, DLGPROC(staticVolumeDlgProc), (LPARAM) this);
 }
 //--------------------------------------------------------------------------//
 //
@@ -1477,7 +1477,7 @@ void SoundMan::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &eventHandle);
 
 	updateVolumeState();

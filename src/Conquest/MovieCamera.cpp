@@ -1040,7 +1040,7 @@ struct CamSpot
 				mov eax, DWORD PTR [EBP+4]
 				mov DWORD PTR dwAddr, eax
 			}
-			HEAP->SetBlockOwner(result, dwAddr);
+			HEAP_Acquire()->SetBlockOwner(result, dwAddr);
 		}
 		return result;
 	}

@@ -293,7 +293,7 @@ void PrimitiveBuilder2::Begin( PBenum _type, U32 _vert_cnt)
 //-----------------Main window procedure-------------------------------
 //---------------------------------------------------------------------
 //
-static LONG CALLBACK wndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK wndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	MSG msg;
 	static BOOL32 bInactive,bRecurse,bHasFocus,bLeadChar;
@@ -1158,7 +1158,7 @@ void __stdcall ReadRenderOptions (void)
 	COMPTR<IProfileParser> parser;
 				
 	CQRENDERFLAGS.bFSAA = 0;
-	if (DACOM->QueryInterface("IProfileParser", parser) == GR_OK)
+	if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) == GR_OK)
 	{
 		HANDLE hSection;
 		
@@ -1199,7 +1199,7 @@ static S32 get_desktop_bpp (void)
 static void set_gamma (bool b3DEnabled)
 {
 	COMPTR<IGammaControl> gamma;
-	GS->QueryInterface(IID_IGammaControl, gamma);
+	GS->QueryInterface(IID_IGammaControl, gamma.void_addr());
 
 	if (b3DEnabled)
 	{
@@ -1238,7 +1238,7 @@ void __stdcall ParseVideoINI (void)
 
 	COMPTR<IProfileParser> parser;
 
-	if (DACOM->QueryInterface("IProfileParser", parser) == GR_OK)
+	if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) == GR_OK)
 	{
 		HANDLE hSection;
 		U32 len;
@@ -1421,7 +1421,7 @@ static const char * getRenderSection (const char * regValue)
 	if (regValue[0]==0)
 		goto Done;
 
-	DACOM->QueryInterface(IID_IProfileParser, parser);
+	DACOM->QueryInterface(IID_IProfileParser, parser.void_addr());
 
 	for (i = 0; i < 4; i++)
 	{
@@ -1457,13 +1457,13 @@ void __stdcall FlipToGDI (void)
 		COMPTR<IDirectDraw4> pDD4;
 		HRESULT hr;
 
-		hr = PIPE->QueryInterface(IID_IDDBackDoor, pBackDoor);
+		hr = PIPE->QueryInterface(IID_IDDBackDoor, pBackDoor.void_addr());
 		if (hr != GR_OK)
 			goto Done;
-		hr = pBackDoor->get_dd_provider(DDBD_P_DIRECTDRAW, pDD1);
+		hr = pBackDoor->get_dd_provider(DDBD_P_DIRECTDRAW, pDD1.addr());
 		if (hr != GR_OK)
 			goto Done;
-		hr = pDD1->QueryInterface(IID_IDirectDraw4, pDD4);    
+		hr = pDD1->QueryInterface(IID_IDirectDraw4, pDD4.void_addr());
 		if (hr != DD_OK)
 			goto Done;
 
@@ -1548,13 +1548,13 @@ static void testHardwareCursorSupport (void)
 	COMPTR<IDirectDraw4> pDD4;
 	HRESULT hr;
 
-	hr = PIPE->QueryInterface(IID_IDDBackDoor, pBackDoor);
+	hr = PIPE->QueryInterface(IID_IDDBackDoor, pBackDoor.void_addr());
 	if (hr != GR_OK)
 		goto Done;
-	hr = pBackDoor->get_dd_provider(DDBD_P_DIRECTDRAW, pDD1);
+	hr = pBackDoor->get_dd_provider(DDBD_P_DIRECTDRAW, pDD1.addr());
 	if (hr != GR_OK)
 		goto Done;
-	hr = pDD1->QueryInterface(IID_IDirectDraw4, pDD4);    
+	hr = pDD1->QueryInterface(IID_IDirectDraw4, pDD4.void_addr());
 	if (hr != DD_OK)
 		goto Done;
 
@@ -2604,7 +2604,7 @@ GENRESULT __stdcall CreateProfileParser (const char * filename, IProfileParser2 
 		PROFPARSEDESC2 pdesc;
 		COMPTR<IProfileParser2> parser;
 
-		if ((result = DACOM->CreateInstance(&pdesc, parser)) == GR_OK)
+		if ((result = DACOM->CreateInstance(&pdesc, parser.void_addr())) == GR_OK)
 		{
 			if ((result = parser->Initialize2((char *)pImage, parent->GetFileSize(hFile))) == GR_OK)
 			{
@@ -2669,7 +2669,7 @@ U32 __stdcall CreateZBufferAnalog (const char * filename)
 	HANDLE hMapping=0;
 	U8 * pImage = 0;
 
-	if (DACOM->CreateInstance(&fdesc, file) != GR_OK)
+	if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 	if ((hMapping = file->CreateFileMapping()) == 0)
 		goto Done;

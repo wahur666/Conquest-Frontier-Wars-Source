@@ -491,7 +491,7 @@ GENRESULT Static::Notify (U32 message, void *param)
 		if (bAlert && buddyControl != 0)
 		{
 			COMPTR<IEventCallback> event;
-			buddyControl->QueryInterface("IEventCallback", event);
+			buddyControl->QueryInterface("IEventCallback", event.void_addr());
 			
 			if (event)
 			{
@@ -508,7 +508,7 @@ GENRESULT Static::Notify (U32 message, void *param)
 		if (bAlert && buddyControl != 0 && bLeftDown)
 		{
 			COMPTR<IEventCallback> event;
-			buddyControl->QueryInterface("IEventCallback", event);
+			buddyControl->QueryInterface("IEventCallback", event.void_addr());
 			
 			if (event)
 			{
@@ -645,17 +645,17 @@ void Static::init (STATICTYPE * _pStaticType)
 
 	if (pStaticType->pFontType)
 	{
-		GENDATA->CreateInstance(pStaticType->pFontType, pBase);
+		GENDATA->CreateInstance(pStaticType->pFontType, pBase.addr());
 		CQASSERT(pBase!=0);
-		pBase->QueryInterface("IFontDrawAgent", pFont);
+		pBase->QueryInterface("IFontDrawAgent", pFont.void_addr());
 		pFont->SetFontColor(RGB(pStaticType->normalText.red, pStaticType->normalText.green, pStaticType->normalText.blue) | 0xFF000000, 0);
 
 		// create the background font
 		if (pStaticType->bBackdraw)
 		{
-			GENDATA->CreateInstance(pStaticType->pFontType, pBase);
+			GENDATA->CreateInstance(pStaticType->pFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pFontBackground);
+			pBase->QueryInterface("IFontDrawAgent", pFontBackground.void_addr());
 			pFontBackground->SetFontColor(0 | 0xFF000000, 0);
 		}
 	}
@@ -719,7 +719,7 @@ StaticFactory::~StaticFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -728,7 +728,7 @@ void StaticFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -758,7 +758,7 @@ HANDLE StaticFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYPE objClas
 		//
 		if (data->shapeFile[0])
 		{
-			CreateDrawAgent(data->shapeFile, INTERFACEDIR, DA::UNKTYPE, 0, result->shape);
+			CreateDrawAgent(data->shapeFile, INTERFACEDIR, DA::UNKTYPE, 0, result->shape.addr());
 			result->shape->GetDimensions(result->width, result->height);
 		}
 

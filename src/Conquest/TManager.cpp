@@ -27,11 +27,12 @@
 #include <EventSys2.h>
 #include <IConnection.h>
 #include <HeapObj.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <WindowManager.h>
 #include <HKEvent.h>
 
 #include <commctrl.h>
+#include <span>
 
 //--------------------------------------------------------------------------//
 //
@@ -43,7 +44,7 @@ struct TMNODE
 	// adding all ASCII character values modulo 256
 	//
 	
-	static inline U32 TMNODE::hash (const char *ptr)
+	static U32 hash (const char *ptr)
 	{
 		U8 result = 0;
 		char a=*ptr++;
@@ -131,10 +132,22 @@ struct DANODE
 //
 struct DACOM_NO_VTABLE TManager : public ITManager, IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(TManager)
-	DACOM_INTERFACE_ENTRY(ITManager)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetITManager(void* self) {
+	    return static_cast<ITManager*>(
+	        static_cast<TManager*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<TManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ITManager",      &GetITManager},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
  	//------------------------
 
@@ -163,21 +176,21 @@ struct DACOM_NO_VTABLE TManager : public ITManager, IEventCallback
 
 	virtual U32 __stdcall CreateTextureFromFile (const char *fileName, IComponentFactory *parentFile, DA::FILETYPE type, const PixelFormat &format);
 
-	virtual U32 __stdcall AddTextureRef (U32 textureID);
+	virtual LONG_PTR __stdcall AddTextureRef (LONG_PTR textureID);
 
-	virtual U32 __stdcall ReleaseTextureRef (U32 textureID);
+	virtual LONG_PTR __stdcall ReleaseTextureRef (LONG_PTR textureID);
 
 	virtual void __stdcall Flush (void);
 
-	virtual U32 __stdcall GetFirstTexture();
+	virtual LONG_PTR __stdcall GetFirstTexture();
 
-	virtual U32 __stdcall GetNextTexture(U32 textureID);
+	virtual LONG_PTR __stdcall GetNextTexture(LONG_PTR textureID);
 
-	virtual U32 __stdcall GetPrevTexture(U32 textureID);
+	virtual LONG_PTR __stdcall GetPrevTexture(LONG_PTR textureID);
 
 	virtual U32 __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha);
 
-	virtual void __stdcall ReleaseDrawAgentTexture (U32 textureID);
+	virtual void __stdcall ReleaseDrawAgentTexture (LONG_PTR textureID);
 
 	virtual void Initialize(InitInfo & info){};
 
@@ -187,15 +200,15 @@ struct DACOM_NO_VTABLE TManager : public ITManager, IEventCallback
 
 	/* TManager methods */
 
-	static U32 __stdcall createTextureFromFile (const char *fileName, IComponentFactory *parentFile, DA::FILETYPE type, const PixelFormat &format);
+	static LONG_PTR __stdcall createTextureFromFile (const char *fileName, IComponentFactory *parentFile, DA::FILETYPE type, const PixelFormat &format);
 
-	static U32 __stdcall createTextureFromMemory (void *pMemory, DA::FILETYPE type, const PixelFormat &format, const char *name);
+	static LONG_PTR __stdcall createTextureFromMemory (void *pMemory, DA::FILETYPE type, const PixelFormat &format, const char *name);
 
 	void reset (void);
 
-	void addTexture (const char * name, U32 textureID);
+	void addTexture (const char * name, LONG_PTR textureID);
 
-	TMNODE * findTexture (U32 textureID);
+	TMNODE * findTexture (LONG_PTR textureID);
 
 	void moveDATextures (void);
 
@@ -215,7 +228,7 @@ TManager::~TManager (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
 	reset();
@@ -299,7 +312,7 @@ U32 TManager::CreateTextureFromFile (const char *fileName, IComponentFactory *pa
 }
 //--------------------------------------------------------------------------//
 //
-U32 TManager::AddTextureRef (U32 textureID)
+LONG_PTR TManager::AddTextureRef (LONG_PTR textureID)
 {
 	TMNODE * node = findTexture(textureID);
 	CQASSERT(node && "invalid texture id (ignorable)");
@@ -314,7 +327,7 @@ U32 TManager::AddTextureRef (U32 textureID)
 }
 //--------------------------------------------------------------------------//
 //
-U32 TManager::ReleaseTextureRef (U32 textureID)
+LONG_PTR TManager::ReleaseTextureRef (LONG_PTR textureID)
 {
 	if (textureID == 0)
 		return 0;
@@ -347,7 +360,7 @@ void TManager::Flush (void)
 }
 //--------------------------------------------------------------------------//
 //
-U32 TManager::GetFirstTexture()
+LONG_PTR TManager::GetFirstTexture()
 {
 	TMNODE * node = textureList.getFirstNode();
 	if(node)
@@ -356,7 +369,7 @@ U32 TManager::GetFirstTexture()
 }
 //--------------------------------------------------------------------------//
 //
-U32 TManager::GetNextTexture(U32 textureID)
+LONG_PTR TManager::GetNextTexture(LONG_PTR textureID)
 {
 	TMNODE * node = textureList.findNextNode(textureID);
 	if(node)
@@ -365,7 +378,7 @@ U32 TManager::GetNextTexture(U32 textureID)
 }
 //--------------------------------------------------------------------------//
 //
-U32 TManager::GetPrevTexture(U32 textureID)
+LONG_PTR TManager::GetPrevTexture(LONG_PTR textureID)
 {
 	TMNODE * node = textureList.findPrevNode(textureID);
 	if(node)
@@ -376,7 +389,7 @@ U32 TManager::GetPrevTexture(U32 textureID)
 //
 U32 TManager::CreateDrawAgentTexture (U32 resolution, bool bAlpha)
 {
-	U32 result=0;
+	LONG_PTR result=0;
 	PixelFormat desiredFormat(16, 5, 6-bAlpha, 5, bAlpha);		// GL_RGB5_A1
 	//DANODE * pInUseList, * pJustFreedList, *pFreedList;
 	DANODE * pNode, *pPrev;
@@ -426,7 +439,7 @@ Done:
 }
 //--------------------------------------------------------------------------//
 //
-void TManager::ReleaseDrawAgentTexture (U32 textureID)
+void TManager::ReleaseDrawAgentTexture (LONG_PTR textureID)
 {
 	DANODE * pNode, *pPrev;
 	//
@@ -627,9 +640,9 @@ void convertBumpmap(COLORREF * src,COLORREF * dst, int originalSize)
 
 
 
-U32 TManager::createTextureFromMemory (void *pMemory, DA::FILETYPE type, const PixelFormat &format, const char *name)
+LONG_PTR TManager::createTextureFromMemory (void *pMemory, DA::FILETYPE type, const PixelFormat &format, const char *name)
 {
-	U32 textureID=0;
+	LONG_PTR textureID=0;
 	COLORREF *bits = texLoadBitsA;
 	COMPTR<IImageReader> reader;
 	U32 width, height;
@@ -645,13 +658,13 @@ U32 TManager::createTextureFromMemory (void *pMemory, DA::FILETYPE type, const P
 	switch (type)
 	{
 	case DA::BMP:
-		CreateBMPReader(reader);
+		CreateBMPReader(reader.addr());
 		break;
 	case DA::TGA:
-		CreateTGAReader(reader);
+		CreateTGAReader(reader.addr());
 		break;
 	case DA::VFX:
-		CreateVFXReader(reader);
+		CreateVFXReader(reader.addr());
 		break;
 	default:
 		CQERROR0("Invalid image type!");
@@ -744,9 +757,9 @@ Done:
 }
 //--------------------------------------------------------------------------//
 //
-U32 TManager::createTextureFromFile (const char *fileName, IComponentFactory *parentFile, DA::FILETYPE type, const PixelFormat &format)
+LONG_PTR TManager::createTextureFromFile (const char *fileName, IComponentFactory *parentFile, DA::FILETYPE type, const PixelFormat &format)
 {
-	U32 textureID=0;
+	LONG_PTR textureID=0;
 
 
 	// temporary kludge... unless it never gets changed... in which case it would be a permanent kludge... which would be bad... probably...
@@ -768,7 +781,7 @@ U32 TManager::createTextureFromFile (const char *fileName, IComponentFactory *pa
 	if (parentFile == 0)
 		parentFile = DACOM;
 
-	if (parentFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (parentFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
 		//CQFILENOTFOUND(fdesc.lpFileName);
 		goto Done;
@@ -846,7 +859,7 @@ void TManager::reset (void)
 }
 //--------------------------------------------------------------------------//
 //
-void TManager::addTexture (const char * name, U32 textureID)
+void TManager::addTexture (const char * name, LONG_PTR textureID)
 {
 	TMNODE * node = new TMNODE(name);
 	node->textureID = textureID;
@@ -854,7 +867,7 @@ void TManager::addTexture (const char * name, U32 textureID)
 }
 //--------------------------------------------------------------------------//
 //
-TMNODE * TManager::findTexture (U32 textureID)
+TMNODE * TManager::findTexture (LONG_PTR textureID)
 {
 	TMNODE * node = textureList.findNode(textureID);
 	return node;
@@ -870,7 +883,7 @@ struct _tmanager : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		TMANAGER = manager = new DAComponent<TManager>;
+		TMANAGER = manager = new DAComponentX<TManager>;
 		AddToGlobalCleanupList(&TMANAGER);
 	}
 
@@ -878,7 +891,7 @@ struct _tmanager : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(TMANAGER, &manager->eventHandle);
 	}
 };

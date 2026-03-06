@@ -84,7 +84,7 @@ double get_angle_double(const double* x, const double* y)
 //--------------------------------------------------------------------------
 // get_angle (float version): Calculate atan2(x, y)
 //--------------------------------------------------------------------------
-float get_angle_float(float x, float y)
+float get_angle(float x, float y)
 {
     if (y == 0.0f)
     {

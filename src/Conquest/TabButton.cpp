@@ -233,9 +233,10 @@ struct DACOM_NO_VTABLE TabButton :  BaseHotRect, ITabButton, IKeyboardFocus
 
 	void nextFocus (void);
 
+	size_t findPrevFocusIndex(IKeyboardFocus *pCurr);
+
 	void prevFocus (void);
 
-	CONNECTION_NODE<IKeyboardFocus> * findPrevFocus (CONNECTION_NODE<IKeyboardFocus> * pFirst, IKeyboardFocus * pCurr);
 };
 //--------------------------------------------------------------------------//
 //
@@ -275,7 +276,7 @@ void TabButton::InitTabButton (const HOTBUTTON_DATA & data, BaseHotRect * _paren
 	
 	int i;
 	for (i = 0; i < GTHBSHP_MAX_SHAPES; i++)
-		loader->CreateDrawAgent(i+base, shapes[i]);
+		loader->CreateDrawAgent(i+base, shapes[i].addr());
 
 	U16 width, height;
 	if (shapes[0])
@@ -604,7 +605,7 @@ bool TabButton::onTabPressed (void)
 		if (shiftDown == 0)
 		{
 			COMPTR<ITabControl> tabControl;
-			parent->QueryInterface("ITabControl", tabControl);
+			parent->QueryInterface("ITabControl", tabControl.void_addr());
 		
 			int nextTab = (tabControl->GetCurrentTab() + 1)%tabControl->GetTabCount();
 			tabControl->SetCurrentTab(nextTab);
@@ -613,7 +614,7 @@ bool TabButton::onTabPressed (void)
 		else 
 		{
 			COMPTR<ITabControl> tabControl;
-			parent->QueryInterface("ITabControl", tabControl);
+			parent->QueryInterface("ITabControl", tabControl.void_addr());
 
 			int prevTab = tabControl->GetCurrentTab() - 1;
 			if (prevTab < 0)
@@ -686,7 +687,7 @@ void TabButton::SetDefaultFocusControl (struct IDAComponent * component)
 		
 		if (component)
 		{
-			component->QueryInterface("IKeyboardFocus", res);
+			component->QueryInterface("IKeyboardFocus", res.void_addr());
 			CQASSERT(res!=0);
 
 			defaultFocusControl = res;
@@ -708,7 +709,7 @@ void TabButton::setFocus (struct IDAComponent * component)
 	COMPTR<IKeyboardFocus> res;
 	if (component)
 	{
-		component->QueryInterface("IKeyboardFocus", res);
+		component->QueryInterface("IKeyboardFocus", res.void_addr());
 		CQASSERT(res!=0);
 	}
 
@@ -736,124 +737,96 @@ void TabButton::nextFocus (void)
 	if (bKeyboardFocusEnabled == false)
 		return;
 
-	CONNECTION_NODE<IKeyboardFocus> *node = point2.pClientList;
+	auto& clients = point2.clients;
 
 	if (focusControl == 0)
 	{
-		if (node == 0)
+		if (clients.empty())
 			return;
-		focusControl = node->client;
-
+		focusControl = clients.front();
 		if (focusControl->SetKeyboardFocus(true) == false)
-		{
 			nextFocus();
-		}
 		return;
 	}
 
-	//
-	// find the next control after current focus
-	//
-	while (node)
+	auto it = std::find(clients.begin(), clients.end(), (IKeyboardFocus*)focusControl);
+
+	if (it != clients.end())
 	{
-		if (node->client == focusControl)
-		{
-			if ((node = node->pNext) == 0)
-				node = point2.pClientList;
-			break;
-		}
-		node = node->pNext;
+		++it;
+		if (it == clients.end())
+			it = clients.begin();  // wrap around
 	}
 
-	if (node && node->client != focusControl)
+	if (it != clients.end() && *it != (IKeyboardFocus*)focusControl)
 	{
 		focusControl->SetKeyboardFocus(false);
-		while (node->client != focusControl)
+
+		while (*it != (IKeyboardFocus*)focusControl)
 		{
-			if (node->client->SetKeyboardFocus(true))
+			if ((*it)->SetKeyboardFocus(true))
 			{
-				focusControl = node->client;
+				focusControl = *it;
 				return;
 			}
-
-			if ((node = node->pNext) == 0)
-				node = point2.pClientList;
+			++it;
+			if (it == clients.end())
+				it = clients.begin();  // wrap around
 		}
-		focusControl->SetKeyboardFocus(true);	// failed to find another control to switch to
+		focusControl->SetKeyboardFocus(true);
 	}
 }
 //----------------------------------------------------------------------------------//
 //
-CONNECTION_NODE<IKeyboardFocus> * TabButton::findPrevFocus (CONNECTION_NODE<IKeyboardFocus> * pFirst, IKeyboardFocus * pCurr)
+inline size_t TabButton::findPrevFocusIndex (IKeyboardFocus* pCurr)
 {
-	// go through everything in the list until pNext == pCurr
-	CONNECTION_NODE<IKeyboardFocus> *node = pFirst;
+	auto& clients = point2.clients;
 
-	if (pCurr == NULL)
-	{
+	if (pCurr == nullptr)
 		pCurr = focusControl;
-	}
 
-	while (node)
+	// find the element whose next is pCurr
+	for (size_t i = 0; i + 1 < clients.size(); ++i)
 	{
-		if (node->pNext && (node->pNext->client == pCurr))
-		{
-			return node;
-		}
-		node = node->pNext;
+		if (clients[i + 1] == pCurr)
+			return i;
 	}
 
-	// if node was null then pick the last control in the list
-	if (node == NULL)
-	{
-		node = pFirst;
-		while (node->pNext)
-		{
-			node = node->pNext;
-		}
-	}
-
-	return node;
+	// not found - return last element
+	return clients.size() - 1;
 }
 //----------------------------------------------------------------------------------//
 //
 void TabButton::prevFocus (void)
 {
-	CONNECTION_NODE<IKeyboardFocus> *node = point2.pClientList;
-	CONNECTION_NODE<IKeyboardFocus> *first = point2.pClientList;
+	auto& clients = point2.clients;
 
 	if (focusControl == 0)
 	{
-		if (node == 0)
+		if (clients.empty())
 			return;
-		focusControl = node->client;
+		focusControl = clients.front();
 		if (focusControl->SetKeyboardFocus(true) == false)
-		{
 			prevFocus();
-		}
 		return;
 	}
 
-	//
-	// find the prev control before current focus
-	//
-	node = findPrevFocus(first, NULL);
+	size_t idx = findPrevFocusIndex(nullptr);
 
-	if (node && node->client != focusControl)
+	if (clients[idx] != (IKeyboardFocus*)focusControl)
 	{
 		focusControl->SetKeyboardFocus(false);
-		while (node->client != focusControl)
+
+		while (clients[idx] != (IKeyboardFocus*)focusControl)
 		{
-			if (node->client->SetKeyboardFocus(true))
+			if (clients[idx]->SetKeyboardFocus(true))
 			{
-				focusControl = node->client;
+				focusControl = clients[idx];
 				return;
 			}
-
-			if ((node = findPrevFocus(first, node->client)) == 0)
-				node = point2.pClientList;
+			idx = findPrevFocusIndex(clients[idx]);
 		}
-		focusControl->SetKeyboardFocus(true);	// failed to find another control to switch to
+		focusControl->SetKeyboardFocus(true);
 	}
 }
 //--------------------------------------------------------------------------//
@@ -866,8 +839,8 @@ void TabButton::init (TABBUTTONTYPE * _pButtonType)
 	{
 		COMPTR<IDAComponent> pBase;
 
-		GENDATA->CreateInstance(pButtonType->pFontType, pBase);
-		pBase->QueryInterface("IFontDrawAgent", pFont);
+		GENDATA->CreateInstance(pButtonType->pFontType, pBase.addr());
+		pBase->QueryInterface("IFontDrawAgent", pFont.void_addr());
 	}
 }
 //--------------------------------------------------------------------------//
@@ -925,7 +898,7 @@ TabButtonFactory::~TabButtonFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -934,7 +907,7 @@ void TabButtonFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

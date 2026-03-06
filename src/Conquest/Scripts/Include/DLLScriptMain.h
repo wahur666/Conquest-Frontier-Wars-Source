@@ -112,7 +112,7 @@ BOOL WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved)
 	{
 		case DLL_PROCESS_ATTACH:
 		{
-			HEAP = HEAP_Acquire();
+			HEAP_Acquire();
 			setDllHeapMsg(hInstance);
 			setScriptData(hInstance);
 		}

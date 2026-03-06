@@ -61,11 +61,11 @@ struct ProgClass : CQBaseProgram, ProgSave  \
 		\
 	void * operator new (size_t size)		\
 	{										\
-		return HEAP->ClearAllocateMemory(size+4, #ProgClass);	\
+		return HEAP_Acquire()->ClearAllocateMemory(size+4, #ProgClass);	\
 	}										\
 	void   operator delete (void *ptr)		\
 	{	\
-		HEAP->FreeMemory(ptr);	\
+		HEAP_Acquire()->FreeMemory(ptr);	\
 	}	\
 };											\
 											\

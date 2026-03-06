@@ -45,6 +45,8 @@
 
 #include <commctrl.h>
 
+#include "VFX_shapes.hpp"
+
 
 #define DBLCLICK_PERIOD  250
 #define MAX_CURSOR_SPEED 10

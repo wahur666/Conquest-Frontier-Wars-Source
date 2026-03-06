@@ -25,9 +25,7 @@
 #include "frame.h"
 #include "hotkeys.h"
 #include "Sfx.h"
-
-#include <da_vector>
-using namespace da_std;
+#include <vector.h>
 
 #define MAX_CHARS 256
 
@@ -249,8 +247,8 @@ struct TeletypeLine
 			background	= RGB(0,0,0);
 			hFont = CQCreateFont(fontID);
 
-			CreateFontDrawAgent(hFont, 1, pen, background, fontAgent);
-			CreateFontDrawAgent(hFont, 0, background | 0xFF000000, background, backAgent);
+			CreateFontDrawAgent(hFont, 1, pen, background, fontAgent.addr());
+			CreateFontDrawAgent(hFont, 0, background | 0xFF000000, background, backAgent.addr());
 		}
 		else
 		{
@@ -266,7 +264,7 @@ HSOUND TeletypeLine::HsndTeletype;
 //--------------------------------------------------------------------------//
 struct TeletypeObj
 {
-	typedef vector<TeletypeLine*> TTLINE_VECTOR;
+	typedef std::vector<TeletypeLine*> TTLINE_VECTOR;
 
 	TeletypeObj (const wchar_t *string, U32 _fontID, COLORREF _color, RECT rc, U32 _lifetime = 10000, U32 _speed = 20, 
 				 bool _bMute = false, bool _bIgnorePause = false, bool _bCenter = false) 
@@ -411,7 +409,7 @@ struct TeletypeObj
 			background	= RGB(0,0,0);
 			hFont = CQCreateFont(fontID);
 
-			CreateFontDrawAgent(hFont, 1, pen, background, testAgent);
+			CreateFontDrawAgent(hFont, 1, pen, background, testAgent.addr());
 		}
 	}
 
@@ -549,7 +547,7 @@ struct DACOM_NO_VTABLE Teletype : public IEventCallback, ITeletype
 	DACOM_INTERFACE_ENTRY(IEventCallback)
 	END_DACOM_MAP()
 
-	typedef vector<TeletypeObj*> TTOBJ_VECTOR;
+	typedef std::vector<TeletypeObj*> TTOBJ_VECTOR;
 
 	U32 handle;			// connection handle
 	static U32 teletypeIDCounter;
@@ -647,7 +645,7 @@ Teletype::~Teletype (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(handle);
 	}
 
@@ -827,7 +825,7 @@ struct _teletype : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 	
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(TTYPE->GetBase(), &TTYPE->handle);
 			FULLSCREEN->SetCallbackPriority(TTYPE, EVENT_PRIORITY_TEXTCHAT);

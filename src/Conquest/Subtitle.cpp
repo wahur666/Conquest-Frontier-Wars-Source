@@ -122,8 +122,8 @@ void Subtitle::NewBriefingSubtitle(wchar_t * subtitle,U32 _soundHandle)
 	{
 		CQASSERT(subtitle[0]-1 < 1024);
 		soundHandle = _soundHandle;
-		wcsncpy(textBuffer,subtitle+1,min(subtitle[0],1023));
-		textBuffer[min(subtitle[0],1023)] = 0;
+		wcsncpy(textBuffer,subtitle+1,std::min((int)subtitle[0],1023));
+		textBuffer[std::min((int)subtitle[0],1023)] = 0;
 
 		if(!fontAgent)
 			reloadFonts(true);
@@ -146,8 +146,8 @@ void Subtitle::NewSubtitle(wchar_t * subtitle,U32 _soundHandle)
 	{
 		CQASSERT(subtitle[0]-1 < 1024);
 		soundHandle = _soundHandle;
-		wcsncpy(textBuffer,subtitle+1,min(subtitle[0],1023));
-		textBuffer[min(subtitle[0],1023)] = 0;
+		wcsncpy(textBuffer,subtitle+1,std::min((int)subtitle[0],1023));
+		textBuffer[std::min((int)subtitle[0],1023)] = 0;
 
 		if(!fontAgent)
 			reloadFonts(true);
@@ -246,7 +246,7 @@ void Subtitle::reloadFonts (bool bLoad)
 		background	= RGB(0,0,0);
 		hFont = CQCreateFont(IDS_SUBTITLE_FONT);
 
-		CreateMultilineFontDrawAgent(0,hFont, pen, background, fontAgent);
+		CreateMultilineFontDrawAgent(0,hFont, pen, background, fontAgent.addr());
 	}
 	else
 	{
@@ -270,7 +270,7 @@ struct _subtitle : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 	
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(SSubTitle->GetBase(), &SSubTitle->handle);
 			FULLSCREEN->SetCallbackPriority(SSubTitle, EVENT_PRIORITY_TEXTCHAT);

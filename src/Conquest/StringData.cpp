@@ -123,7 +123,7 @@ StringData::~StringData (void)
 	archData = 0;
 
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 }
 //-------------------------------------------------------------------
@@ -269,10 +269,10 @@ BOOL32 StringData::loadTypesData (void)
 	BOOL32 result = 0;
 	COMPTR<IFileSystem> pFile;
 
-	if (DACOM->CreateInstance(&fdesc, pFile) != GR_OK)
+	if (DACOM->CreateInstance(&fdesc, pFile.void_addr()) != GR_OK)
 	{
 		fdesc.lpFileName = "..\\DB\\StringPack.db";
-		if (DACOM->CreateInstance(&fdesc, pFile) != GR_OK)
+		if (DACOM->CreateInstance(&fdesc, pFile.void_addr()) != GR_OK)
 		{
 			CQBOMB1("Could not access '%s'", fdesc.lpFileName);
 			goto Done;
@@ -336,7 +336,7 @@ GENRESULT StringData::copyOpenFile (IFileSystem *file,char *fileName)
 	file->SetFilePointer(0,0);
 	file->ReadFile(0,buffer,dwSize,&dwRead,0);
 
-	if ((result = CreateUTFMemoryFile(mdesc, temp)) != GR_OK)
+	if ((result = CreateUTFMemoryFile(mdesc, temp.addr())) != GR_OK)
 		return result;
 
 	temp.free();		// clears all of the sharing flags
@@ -346,7 +346,7 @@ GENRESULT StringData::copyOpenFile (IFileSystem *file,char *fileName)
 	fdesc.dwShareMode = 0;
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if ((result = DACOM->CreateInstance(&fdesc,outFile)) == GR_OK)
+	if ((result = DACOM->CreateInstance(&fdesc,outFile.void_addr())) == GR_OK)
 	{
 		outFile->WriteFile(0,buffer,dwRead,&dwWritten,0);
 	}
@@ -377,7 +377,7 @@ struct _stringlist : GlobalComponent
 		if (list->loadTypesData() == 0)
 			CQBOMB0("Load failed on string database.");
 
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(list->getBase(), &list->eventHandle);
 	}
 };

@@ -149,7 +149,7 @@ void __stdcall RunTestScript (const char *cmd_line_script)
 	ChangeInterfaceRes(IR_IN_GAME_RESOLUTION);
 
 	COMPTR<IPANIM> ipAnim;
-	MISSION->StartProgressAnim(ipAnim);
+	MISSION->StartProgressAnim(ipAnim.addr());
 	
 	if (cqgame.mapType == RANDOM_MAP)
 		MISSION->GenerateMultiplayerMap(cqgame, seed);

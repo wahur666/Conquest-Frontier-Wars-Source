@@ -19,9 +19,10 @@
 
 #include <HeapObj.h>
 #include <TSmartPointer.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <RendPipeline.h>
 #include <IDDBackDoor.h>
+#include <span>
 #include <WindowManager.h>
 
 
@@ -35,9 +36,17 @@ static U32 bitwidthR, bitwidthG, bitwidthB;
 //
 struct VideoSurface : public IVideoSurface
 {
-	BEGIN_DACOM_MAP_INBOUND(VideoSurface)
-	DACOM_INTERFACE_ENTRY(IVideoSurface)
-	END_DACOM_MAP()
+	static IDAComponent* GetIVideoSurface(void* self) {
+	    return static_cast<IVideoSurface*>(
+	        static_cast<VideoSurface*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IVideoSurface", &GetIVideoSurface},
+	    };
+	    return map;
+	}
 
 	// pixel format 
 	RPLOCKDATA lockData;
@@ -204,10 +213,10 @@ GENRESULT VideoSurface::getPrimarySurface (IDirectDrawSurface7 ** ppSurface)
 
 	*ppSurface = 0;
 
-	hr = PIPE->QueryInterface(IID_IDDBackDoor, pBackDoor);
+	hr = PIPE->QueryInterface(IID_IDDBackDoor, pBackDoor.void_addr());
 	if (hr != GR_OK)
 		goto Done;
-	hr = pBackDoor->get_dd_provider(DDBD_P_PRIMARYSURFACE, pDD1);
+	hr = pBackDoor->get_dd_provider(DDBD_P_PRIMARYSURFACE, pDD1.addr());
 	if (hr != GR_OK)
 		goto Done;
 	hr = pDD1->QueryInterface(IID_IDirectDrawSurface7, (void **) ppSurface);
@@ -230,7 +239,7 @@ bool VideoSurface::LockFrontBuffer (void)
 
 	CQASSERT(frameLockCount==0);	// can't lock both at once
 
-	if (getPrimarySurface(pPrimary) == GR_OK)
+	if (getPrimarySurface(pPrimary.addr()) == GR_OK)
 	{
 		DDSURFACEDESC2 ddsd2;
 
@@ -281,7 +290,7 @@ void VideoSurface::UnlockFrontBuffer (void)
 
 	CQASSERT(frameLockCount==0);	// can't lock both at once
 
-	if (getPrimarySurface(pPrimary) == GR_OK)
+	if (getPrimarySurface(pPrimary.addr()) == GR_OK)
 	{
 		pPrimary->Unlock( NULL );
 
@@ -524,7 +533,7 @@ struct _video : GlobalComponent
 	{
 		VideoSurface * video;
 
-		SURFACE = video = new DAComponent<VideoSurface>;
+		SURFACE = video = new DAComponentX<VideoSurface>;
 		AddToGlobalCleanupList((IDAComponent **) &SURFACE);
 
 		video->init();

@@ -128,12 +128,12 @@ struct DACOM_NO_VTABLE Slider : BaseHotRect, ISlider, IKeyboardFocus
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "Slider");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "Slider");
 	}
 
 	void   operator delete (void *ptr)
 	{
-		HEAP->FreeMemory(ptr);
+		HEAP_Acquire()->FreeMemory(ptr);
 	}
 
 	/* ISlider methods  */
@@ -788,7 +788,7 @@ SliderFactory::~SliderFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -797,7 +797,7 @@ void SliderFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -825,7 +825,7 @@ HANDLE SliderFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYPE objClas
 			BEGIN_MAPPING(INTERFACEDIR, data->shapeFile);
 				int i;
 				for (i = 0; i < MAX_SLIDER_SHAPES; i++)
-					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i]);
+					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i].addr());
 			END_MAPPING(INTERFACEDIR);
 
 			// the tab width is defined by art

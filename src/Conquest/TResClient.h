@@ -106,7 +106,7 @@ public:
 #ifndef FINAL_RELEASE
 		if (recurseCount++>2)
 		{
-			CQASSERT(HEAP->EnumerateBlocks());
+			CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 			CQBOMB1("recurseCount>2 in resourceClient!\nStatusTextID=%d", statusTextID);
 		}
 #endif

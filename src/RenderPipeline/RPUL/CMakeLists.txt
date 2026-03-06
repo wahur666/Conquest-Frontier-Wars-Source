@@ -42,7 +42,7 @@ target_link_directories(RPUL PRIVATE
         "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x64"
 )
 
-
+set_property(TARGET RPUL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 ## Optional: Output directories per configuration
 #set_target_properties(RPUL PROPERTIES
 #        ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/../../../../Static/Debug

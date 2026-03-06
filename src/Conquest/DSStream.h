@@ -110,7 +110,7 @@ struct DSStream : IDAComponent
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "DSStream");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "DSStream");
 	}
 
 private:

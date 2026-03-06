@@ -279,7 +279,7 @@ GENRESULT SetDeviceInfoInFile( const char *ini_file, const char *device_class, c
 	fclose( in );
 	fclose( out );
 
-	unlink( ini_file );
+	_unlink( ini_file );
 
 	if( (in = fopen( "ini_file.tmp", "rt" )) == NULL ) {
 		return GR_GENERIC;
@@ -296,7 +296,7 @@ GENRESULT SetDeviceInfoInFile( const char *ini_file, const char *device_class, c
 	fclose( in );
 	fclose( out );
 
-	unlink( "ini_file.tmp" );
+	_unlink( "ini_file.tmp" );
 
 	return GR_OK;
 }

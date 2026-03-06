@@ -391,7 +391,7 @@ static BOOL32 LoadHotkeys (void)
 //
 static void draw (void)
 {
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 
    	DrawMap();
 
@@ -405,7 +405,7 @@ static void draw (void)
 		DA::LineDraw(0, linkX, linkY, mouseX, mouseY, RGB(255,255,0), 0);
 	}
 
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 }
 //--------------------------------------------------------------------------//
 //
@@ -725,7 +725,7 @@ GENRESULT EventCallback::Notify (U32 message, void *param)
 //  
 void __stdcall ActivateRUSE (IFileSystem * outFile)
 {
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 
 	if (hMenu==0)
 		hMenu = LoadMenu(hResource, MAKEINTRESOURCE(IDR_MENU2));
@@ -767,14 +767,14 @@ void __stdcall ActivateRUSE (IFileSystem * outFile)
 
 	hDlgBox = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_DIALOG12), hMainWindow, loadArchDlgProc, NULL);//(LPARAM) this);
 
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 
 }
 //--------------------------------------------------------------------------
 //  
 BOOL32 __stdcall DeactivateRUSE (void)
 {
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 
 	if (bMapChanged)
 	switch (MessageBox(hMainWindow, "Save map data?", "Unsaved Data", MB_YESNOCANCEL|MB_ICONEXCLAMATION))
@@ -815,7 +815,7 @@ BOOL32 __stdcall DeactivateRUSE (void)
 	TMANAGER->ReleaseTextureRef(sysTextureID);
 	sysTextureID=0;
 
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 
 	return 1;
 }

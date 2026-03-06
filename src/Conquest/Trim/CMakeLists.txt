@@ -110,7 +110,6 @@ add_library(Trim SHARED
         ../VoxCompress.cpp
         ../WindowManager.cpp
         # ASM sources - assembled via MASM
-        ../Search.cpp
 
 #        Winvfx16.asm
 )
@@ -145,6 +144,7 @@ target_include_directories(Trim PRIVATE
 
 target_link_directories(Trim PRIVATE
         "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x64"
+        ../../../lib
 )
 
 # Preprocessor definitions
@@ -164,11 +164,11 @@ target_compile_definitions(Trim PRIVATE
 if (MSVC)
     target_compile_options(Trim PRIVATE
             /W4
-            $<$<CONFIG:Debug>:/Od /Zi /MTd>
-            $<$<CONFIG:DEMO_Debug>:/Od /Zi /MT>
-            $<$<CONFIG:Release>:/O2 /Oi /Ob1 /Gs /MT>
-            $<$<CONFIG:DEMO_Final>:/O2 /Oi /Ob1 /Gs /MT>
-            $<$<CONFIG:Final>:/O2 /Oi /Ob1 /Gs /MT>
+            $<$<CONFIG:Debug>:/Od /Zi>
+            $<$<CONFIG:DEMO_Debug>:/Od /Zi>
+            $<$<CONFIG:Release>:/O2 /Oi /Ob1 /Gs>
+            $<$<CONFIG:DEMO_Final>:/O2 /Oi /Ob1 /Gs>
+            $<$<CONFIG:Final>:/O2 /Oi /Ob1 /Gs>
     )
 endif()
 
@@ -176,11 +176,6 @@ endif()
 set_target_properties(Trim PROPERTIES
         PREFIX ""
         SUFFIX ".dll"
-)
-
-# Module definition file
-set_target_properties(Trim PROPERTIES
-        LINK_FLAGS "/DEF:\"${CMAKE_CURRENT_SOURCE_DIR}/Trim.def\""
 )
 
 # Linker settings
@@ -199,10 +194,11 @@ target_link_libraries(Trim PRIVATE
         DACOM
         # Prebuilt static libs from Libs/Static - adjust path as needed
         # COMHeap     # comheap.lib
-        # rpul        # rpul.lib
+        RPUL # rpul.lib
         ddraw
+        dplayx
         dinput
-        dsetup
+#        dsetup
         shlwapi
         version
         imm32
@@ -214,3 +210,5 @@ target_link_libraries(Trim PRIVATE
         $<$<NOT:$<CONFIG:Debug>>:strmiids>
         $<$<NOT:$<CONFIG:Debug>>:amstrmid>
 )
+
+set_property(TARGET Trim PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

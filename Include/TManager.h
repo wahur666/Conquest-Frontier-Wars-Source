@@ -45,17 +45,17 @@ struct DACOM_NO_VTABLE ITManager : public IDAComponent
 
 	virtual U32 __stdcall CreateTextureFromFile (const char *fileName, IComponentFactory *parentFile, DA::FILETYPE type, const PixelFormat &format) = 0;
 
-	virtual U32 __stdcall AddTextureRef (U32 textureID) = 0;		// returns new ref count
+	virtual LONG_PTR __stdcall AddTextureRef (LONG_PTR textureID) = 0;		// returns new ref count
 
-	virtual U32 __stdcall ReleaseTextureRef (U32 textureID) = 0;	// returns new ref count
+	virtual LONG_PTR __stdcall ReleaseTextureRef (LONG_PTR textureID) = 0;	// returns new ref count
 
 	virtual void __stdcall Flush (void) = 0;
 
-	virtual U32 __stdcall GetFirstTexture() = 0;
+	virtual LONG_PTR __stdcall GetFirstTexture() = 0;
 
-	virtual U32 __stdcall GetNextTexture(U32 textureID) = 0;
+	virtual LONG_PTR __stdcall GetNextTexture(LONG_PTR textureID) = 0;
 
-	virtual U32 __stdcall GetPrevTexture(U32 textureID) = 0;
+	virtual LONG_PTR __stdcall GetPrevTexture(LONG_PTR textureID) = 0;
 
 	virtual void Initialize(InitInfo & info) = 0;
 
@@ -66,7 +66,7 @@ struct DACOM_NO_VTABLE ITManager : public IDAComponent
 	// use a texture from special drawAgent cache, or create a new texture
 	virtual U32 __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha) = 0;
 
-	virtual void __stdcall ReleaseDrawAgentTexture (U32 textureID) = 0;
+	virtual void __stdcall ReleaseDrawAgentTexture (LONG_PTR textureID) = 0;
 };
 
 

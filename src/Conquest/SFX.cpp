@@ -329,7 +329,7 @@ Sfx::~Sfx (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 #endif
@@ -477,7 +477,7 @@ bool Sfx::load (SFX::ID id)
 	dsdesc.lpwfxFormat = & outputWaveFormat;		
 	dsdesc.dwFlags = DSBCAPS_CTRLVOLUME|DSBCAPS_CTRLPAN|DSBCAPS_GETCURRENTPOSITION2|DSBCAPS_STATIC;
 	dsdesc.dwBufferBytes = data_size;
-	hr = DSOUND->CreateSoundBuffer(&dsdesc, lpDSBuffer, 0);
+	hr = DSOUND->CreateSoundBuffer(&dsdesc, lpDSBuffer.addr(), 0);
 	if (hr != DS_OK)
 	{
 		CQTRACE11("DSound error #%08X",hr);
@@ -1189,7 +1189,7 @@ bool Sfx::loadSoundInstance (SoundInstance * instance, SFX::ID id)
 		else // need to duplicate the buffer
 		{
 			HRESULT hr;
-			hr = DSOUND->DuplicateSoundBuffer(table[id].lpDSBuffer, instance->lpDSBuffer);
+			hr = DSOUND->DuplicateSoundBuffer(table[id].lpDSBuffer, instance->lpDSBuffer.addr());
 			if (hr != DS_OK)
 			{
 				instance->id = SFX::INVALID;
@@ -1202,7 +1202,7 @@ bool Sfx::loadSoundInstance (SoundInstance * instance, SFX::ID id)
 	}
 
 Done:
-	return (instance->lpDSBuffer.ptr!=0);
+	return (instance->lpDSBuffer.addr()!=0);
 }
 //--------------------------------------------------------------------------//
 //
@@ -1240,7 +1240,7 @@ struct _sfx : GlobalComponent
 #if SFXNOTIFY
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(manager->getBase(), &manager->eventHandle);
 		FULLSCREEN->SetCallbackPriority(manager,EVENT_PRIORITY_SFX);
 #endif

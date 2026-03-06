@@ -729,26 +729,26 @@ namespace DA
 
 //--------------------------
 // WinVfx16.asm
-extern "C"{
-S32  WINAPI VFX_shape_scan8 (PANE *pane, U32 transparent_color, S32 hotX, S32 hotY, VFX_SHAPETABLE *shape_table);
-void WINAPI VFX_shape_draw (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
-void WINAPI VFX_shape_draw8 (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
-void WINAPI VFX_shape_draw_unclipped8 (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
-void WINAPI VFX_shape_palette (VFX_SHAPETABLE *shape_table, S32 shape_num, VFX_RGB *palette);
-S32  WINAPI VFX_shape_colors (VFX_SHAPETABLE *shape_table, S32 shape_num, VFX_CRGB *colors);
-S32  WINAPI VFX_shape_bounds (VFX_SHAPETABLE *shape_table, S32 shape_num);
-S32  WINAPI VFX_font_height (VFX_FONT *font);
-S32  WINAPI VFX_character_width (VFX_FONT *font, S32 character);
-S32  WINAPI VFX_character_draw (PANE *pane, S32 x, S32 y, VFX_FONT *font, S32 character, void *color_translate);
-void WINAPI VFX_string_draw (PANE *pane, S32 x, S32 y, VFX_FONT *font, const char *string, void *color_translate);
-S32  WINAPI VFX_rectangle_hash (const PANE *pane, S32 x0, S32 y0, S32 x1, S32 y1, U32 color);
-S32  WINAPI VFX_pane_wipe (const PANE *pane, U32 color);
-S32  WINAPI VFX_pane_copy (PANE *source, S32 sx, S32 sy, PANE *target, S32 tx, S32 ty, S32 fill);
-void WINAPI VFX_ellipse_fill (PANE *pane, S32 xc, S32 yc, S32 width, S32 height, U32 color);
-U32  WINAPI VFX_pixel_write (const PANE *pane, S32 x, S32 y, U32 color);
-U32  WINAPI VFX_pixel_read (const PANE *pane, S32 x, S32 y);
-S32  WINAPI VFX_line_draw (const PANE *pane, S32 x0, S32 y0, S32 x1, S32 y1, S32 mode, U32 parm);
-} // end extern "C"
+// extern "C"{
+// S32  WINAPI VFX_shape_scan8 (PANE *pane, U32 transparent_color, S32 hotX, S32 hotY, VFX_SHAPETABLE *shape_table);
+// void WINAPI VFX_shape_draw (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
+// void WINAPI VFX_shape_draw8 (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
+// void WINAPI VFX_shape_draw_unclipped8 (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
+// void WINAPI VFX_shape_palette (VFX_SHAPETABLE *shape_table, S32 shape_num, VFX_RGB *palette);
+// S32  WINAPI VFX_shape_colors (VFX_SHAPETABLE *shape_table, S32 shape_num, VFX_CRGB *colors);
+// S32  WINAPI VFX_shape_bounds (VFX_SHAPETABLE *shape_table, S32 shape_num);
+// S32  WINAPI VFX_font_height (VFX_FONT *font);
+// S32  WINAPI VFX_character_width (VFX_FONT *font, S32 character);
+// S32  WINAPI VFX_character_draw (PANE *pane, S32 x, S32 y, VFX_FONT *font, S32 character, void *color_translate);
+// void WINAPI VFX_string_draw (PANE *pane, S32 x, S32 y, VFX_FONT *font, const char *string, void *color_translate);
+// S32  WINAPI VFX_rectangle_hash (const PANE *pane, S32 x0, S32 y0, S32 x1, S32 y1, U32 color);
+// S32  WINAPI VFX_pane_wipe (const PANE *pane, U32 color);
+// S32  WINAPI VFX_pane_copy (PANE *source, S32 sx, S32 sy, PANE *target, S32 tx, S32 ty, S32 fill);
+// void WINAPI VFX_ellipse_fill (PANE *pane, S32 xc, S32 yc, S32 width, S32 height, U32 color);
+// U32  WINAPI VFX_pixel_write (const PANE *pane, S32 x, S32 y, U32 color);
+// U32  WINAPI VFX_pixel_read (const PANE *pane, S32 x, S32 y);
+// S32  WINAPI VFX_line_draw (const PANE *pane, S32 x0, S32 y0, S32 x1, S32 y1, S32 mode, U32 parm);
+// } // end extern "C"
 //
 //
 //--------------------------
@@ -776,10 +776,10 @@ struct IBaseObject * __stdcall CreateTrail (PARCHETYPE pArchetype, IBaseObject *
 
 //--------------------------
 // search.asm
-SINGLE __stdcall get_angle (SINGLE x, SINGLE y);
-double __fastcall get_angle (double *x, double *y);
-void * __fastcall unmemchr (const void * ptr, int c, int size);
-extern "C" void rmemcpy (void * dst, const void * src, int size);
+// SINGLE __stdcall get_angle (SINGLE x, SINGLE y);
+// double __fastcall get_angle (double *x, double *y);
+// void * __fastcall unmemchr (const void * ptr, int c, int size);
+// extern "C" void rmemcpy (void * dst, const void * src, int size);
 //
 // global functions defined outside of Conquest.exe
 //

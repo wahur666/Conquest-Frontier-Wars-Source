@@ -147,7 +147,7 @@ StatusBarResource::~StatusBarResource (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(handle);
 	}
 }
@@ -410,11 +410,11 @@ void StatusBarResource::reloadFonts (bool bLoad)
 		background	= RGB(0,0,0);	   //| 0xFF000000;		// black	(background color)
 		hFont = CQCreateFont(IDS_STATUSBAR_FONT);
 
-		CreateFontDrawAgent(hFont, 1, pen, background, font);
-		font->CreateDuplicate(shadowFont);
+		CreateFontDrawAgent(hFont, 1, pen, background, font.addr());
+		font->CreateDuplicate(shadowFont.addr());
 
-		font->CreateDuplicate(shadowFontName);
-		font->CreateDuplicate(fontName);
+		font->CreateDuplicate(shadowFontName.addr());
+		font->CreateDuplicate(fontName.addr());
 	}
 	else
 	{
@@ -455,7 +455,7 @@ struct _status : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 	
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(STATUS, &SBAR->handle);
 			FULLSCREEN->SetCallbackPriority(SBAR, EVENT_PRIORITY_STATUS);

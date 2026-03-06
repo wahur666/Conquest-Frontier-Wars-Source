@@ -42,7 +42,7 @@ static void SetDllHeapMsg (HINSTANCE hInstance)
 		dwLen--;
 	}
 
-	SetDefaultHeapMsg(buffer+dwLen);
+	// SetDefaultHeapMsg(buffer+dwLen);
 }
 //--------------------------------------------------------------------------//
 //
@@ -56,7 +56,7 @@ BOOL WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved)
 	{
 		case DLL_PROCESS_ATTACH:
 		{
-			HEAP = HEAP_Acquire();
+			HEAP_Acquire();
 			SetDllHeapMsg(hInstance);
 		}
 		break;

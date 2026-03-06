@@ -120,7 +120,7 @@ void * ObjectImpl< Base >::operator new (size_t size)
 #ifdef _DEBUG
 	void * result;
 
-	if ((result = HEAP->ClearAllocateMemory(size, "Object instance")) != 0)
+	if ((result = HEAP_Acquire()->ClearAllocateMemory(size, "Object instance")) != 0)
 	{
 		DWORD dwAddr;
 		__asm
@@ -128,11 +128,11 @@ void * ObjectImpl< Base >::operator new (size_t size)
 			mov eax, DWORD PTR [EBP+4]
 			mov DWORD PTR dwAddr, eax
 		}
-		HEAP->SetBlockOwner(result, dwAddr);
+		HEAP_Acquire()->SetBlockOwner(result, dwAddr);
 	}
 	return result;
 #else
-	return HEAP->ClearAllocateMemory(size);
+	return HEAP_Acquire()->ClearAllocateMemory(size);
 #endif
 }
 //--------------------------------------------------------------------------//
@@ -143,7 +143,7 @@ void * ObjectImpl< Base >::operator new[] (size_t size)
 #ifdef _DEBUG
 	void * result;
 
-	if ((result = HEAP->ClearAllocateMemory(size, "Object instance")) != 0)
+	if ((result = HEAP_Acquire()->ClearAllocateMemory(size, "Object instance")) != 0)
 	{
 		DWORD dwAddr;
 		__asm
@@ -151,11 +151,11 @@ void * ObjectImpl< Base >::operator new[] (size_t size)
 			mov eax, DWORD PTR [EBP+4]
 			mov DWORD PTR dwAddr, eax
 		}
-		HEAP->SetBlockOwner(result, dwAddr);
+		HEAP_Acquire()->SetBlockOwner(result, dwAddr);
 	}
 	return result;
 #else
-	return HEAP->ClearAllocateMemory(size);
+	return HEAP_Acquire()->ClearAllocateMemory(size);
 #endif
 }
 //--------------------------------------------------------------------------//
@@ -163,14 +163,14 @@ void * ObjectImpl< Base >::operator new[] (size_t size)
 template <class Base>
 void ObjectImpl< Base >::operator delete (void *ptr)
 {
-	HEAP->FreeMemory(ptr);
+	HEAP_Acquire()->FreeMemory(ptr);
 }
 //--------------------------------------------------------------------------//
 //
 template <class Base>
 void ObjectImpl< Base >::operator delete[] (void *ptr)
 {
-	HEAP->FreeMemory(ptr);
+	HEAP_Acquire()->FreeMemory(ptr);
 }
 
 

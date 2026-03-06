@@ -240,11 +240,11 @@ void TabControl::InitTab (const TABCONTROL_DATA & data, BaseHotRect * _parent, I
 	if (bTabsLoaded == false)
 	{
 		// load the base tab control image
-		loader->CreateImageReader(baseImage, reader);
+		loader->CreateImageReader(baseImage, reader.addr());
 		controlWidth  = reader->GetWidth();
 		controlHeight = reader->GetHeight();
 
-		loader->CreateDrawAgent(baseImage, borderDrawAgent, NULL);
+		loader->CreateDrawAgent(baseImage, borderDrawAgent.addr(), NULL);
 	} 
 
 	// set the screen rect
@@ -258,7 +258,7 @@ void TabControl::InitTab (const TABCONTROL_DATA & data, BaseHotRect * _parent, I
 
 	for (int i = 0; i < data.numTabs; i++)
 	{
-		loader->CreateImageReader(i*4 + 1 + baseImage, reader);
+		loader->CreateImageReader(i*4 + 1 + baseImage, reader.addr());
 		width = reader->GetWidth();
 		height = reader->GetHeight();
 
@@ -272,13 +272,13 @@ void TabControl::InitTab (const TABCONTROL_DATA & data, BaseHotRect * _parent, I
 		{
 			if (data.hotButtonType[0])
 			{
-				GENDATA->CreateInstance(data.hotButtonType, pBase);
+				GENDATA->CreateInstance(data.hotButtonType, pBase.addr());
 			}
 			else
 			{
-				GENDATA->CreateInstance("HotButton!!Tab", pBase);
+				GENDATA->CreateInstance("HotButton!!Tab", pBase.addr());
 			}
-			pBase->QueryInterface("ITabButton", tabs[i]);
+			pBase->QueryInterface("ITabButton", tabs[i].void_addr());
 		}
 
 		tabs[i]->InitTabButton(dumbData[i], this, loader);
@@ -436,7 +436,7 @@ TabControlFactory::~TabControlFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -445,7 +445,7 @@ void TabControlFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

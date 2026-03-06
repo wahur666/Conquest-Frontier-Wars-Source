@@ -2101,7 +2101,7 @@ struct DACOM_NO_VTABLE Nebula : ObjectMission<
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "Nebula");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "Nebula");
 	}
 	
 	
@@ -4092,7 +4092,7 @@ BOOL FieldManager::FieldListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 
 					SYSMAP->InvalidateMap(fieldmgr->workingSystemID);
 
-					CQASSERT(HEAP->EnumerateBlocks());
+					CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 				}
 				else 
 				{

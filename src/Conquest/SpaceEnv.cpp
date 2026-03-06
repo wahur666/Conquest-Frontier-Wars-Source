@@ -174,7 +174,7 @@ SpaceEnvironment::~SpaceEnvironment (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -574,7 +574,7 @@ void SpaceEnvironment::LoadBackground(char * filename,U32 systemID)
 		DAFILEDESC fdesc = filename;
 		COMPTR<IFileSystem> file;
 				
-		if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 		{
 			if(nebShapeArcheIndex[systemID])
 			{
@@ -703,7 +703,7 @@ struct _stars : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(spaceEnv->getBase(), &spaceEnv->eventHandle);
 	}
 };

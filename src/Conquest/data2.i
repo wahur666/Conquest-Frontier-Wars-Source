@@ -335875,17 +335875,17 @@ struct __declspec(novtable) ITManager : public IDAComponent
 
 	virtual U32 __stdcall CreateTextureFromFile (const char *fileName, IComponentFactory *parentFile, DA::FILETYPE type, const PixelFormat &format) = 0;
 
-	virtual U32 __stdcall AddTextureRef (U32 textureID) = 0;		
+	virtual LONG_PTR __stdcall AddTextureRef (LONG_PTR textureID) = 0;		
 
-	virtual U32 __stdcall ReleaseTextureRef (U32 textureID) = 0;	
+	virtual LONG_PTR __stdcall ReleaseTextureRef (LONG_PTR textureID) = 0;	
 
 	virtual void __stdcall Flush (void) = 0;
 
-	virtual U32 __stdcall GetFirstTexture() = 0;
+	virtual LONG_PTR __stdcall GetFirstTexture() = 0;
 
-	virtual U32 __stdcall GetNextTexture(U32 textureID) = 0;
+	virtual LONG_PTR __stdcall GetNextTexture(LONG_PTR textureID) = 0;
 
-	virtual U32 __stdcall GetPrevTexture(U32 textureID) = 0;
+	virtual LONG_PTR __stdcall GetPrevTexture(LONG_PTR textureID) = 0;
 
 	virtual void Initialize(InitInfo & info) = 0;
 
@@ -335896,7 +335896,7 @@ struct __declspec(novtable) ITManager : public IDAComponent
 	
 	virtual U32 __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha) = 0;
 
-	virtual void __stdcall ReleaseDrawAgentTexture (U32 textureID) = 0;
+	virtual void __stdcall ReleaseDrawAgentTexture (LONG_PTR textureID) = 0;
 };
 
 
@@ -337385,26 +337385,26 @@ enum PACKET_TYPE
 
 
 
-extern "C"{
-S32  __stdcall VFX_shape_scan8 (PANE *pane, U32 transparent_color, S32 hotX, S32 hotY, VFX_SHAPETABLE *shape_table);
-void __stdcall VFX_shape_draw (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
-void __stdcall VFX_shape_draw8 (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
-void __stdcall VFX_shape_draw_unclipped8 (PANE *pane, VFX_SHAPETABLE *shape_table, S32 shape_number, S32 hotX, S32 hotY);
-void __stdcall VFX_shape_palette (VFX_SHAPETABLE *shape_table, S32 shape_num, VFX_RGB *palette);
-S32  __stdcall VFX_shape_colors (VFX_SHAPETABLE *shape_table, S32 shape_num, VFX_CRGB *colors);
-S32  __stdcall VFX_shape_bounds (VFX_SHAPETABLE *shape_table, S32 shape_num);
-S32  __stdcall VFX_font_height (VFX_FONT *font);
-S32  __stdcall VFX_character_width (VFX_FONT *font, S32 character);
-S32  __stdcall VFX_character_draw (PANE *pane, S32 x, S32 y, VFX_FONT *font, S32 character, void *color_translate);
-void __stdcall VFX_string_draw (PANE *pane, S32 x, S32 y, VFX_FONT *font, const char *string, void *color_translate);
-S32  __stdcall VFX_rectangle_hash (const PANE *pane, S32 x0, S32 y0, S32 x1, S32 y1, U32 color);
-S32  __stdcall VFX_pane_wipe (const PANE *pane, U32 color);
-S32  __stdcall VFX_pane_copy (PANE *source, S32 sx, S32 sy, PANE *target, S32 tx, S32 ty, S32 fill);
-void __stdcall VFX_ellipse_fill (PANE *pane, S32 xc, S32 yc, S32 width, S32 height, U32 color);
-U32  __stdcall VFX_pixel_write (const PANE *pane, S32 x, S32 y, U32 color);
-U32  __stdcall VFX_pixel_read (const PANE *pane, S32 x, S32 y);
-S32  __stdcall VFX_line_draw (const PANE *pane, S32 x0, S32 y0, S32 x1, S32 y1, S32 mode, U32 parm);
-} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -337432,10 +337432,10 @@ struct IBaseObject * __stdcall CreateTrail (PARCHETYPE pArchetype, IBaseObject *
 
 
 
-SINGLE __stdcall get_angle (SINGLE x, SINGLE y);
-double __fastcall get_angle (double *x, double *y);
-void * __fastcall unmemchr (const void * ptr, int c, int size);
-extern "C" void rmemcpy (void * dst, const void * src, int size);
+
+
+
+
 
 
 

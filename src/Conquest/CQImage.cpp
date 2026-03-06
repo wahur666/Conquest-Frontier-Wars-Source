@@ -1038,13 +1038,13 @@ int ICQImage::STANDARD_DUMP(ErrorCode code, const C8 *fmt, ...)
                         (unsigned long long)(memoryStatus.ullTotalPhys     >> 20),
                         (unsigned long long)(memoryStatus.ullAvailPageFile  >> 20),
                         (unsigned long long)(memoryStatus.ullAvailVirtual   >> 20),
-                        HEAP->GetHeapSize() >> 20);
+                        HEAP_Acquire()->GetHeapSize() >> 20);
             }
             break;
 
         case DAHEAP_OUT_OF_MEMORY:
             Bomb(buffer);
-            InitializeDAHeap(0x800000, 0x800000, DAHEAPFLAG_DEBUGFILL_SNAN | DAHEAPFLAG_NOMSGS);
+            // InitializeDAHeap(0x800000, 0x800000, DAHEAPFLAG_DEBUGFILL_SNAN | DAHEAPFLAG_NOMSGS);
             return 1;
         }
     }

@@ -128,7 +128,7 @@ static void slam2Dcomponents (S32 frame_time, bool bUseLocking)
 			U32 batchMem = batchHeap->GetHeapSize()-batchHeap->GetAvailableMemory();
 			
 			wsprintf(buffer,"FPS: %2d, TEX: %d, VB: %d, SND: %d, HEAP: %d, BATCH: %d, POLYS: %3d%s", 
-				fps, TEXMEMORYUSED, VBMEMORYUSED, SNDMEMORYUSED, HEAP->GetLargestBlock(), batchMem, stats.num_dp_primitives+stats.num_dip_primitives, stats.is_thrashing ? " TEXTURE THRASHING" : "");
+				fps, TEXMEMORYUSED, VBMEMORYUSED, SNDMEMORYUSED, HEAP_Acquire()->GetLargestBlock(), batchMem, stats.num_dp_primitives+stats.num_dip_primitives, stats.is_thrashing ? " TEXTURE THRASHING" : "");
 			
 			DEBUGFONT->StringDraw(0, 8, 14, buffer, RGB(200,200,200));
 			
@@ -136,7 +136,7 @@ static void slam2Dcomponents (S32 frame_time, bool bUseLocking)
 		else
 		{
 			wsprintf(buffer,"FPS: %2d, HEAP: %d",
-			fps, HEAP->GetLargestBlock());
+			fps, HEAP_Acquire()->GetLargestBlock());
 
 			DEBUGFONT->StringDraw(0, 8, 14, buffer, RGB(200,200,200));
 		}

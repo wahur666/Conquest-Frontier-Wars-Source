@@ -674,7 +674,7 @@ struct DACOM_NO_VTABLE ObjectList : public IObjectList,
 	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
 	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
 	END_DACOM_MAP()
-	
+
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
 		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
 			{"IEventCallback", [](void* self) -> IDAComponent* {
@@ -1108,7 +1108,7 @@ void ObjectList::Update (void)
 		doPerformanceTrace(updateCounter);
 	QueryPerformanceCounter((LARGE_INTEGER *)&firsttick);
 #if 0
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 #endif
 
 
@@ -1225,7 +1225,7 @@ void ObjectList::Update (void)
 	}
 
 #if 0
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 #endif
 	QueryPerformanceCounter((LARGE_INTEGER *)&lasttick);
 	timing.add_to_update_total(lasttick-firsttick);
@@ -1280,7 +1280,7 @@ void ObjectList::Render (void)
 	const bool bPointRect = (selectionRect.top == selectionRect.bottom && selectionRect.right == selectionRect.left);
 
 #if 0
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 #endif
 
 	if (CQEFFECTS.bNoForceMaxLOD==0)
@@ -1610,7 +1610,7 @@ void ObjectList::Render (void)
 	}
 
 #if 0
-	CQASSERT(HEAP->EnumerateBlocks());
+	CQASSERT(HEAP_Acquire()->EnumerateBlocks());
 #endif
 
 	U64 lastMapTime = SYSMAP->GetMapTiming();
@@ -1960,7 +1960,7 @@ void ObjectList::issuePerformanceWarning (bool bWarning)
 	report.addText(buffer);
 	GlobalMemoryStatus(&memoryStatus);
 	sprintf(buffer, "PMemory: %d MB, VMemory: %d MB, VAddress: %d MB, HeapSize: %d MB\r\n", memoryStatus.dwTotalPhys>>20, memoryStatus.dwAvailPageFile>>20, memoryStatus.dwAvailVirtual>>20,
-		(HEAP->GetHeapSize()+GetBatchHeap()->GetHeapSize()) >> 20);
+		(HEAP_Acquire()->GetHeapSize()+GetBatchHeap()->GetHeapSize()) >> 20);
 	report.addText(buffer);
 	sprintf(buffer, "TEXTURES: %d MB, VERTEX: %d MB, SOUND: %d MB, TexLOD: %d\r\n", TEXMEMORYUSED>>20, VBMEMORYUSED>>20, SNDMEMORYUSED>>20, TEXLOD);
 	report.addText(buffer);
@@ -2577,14 +2577,14 @@ IBaseObject * ObjectList::CreateInstance (PARCHETYPE pArchetype)
 		goto Done;
 
 #if 0   //def _JASON
-	CQTRACE12("Entering CreateInstance(\"%s\") HEAP=%d", GetArchName(pArchetype), HEAP->GetAvailableMemory());
+	CQTRACE12("Entering CreateInstance(\"%s\") HEAP=%d", GetArchName(pArchetype), HEAP_Acquire()->GetAvailableMemory());
 	MarkAllocatedBlocks(HEAP);
 #endif
 	CQFLAGS.bInsideCreateInstance=1;	// for test purposes only
 	obj = node->factory->CreateInstance(node->hArchetype);
 	CQFLAGS.bInsideCreateInstance=0;	// for test purposes only
 #if 0 // def _JASON
-	CQTRACE12("Leaving CreateInstance(\"%s\")  HEAP=%d", GetArchName(pArchetype), HEAP->GetAvailableMemory());
+	CQTRACE12("Leaving CreateInstance(\"%s\")  HEAP=%d", GetArchName(pArchetype), HEAP_Acquire()->GetAvailableMemory());
 	PrintHeap(HEAP);
 #endif
 

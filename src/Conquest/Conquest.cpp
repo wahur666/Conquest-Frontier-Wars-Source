@@ -107,9 +107,9 @@ static void clean_up (void)
 	{
 		COMPTR<IHeapBackdoor> door;
 
-		if (HEAP->QueryInterface("IHeapBackdoor", door) == GR_OK)
+		if (HEAP_Acquire()->QueryInterface("IHeapBackdoor", door) == GR_OK)
 		{
-			U32 flags = HEAP->GetHeapFlags();
+			U32 flags = HEAP_Acquire()->GetHeapFlags();
 
 			flags &= ~DAHEAPFLAG_DEBUGFILL_SNAN;		// don't fill memory
 			flags |= DAHEAPFLAG_NOBESTFIT|DAHEAPFLAG_NOVERIFYPTR;
@@ -662,8 +662,8 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		goto Done;
 	}
 
-	HEAP->SetErrorHandler(ICQImage::STANDARD_DUMP);
-	TrimResetHeap(HEAP);
+	HEAP_Acquire()->SetErrorHandler(ICQImage::STANDARD_DUMP);
+	// TrimResetHeap(HEAP);
 	MissionResetHeap(HEAP);
 	GetBatchHeap()->SetErrorHandler(ICQImage::STANDARD_DUMP);
 
@@ -922,7 +922,7 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			MISSION->Close();
 			FULLSCREEN->Notify(CQE_UPDATE, 0);	// give all menus a chance to destruct
 			GENDATA->FlushUnusedArchetypes();
-			HEAP->HeapMinimize();
+			HEAP_Acquire()->HeapMinimize();
 			ChangeInterfaceRes(IR_FRONT_END_RESOLUTION);
 
 			if (CQ_SplashInfo.vfxName[0])
@@ -973,7 +973,7 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			ChangeInterfaceRes(IR_FRONT_END_RESOLUTION);
 			FULLSCREEN->Notify(CQE_UPDATE, 0);	// give all menus a chance to destruct
 			GENDATA->FlushUnusedArchetypes();
-			HEAP->HeapMinimize();
+			HEAP_Acquire()->HeapMinimize();
 
 			switch (missionResult)
 			{

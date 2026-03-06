@@ -272,13 +272,13 @@ void ScrollBar::InitScrollBar (const SCROLLBAR_DATA & data, BaseHotRect * _paren
 		//create scroll Buttons
 		COMPTR<IDAComponent> pComp;
 
-		GENDATA->CreateInstance(pScrollBarType->pTopLeftButton, pComp);
-		pComp->QueryInterface("IButton2", topLeftButton);
+		GENDATA->CreateInstance(pScrollBarType->pTopLeftButton, pComp.addr());
+		pComp->QueryInterface("IButton2", topLeftButton.void_addr());
 		
 		topLeftButton->SetControlID(TOP_LEFT_SCROLL_BUTTON_ID);
-		GENDATA->CreateInstance(pScrollBarType->pBottomRightButton, pComp);
+		GENDATA->CreateInstance(pScrollBarType->pBottomRightButton, pComp.addr());
 		
-		pComp->QueryInterface("IButton2", bottomRightButton);
+		pComp->QueryInterface("IButton2", bottomRightButton.void_addr());
 		bottomRightButton->SetControlID(BOTTOM_RIGHT_SCROLL_BUTTON_ID);
 		
 		// get size info
@@ -924,7 +924,7 @@ ScrollBarFactory::~ScrollBarFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -933,7 +933,7 @@ void ScrollBarFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -990,7 +990,7 @@ HANDLE ScrollBarFactory::CreateArchetype (PGENTYPE pArchetype, GENBASE_TYPE objC
 			BEGIN_MAPPING(INTERFACEDIR, data->shapeFile);
 				int i;
 				for (i = 0; i < MAX_SCROLLBAR_SHAPES; i++)
-					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i]);
+					CreateDrawAgent((VFX_SHAPETABLE *) pImage, i, result->shapes[i].addr());
 			END_MAPPING(INTERFACEDIR);
 		}
 

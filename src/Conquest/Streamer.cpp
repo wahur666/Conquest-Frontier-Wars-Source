@@ -49,7 +49,7 @@ struct _streamer : GlobalComponent
 		HANDLE hSection;
 		GUID guid, *pGuid;
 
-		if (DACOM->QueryInterface("IProfileParser", parser) != GR_OK)
+		if (DACOM->QueryInterface("IProfileParser", parser.void_addr()) != GR_OK)
 			return 0;
 		if ((hSection = parser->CreateSection("Sound")) == 0)
 			return 0;
@@ -98,7 +98,7 @@ struct _streamer : GlobalComponent
 			memset(&dsdesc, 0, sizeof(dsdesc));
 			dsdesc.dwSize = sizeof(dsdesc);
 			dsdesc.dwFlags = DSBCAPS_PRIMARYBUFFER;
-			if ((hr = DSOUND->CreateSoundBuffer(&dsdesc, lpDSPrimary, 0)) == DS_OK)
+			if ((hr = DSOUND->CreateSoundBuffer(&dsdesc, lpDSPrimary.addr(), 0)) == DS_OK)
 			{
 				// set the format to 16 bit 22khz
 				WAVEFORMATEX format;

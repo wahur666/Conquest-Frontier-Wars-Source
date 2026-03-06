@@ -52,7 +52,7 @@ struct BB_Mesh
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "BB_Mesh");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "BB_Mesh");
 	}
 
 	void Update(SINGLE dt);

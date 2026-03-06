@@ -157,7 +157,7 @@ GENRESULT ShapeLoader::CreateDrawAgent (U32 subImage, struct IDrawAgent ** drawA
 	{
 		GT_VFXSHAPE * data = (GT_VFXSHAPE *)(GENDATA->GetArchetypeData(pShpType->pArchetype));
 		COMPTR<IImageReader> imageReader;
-		CreateImageReader(subImage, imageReader);
+		CreateImageReader(subImage, imageReader.addr());
 
 		if (imageReader)
 			::CreateDrawAgent(imageReader, drawAgent, data->bHiRes, pRect);
@@ -257,7 +257,7 @@ ShapeLoaderFactory::~ShapeLoaderFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA && GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//
@@ -266,7 +266,7 @@ void ShapeLoaderFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection) == GR_OK)
+	if (GENDATA->QueryOutgoingInterface("ICQFactory", connection.addr()) == GR_OK)
 		connection->Advise(this, &factoryHandle);
 }
 //-----------------------------------------------------------------------------------------//

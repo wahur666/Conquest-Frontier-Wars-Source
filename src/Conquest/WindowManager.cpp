@@ -144,8 +144,7 @@ struct WindowManager : public ISystemComponent,
 		return GR_OK;
 	}
 
-	DA_HEAP_DEFINE_NEW_OPERATOR(WindowManager)
-	
+
 	/* IDAComponent methods */
 	
 	DEFMETHOD(QueryInterface) (const C8 *interface_name, void **instance)
@@ -209,6 +208,11 @@ struct WindowManager : public ISystemComponent,
 	void getWindowRects (void);
 
 	long WndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam);
+
+	static void *operator new(size_t size);
+
+	static void operator delete(void *ptr);
+
 	static LONG CALLBACK _wndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM lParam);
 
 	BOOL32 resizeTheWindow (S32 width, S32 height, U32 flags);
@@ -219,6 +223,8 @@ struct WindowManager : public ISystemComponent,
 
 	static BOOL32 onClose (const std::vector<ISystemEventCallback *>& clients);
 };
+
+DA_HEAP_DEFINE_NEW_OPERATOR(WindowManager)
 
 //-------------------------------------------------
 //

@@ -66,12 +66,12 @@ struct TurretArchetype
 
 	void * operator new (size_t size)
 	{
-		return HEAP->ClearAllocateMemory(size, "TurretArchetype");
+		return HEAP_Acquire()->ClearAllocateMemory(size, "TurretArchetype");
 	}
 
 	void   operator delete (void *ptr)
 	{
-		HEAP->FreeMemory(ptr);
+		HEAP_Acquire()->FreeMemory(ptr);
 	}
 
 	TurretArchetype (void)

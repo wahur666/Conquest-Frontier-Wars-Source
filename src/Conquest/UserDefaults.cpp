@@ -292,7 +292,7 @@ BOOL32 UserDefaults::createKey (HKEY & hKey, const HKEY rootKey)
 	BOOL32 result = 0;
 	HKEY hkey1, hkey2, hkey3, hkey4;
 	U32 dwDisposition;
-	char *version = szVersion;
+	const char *version = szVersion;
 
 	hKey = 0;
 
@@ -344,7 +344,7 @@ BOOL32 UserDefaults::openKey (HKEY & hKey, const HKEY rootKey)
 {
 	HKEY hkey1, hkey2, hkey3, hkey4;
 	BOOL32 result = 0;
-	char *version = szVersion;
+	const char *version = szVersion;
 
 	if (RegOpenKeyEx(rootKey, "Software", 0, KEY_READ, &hkey1) != ERROR_SUCCESS)
 		goto Done0;
@@ -445,42 +445,7 @@ BOOL32 UserDefaults::LoadDefaults (void)
 //
 BOOL32 UserDefaults::storeDPlayInfo (void)
 {
-	HKEY hkey;
-	BOOL32 result = 0;
-
-	if (createKey(hkey, HKEY_LOCAL_MACHINE))
-	{
-		char dir[MAX_PATH];
-		char path[MAX_PATH];
-		char * tmp;
-		DIRECTXREGISTERAPP directXRegister;
-
-		::GetCurrentDirectory(sizeof(dir), dir);
-		RegSetValueEx(hkey, "InstallPath", 0, REG_SZ, (U8 *)dir, strlen(dir)+1);
-		RegSetValueEx(hkey, "Version", 0, REG_SZ, (U8 *)szVersion, 4);
-
-		::GetModuleFileName(0, path, sizeof(path));
-		if ((tmp = strrchr(path, '\\')) != 0)
-			*tmp++ = 0;
-
-		memset(&directXRegister, 0, sizeof(directXRegister));
-		directXRegister.dwSize = sizeof(directXRegister);
-		directXRegister.lpszApplicationName = "Conquest Frontier Wars";
-		directXRegister.lpGUID = const_cast<GUID *>(&APPGUID_CONQUEST);
-		directXRegister.lpszFilename = tmp;
-		directXRegister.lpszCommandLine = "/lobby";
-		directXRegister.lpszPath = path;
-		directXRegister.lpszCurrentDirectory = dir;
-		DirectXRegisterApplication(0, &directXRegister);
-
-		result = 1;
-		RegCloseKey(hkey);
-	}
-
-	// removed because of explorer 4.0 dependency
-//	removeOldKeys();
-
-	return result;
+	return 1;
 }
 #endif // !_DEMO_
 #endif // !FINAL_RELEASE
@@ -1060,12 +1025,12 @@ BOOL32 UserDefaults::GetUserData (const C8 * typeName, const C8 * instanceName, 
 
 	if (viewerCount == 0)
 	{
-		hOldCursor = (HCURSOR)GetClassLong(hMainWindow, GCL_HCURSOR);
-		SetClassLong(hMainWindow, GCL_HCURSOR, (LONG)LoadCursor(0, IDC_ARROW));
+		hOldCursor = (HCURSOR)GetClassLongPtr(hMainWindow, GCLP_HCURSOR);
+		SetClassLongPtr(hMainWindow, GCLP_HCURSOR, LONG_PTR(LoadCursor(0, IDC_ARROW)));
 	}
 	viewerCount++;
 
-	if ((result = DACOM->CreateInstance(&ddesc, doc)) == GR_OK)
+	if ((result = DACOM->CreateInstance(&ddesc, doc.void_addr())) == GR_OK)
 	{
 		COMPTR<IViewer> viewer;
 		VIEWDESC vdesc;
@@ -1075,7 +1040,7 @@ BOOL32 UserDefaults::GetUserData (const C8 * typeName, const C8 * instanceName, 
 		vdesc.doc = doc;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if ((result = PARSER->CreateInstance(&vdesc, viewer)) == GR_OK)
+		if ((result = PARSER->CreateInstance(&vdesc, viewer.void_addr())) == GR_OK)
 		{
 			BOOL32 bState;
 			S32 x,y;
@@ -1119,7 +1084,7 @@ BOOL32 UserDefaults::GetUserData (const C8 * typeName, const C8 * instanceName, 
 	}
 
 	if (--viewerCount == 0)
-		SetClassLong(hMainWindow, GCL_HCURSOR, (LONG) hOldCursor);
+		SetClassLongPtr(hMainWindow, GCLP_HCURSOR, LONG_PTR(hOldCursor));
 
 	return (result == GR_OK);
 }
@@ -1136,12 +1101,12 @@ BOOL32 UserDefaults::GetScriptData (void * symbol, const C8 * instanceName, void
 
 	if (viewerCount == 0)
 	{
-		hOldCursor = (HCURSOR)GetClassLong(hMainWindow, GCL_HCURSOR);
-		SetClassLong(hMainWindow, GCL_HCURSOR, (LONG)LoadCursor(0, IDC_ARROW));
+		hOldCursor = (HCURSOR)GetClassLongPtr(hMainWindow, GCLP_HCURSOR);
+		SetClassLongPtr(hMainWindow, GCLP_HCURSOR, LONG_PTR(LoadCursor(0, IDC_ARROW)));
 	}
 	viewerCount++;
 
-	if ((result = DACOM->CreateInstance(&ddesc, doc)) == GR_OK)
+	if ((result = DACOM->CreateInstance(&ddesc, doc.void_addr())) == GR_OK)
 	{
 		COMPTR<IViewer> viewer;
 		struct VIEWDESC2 : VIEWDESC
@@ -1156,7 +1121,7 @@ BOOL32 UserDefaults::GetScriptData (void * symbol, const C8 * instanceName, void
 		vdesc.hOwnerWindow = hMainWindow;
 		vdesc.size = sizeof(vdesc);
 		
-		if ((result = PARSER->CreateInstance(&vdesc, viewer)) == GR_OK)
+		if ((result = PARSER->CreateInstance(&vdesc, viewer.void_addr())) == GR_OK)
 		{
 			BOOL32 bState;
 			S32 x,y;
@@ -1202,7 +1167,7 @@ BOOL32 UserDefaults::GetScriptData (void * symbol, const C8 * instanceName, void
 	}
 
 	if (--viewerCount == 0)
-		SetClassLong(hMainWindow, GCL_HCURSOR, (LONG) hOldCursor);
+		SetClassLongPtr(hMainWindow, GCLP_HCURSOR,  LONG_PTR(hOldCursor));
 
 	return (result == GR_OK);
 }
