@@ -188,7 +188,7 @@ struct DACOM_NO_VTABLE TManager : public ITManager, IEventCallback
 
 	virtual LONG_PTR __stdcall GetPrevTexture(LONG_PTR textureID);
 
-	virtual U32 __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha);
+	virtual LONG_PTR __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha);
 
 	virtual void __stdcall ReleaseDrawAgentTexture (LONG_PTR textureID);
 
@@ -387,7 +387,7 @@ LONG_PTR TManager::GetPrevTexture(LONG_PTR textureID)
 }
 //--------------------------------------------------------------------------//
 //
-U32 TManager::CreateDrawAgentTexture (U32 resolution, bool bAlpha)
+LONG_PTR TManager::CreateDrawAgentTexture (U32 resolution, bool bAlpha)
 {
 	LONG_PTR result=0;
 	PixelFormat desiredFormat(16, 5, 6-bAlpha, 5, bAlpha);		// GL_RGB5_A1

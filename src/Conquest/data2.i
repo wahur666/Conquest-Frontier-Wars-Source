@@ -335894,7 +335894,7 @@ struct __declspec(novtable) ITManager : public IDAComponent
 	
 	
 	
-	virtual U32 __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha) = 0;
+	virtual LONG_PTR __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha) = 0;
 
 	virtual void __stdcall ReleaseDrawAgentTexture (LONG_PTR textureID) = 0;
 };

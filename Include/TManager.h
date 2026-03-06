@@ -64,7 +64,7 @@ struct DACOM_NO_VTABLE ITManager : public IDAComponent
 	//
 	
 	// use a texture from special drawAgent cache, or create a new texture
-	virtual U32 __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha) = 0;
+	virtual LONG_PTR __stdcall CreateDrawAgentTexture (U32 resolution, bool bAlpha) = 0;
 
 	virtual void __stdcall ReleaseDrawAgentTexture (LONG_PTR textureID) = 0;
 };
