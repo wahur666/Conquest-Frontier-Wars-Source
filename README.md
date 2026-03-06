@@ -12,6 +12,8 @@ Conquest Frontier Wars Source code rebuilt for modern systems.
   - https://archive.org/details/dxsdk_jun10
 - DirectX 2007 Aug SDK
   - https://archive.org/details/dxsdk_aug2007
+- You will need the Windows msvc debugger, without that dont even start anything, a lots of debug log only visible with the debugger
+- MinGW and cLang is not supported at all
 
 ## Configurations
 
