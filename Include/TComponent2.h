@@ -8,7 +8,7 @@
 //                                                                          //
 //--------------------------------------------------------------------------//
 /*
-   $Author: Rmarr $
+   $Author: Wahur666 $
 
                        Template class for Base DA Components
 

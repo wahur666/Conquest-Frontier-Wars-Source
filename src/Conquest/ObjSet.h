@@ -13,12 +13,12 @@
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
-const DWORD * __fastcall dwordsearch (DWORD len, DWORD value, const DWORD * buffer);
+const unsigned long* dwordsearch(unsigned long len, unsigned long value, const unsigned long* buffer);
 
 struct ObjSet
 {
 	U32 numObjects;
-	U32 objectIDs[MAX_SELECTED_UNITS];
+	unsigned long objectIDs[MAX_SELECTED_UNITS];
 
 	ObjSet (void)
 	{
@@ -55,7 +55,7 @@ struct ObjSet
 	{
 		bool result = true;
 		U32 i = 0;
-		const U32 * ptr;
+		const  unsigned long * ptr;
 
 		while (i < numObjects)
 		{
@@ -107,7 +107,7 @@ struct ObjSet
 
 	bool removeObject (U32 object)
 	{
-		U32 * match = const_cast<U32 *>(dwordsearch(numObjects, object, objectIDs));
+		auto * match = const_cast< unsigned long *>(dwordsearch(numObjects, object, objectIDs));
 
 		if (match)
 		{
@@ -123,7 +123,7 @@ struct ObjSet
 		// return false if we are already full
 		if (numObjects < MAX_SELECTED_UNITS)
 		{
-			U32 * match = const_cast<U32 *>(dwordsearch(numObjects, object, objectIDs));
+			auto * match = const_cast< unsigned long *>(dwordsearch(numObjects, object, objectIDs));
 
 			if (match)
 			{
@@ -146,7 +146,7 @@ struct ObjSet
 		if (numObjects)
 		for (i = 0; i < set.numObjects; i++)
 		{
-			U32 * match = const_cast<U32 *>(dwordsearch(numObjects, set.objectIDs[i], objectIDs));
+			auto match = const_cast<unsigned long *>(dwordsearch(numObjects, set.objectIDs[i], objectIDs));
 
 			if (match)
 				*match = objectIDs[--numObjects];

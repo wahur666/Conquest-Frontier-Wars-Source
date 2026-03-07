@@ -7,14 +7,14 @@
 //--------------------------------------------------------------------------//
 
 // Constants for angle calculations
-static const double angle_neg90 = -1.5707963267948966;  // -90 degrees (-1.57 radians)
-static const double angle_pos90 = 1.5707963267948966;   // 90 degrees (1.57 radians)
+static constexpr double angle_neg90 = -1.5707963267948966;  // -90 degrees (-1.57 radians)
+static constexpr double angle_pos90 = 1.5707963267948966;   // 90 degrees (1.57 radians)
 
 //--------------------------------------------------------------------------
 // dwordsearch: Search for a DWORD value in a buffer
 // Returns pointer to matching DWORD, or NULL if not found
 //--------------------------------------------------------------------------
-const unsigned long* dwordsearch(unsigned long len, unsigned long value, const unsigned long* buffer)
+const U32* dwordsearch(U32 len, U32 value, const U32* buffer)
 {
     if (len == 0)
         return NULL;

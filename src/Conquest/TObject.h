@@ -117,46 +117,14 @@ void * ObjectImpl< Base >::QueryInterface (OBJID objid, OBJPTR<IBaseObject> & pI
 template <class Base>
 void * ObjectImpl< Base >::operator new (size_t size)
 {
-#ifdef _DEBUG
-	void * result;
-
-	if ((result = HEAP_Acquire()->ClearAllocateMemory(size, "Object instance")) != 0)
-	{
-		DWORD dwAddr;
-		__asm
-		{
-			mov eax, DWORD PTR [EBP+4]
-			mov DWORD PTR dwAddr, eax
-		}
-		HEAP_Acquire()->SetBlockOwner(result, dwAddr);
-	}
-	return result;
-#else
 	return HEAP_Acquire()->ClearAllocateMemory(size);
-#endif
 }
 //--------------------------------------------------------------------------//
 //
 template <class Base>
 void * ObjectImpl< Base >::operator new[] (size_t size)
 {
-#ifdef _DEBUG
-	void * result;
-
-	if ((result = HEAP_Acquire()->ClearAllocateMemory(size, "Object instance")) != 0)
-	{
-		DWORD dwAddr;
-		__asm
-		{
-			mov eax, DWORD PTR [EBP+4]
-			mov DWORD PTR dwAddr, eax
-		}
-		HEAP_Acquire()->SetBlockOwner(result, dwAddr);
-	}
-	return result;
-#else
 	return HEAP_Acquire()->ClearAllocateMemory(size);
-#endif
 }
 //--------------------------------------------------------------------------//
 //

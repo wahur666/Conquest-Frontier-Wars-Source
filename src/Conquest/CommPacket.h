@@ -31,7 +31,7 @@
 #endif
 #endif
 
-const DWORD * __fastcall dwordsearch (DWORD len, DWORD value, const DWORD * buffer);
+const U32 * dwordsearch (U32 len, U32 value, const U32 * buffer);
 
 #pragma pack (push , 1)
 
@@ -640,21 +640,24 @@ inline void VerifySet (U32 objectID[MAX_SELECTED_UNITS], int numObjects)
 }
 //--------------------------------------------------------------------------//
 //
-template <class Type> 
+template <typename T>
+concept DerivedFromBasePacket = std::is_base_of_v<BASE_PACKET, T>;
+
+template <DerivedFromBasePacket Type>
 struct USR_PACKET : Type
 {
 	U32 objectID[MAX_SELECTED_UNITS];
 
 	void init (int numObjects, bool bTrackCommand=true)
 	{
-		dwSize = sizeof(Type) + (numObjects*sizeof(U32));
+		this->dwSize = sizeof(Type) + (numObjects*sizeof(U32));
 		CQASSERT(numObjects);
 		CQASSERT(numObjects <= MAX_SELECTED_UNITS);
 		CQASSERT((objectID[0]&PLAYERID_MASK)!=MGlobals::GetGroupID() || OBJLIST->FindGroupObject(objectID[0]));
 		CQASSERT((objectID[0]&PLAYERID_MASK)==MGlobals::GetGroupID() || OBJLIST->FindObject(objectID[0]));
 		VerifySet(objectID, numObjects);
 		if (bTrackCommand)
-			COMMTRACK->AddCommand(type, objectID, numObjects);
+			COMMTRACK->AddCommand(this->type, objectID, numObjects);
 	}
 };
 template <> struct USR_PACKET<USRMOVE>;

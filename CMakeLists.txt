@@ -104,7 +104,7 @@ add_subdirectory(src/TestProject)
 # ============================================================================
 add_subdirectory(src/Conquest/Globals)
 add_subdirectory(Src/Conquest/Trim)
-#add_subdirectory(Src/Conquest/Mission)
+add_subdirectory(Src/Conquest/Mission)
 add_subdirectory(Src/Conquest/ZBatcher)
 
 # ============================================================================
