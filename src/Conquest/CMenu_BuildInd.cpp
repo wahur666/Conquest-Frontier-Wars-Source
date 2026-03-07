@@ -190,7 +190,7 @@ CMenu_BuildInd::~CMenu_BuildInd (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -556,11 +556,11 @@ void CMenu_BuildInd::enableMenu (bool bEnable)
 	{
 		COMPTR<IToolbar> toolbar;
 
-		if (TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+		if (TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
-			if (TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Advise(getBase(), &hotEventHandle);
 		}
 	}
@@ -570,7 +570,7 @@ void CMenu_BuildInd::enableMenu (bool bEnable)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 		
-			if (TOOLBAR && TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (TOOLBAR && TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Unadvise(hotEventHandle);
 			hotEventHandle = 0;
 		}
@@ -585,7 +585,7 @@ void CMenu_BuildInd::setPanelOwnership (bool bOwn)
 		lastMissionID = 0;
 		COMPTR<IToolbar> toolbar;
 
-		if (TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+		if (TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 		{
 			IBaseObject * obj = OBJLIST->GetSelectedList();
 			MPart part(obj);
@@ -614,30 +614,30 @@ void CMenu_BuildInd::setPanelOwnership (bool bOwn)
 				strcpy(menuName,"V_Compiler");
 			else if(part->mObjClass == M_FORMULATOR)
 				strcpy(menuName,"V_Formulator");
-			if (toolbar->GetToolbar(menuName, menu, part->race) == GR_OK)
+			if (toolbar->GetToolbar(menuName, menu.addr(), part->race) == GR_OK)
 			{
 				COMPTR<IDAComponent> pComp;
 
-				if (toolbar->GetControl("shipclass", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", shipClass);
-				if (menu->GetControl("hull", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", hull);
-				if (menu->GetControl("metalStorage", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", metalStorage);
-				if (menu->GetControl("gasStorage", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", gasStorage);
-				if (menu->GetControl("crewStorage", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", crewStorage);
-				if (menu->GetControl("location", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", location);
-				if (menu->GetControl("disabledText", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", disabledText);
-				if (menu->GetControl("inSupply", pComp) == GR_OK)
-					pComp->QueryInterface("IIcon", inSupply);
-				if (menu->GetControl("notInSupply", pComp) == GR_OK)
-					pComp->QueryInterface("IIcon", notInSupply);
-				if (menu->GetControl("buildQueue", pComp) == GR_OK)
-					pComp->QueryInterface("IQueueControl", buildQueue);
+				if (toolbar->GetControl("shipclass", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", shipClass.void_addr());
+				if (menu->GetControl("hull", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", hull.void_addr());
+				if (menu->GetControl("metalStorage", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", metalStorage.void_addr());
+				if (menu->GetControl("gasStorage", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", gasStorage.void_addr());
+				if (menu->GetControl("crewStorage", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", crewStorage.void_addr());
+				if (menu->GetControl("location", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", location.void_addr());
+				if (menu->GetControl("disabledText", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", disabledText.void_addr());
+				if (menu->GetControl("inSupply", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IIcon", inSupply.void_addr());
+				if (menu->GetControl("notInSupply", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IIcon", notInSupply.void_addr());
+				if (menu->GetControl("buildQueue", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IQueueControl", buildQueue.void_addr());
 
 				lastNode = MGlobals::GetCurrentTechLevel(MGlobals::GetThisPlayer());
 				TECHNODE workingNode = MGlobals::GetWorkingTechLevel(MGlobals::GetThisPlayer());
@@ -646,8 +646,8 @@ void CMenu_BuildInd::setPanelOwnership (bool bOwn)
 				{
 					char buffer[32];
 					sprintf(buffer,"build%d",index);
-					if (menu->GetControl(buffer, pComp) == GR_OK)
-						pComp->QueryInterface("IActiveButton", buildButton[index]);
+					if (menu->GetControl(buffer, pComp.void_addr()) == GR_OK)
+						pComp->QueryInterface("IActiveButton", buildButton[index].void_addr());
 					if(buildButton[index] != 0)
 					{
 						buildButton[index]->SetControlID(buildButton[index]->GetBuildArchetype());//hack;
@@ -657,7 +657,7 @@ void CMenu_BuildInd::setPanelOwnership (bool bOwn)
 
 				COMPTR<IDAConnectionPoint> connection;
 
-				if (menu->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+				if (menu->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 					connection->Advise(getBase(), &hotEventHandle);
 			}
 			if(menu)
@@ -670,7 +670,7 @@ void CMenu_BuildInd::setPanelOwnership (bool bOwn)
 			menu->SetVisible(false);
 			COMPTR<IDAConnectionPoint> connection;
 		
-			if (menu->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (menu->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Unadvise(hotEventHandle);
 			hotEventHandle = 0;
 		}
@@ -710,7 +710,7 @@ struct _cmenu_buildind: GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(menu->getBase(), &menu->eventHandle);
 	}
 };

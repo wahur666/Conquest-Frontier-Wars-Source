@@ -347,7 +347,7 @@ CMenu_Ind::~CMenu_Ind (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -871,105 +871,105 @@ void CMenu_Ind::setPanelOwnership (bool bOwn)
 	{
 		COMPTR<IToolbar> toolbar;
 
-		if (TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+		if (TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 		{
 			IBaseObject * obj = OBJLIST->GetSelectedList();
 			MPart part(obj);
-			if (toolbar->GetToolbar("individual", menu, part->race) == GR_OK)
+			if (toolbar->GetToolbar("individual", menu.addr(), part->race) == GR_OK)
 			{
 				COMPTR<IDAComponent> pComp;
 
-				if (menu->GetControl("namearea", pComp) == GR_OK)
-					pComp->QueryInterface("IEdit2", namearea);
-				if (menu->GetControl("hull", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", hull);
-				if (menu->GetControl("supplies", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", supplies);
-				if (menu->GetControl("kills", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", kills);
-				if (menu->GetControl("metal", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", metal);
-				if (menu->GetControl("gas", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", gas);
-				if (menu->GetControl("techarmor", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techarmor);
-				if (menu->GetControl("techsupply", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techsupply);
-				if (menu->GetControl("techengine", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techengine);
-				if (menu->GetControl("techsheild", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techsheild);
-				if (menu->GetControl("techweapon", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techweapon);
-				if (menu->GetControl("techsensors", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techsensors);
-				if (menu->GetControl("techspecial", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techspecial);
-				if (menu->GetControl("stop", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", stopCmd);
-				if (menu->GetControl("sell", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", sellCmd);
-				if (menu->GetControl("specialweapon", pComp) == GR_OK)
+				if (menu->GetControl("namearea", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IEdit2", namearea.void_addr());
+				if (menu->GetControl("hull", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", hull.void_addr());
+				if (menu->GetControl("supplies", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", supplies.void_addr());
+				if (menu->GetControl("kills", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", kills.void_addr());
+				if (menu->GetControl("metal", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", metal.void_addr());
+				if (menu->GetControl("gas", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", gas.void_addr());
+				if (menu->GetControl("techarmor", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techarmor.void_addr());
+				if (menu->GetControl("techsupply", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techsupply.void_addr());
+				if (menu->GetControl("techengine", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techengine.void_addr());
+				if (menu->GetControl("techsheild", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techsheild.void_addr());
+				if (menu->GetControl("techweapon", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techweapon.void_addr());
+				if (menu->GetControl("techsensors", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techsensors.void_addr());
+				if (menu->GetControl("techspecial", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techspecial.void_addr());
+				if (menu->GetControl("stop", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", stopCmd.void_addr());
+				if (menu->GetControl("sell", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", sellCmd.void_addr());
+				if (menu->GetControl("specialweapon", pComp.void_addr()) == GR_OK)
 				{
-					pComp->QueryInterface("IHotButton", specialWpnCmd);
-					pComp->QueryInterface("IMultiHotButton",specialWpnMulti);
+					pComp->QueryInterface("IHotButton", specialWpnCmd.void_addr());
+					pComp->QueryInterface("IMultiHotButton",specialWpnMulti.void_addr());
 				}
-				if (menu->GetControl("specialweapon1", pComp) == GR_OK)
+				if (menu->GetControl("specialweapon1", pComp.void_addr()) == GR_OK)
 				{
-					pComp->QueryInterface("IHotButton", specialWpnCmd1);
-					pComp->QueryInterface("IMultiHotButton",specialWpnMulti1);
+					pComp->QueryInterface("IHotButton", specialWpnCmd1.void_addr());
+					pComp->QueryInterface("IMultiHotButton",specialWpnMulti1.void_addr());
 				}
-				if (menu->GetControl("specialweapon2", pComp) == GR_OK)
+				if (menu->GetControl("specialweapon2", pComp.void_addr()) == GR_OK)
 				{
-					pComp->QueryInterface("IHotButton", specialWpnCmd2);
-					pComp->QueryInterface("IMultiHotButton",specialWpnMulti2);
+					pComp->QueryInterface("IHotButton", specialWpnCmd2.void_addr());
+					pComp->QueryInterface("IMultiHotButton",specialWpnMulti2.void_addr());
 				}
-				if (menu->GetControl("patrol", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", patrolCmd);
-				if (menu->GetControl("escort", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", escortCmd);
-				if (menu->GetControl("cloak", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", cloak);
-				if (menu->GetControl("attackPosition", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", attackPosition);
+				if (menu->GetControl("patrol", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", patrolCmd.void_addr());
+				if (menu->GetControl("escort", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", escortCmd.void_addr());
+				if (menu->GetControl("cloak", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", cloak.void_addr());
+				if (menu->GetControl("attackPosition", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", attackPosition.void_addr());
 			
-				if (toolbar->GetControl("shipclass", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", shipclass);
+				if (toolbar->GetControl("shipclass", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", shipclass.void_addr());
 				if(namearea)
 					namearea->EnableEdit(true);
 
-				if (menu->GetControl("stanceAttack", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", stanceAttack);
-				if (menu->GetControl("stanceDefend", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", stanceDefend);
-				if (menu->GetControl("stanceStand", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", stanceStand);
-				if (menu->GetControl("stanceStop", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", stanceStop);
-				if (menu->GetControl("supplyStanceAuto", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", supplyStanceAuto);
-				if (menu->GetControl("supplyStanceNoAuto", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", supplyStanceNoAuto);
-				if (menu->GetControl("supplyStanceResupplyOnly", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", supplyStanceResupplyOnly);
-				if (menu->GetControl("fighterStanceNormal", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", fighterStanceNormal);
-				if (menu->GetControl("fighterStancePatrol", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", fighterStancePatrol);
+				if (menu->GetControl("stanceAttack", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", stanceAttack.void_addr());
+				if (menu->GetControl("stanceDefend", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", stanceDefend.void_addr());
+				if (menu->GetControl("stanceStand", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", stanceStand.void_addr());
+				if (menu->GetControl("stanceStop", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", stanceStop.void_addr());
+				if (menu->GetControl("supplyStanceAuto", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", supplyStanceAuto.void_addr());
+				if (menu->GetControl("supplyStanceNoAuto", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", supplyStanceNoAuto.void_addr());
+				if (menu->GetControl("supplyStanceResupplyOnly", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", supplyStanceResupplyOnly.void_addr());
+				if (menu->GetControl("fighterStanceNormal", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", fighterStanceNormal.void_addr());
+				if (menu->GetControl("fighterStancePatrol", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", fighterStancePatrol.void_addr());
 
-				if (menu->GetControl("ejectArtifact", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", ejectArtifact);
-				if (menu->GetControl("artifact", pComp) == GR_OK)
+				if (menu->GetControl("ejectArtifact", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", ejectArtifact.void_addr());
+				if (menu->GetControl("artifact", pComp.void_addr()) == GR_OK)
 				{
-					pComp->QueryInterface("IHotButton", useArtifactHB);
-					pComp->QueryInterface("IMultiHotButton", useArtifactMB);
+					pComp->QueryInterface("IHotButton", useArtifactHB.void_addr());
+					pComp->QueryInterface("IMultiHotButton", useArtifactMB.void_addr());
 				}
 			}
 
 		
 			COMPTR<IDAConnectionPoint> connection;
 
-			if (TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Advise(getBase(), &hotEventHandle);
 
 			if(menu)
@@ -985,7 +985,7 @@ void CMenu_Ind::setPanelOwnership (bool bOwn)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 		
-			if (TOOLBAR && TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (TOOLBAR && TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Unadvise(hotEventHandle);
 			hotEventHandle = 0;
 		}
@@ -1049,7 +1049,7 @@ struct _cmenu_ind : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(menu->getBase(), &menu->eventHandle);
 	}
 };

@@ -7,29 +7,6 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../DInclude
 )
 
-# Header files
-set(MISSION_HEADERS
-        ../common.h
-        ../CommPacket.h
-        ../../../DInclude/DMenuObjectives.h
-        ../Include/Globals.h
-        ../IBanker.h
-        ../ISPlayerAI.h
-        ../MapGen.h
-        ../Include/MGlobals.h
-        ../Mission.h
-        ../Include/MPartRef.h
-        ../Include/MScript.h
-        ../NetVector.h
-        ../ObjSet.h
-        ../OpAgent.h
-        ../RuseKeys.h
-        ../RuseMap.h
-        ../ScrollingText.h
-        ../SPlayerAI.h
-        ../UnitComm.h
-)
-
 # Strategic AI source files
 set(STRATEGIC_AI_SOURCES
         ../MCorvetteRush.cpp
@@ -82,6 +59,7 @@ set(MISSION_SOURCES
         ../MGlobals.cpp
         ../Mission.cpp
         ../MScript.cpp
+        ../ObjList.cpp
         ../ObjMapIterator.cpp
         ../OpAgent.cpp
         ../Pch.cpp
@@ -94,17 +72,9 @@ set(MISSION_SOURCES
         ../UnitComm.cpp
 )
 
-# Data definition files
-set(DATA_DEFINITIONS
-        ../../../DInclude/DCQGame.h
-        ../../../DInclude/DEndGame.h
-        ../../../DInclude/DGlobalData.h
-        ../../../DInclude/DMapGen.h
-        ../../../DInclude/DPlayerMenu.h
-)
 
 # Create a library target (won't actually build, but enables IDE features)
-add_library(Mission SHARED ${MISSION_SOURCES} ${MISSION_HEADERS} ${DATA_DEFINITIONS})
+add_library(Mission SHARED ${MISSION_SOURCES} )
 
 # Add include directories to target
 target_include_directories(Mission PRIVATE

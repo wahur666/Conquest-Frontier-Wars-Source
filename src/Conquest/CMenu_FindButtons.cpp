@@ -143,7 +143,7 @@ CMenu_FindButtons::~CMenu_FindButtons (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -1001,33 +1001,33 @@ void CMenu_FindButtons::enableMenu (bool bEnable)
 	{
 		COMPTR<IToolbar> toolbar;
 
-		if (TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+		if (TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAComponent> pComp;
-			if (toolbar->GetControl("hpIndustrial", pComp) == GR_OK)
-				pComp->QueryInterface("IHotButton", indButton);
-			if (toolbar->GetControl("hpIdleCivilian", pComp) == GR_OK)
-				pComp->QueryInterface("IHotButton", civButton);
-			if (toolbar->GetControl("hpResearch", pComp) == GR_OK)
-				pComp->QueryInterface("IHotButton", researchButton);
-			if (toolbar->GetControl("hpFleetOfficer", pComp) == GR_OK)
-				pComp->QueryInterface("IHotButton", fleetButton);
-			if (toolbar->GetControl("go", pComp) == GR_OK)
-				pComp->QueryInterface("IHotButton", gotoButton);
-			if (toolbar->GetControl("inSupply", pComp) == GR_OK)
-				pComp->QueryInterface("IIcon", inSupply);
-			if (toolbar->GetControl("notInSupply", pComp) == GR_OK)
-				pComp->QueryInterface("IIcon", notInSupply);
-			if (toolbar->GetControl("missionObjectives", pComp) == GR_OK)
-				pComp->QueryInterface("IHotButton", missionButton);
-			if (toolbar->GetControl("hpDiplomacy", pComp) == GR_OK)
-				pComp->QueryInterface("IHotButton", diplomacyButton);
-			if (toolbar->GetControl("chat", pComp) == GR_OK)
-				pComp->QueryInterface("IHotButton", chatButton);
+			if (toolbar->GetControl("hpIndustrial", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", indButton.void_addr());
+			if (toolbar->GetControl("hpIdleCivilian", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", civButton.void_addr());
+			if (toolbar->GetControl("hpResearch", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", researchButton.void_addr());
+			if (toolbar->GetControl("hpFleetOfficer", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", fleetButton.void_addr());
+			if (toolbar->GetControl("go", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", gotoButton.void_addr());
+			if (toolbar->GetControl("inSupply", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IIcon", inSupply.void_addr());
+			if (toolbar->GetControl("notInSupply", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IIcon", notInSupply.void_addr());
+			if (toolbar->GetControl("missionObjectives", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", missionButton.void_addr());
+			if (toolbar->GetControl("hpDiplomacy", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", diplomacyButton.void_addr());
+			if (toolbar->GetControl("chat", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IHotButton", chatButton.void_addr());
 			
 			COMPTR<IDAConnectionPoint> connection;
 
-			if (TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Advise(getBase(), &hotEventHandle);
 		}
 		lastRefineryFound = M_NONE;
@@ -1052,7 +1052,7 @@ void CMenu_FindButtons::enableMenu (bool bEnable)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 		
-			if (TOOLBAR && TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (TOOLBAR && TOOLBAR->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Unadvise(hotEventHandle);
 			hotEventHandle = 0;
 		}
@@ -1085,7 +1085,7 @@ struct _cmenu_findbuttons: GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(menu->getBase(), &menu->eventHandle);
 	}
 };

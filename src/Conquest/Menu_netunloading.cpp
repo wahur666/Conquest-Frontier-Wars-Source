@@ -135,10 +135,10 @@ void Menu_nul::init (void)
 	// create members
 	//
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance("Static!!LoadingBackground", pComp);
-	pComp->QueryInterface("IStatic", background);
-	GENDATA->CreateInstance("Static!!GrayedRect", pComp);
-	pComp->QueryInterface("IStatic", unloading);
+	GENDATA->CreateInstance("Static!!LoadingBackground", pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
+	GENDATA->CreateInstance("Static!!GrayedRect", pComp.addr());
+	pComp->QueryInterface("IStatic", unloading.void_addr());
 
 	CQFLAGS.bGamePaused = 1;
 	EVENTSYS->Send(CQE_LOCALPAUSED, (void*)1);

@@ -115,7 +115,7 @@ CMenu_None::~CMenu_None (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -193,14 +193,14 @@ void CMenu_None::setPanelOwnership (bool bOwn)
 		lastMissionID = 0;
 		COMPTR<IToolbar> toolbar;
 
-		if (TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+		if (TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 		{
-			if (toolbar->GetToolbar("none", menu) == GR_OK)
+			if (toolbar->GetToolbar("none", menu.addr()) == GR_OK)
 			{
 				COMPTR<IDAComponent> pComp;
 
-				if (toolbar->GetControl("shipclass", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", shipclass);
+				if (toolbar->GetControl("shipclass", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", shipclass.void_addr());
 				if(shipclass)
 				{
 					shipclass->SetText(L"");
@@ -239,7 +239,7 @@ struct _cmenu_none: GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(menu->getBase(), &menu->eventHandle);
 	}
 };

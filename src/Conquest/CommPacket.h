@@ -31,6 +31,8 @@
 #endif
 #endif
 
+#include "ObjList.h"
+
 const U32 * dwordsearch (U32 len, U32 value, const U32 * buffer);
 
 #pragma pack (push , 1)

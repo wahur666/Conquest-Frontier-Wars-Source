@@ -55,8 +55,8 @@
 #include "DrawAgent.h"
 #include "IShapeLoader.h"
 
-#include <dplay.h>
-#include <dplobby.h>
+#include <directx2007aug/dplay.h>
+#include <directx2007aug/dplobby.h>
 #include "ZoneLobby.h"
 #include <TSmartPointer.h>
 #include <EventSys2.h>

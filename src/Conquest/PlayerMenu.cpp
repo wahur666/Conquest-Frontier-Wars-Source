@@ -28,9 +28,7 @@
 
 #include <stdio.h>
 
-#include <da_vector>
-
-using namespace da_std;
+#include <vector.h>
 using namespace CQGAMETYPES;
 
 #define UPDATE_SCORE_TIMER 1000
@@ -39,7 +37,7 @@ using namespace CQGAMETYPES;
 //
 struct PlayerMenu : public DAComponent<Frame>
 {
-	typedef vector<U32> U32VECTOR;
+	typedef std::vector<U32> U32VECTOR;
 
 	//
 	// data items
@@ -256,8 +254,8 @@ void PlayerMenu::onDraw (void)
 			if (bBold[i])		// switch to regular font
 			{
 				bBold[i] = false;
-				CreateFontDrawAgent(hFont, 0, RGB(0,0,0), RGB(0,0,0), font[i]);
-				font[i]->CreateDuplicate(shadowFont[i]);
+				CreateFontDrawAgent(hFont, 0, RGB(0,0,0), RGB(0,0,0), font[i].addr());
+				font[i]->CreateDuplicate(shadowFont[i].addr());
 			}
 		}
 		else
@@ -265,8 +263,8 @@ void PlayerMenu::onDraw (void)
 			if (bBold[i]==0)		// switch to bold font
 			{
 				bBold[i] = true;
-				CreateFontDrawAgent(hBoldFont, 0, RGB(0,0,0), RGB(0,0,0), font[i]);
-				font[i]->CreateDuplicate(shadowFont[i]);
+				CreateFontDrawAgent(hBoldFont, 0, RGB(0,0,0), RGB(0,0,0), font[i].addr());
+				font[i]->CreateDuplicate(shadowFont[i].addr());
 			}
 		}
 		
@@ -300,15 +298,15 @@ void PlayerMenu::reloadFonts (bool bLoad)
 		pen			= RGB_GOLD		   | 0xFF000000;		// white	(pen color)
 		background	= RGB(0,0,0);	   //| 0xFF000000;		// black	(background color)
 
-		CreateFontDrawAgent(hBoldFont, 0, pen, background, font[0]);
-		font[0]->CreateDuplicate(shadowFont[0]);
+		CreateFontDrawAgent(hBoldFont, 0, pen, background, font[0].addr());
+		font[0]->CreateDuplicate(shadowFont[0].addr());
 		bBold[0] = true;
 		fontHeight = font[0]->GetFontHeight();
 
 		for (i = 1; i < MAX_PLAYERS; i++)
 		{
-			font[0]->CreateDuplicate(font[i]);
-			font[0]->CreateDuplicate(shadowFont[i]);
+			font[0]->CreateDuplicate(font[i].addr());
+			font[0]->CreateDuplicate(shadowFont[i].addr());
 			bBold[i] = true;
 		}
 	}

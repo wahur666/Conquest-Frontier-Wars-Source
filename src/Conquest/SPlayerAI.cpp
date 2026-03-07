@@ -82,7 +82,7 @@ SPlayerAI::~SPlayerAI (void)
 
 	resetAssignments();
 
-	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 }
 //--------------------------------------------------------------------------//
@@ -91,7 +91,7 @@ void SPlayerAI::init (U32 _playerID, M_RACE race)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (eventHandle==0 && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (eventHandle==0 && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		connection->Advise(getBase(), &eventHandle);
 		FULLSCREEN->SetCallbackPriority(this, EVENT_PRIORITY_MISSION);
@@ -3400,7 +3400,7 @@ NETGRIDVECTOR SPlayerAI::ChooseFreeBuildSite(PARCHETYPE pArchetype, U32 dwFabID,
 			final.init(temp, bestSys);
 
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(systemID, map);
+			SECTOR->GetTerrainMap(systemID, map.addr());
 			bLegal = map->IsGridValid(temp);  //check if the grid is unoccupied, and if it's the SAME as the jumpgate fix 
 			if(c++ > 25)
 			{
@@ -8545,15 +8545,15 @@ BOOL32 SPlayerAI::Load (struct IFileSystem * inFile)
 {
 	DAFILEDESC fdesc;
 	COMPTR<IFileSystem> file;
-	U32 dwRead, numAssignments;
+	LPDWORD dwRead, numAssignments;
 	BOOL32 result = 0;
 	ASSIGNMENT* curass = NULL;
 
 	fdesc.lpFileName = "StrategicAI";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
-	file->ReadFile(0,static_cast<PLAYERAI_SAVELOAD *>(this),sizeof(PLAYERAI_SAVELOAD),&dwRead);
+	file->ReadFile(0,static_cast<PLAYERAI_SAVELOAD *>(this),sizeof(PLAYERAI_SAVELOAD),LPDWORD(&dwRead));
 
 	if (m_StrategicTargetID)
 		OBJLIST->FindObject(m_StrategicTargetID, playerID, m_StrategicTarget, IBaseObjectID);
@@ -8562,10 +8562,10 @@ BOOL32 SPlayerAI::Load (struct IFileSystem * inFile)
 	CQASSERT(pAssignments == NULL);
 
 	fdesc.lpFileName = "Assignments";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+		if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
-	numAssignments = file->GetFileSize() / sizeof(ASSIGNMENT);
+	numAssignments = LPDWORD(file->GetFileSize() / sizeof(ASSIGNMENT));
 	if ((file->GetFileSize() % sizeof(ASSIGNMENT)) != 0)
 		goto Done;		// structure size changed!
 
@@ -8574,7 +8574,7 @@ BOOL32 SPlayerAI::Load (struct IFileSystem * inFile)
 		curass = new ASSIGNMENT;
 		curass->Init();
 
-		file->ReadFile(0,curass,sizeof(ASSIGNMENT),&dwRead);
+		file->ReadFile(0,curass,sizeof(ASSIGNMENT),LPDWORD(&dwRead));
 		
 		curass->pNext = pAssignments;
 		pAssignments = curass;
@@ -8591,7 +8591,7 @@ Done:
 //---------------------------------------------------------------------------//
 BOOL32 SPlayerAI::Save (struct IFileSystem * outFile) 
 {
-	U32 dwWritten;
+	LPDWORD dwWritten;
 	COMPTR<IFileSystem> file;
 	BOOL32 result = 0;
 	DAFILEDESC fdesc;
@@ -8604,18 +8604,18 @@ BOOL32 SPlayerAI::Save (struct IFileSystem * outFile)
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 	
 	fdesc.lpFileName = "StrategicAI";
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
-	file->WriteFile(0,static_cast<PLAYERAI_SAVELOAD *>(this),sizeof(PLAYERAI_SAVELOAD),&dwWritten);
+	file->WriteFile(0,static_cast<PLAYERAI_SAVELOAD *>(this),sizeof(PLAYERAI_SAVELOAD),LPDWORD(&dwWritten));
 
 	fdesc.lpFileName = "Assignments";
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	while(node)
 	{
-		file->WriteFile(0,node,sizeof(ASSIGNMENT),&dwWritten);
+		file->WriteFile(0,node,sizeof(ASSIGNMENT),LPDWORD(&dwWritten));
 		node = node->pNext;
 	}
 

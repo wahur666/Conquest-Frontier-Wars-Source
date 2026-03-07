@@ -55,8 +55,7 @@
 
 #pragma warning (disable : 4018 4245 4530 4663)
 
-#include <da_vector>
-using namespace da_std;
+#include <vector.h>
 
 Frame * __stdcall CreateMenuChat (bool bChatAll);
 Frame * __stdcall CreatePlayerMenu (void);
@@ -88,7 +87,7 @@ struct DACOM_NO_VTABLE ScrollingText : public IEventCallback, IScrollingText
 	DACOM_INTERFACE_ENTRY(IEventCallback)
 	END_DACOM_MAP()
 
-	typedef vector<TextEntity> TE_VECTOR;
+	typedef std::vector<TextEntity> TE_VECTOR;
 
 	COMPTR<IFontDrawAgent> fontAgentText[MAX_LINES_TEXT];
 	COMPTR<IFontDrawAgent> fontAgentPlayer[MAX_LINES_TEXT];

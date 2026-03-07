@@ -260,7 +260,7 @@ CMenu_Fabricator::~CMenu_Fabricator (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -550,7 +550,7 @@ void CMenu_Fabricator::setPanelOwnership (bool bOwn)
 		lastObjType = 0;
 		COMPTR<IToolbar> toolbar;
 
-		if (TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+		if (TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 		{
 			IBaseObject * obj = OBJLIST->GetSelectedList();
 			MPart part(obj);
@@ -565,18 +565,18 @@ void CMenu_Fabricator::setPanelOwnership (bool bOwn)
 				strcpy(buffer,"S_Forger");
 			else if(lastObjType == M_SHAPER)
 				strcpy(buffer,"V_Shaper");
-			if (toolbar->GetToolbar(buffer, menu,part->race) == GR_OK)
+			if (toolbar->GetToolbar(buffer, menu.addr(),part->race) == GR_OK)
 			{
 				COMPTR<IDAComponent> pComp;
 
-				if (toolbar->GetControl("shipclass", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", shipclass);
+				if (toolbar->GetControl("shipclass", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", shipclass.void_addr());
 				if(namearea)
 					namearea->EnableEdit(true);
-				if (menu->GetControl("shipname", pComp) == GR_OK)
-					pComp->QueryInterface("IEdit2", namearea);
-				if (menu->GetControl("hull", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", hull);
+				if (menu->GetControl("shipname", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IEdit2", namearea.void_addr());
+				if (menu->GetControl("hull", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", hull.void_addr());
 
 				//get build buttons
 				lastNode = MGlobals::GetCurrentTechLevel(MGlobals::GetThisPlayer());
@@ -586,8 +586,8 @@ void CMenu_Fabricator::setPanelOwnership (bool bOwn)
 				{
 					char buffer[32];
 					sprintf(buffer,"plat%d",index);
-					if (menu->GetControl(buffer, pComp) == GR_OK)
-						pComp->QueryInterface("IActiveButton", buildButton[index]);
+					if (menu->GetControl(buffer, pComp.void_addr()) == GR_OK)
+						pComp->QueryInterface("IActiveButton", buildButton[index].void_addr());
 					if(buildButton[index] != 0)
 					{
 						buildButton[index]->SetControlID(buildButton[index]->GetBuildArchetype());//hack;
@@ -595,20 +595,20 @@ void CMenu_Fabricator::setPanelOwnership (bool bOwn)
 					}
 				}
 
-				if (menu->GetControl("techarmor", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techarmor);
-				if (menu->GetControl("techengine", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techengine);
-				if (menu->GetControl("techsheild", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techsheild);
-				if (menu->GetControl("techsensors", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techsensors);				
-				if (menu->GetControl("fabTab", pComp) == GR_OK)
-					pComp->QueryInterface("ITabControl", fabTab);
+				if (menu->GetControl("techarmor", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techarmor.void_addr());
+				if (menu->GetControl("techengine", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techengine.void_addr());
+				if (menu->GetControl("techsheild", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techsheild.void_addr());
+				if (menu->GetControl("techsensors", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techsensors.void_addr());
+				if (menu->GetControl("fabTab", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("ITabControl", fabTab.void_addr());
 
 				COMPTR<IDAConnectionPoint> connection;
 
-				if (menu->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+				if (menu->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 					connection->Advise(getBase(), &hotEventHandle);
 			}
 			
@@ -651,7 +651,7 @@ void CMenu_Fabricator::setPanelOwnership (bool bOwn)
 			menu->SetVisible(false);
 			COMPTR<IDAConnectionPoint> connection;
 		
-			if (menu->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (menu->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Unadvise(hotEventHandle);
 			hotEventHandle = 0;
 		}
@@ -689,7 +689,7 @@ struct _cmenu_fabricator: GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(menu->getBase(), &menu->eventHandle);
 	}
 };

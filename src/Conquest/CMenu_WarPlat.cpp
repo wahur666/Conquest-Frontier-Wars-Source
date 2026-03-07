@@ -146,7 +146,7 @@ CMenu_WarPlat::~CMenu_WarPlat (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -380,7 +380,7 @@ void CMenu_WarPlat::setPanelOwnership (bool bOwn)
 		lastMissionID = 0;
 		COMPTR<IToolbar> toolbar;
 
-		if (TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+		if (TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 		{
 			IBaseObject * obj = OBJLIST->GetSelectedList();
 			MPart part(obj);
@@ -393,48 +393,48 @@ void CMenu_WarPlat::setPanelOwnership (bool bOwn)
 				(lastObjType == M_HYDROFOIL) || (lastObjType == M_ESPCOIL) ||
 				(lastObjType == M_STARBURST)|| (lastObjType == M_NOVA_BOMB))
 				strcpy(buffer,"WarTurret");
-			if (toolbar->GetToolbar(buffer, menu, part->race) == GR_OK)
+			if (toolbar->GetToolbar(buffer, menu.addr(), part->race) == GR_OK)
 			{
 				COMPTR<IDAComponent> pComp;
 
-				if (toolbar->GetControl("shipclass", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", shipclass);
-				if (menu->GetControl("hull", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", hull);
-				if (menu->GetControl("supplies", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", supplies);
-				if (menu->GetControl("location", pComp) == GR_OK)
-					pComp->QueryInterface("IStatic", location);
-				if (menu->GetControl("inSupply", pComp) == GR_OK)
-					pComp->QueryInterface("IIcon", inSupply);
-				if (menu->GetControl("notInSupply", pComp) == GR_OK)
-					pComp->QueryInterface("IIcon", notInSupply);
-				if (menu->GetControl("fighterStanceNormal", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", fighterStanceNormal);
-				if (menu->GetControl("fighterStancePatrol", pComp) == GR_OK)
-					pComp->QueryInterface("IHotButton", fighterStancePatrol);
-				if (menu->GetControl("techarmor", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techarmor);
-				if (menu->GetControl("techsupply", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techsupply);
-				if (menu->GetControl("techsheild", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techsheild);
-				if (menu->GetControl("techweapon", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techweapon);
-				if (menu->GetControl("techsensors", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techsensors);
-				if (menu->GetControl("techspecial", pComp) == GR_OK)
-					pComp->QueryInterface("IHotStatic", techspecial);
-				if (menu->GetControl("specialweapon", pComp) == GR_OK)
+				if (toolbar->GetControl("shipclass", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", shipclass.void_addr());
+				if (menu->GetControl("hull", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", hull.void_addr());
+				if (menu->GetControl("supplies", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", supplies.void_addr());
+				if (menu->GetControl("location", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IStatic", location.void_addr());
+				if (menu->GetControl("inSupply", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IIcon", inSupply.void_addr());
+				if (menu->GetControl("notInSupply", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IIcon", notInSupply.void_addr());
+				if (menu->GetControl("fighterStanceNormal", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", fighterStanceNormal.void_addr());
+				if (menu->GetControl("fighterStancePatrol", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotButton", fighterStancePatrol.void_addr());
+				if (menu->GetControl("techarmor", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techarmor.void_addr());
+				if (menu->GetControl("techsupply", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techsupply.void_addr());
+				if (menu->GetControl("techsheild", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techsheild.void_addr());
+				if (menu->GetControl("techweapon", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techweapon.void_addr());
+				if (menu->GetControl("techsensors", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techsensors.void_addr());
+				if (menu->GetControl("techspecial", pComp.void_addr()) == GR_OK)
+					pComp->QueryInterface("IHotStatic", techspecial.void_addr());
+				if (menu->GetControl("specialweapon", pComp.void_addr()) == GR_OK)
 				{
-					pComp->QueryInterface("IHotButton", specialWpnCmd);
-					pComp->QueryInterface("IMultiHotButton",specialWpnMulti);
+					pComp->QueryInterface("IHotButton", specialWpnCmd.void_addr());
+					pComp->QueryInterface("IMultiHotButton",specialWpnMulti.void_addr());
 				}
 
 
 				COMPTR<IDAConnectionPoint> connection;
 
-				if (menu->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+				if (menu->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 					connection->Advise(getBase(), &hotEventHandle);
 			}
 			if(menu)
@@ -447,7 +447,7 @@ void CMenu_WarPlat::setPanelOwnership (bool bOwn)
 			menu->SetVisible(false);
 			COMPTR<IDAConnectionPoint> connection;
 		
-			if (menu->QueryOutgoingInterface("IHotControlEvent", connection) == GR_OK)
+			if (menu->QueryOutgoingInterface("IHotControlEvent", connection.addr()) == GR_OK)
 				connection->Unadvise(hotEventHandle);
 			hotEventHandle = 0;
 		}
@@ -490,7 +490,7 @@ struct _cmenu_warplat: GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(menu->getBase(), &menu->eventHandle);
 	}
 };

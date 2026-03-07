@@ -842,71 +842,71 @@ void Menu_Diplomacy::init (void)
 
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.staticTitle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticTitle);
+	GENDATA->CreateInstance(data.staticTitle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticTitle.void_addr());
 
-	GENDATA->CreateInstance(data.staticName.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticName);
+	GENDATA->CreateInstance(data.staticName.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticName.void_addr());
 
-	GENDATA->CreateInstance(data.staticRace.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticRace);
+	GENDATA->CreateInstance(data.staticRace.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticRace.void_addr());
 
-	GENDATA->CreateInstance(data.staticAllies.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticAllies);
+	GENDATA->CreateInstance(data.staticAllies.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticAllies.void_addr());
 
-	GENDATA->CreateInstance(data.staticMetalTitle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMetalTitle);
+	GENDATA->CreateInstance(data.staticMetalTitle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMetalTitle.void_addr());
 
-	GENDATA->CreateInstance(data.staticGasTitle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticGasTitle);
+	GENDATA->CreateInstance(data.staticGasTitle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticGasTitle.void_addr());
 
-	GENDATA->CreateInstance(data.staticCrewTitle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticCrewTitle);
+	GENDATA->CreateInstance(data.staticCrewTitle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticCrewTitle.void_addr());
 
-	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonOk);
+	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonOk.void_addr());
 
-	GENDATA->CreateInstance(data.buttonReset.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonReset);
+	GENDATA->CreateInstance(data.buttonReset.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonReset.void_addr());
 
-	GENDATA->CreateInstance(data.buttonCancel.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonCancel);
+	GENDATA->CreateInstance(data.buttonCancel.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonCancel.void_addr());
 
-	GENDATA->CreateInstance(data.buttonApply.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonApply);
+	GENDATA->CreateInstance(data.buttonApply.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonApply.void_addr());
  
-	GENDATA->CreateInstance(data.staticCrew.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticCrew);
+	GENDATA->CreateInstance(data.staticCrew.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticCrew.void_addr());
 
-	GENDATA->CreateInstance(data.staticMetal.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMetal);
+	GENDATA->CreateInstance(data.staticMetal.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMetal.void_addr());
 
-	GENDATA->CreateInstance(data.staticGas.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticGas);
+	GENDATA->CreateInstance(data.staticGas.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticGas.void_addr());
 
 	U32 i;
 	for (i = 0; i < NUM_OTHERS; i++)
 	{
-		GENDATA->CreateInstance(data.staticNames[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticNames[i]);
+		GENDATA->CreateInstance(data.staticNames[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticNames[i].void_addr());
 
-		GENDATA->CreateInstance(data.staticRaces[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticRaces[i]);
+		GENDATA->CreateInstance(data.staticRaces[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticRaces[i].void_addr());
 
-		GENDATA->CreateInstance(data.buttonCrew[i].buttonType, pComp);
-		pComp->QueryInterface("IButton2", buttonCrew[i]);
+		GENDATA->CreateInstance(data.buttonCrew[i].buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", buttonCrew[i].void_addr());
 
-		GENDATA->CreateInstance(data.buttonMetal[i].buttonType, pComp);
-		pComp->QueryInterface("IButton2", buttonMetal[i]);
+		GENDATA->CreateInstance(data.buttonMetal[i].buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", buttonMetal[i].void_addr());
 
-		GENDATA->CreateInstance(data.buttonGas[i].buttonType, pComp);
-		pComp->QueryInterface("IButton2", buttonGas[i]);
+		GENDATA->CreateInstance(data.buttonGas[i].buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", buttonGas[i].void_addr());
 
-		GENDATA->CreateInstance(data.diplomacyButtons[i].buttonType, pComp);
-		pComp->QueryInterface("IDiplomacyButton", diplomacyButtons[i]);
+		GENDATA->CreateInstance(data.diplomacyButtons[i].buttonType, pComp.addr());
+		pComp->QueryInterface("IDiplomacyButton", diplomacyButtons[i].void_addr());
 	}
 
 	resPriority = RES_PRIORITY_HIGH;

@@ -294,18 +294,18 @@ void MenuChat::init (void)
 	data = 	*((GT_CHAT *) GENDATA->GetArchetypeData("MenuChat"));
 
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.chatbox.editType, pComp);
-	pComp->QueryInterface("IEdit2", chatbox);
+	GENDATA->CreateInstance(data.chatbox.editType, pComp.addr());
+	pComp->QueryInterface("IEdit2", chatbox.void_addr());
 
 	chatbox->EnableToolbarBehavior();
 	chatbox->EnableChatboxBehavior();
 	chatbox->SetMaxChars(MAX_TEXT_LENGTH);
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.ask.staticType, pComp);
-	pComp->QueryInterface("IStatic", ask);
+	GENDATA->CreateInstance(data.ask.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", ask.void_addr());
 
 	resPriority = RES_PRIORITY_HIGH;
 	cursorID = IDC_CURSOR_ARROW;
