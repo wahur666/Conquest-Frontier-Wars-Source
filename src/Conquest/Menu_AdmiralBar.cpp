@@ -1226,7 +1226,7 @@ void Menu_AdmiralBar::handleCommandKitRes(U32 index)
 {
 	if(admiral)
 	{
-		VOLPTR(IAdmiral) admiralPtr = admiral;
+		VOLPTR(IAdmiral) admiralPtr = admiral.ptr;
 		if(admiralPtr)
 		{
 			U32 archId = admiralPtr->GetAvailibleCommandKitID(index);
@@ -2096,7 +2096,7 @@ void Menu_AdmiralBar::onResupplyFleet (void)
 	caps.supplyOk = true;
 
 	IBaseObject * plat = NULL;
-	MPart part = admiral;
+	MPart part = admiral.ptr;
 
 	if (part.isValid())
 	{
@@ -2148,7 +2148,7 @@ void Menu_AdmiralBar::onRepairFleet (void)
 	caps.repairOk = true;
 
 	IBaseObject * plat = NULL;
-	MPart part = admiral;
+	MPart part = admiral.ptr;
 
 	if (part.isValid())
 	{
@@ -2226,7 +2226,7 @@ void Menu_AdmiralBar::onCreateFleet (void)
 	
 	U32 dockshipID = 0;
 	
-	VOLPTR(IAdmiral) flagship = admiral;
+	VOLPTR(IAdmiral) flagship = admiral.ptr;
 	if (flagship)
 	{
 		IBaseObject * dockship = flagship->GetDockship();

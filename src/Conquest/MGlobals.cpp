@@ -362,7 +362,7 @@ struct DACOM_NO_VTABLE GlobalViewer : IEventCallback, IDocumentClient
 			COMPTR<IDAConnectionPoint> connection;
 			GENRESULT result;
 			
-			if ((result = _doc->QueryOutgoingInterface("IDocumentClient", connection)) == GR_OK)
+			if ((result = _doc->QueryOutgoingInterface("IDocumentClient", connection.addr())) == GR_OK)
 				connection->Unadvise(docHandle1);
 			connection.free();
 			doc1 = 0;
@@ -374,7 +374,7 @@ struct DACOM_NO_VTABLE GlobalViewer : IEventCallback, IDocumentClient
 			COMPTR<IDAConnectionPoint> connection;
 			GENRESULT result;
 			
-			if ((result = _doc->QueryOutgoingInterface("IDocumentClient", connection)) == GR_OK)
+			if ((result = _doc->QueryOutgoingInterface("IDocumentClient", connection.addr())) == GR_OK)
 				connection->Unadvise(docHandle2);
 			connection.free();
 			doc2 = 0;
@@ -386,7 +386,7 @@ struct DACOM_NO_VTABLE GlobalViewer : IEventCallback, IDocumentClient
 			COMPTR<IDAConnectionPoint> connection;
 			GENRESULT result;
 			
-			if ((result = _doc->QueryOutgoingInterface("IDocumentClient", connection)) == GR_OK)
+			if ((result = _doc->QueryOutgoingInterface("IDocumentClient", connection.addr())) == GR_OK)
 				connection->Unadvise(docHandle3);
 			connection.free();
 			doc3 = 0;
@@ -405,7 +405,7 @@ struct DACOM_NO_VTABLE GlobalViewer : IEventCallback, IDocumentClient
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (_doc->QueryOutgoingInterface("IDocumentClient", connection) == GR_OK)
+		if (_doc->QueryOutgoingInterface("IDocumentClient", connection.addr()) == GR_OK)
 		{
 			if (connection->Advise(getBase(), &handle) == GR_OK)
 			{
@@ -459,7 +459,7 @@ GlobalViewer::~GlobalViewer (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -477,7 +477,7 @@ void GlobalViewer::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 	
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		connection->Advise(getBase(), &eventHandle);
 	}
@@ -490,19 +490,19 @@ void GlobalViewer::init()
 	minfo.fMask = MIIM_ID | MIIM_TYPE;
 	minfo.fType = MFT_STRING;
 	minfo.wID = IDS_VIEW_GLOBALS;
-	minfo.dwTypeData = "Global Values";
+	minfo.dwTypeData = LPSTR("Global Values");
 	minfo.cch = strlen(minfo.dwTypeData);
 		
 	InsertMenuItem(hMenu, 0x7FFE, 1, &minfo);
 
 	minfo.wID = IDS_VIEW_GLOBAL_DATA;
-	minfo.dwTypeData = "Global Data";
+	minfo.dwTypeData = LPSTR("Global Data");
 	minfo.cch = strlen(minfo.dwTypeData);
 		
 	InsertMenuItem(hMenu, 0x7FFE, 1, &minfo);
 
 	minfo.wID = IDS_VIEW_EFFECT_OPTIONS;
-	minfo.dwTypeData = "Effect Options";
+	minfo.dwTypeData = LPSTR("Effect Options");
 	minfo.cch = strlen(minfo.dwTypeData);
 		
 	InsertMenuItem(hMenu, 0x7FFE, 1, &minfo);
@@ -621,7 +621,7 @@ BOOL32 GlobalViewer::createViewer (void)
 		mdesc.dwDesiredAccess |= GENERIC_WRITE;
 		mdesc.dwShareMode = 0;
 
-		if (DACOM->CreateInstance(&mdesc, file) == GR_OK)
+		if (DACOM->CreateInstance(&mdesc, file.void_addr()) == GR_OK)
 			file->AddRef();
 		ddesc.lpParent = file;
 		ddesc.lpImplementation = "DOS";
@@ -629,7 +629,7 @@ BOOL32 GlobalViewer::createViewer (void)
 		ddesc.dwShareMode = 0;
 		ddesc.lpFileName = mdesc.lpFileName;
 
-		if (file!=0 && DACOM->CreateInstance(&ddesc, doc1) != GR_OK)
+		if (file!=0 && DACOM->CreateInstance(&ddesc, doc1.void_addr()) != GR_OK)
 			file->Release();		// get rid of the extra reference
 	}
 
@@ -642,7 +642,7 @@ BOOL32 GlobalViewer::createViewer (void)
 		vdesc.doc = doc1;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if (PARSER->CreateInstance(&vdesc, viewer) == GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
@@ -683,7 +683,7 @@ BOOL32 GlobalViewer::createViewer2 (void)
 	mdesc.dwDesiredAccess |= GENERIC_WRITE;
 	mdesc.dwShareMode = 0;
 
-	if (DACOM->CreateInstance(&mdesc, file) == GR_OK)
+	if (DACOM->CreateInstance(&mdesc, file.void_addr()) == GR_OK)
 		file->AddRef();
 	ddesc.lpParent = file;
 	ddesc.lpImplementation = "DOS";
@@ -691,7 +691,7 @@ BOOL32 GlobalViewer::createViewer2 (void)
 	ddesc.dwShareMode = 0;
 	ddesc.lpFileName = mdesc.lpFileName;
 
-	if (file!=0 && DACOM->CreateInstance(&ddesc, doc2) == GR_OK)
+	if (file!=0 && DACOM->CreateInstance(&ddesc, doc2.void_addr()) == GR_OK)
 	{
 		VIEWDESC vdesc;
 		HWND hwnd;
@@ -700,7 +700,7 @@ BOOL32 GlobalViewer::createViewer2 (void)
 		vdesc.doc = doc2;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if (PARSER->CreateInstance(&vdesc, viewer2) == GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer2.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
@@ -740,11 +740,11 @@ BOOL32 GlobalViewer::createViewer3 (void)
 {
 	COMPTR<IDocument> pDatabase;
 
-	if (GENDATA->GetDataFile(pDatabase) == GR_OK)
+	if (GENDATA->GetDataFile(pDatabase.addr()) == GR_OK)
 	{
 		// create viewer for global values
 
-		if (doc3==0 && pDatabase->GetChildDocument("\\GT_GLOBAL_VALUES\\GlobalValues", doc3) == GR_OK)
+		if (doc3==0 && pDatabase->GetChildDocument("\\GT_GLOBAL_VALUES\\GlobalValues", doc3.addr()) == GR_OK)
 		{
 			VIEWDESC vdesc;
 			HWND hwnd;
@@ -753,7 +753,7 @@ BOOL32 GlobalViewer::createViewer3 (void)
 			vdesc.doc = doc3;
 			vdesc.hOwnerWindow = hMainWindow;
 			
-			if (CQFLAGS.bNoGDI==0 && PARSER->CreateInstance(&vdesc, viewer3) == GR_OK)
+			if (CQFLAGS.bNoGDI==0 && PARSER->CreateInstance(&vdesc, viewer3.void_addr()) == GR_OK)
 			{
 				COMPTR<IDAConnectionPoint> connection;
 
@@ -1744,7 +1744,7 @@ U32 MGlobals::GetFileDescription (const C8 * fileName, wchar_t * string, U32 buf
 	MT_GlobalData data;
 	memset(&data, 0, sizeof(MT_GlobalData));
 
-	SAVEDIR->CreateInstance(&fdesc, tempFile);
+	SAVEDIR->CreateInstance(&fdesc, tempFile.void_addr());
 
 	if (tempFile == NULL || tempFile->SetCurrentDirectory("\\MT_GlobalData") == 0)
 	{
@@ -1778,7 +1778,7 @@ U32 MGlobals::GetFileDescription (IFileSystem * fileDir, const C8 * fileName, wc
 	MT_GlobalData data;
 	memset(&data, 0, sizeof(MT_GlobalData));
 
-	fileDir->CreateInstance(&fdesc, tempFile);
+	fileDir->CreateInstance(&fdesc, tempFile.void_addr());
 
 	if (tempFile == NULL || tempFile->SetCurrentDirectory("\\MT_GlobalData") == 0)
 	{
@@ -1812,7 +1812,7 @@ U32 MGlobals::GetFileMaxPlayers (IFileSystem * fileDir, const C8 * fileName, U32
 	MT_GlobalData data;
 	memset(&data, 0, sizeof(MT_GlobalData));
 
-	fileDir->CreateInstance(&fdesc, tempFile);
+	fileDir->CreateInstance(&fdesc, tempFile.void_addr());
 
 	if (tempFile == NULL || tempFile->SetCurrentDirectory("\\MT_GlobalData") == 0)
 	{
@@ -1846,7 +1846,7 @@ U32 MGlobals::GetFileMaxPlayers (const C8 * fileName, U32 & maxPlayers)
 	MT_GlobalData data;
 	memset(&data, 0, sizeof(MT_GlobalData));
 
-	SAVEDIR->CreateInstance(&fdesc, tempFile);
+	SAVEDIR->CreateInstance(&fdesc, tempFile.void_addr());
 
 	if (tempFile == NULL || tempFile->SetCurrentDirectory("\\MT_GlobalData") == 0)
 	{

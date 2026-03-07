@@ -59,7 +59,7 @@ set(MISSION_SOURCES
         ../MGlobals.cpp
         ../Mission.cpp
         ../MScript.cpp
-        ../ObjList.cpp
+#        ../ObjList.cpp
         ../ObjMapIterator.cpp
         ../OpAgent.cpp
         ../Pch.cpp
@@ -112,6 +112,8 @@ target_link_libraries(Mission PRIVATE
         MathLib
         DACOM
         RPUL
+        Globals
+        Trim
 )
 
 set_property(TARGET RPUL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

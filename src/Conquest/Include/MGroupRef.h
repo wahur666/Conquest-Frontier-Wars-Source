@@ -64,15 +64,6 @@ public:
 	// verify that instance is allocated on the stack
 	void verify (void) const 
 	{
-#ifdef _DEBUG
-#ifdef CQASSERT
-		U32 stack;
-
-		__asm mov stack, esp
-
-		CQASSERT((U32(this) - stack < 8196) && "INVALID USE OF MGroupRef");
-#endif
-#endif
 	}
 
 	friend struct MScript;

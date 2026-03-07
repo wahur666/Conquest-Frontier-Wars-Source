@@ -4,48 +4,18 @@
 // 
 //---------------------------------------------------------------------------
 
-#include <cstdint>
-
 #ifndef US_TYPEDEFS
 #define US_TYPEDEFS
-
-typedef int32_t BOOL32;
-typedef uint8_t    U8 ;
-typedef uint16_t   U16;
-typedef uint32_t   U32;
-typedef uint64_t   U64;
-typedef char       C8 ;
-typedef int8_t     S8 ;
-typedef int16_t    S16;
-typedef int32_t    S32;
-typedef int64_t    S64;
-
-// bool is not defined on SGI
-#ifdef SGI
-#ifndef bool
-#include <inttypes.h>
-typedef unsigned char bool;
-#endif
-#endif
-
-// #ifndef true
-// #define true ((bool)1)
-// #endif
-//
-// #ifndef false
-// #define false ((bool)0)
-// #endif
-
-#ifdef __cplusplus      // (for H2INC compatibility)
-#ifdef SGI
-typedef __uint64_t U64;
-typedef __int64_t S64;
-#else
+typedef signed   long    BOOL32;
+typedef unsigned char    U8 ;
+typedef unsigned short   U16;
+typedef unsigned long    U32;
+typedef          char    C8 ;
+typedef signed   char    S8 ;
+typedef signed   short   S16;
+typedef signed   long    S32;
 typedef unsigned __int64 U64;
 typedef signed   __int64 S64;
-#endif
-#endif
-
 #endif // US_TYPEDEFS
 
 //---------------------------------------------------------------------------

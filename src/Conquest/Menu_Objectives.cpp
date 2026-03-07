@@ -9,7 +9,7 @@
    $Header: /Conquest/App/Src/Menu_Objectives.cpp 25    10/06/00 5:43p Sbarton $
 */
 //--------------------------------------------------------------------------//
- 
+
 #include "pch.h"
 #include <globals.h>
 
@@ -51,7 +51,7 @@ void add_objective_stringID (ObjectiveList *& list, U32 stringID)
 	{
 		// add the object to the end of the list
 		ObjectiveList * p = list;
-		
+
 		while (p)
 		{
 			if (p->pNext == NULL)
@@ -84,7 +84,7 @@ struct dummy_menuobjectives : public Frame
 	DACOM_INTERFACE_ENTRY(IDocumentClient)
 	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
 	DACOM_INTERFACE_ENTRY(IEventCallback)
-	
+
 	// the following are for BaseHotRect
 	DACOM_INTERFACE_ENTRY(IResourceClient)
 	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
@@ -190,7 +190,7 @@ struct Menu_Objectives : public DAComponent<dummy_menuobjectives>
 	}
 
 	void init (void);
-	
+
 	void updateObjectiveInfo (void);
 
 	void addObjective (void);
@@ -292,7 +292,7 @@ void Menu_Objectives::addObjectiveToList (U32 stringID)
 	wchar_t * pString;
 	wchar_t buffer[128];
 	memset(buffer, 0, sizeof(buffer));
-	
+
 	pString = MScript::GetCountedString(stringID);
 	CQASSERT(pString);
 
@@ -304,7 +304,7 @@ void Menu_Objectives::addObjectiveToList (U32 stringID)
 	COLORREF color;
 	bool bObjectiveVisible = true;
 	bool bObjectiveFailed = false;
-	
+
 	if (MGlobals::IsObjectiveFailed(stringID))
 	{
 		bObjectiveFailed = true;
@@ -336,7 +336,7 @@ void Menu_Objectives::addObjectiveToList (U32 stringID)
 	}
 	staticObjectiveArray[nObjectives]->SetTextColor(color);
 	staticObjectiveArray[nObjectives]->SetVisible(true);
-	
+
 	checkObjectives[nObjectives]->SetVisible(bObjectiveVisible);
 	checkObjectives[nObjectives]->SetPushState(bObjectiveFailed);
 	checkObjectives[nObjectives]->EnableButton(false);
@@ -376,7 +376,7 @@ void Menu_Objectives::updateObjectiveInfo (void)
 	}
 
 	U32 numObjectives = MGlobals::GetNumberObjectives();
-	
+
 	for (i = 0; i < numObjectives; i++)
 	{
 		stringID = MGlobals::GetObjectiveStringID(i);
@@ -410,7 +410,7 @@ GENRESULT Menu_Objectives::Notify (U32 message, void *param)
 			// draw our teletype rectangle
 			if (DEFAULTS->GetDefaults()->bDrawHotrects)
 			{
-				DA::RectangleHash(NULL, IDEAL2REALX(rcTeletype.left), IDEAL2REALY(rcTeletype.top), 
+				DA::RectangleHash(NULL, IDEAL2REALX(rcTeletype.left), IDEAL2REALY(rcTeletype.top),
 					  IDEAL2REALX(rcTeletype.right), IDEAL2REALY(rcTeletype.bottom), RGB(0,255,0));
 			}
 			return result;
@@ -475,25 +475,25 @@ void Menu_Objectives::init (void)
 
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.staticName.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticName);
+	GENDATA->CreateInstance(data.staticName.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticName.void_addr());
 
-	GENDATA->CreateInstance(data.staticObjectives.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticObjectives);
+	GENDATA->CreateInstance(data.staticObjectives.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticObjectives.void_addr());
 
-	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonOk);
+	GENDATA->CreateInstance(data.buttonOk.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonOk.void_addr());
 
 	for (int i = 0; i < MAX_MISSION_OBJECTIVES_SHOWN; i++)
 	{
-		GENDATA->CreateInstance(data.checkObjectives[i].buttonType, pComp);
-		pComp->QueryInterface("IButton2", checkObjectives[i]);		
+		GENDATA->CreateInstance(data.checkObjectives[i].buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", checkObjectives[i].void_addr());
 
-		GENDATA->CreateInstance(data.staticObjectiveArray[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticObjectiveArray[i]);
+		GENDATA->CreateInstance(data.staticObjectiveArray[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticObjectiveArray[i].void_addr());
 	}
 }
 //--------------------------------------------------------------------------//

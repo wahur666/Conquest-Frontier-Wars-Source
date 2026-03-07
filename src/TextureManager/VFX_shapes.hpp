@@ -32,12 +32,8 @@
  */
 
 #include <string.h>
-#include <stdint.h>
 
 // Type definitions
-typedef uint8_t  U8;
-typedef int32_t  S32;
-typedef uint32_t U32;
 
 struct SHAPEHEADER
 {

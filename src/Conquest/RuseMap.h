@@ -186,7 +186,7 @@ public:
 	BOOL32 Save(SYSTEM_DATA *save);
 	BOOL32 Load(SYSTEM_DATA *load);
 	void DoDialog();
-	static BOOL CALLBACK DlgProc(HWND hwnd, UINT message, UINT wParam, LPARAM lParam);
+	static LRESULT CALLBACK DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 	void SetName(char buffer[256]);
 	char *GetName();
 	void AssignID();

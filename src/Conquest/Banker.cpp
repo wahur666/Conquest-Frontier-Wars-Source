@@ -48,15 +48,6 @@ struct stalledNode
 	void * operator new (size_t size)
 	{
 		void * result = calloc(size, 1);
-		{
-			DWORD dwAddr;
-			__asm
-			{
-				mov eax, DWORD PTR [EBP+4]
-				mov DWORD PTR dwAddr, eax
-			}
-			HEAP_Acquire()->SetBlockOwner(result, dwAddr);
-		}
 		return result;
 	}
 
@@ -203,7 +194,7 @@ Banker::~Banker()
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 }
@@ -731,16 +722,16 @@ void Banker::enableMenu (bool bEnable)
 		COMPTR<IDAComponent> pComp;
 		COMPTR<IToolbar> toolbar;
 
-		if (TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+		if (TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 		{
-			if (toolbar->GetControl("gas", pComp) == GR_OK)
-				pComp->QueryInterface("IStatic", gasArea);
-			if (toolbar->GetControl("metal", pComp) == GR_OK)
-				pComp->QueryInterface("IStatic", metalArea);
-			if (toolbar->GetControl("crew", pComp) == GR_OK)
-				pComp->QueryInterface("IStatic", crewArea);
-			if (toolbar->GetControl("commandPts", pComp) == GR_OK)
-				pComp->QueryInterface("IStatic", commandPtArea);
+			if (toolbar->GetControl("gas", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IStatic", gasArea.void_addr());
+			if (toolbar->GetControl("metal", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IStatic", metalArea.void_addr());
+			if (toolbar->GetControl("crew", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IStatic", crewArea.void_addr());
+			if (toolbar->GetControl("commandPts", pComp.void_addr()) == GR_OK)
+				pComp->QueryInterface("IStatic", commandPtArea.void_addr());
 			if(gasArea)
 			{
 				wchar_t buffer[32];
@@ -784,7 +775,7 @@ void Banker::enableMenu (bool bEnable)
 void Banker::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
-	if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &eventHandle);
 	for(U32 playerID = 1; playerID <= MAX_PLAYERS; ++playerID)
 	{

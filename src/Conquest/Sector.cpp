@@ -521,7 +521,7 @@ struct DACOM_NO_VTABLE Sector : public ISector,
 
 	virtual U32 CreateSystem (U32 xPos, U32 yPos, U32 width, U32 height);
 
-	virtual void CreateJumpGate(U32 systemID1, U32 x1, U32 y1, U32 & id1,U32 systemID2, U32 x2, U32 y2, U32 & id2,char * jumpArch);
+	virtual void CreateJumpGate(U32 systemID1, U32 x1, U32 y1, U32 & id1,U32 systemID2, U32 x2, U32 y2, U32 & id2,const char * jumpArch);
 
 	virtual void AddPlatformToSystem (U32 systemID, U32 playerMask, U32 playerID, enum M_OBJCLASS mObjClass);
 
@@ -3365,7 +3365,7 @@ U32 Sector::CreateSystem (U32 xPos, U32 yPos, U32 width, U32 height)
 }
 //--------------------------------------------------------------------------//
 //
-void Sector::CreateJumpGate(U32 systemID1, U32 x1, U32 y1, U32 & id1,U32 systemID2, U32 x2, U32 y2, U32 & id2,char * jumpArch)
+void Sector::CreateJumpGate(U32 systemID1, U32 x1, U32 y1, U32 & id1,U32 systemID2, U32 x2, U32 y2, U32 & id2,const char * jumpArch)
 {
 	System * A = firstSystem;
 	while(A && (A->d.id != systemID1))

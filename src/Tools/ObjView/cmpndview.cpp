@@ -1351,7 +1351,7 @@ void RenderObjects (void)
 		}
 		else {
 			Renderer->set_render_property( NURB_PIXEL_ERROR, nurb_error );
-			Renderer->set_render_property( BEZIER_SUBDIV_CNT, bezier_sub );
+			Renderer->set_render_property( BEZIER_SUBDIV_CNT, (S32)bezier_sub );
 			visible = Engine->render_instance( Camera, LoadedInstIndices[i], 0, lod_fraction, render_mode, NULL );
 		}
 	}

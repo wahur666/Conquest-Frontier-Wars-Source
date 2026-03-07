@@ -98,7 +98,7 @@ template <class Base>
 void * ObjectImpl< Base >::QueryInterface (OBJID objid, OBJPTR<IBaseObject> & pInterface, U32 playerID)
 {
 	int i;
-	const _INTMAP_ENTRY * interfaces = _CQGetEntriesIn();
+	const _INTMAP_ENTRY * interfaces = Base::_CQGetEntriesIn();
 
 	for (i = 0; interfaces[i].objid; i++)
 	{

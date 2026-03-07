@@ -189,7 +189,7 @@ UnitComm::~UnitComm (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
 	reset();
@@ -855,7 +855,7 @@ void UnitComm::on3DEnable (bool bEnable)
 
 		for(U32 index = 0; index < MAX_ALERT_FONTS;++index)
 		{
-			CreateFontDrawAgent(hFont, 0, pen, background, pFont[index]);
+			CreateFontDrawAgent(hFont, 0, pen, background, pFont[index].addr());
 		}
 
 		wcsncpy(alertStrings[ALERT_UNKNOWN], _localLoadStringW(IDS_ALERT_UNKNOWN),ALERT_STRING_LENGTH);
@@ -966,7 +966,7 @@ void UnitComm::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &eventHandle);
 }
 //--------------------------------------------------------------------------//

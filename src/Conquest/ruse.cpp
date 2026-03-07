@@ -106,9 +106,9 @@ static BOOL32 GuardedEnableWindow (HWND hwnd, BOOL bEnable)
 }
 //----------------------------------------------------------------------------
 //
-static LONG CALLBACK editControlProcedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
+static LRESULT CALLBACK editControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
- 	WNDPROC oldProc = (WNDPROC) GetWindowLong(hwnd, GWL_USERDATA);
+ 	WNDPROC oldProc = (WNDPROC) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 	switch (message)
 	{
@@ -129,9 +129,9 @@ static LONG CALLBACK editControlProcedure(HWND hwnd, UINT message, UINT wParam, 
 }
 //----------------------------------------------------------------------------
 //
-static LONG CALLBACK listControlProcedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
+static LRESULT CALLBACK listControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
- 	WNDPROC oldProc = (WNDPROC) GetWindowLong(hwnd, GWL_USERDATA);
+ 	WNDPROC oldProc = (WNDPROC) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 	switch (message)
 	{
@@ -146,7 +146,7 @@ static LONG CALLBACK listControlProcedure(HWND hwnd, UINT message, UINT wParam, 
 			break;
 	}
 
-	return CallWindowProc((long (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long))oldProc, hwnd, message, wParam, lParam);
+	return CallWindowProc(oldProc, hwnd, message, wParam, lParam);
 }
 //-------------------------------------------------------------------
 //
@@ -167,7 +167,7 @@ struct loadDlgSaveStruct : WINDOWPLACEMENT
 };
 //-------------------------------------------------------------------
 //
-static BOOL CALLBACK loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+static LPARAM CALLBACK loadArchDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
 
@@ -184,17 +184,17 @@ static BOOL CALLBACK loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG
 			WNDPROC oldProc;
 			loadDlgSaveStruct loadStruct;
 
-			if ((oldProc = (WNDPROC) GetWindowLong(hList, GWL_WNDPROC)) != 0)
+			if ((oldProc = (WNDPROC) GetWindowLongPtr(hList, GWLP_WNDPROC)) != 0)
 			{
-				SetWindowLong(hList, GWL_USERDATA, (LONG) oldProc);
-				SetWindowLong(hList, GWL_WNDPROC, (LONG) listControlProcedure);
+				SetWindowLongPtr(hList, GWLP_USERDATA, LONG_PTR(oldProc));
+				SetWindowLongPtr(hList, GWLP_WNDPROC, LONG_PTR(listControlProcedure));
 			}
 			HWND hPartName = GetDlgItem(hwnd, IDC_PART_NAME);
-			if ((oldProc = (WNDPROC) GetWindowLong(hPartName, GWL_WNDPROC)) != 0)
+			if ((oldProc = (WNDPROC) GetWindowLongPtr(hPartName, GWLP_WNDPROC)) != 0)
 			{
 				SetWindowText(hPartName, "");
-				SetWindowLong(hPartName, GWL_USERDATA, (LONG) oldProc);
-				SetWindowLong(hPartName, GWL_WNDPROC, (LONG) editControlProcedure);
+				SetWindowLongPtr(hPartName, GWLP_USERDATA, (LONG_PTR) oldProc);
+				SetWindowLongPtr(hPartName, GWLP_WNDPROC, (LONG_PTR) editControlProcedure);
 			}
 			setTextForSelection(hwnd);
 
@@ -218,7 +218,7 @@ static BOOL CALLBACK loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG
 			EnableMenuItem(hMenu, SC_CLOSE, MF_BYCOMMAND|MF_GRAYED); 
 			EnableMenuItem(hMenu, SC_MAXIMIZE, MF_BYCOMMAND|MF_GRAYED); 
 			EnableMenuItem(hMenu, SC_SIZE, MF_BYCOMMAND|MF_GRAYED); 
-			SetWindowLong(hwnd, DWL_MSGRESULT, 0);
+			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 0);
 			result = 1;
 		}
 		break;
@@ -358,7 +358,7 @@ static BOOL32 LoadHotkeys (void)
 				mdesc.dwBufferSize = SizeofResource(hResource, hRes);
 				mdesc.dwFlags = CMF_DONT_COPY_MEMORY;
 
-				CreateUTFMemoryFile(mdesc, pFile);
+				CreateUTFMemoryFile(mdesc, pFile.addr());
 			}
 		}
 	}
@@ -379,7 +379,7 @@ static BOOL32 LoadHotkeys (void)
 		return 0;
 	}
 
-	if (RHOTKEY->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (RHOTKEY->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		U32 handle;
 		connection->Advise(EVENT, &handle);
@@ -753,7 +753,7 @@ void __stdcall ActivateRUSE (IFileSystem * outFile)
 
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(EVENT, &eventHandle);
 
 	if (!LoadMap())
@@ -797,7 +797,7 @@ BOOL32 __stdcall DeactivateRUSE (void)
 	HOTKEY->Enable();
 
 	COMPTR<IDAConnectionPoint> connection;
-	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 	eventHandle = 0;
 	bMapChanged = 0;

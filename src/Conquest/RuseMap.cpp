@@ -97,7 +97,7 @@ BOOL32 __stdcall RUSELoadArchEnum::ArchetypeEnum (const char * name, void *data,
 			{
 				COMPTR<IFileSystem> file;
 				DAFILEDESC fdesc = data.cFileName;
-				if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+				if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 					goto Done;
 				Jump * jump = MakeJumpgate(file,ARCHLIST->GetArchetypeDataID(name));
 				jump->partName = name;
@@ -415,7 +415,7 @@ Done:
 BOOL32
 Jump::Load(IFileSystem *file)
 {
-	U32 dwRead;
+	DWORD dwRead;
 	System *sysPos = firstSystem;
 	BOOL32 temp;
 
@@ -1029,7 +1029,7 @@ System::Size(S32 oldX,S32 oldY,S32 mouseX,S32 mouseY)
 	{
 		if (xBuf < yBuf)
 		{
-			d.sizeY = max((yBuf/GROW_FACTOR)*GROW_FACTOR,10000);
+			d.sizeY = std::max((yBuf/GROW_FACTOR)*GROW_FACTOR,10000l);
 
 			if (d.sizeY > MAX_SYS_SIZE)
 				d.sizeY = MAX_SYS_SIZE;
@@ -1038,7 +1038,7 @@ System::Size(S32 oldX,S32 oldY,S32 mouseX,S32 mouseY)
 		}
 		else
 		{
-			d.sizeX = max((xBuf/GROW_FACTOR)*GROW_FACTOR,10000);
+			d.sizeX = std::max((xBuf/GROW_FACTOR)*GROW_FACTOR,10000l);
 			if (d.sizeX > MAX_SYS_SIZE)
 				d.sizeX = MAX_SYS_SIZE;
 			d.sizeY = d.sizeX;
@@ -1107,17 +1107,14 @@ System::Load(SYSTEM_DATA *load)
 void
 System::DoDialog()
 {
-	DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_RUSE_NAME_DIALOG), hMainWindow, 
-		DlgProc, (LPARAM) this);
-
+	DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_RUSE_NAME_DIALOG), hMainWindow, DLGPROC(DlgProc), (LPARAM) this);
 }
 
-BOOL 
-System::DlgProc (HWND hwnd, UINT message, UINT wParam, LPARAM lParam)
+LRESULT System::DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_INITDIALOG)
-        SetWindowLong(hwnd, DWL_USER, lParam);
-	System *system = (System *) GetWindowLong(hwnd, DWL_USER);
+        SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+	System *system = (System *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 	switch (message)
 	{
@@ -1339,9 +1336,9 @@ void KillMap()
 
 System * CreateSystem(S32 x0,S32 y0,S32 x1,S32 y1)
 {
-	S32 x = min (abs(x0),abs(x1));
+	S32 x = std::min (abs(x0),abs(x1));
 	//remember y is flipped
-	S32 y = min (abs(y0),abs(y1));
+	S32 y = std::min (abs(y0),abs(y1));
 
 	if (firstSystem)
 	{
@@ -1356,8 +1353,8 @@ System * CreateSystem(S32 x0,S32 y0,S32 x1,S32 y1)
 
 //	lastSystem->d.sizeX = max(abs(x0-x1)*10000/ZOOM,10000);
 //	lastSystem->d.sizeY = max(abs(y0-y1)*10000/ZOOM,10000);
-	lastSystem->d.sizeX = min(max(abs(x0-x1),10000),MAX_SYS_SIZE);
-	lastSystem->d.sizeY = min(max(abs(y0-y1),10000),MAX_SYS_SIZE);
+	lastSystem->d.sizeX = std::min(std::max(abs(x0-x1),10000l),(long)MAX_SYS_SIZE);
+	lastSystem->d.sizeY = std::min(std::max(abs(y0-y1),10000l),(long)MAX_SYS_SIZE);
 
 	return lastSystem;
 
@@ -1467,7 +1464,7 @@ Done:
 BOOL32 SaveMap()
 {
 	BOOL32 result = 0;
-	U32 dwWritten;
+	DWORD dwWritten;
 
 	saveCounter = 0;
 
@@ -1509,7 +1506,7 @@ BOOL32 SaveMap()
 	fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 	
 	file->WriteFile(0,&save,sizeof(save),&dwWritten);
@@ -1546,7 +1543,7 @@ BOOL32 LoadMap()
 	BOOL32 result = 0;
 	COMPTR<IFileSystem> inFile,file;
 	DAFILEDESC fdesc;
-	U32 dwRead;
+	DWORD dwRead;
 
 	KillMap();
 
@@ -1561,7 +1558,7 @@ BOOL32 LoadMap()
 	fdesc.dwDesiredAccess = GENERIC_READ;
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.lpFileName = "Sector";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0,&load,sizeof(load),&dwRead);

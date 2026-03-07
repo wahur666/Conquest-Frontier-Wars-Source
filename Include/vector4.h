@@ -1,23 +1,6 @@
 #ifndef _VECTOR4_H_
 #define _VECTOR4_H_
 
-#include <memory.h>
-#include <math.h>
-
-#ifdef SGI
-#ifndef bool
-typedef unsigned char bool;
-#endif
-#endif
-
-#ifndef true
-#define true ((bool)1)
-#endif
-
-#ifndef false
-#define false ((bool)0)
-#endif
-
 typedef float SINGLE;
 
 class Vector4

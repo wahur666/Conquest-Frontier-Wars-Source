@@ -602,45 +602,45 @@ void Menu_PlayerChat::init (void)
 
 	COMPTR<IDAComponent> pComp;
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.staticTitle.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticTitle);
+	GENDATA->CreateInstance(data.staticTitle.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticTitle.void_addr());
 
-	GENDATA->CreateInstance(data.staticChat.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticChat);
+	GENDATA->CreateInstance(data.staticChat.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticChat.void_addr());
 
-	GENDATA->CreateInstance(data.buttonClose.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonClose);
+	GENDATA->CreateInstance(data.buttonClose.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonClose.void_addr());
 
-	GENDATA->CreateInstance(data.buttonAllies.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonAllies);
+	GENDATA->CreateInstance(data.buttonAllies.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonAllies.void_addr());
 
-	GENDATA->CreateInstance(data.buttonEnemies.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonEnemies);
+	GENDATA->CreateInstance(data.buttonEnemies.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonEnemies.void_addr());
 
-	GENDATA->CreateInstance(data.buttonEveryone.buttonType, pComp);
-	pComp->QueryInterface("IButton2", buttonEveryone);
+	GENDATA->CreateInstance(data.buttonEveryone.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", buttonEveryone.void_addr());
  
 	U32 i;
 	for (i = 0; i < NUM_OTHERS; i++)
 	{
-		GENDATA->CreateInstance(data.staticNames[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticNames[i]);
+		GENDATA->CreateInstance(data.staticNames[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticNames[i].void_addr());
 
-		GENDATA->CreateInstance(data.staticRaces[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticRaces[i]);
+		GENDATA->CreateInstance(data.staticRaces[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticRaces[i].void_addr());
 
-		GENDATA->CreateInstance(data.checkNames[i].buttonType, pComp);
-		pComp->QueryInterface("IButton2", checkNames[i]);
+		GENDATA->CreateInstance(data.checkNames[i].buttonType, pComp.addr());
+		pComp->QueryInterface("IButton2", checkNames[i].void_addr());
 	}
 
-	GENDATA->CreateInstance(data.listChat.listboxType, pComp);
-	pComp->QueryInterface("IListbox", listChat);
+	GENDATA->CreateInstance(data.listChat.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", listChat.void_addr());
 
-	GENDATA->CreateInstance(data.editChat.editType, pComp);
-	pComp->QueryInterface("IEdit2", editChat);
+	GENDATA->CreateInstance(data.editChat.editType, pComp.addr());
+	pComp->QueryInterface("IEdit2", editChat.void_addr());
 
 	resPriority = RES_PRIORITY_HIGH;
 	cursorID = IDC_CURSOR_ARROW;

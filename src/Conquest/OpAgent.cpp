@@ -1521,7 +1521,7 @@ OpAgent::~OpAgent (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
 	reset();
@@ -8233,7 +8233,7 @@ struct _opagent : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(agent->getBase(), &agent->eventHandle);
 			FULLSCREEN->SetCallbackPriority(agent, EVENT_PRIORITY_MISSION);

@@ -152,7 +152,7 @@ struct DACOM_NO_VTABLE ISector : public IDAComponent
 
 	virtual U32 CreateSystem (U32 xPos, U32 yPos, U32 width, U32 height) = 0;
 
-	virtual void CreateJumpGate(U32 systemID1, U32 x1, U32 y1, U32 & id1,U32 systemID2, U32 x2, U32 y2, U32 & id2,char * archtype) =0;
+	virtual void CreateJumpGate(U32 systemID1, U32 x1, U32 y1, U32 & id1,U32 systemID2, U32 x2, U32 y2, U32 & id2,const char * archtype) =0;
 
 	virtual void AddShipToSystem (U32 systemID, U32 playerMask, U32 playerID, enum M_OBJCLASS mObjClass) = 0;
 

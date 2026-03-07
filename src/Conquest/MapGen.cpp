@@ -246,7 +246,7 @@ struct DACOM_NO_VTABLE MapGen : public IMapGen
 
 	void initMap (GenStruct & map, const FULLCQGAME & game);
 
-	void insertObject (char * object,Vector position,U32 playerID, U32 systemID, GenSystem * system);
+	void insertObject (const char * object,Vector position,U32 playerID, U32 systemID, GenSystem * system);
 
 	//Util funcs
 
@@ -930,7 +930,7 @@ void MapGen::initMap (GenStruct & map, const FULLCQGAME & game)
 }
 //--------------------------------------------------------------------------//
 //
-void MapGen::insertObject (char * name,Vector position,U32 playerID,U32 systemID, GenSystem * system)
+void MapGen::insertObject (const char * name,Vector position,U32 playerID,U32 systemID, GenSystem * system)
 {
 	IBaseObject * rtObject = MGlobals::CreateInstance(ARCHLIST->LoadArchetype(name),MGlobals::CreateNewPartID(playerID));
 	OBJLIST->AddObject(rtObject);

@@ -291,7 +291,7 @@ void MScript::SetScriptData (const CQSCRIPTDATADESC & desc)
 	g_scriptDataSize = desc.typeSize;
 	g_hLocalDLL		 = desc.hLocal;
 
-	if (PARSER->QueryInterface("IViewConstructor2", parser) == GR_OK)
+	if (PARSER->QueryInterface("IViewConstructor2", parser.void_addr()) == GR_OK)
 	{
 		char * ptr2 = (char *) malloc(desc.preprocessSize + 1);
 		memcpy(ptr2, desc.preprocessData, desc.preprocessSize);
@@ -314,7 +314,7 @@ static void saveParseData (IFileSystem * outFile)
 	fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
-	if (outFile->CreateInstance(&fdesc, file) == GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 		file->WriteFile(0, g_preprocessData, g_preprocessSize, &dwWritten, 0);
 #endif
 }
@@ -330,7 +330,7 @@ static void saveGlobalData (IFileSystem * outFile)
 	fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
-	if (outFile->CreateInstance(&fdesc, file) == GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 		file->WriteFile(0, g_pScriptData, g_scriptDataSize, &dwWritten, 0);
 }
 //--------------------------------------------------------------------------//
@@ -354,7 +354,7 @@ static void saveProgramData (IFileSystem * outFile)
 			fdesc.dwShareMode = 0;  // no sharing
 			fdesc.dwCreationDistribution = CREATE_ALWAYS;
 			wsprintf(buffer, "%d-%s", i++, node->pScript->progName);
-			if (outFile->CreateInstance(&fdesc, file) == GR_OK)
+			if (outFile->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 				file->WriteFile(0, ((char *)node->pProgram) + node->pScript->saveOffset, node->pScript->saveSize, &dwWritten, 0);
 
 			node = node->pNext;
@@ -467,7 +467,7 @@ static void loadProgramData (IFileSystem * inFile, IViewConstructor2 * parser)
 	DAFILEDESC fdesc = "\\Script\\Programs";
 	COMPTR<IFileSystem> pDir;
 
-	if (inFile->CreateInstance(&fdesc, pDir) == GR_OK)
+	if (inFile->CreateInstance(&fdesc, pDir.void_addr()) == GR_OK)
 	{
 		WIN32_FIND_DATA data;
 		HANDLE handle;
@@ -585,13 +585,13 @@ static void loadStringTable( IFileSystem & inFile )
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = OPEN_EXISTING;
 
-	if( inFile.CreateInstance(&fdesc,file) == GR_OK )
+	if( inFile.CreateInstance(&fdesc,file.void_addr()) == GR_OK )
 	{
 		COMPTR<ISaverLoader> stringTableLoader;
-		if( STRINGTABLE->QueryInterface("ISaverLoader",stringTableLoader) == GR_OK )
+		if( STRINGTABLE->QueryInterface("ISaverLoader",stringTableLoader.void_addr()) == GR_OK )
 		{		
 			file->SetCurrentDirectory("\\");
-			stringTableLoader->Load( *file.ptr );
+			stringTableLoader->Load( *file );
 		}
 	}
 }
@@ -607,13 +607,13 @@ static void loadScripts( IFileSystem & inFile )
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = OPEN_EXISTING;
 
-	if( inFile.CreateInstance(&fdesc,file) == GR_OK )
+	if( inFile.CreateInstance(&fdesc,file.void_addr()) == GR_OK )
 	{
 		COMPTR<ISaverLoader> scriptingLoader;
-		if( SCRIPTING->QueryInterface("ISaverLoader",scriptingLoader) == GR_OK )
+		if( SCRIPTING->QueryInterface("ISaverLoader",scriptingLoader.void_addr()) == GR_OK )
 		{		
 			file->SetCurrentDirectory("\\");
-			scriptingLoader->Load( *file.ptr );
+			scriptingLoader->Load( *file );
 		}
 	}
 }
@@ -656,7 +656,7 @@ void MScript::Load (IFileSystem * inFile)
 				CQIMAGE->LoadSymTable(g_hScriptDLL);
 				enableMenuItems(true);
 
-				if (PARSER->QueryInterface("IViewConstructor2", parser) == GR_OK)
+				if (PARSER->QueryInterface("IViewConstructor2", parser.void_addr()) == GR_OK)
 				{
 					if (inFile != 0)
 					{
@@ -740,7 +740,7 @@ void MScript::Close  (void)
 	{
 		COMPTR<IViewConstructor2> parser;
 
-		if (PARSER->QueryInterface("IViewConstructor2", parser) == GR_OK)
+		if (PARSER->QueryInterface("IViewConstructor2", parser.void_addr()) == GR_OK)
 		{
 			if (g_hNewSymbols)
 				parser->DestroySymbols(g_hNewSymbols);
@@ -917,7 +917,7 @@ static bool viewProgFromList (HWND hListbox)
 			void * pData = ((char *)node->pProgram) + node->pScript->saveOffset;
 			COMPTR<IViewConstructor2> parser;
 
-			if (PARSER->QueryInterface("IViewConstructor2", parser) == GR_OK)
+			if (PARSER->QueryInterface("IViewConstructor2", parser.void_addr()) == GR_OK)
 			{
 				SYMBOL hNewType = parser->GetSymbol(g_hNewSymbols, node->pScript->saveLoadStruct);
 				CQASSERT(hNewType);
@@ -1105,17 +1105,17 @@ void MScript::Notify (U32 message, void * param)
 			switch (LOWORD(msg->wParam))
 			{
 			case IDM_KILL_PROGRAM:
-				DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG11), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) killProgDlgProc, 0);
+				DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG11), hMainWindow, DLGPROC(killProgDlgProc), 0);
 				break;
 			case IDM_START_PROGRAM:
-				DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG5), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) runScriptDlgProc, 0);
+				DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG5), hMainWindow, DLGPROC(runScriptDlgProc), 0);
 				break;
 			case IDS_VIEWMISSIONDATA:
 				if (g_pScriptData && g_hNewSymbols)
 				{
 					COMPTR<IViewConstructor2> parser;
 
-					if (PARSER->QueryInterface("IViewConstructor2", parser) == GR_OK)
+					if (PARSER->QueryInterface("IViewConstructor2", parser.void_addr()) == GR_OK)
 					{
 						SYMBOL hNewType = parser->GetSymbol(g_hNewSymbols, g_scriptDataType);
 						DEFAULTS->GetScriptData(hNewType, "Mission Data", g_pScriptData, g_scriptDataSize);
@@ -1125,7 +1125,7 @@ void MScript::Notify (U32 message, void * param)
 
 			case IDS_VIEWPROGRAMDATA:
 				if (g_hNewSymbols)
-					DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG10), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) runViewProgDlgProc, 0);
+					DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG10), hMainWindow, DLGPROC(runViewProgDlgProc), 0);
 				break;
 			}
 		}
@@ -1433,7 +1433,7 @@ MPartRef MScript::CreatePart (const char *szArchetype, const MPartRef & location
 
 			// the object has to initialize its footprint
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(systemID, map);
+			SECTOR->GetTerrainMap(systemID, map.addr());
 			if (map)
 			{
 				rtObject->SetTerrainFootprint(map);
@@ -2043,7 +2043,7 @@ void MScript::EnableMovieMode (bool bEnable)
 	else
 	{
 		CQFLAGS.bMovieMode = false;
-		EVENTSYS->Send(CQE_MOVIE_MODE,false);
+		EVENTSYS->Send(CQE_MOVIE_MODE, (void *)false);
 	}
 }
 //--------------------------------------------------------------------------//
@@ -2548,7 +2548,7 @@ void MScript::MakeInvincible (MPartRef & part,bool value)
 	{
 		MCachedPart & object = part.getPartFromCache();
 
-		MPartNC part = object.obj;
+		MPartNC part = object.obj.Ptr();
 		part->bInvincible = value;
 	}
 }
@@ -2560,7 +2560,7 @@ void MScript::MakeNonAutoTarget (MPartRef & part,bool value)
 	{
 		MCachedPart & object = part.getPartFromCache();
 
-		MPartNC part = object.obj;
+		MPartNC part = object.obj.Ptr();
 		part->bNoAutoTarget = value;
 	}
 }
@@ -2582,7 +2582,7 @@ void MScript::MakeJumpgateInvisible (const MPartRef & part, bool value)
 	if (part.isValid())
 	{
 		MCachedPart & object = part.getPartFromCache();
-		VOLPTR(IJumpGate) gate = object.obj;
+		VOLPTR(IJumpGate) gate = object.obj.Ptr();
 		if(gate)
 		{
 			gate->SetJumpgateInvisible(value);
@@ -3628,7 +3628,7 @@ void MScript::SetRallyPoint (const MPartRef & platform, const MPartRef & point)
 			NETGRIDVECTOR gridVectorPoint;
 			gridVectorPoint.init( objPoint.obj->GetGridPosition(), objPoint.obj->GetSystemID() );
 			
-			VOLPTR(IPlatform) platform = objPlatform.obj;
+			VOLPTR(IPlatform) platform = objPlatform.obj.Ptr();
 			if( platform )
 				platform->SetRallyPoint(gridVectorPoint);
 		}
@@ -3643,7 +3643,7 @@ void MScript::GiveCommandKit (const MPartRef & admiral, char * kitName)
 		MCachedPart & admiralObj = admiral.getPartFromCache();
 		if(MGlobals::IsFlagship(admiralObj.mdata.pInitData->mObjClass))
 		{
-			VOLPTR(IAdmiral) ad = admiralObj.obj;
+			VOLPTR(IAdmiral) ad = admiralObj.obj.Ptr();
 			ad->LearnCommandKit(kitName);
 		}
 	}
@@ -3657,7 +3657,7 @@ const char * MScript::GetFormationName(const MPartRef & admiral)
 		MCachedPart & admiralObj = admiral.getPartFromCache();
 		if(MGlobals::IsFlagship(admiralObj.mdata.pInitData->mObjClass))
 		{
-			VOLPTR(IAdmiral) ad = admiralObj.obj;
+			VOLPTR(IAdmiral) ad = admiralObj.obj.Ptr();
 			return ARCHLIST->GetArchName(ad->GetFormation());
 		}
 	}

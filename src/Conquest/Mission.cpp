@@ -422,13 +422,13 @@ Mission::~Mission (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (GS && GS->QueryOutgoingInterface("ISystemEventCallback", connection) == GR_OK)
+	if (GS && GS->QueryOutgoingInterface("ISystemEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(systemEventHandle);
 	
-	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
-	if (FILETRANSFER && FILETRANSFER->QueryOutgoingInterface("IFileTransferCallback", connection) == GR_OK)
+	if (FILETRANSFER && FILETRANSFER->QueryOutgoingInterface("IFileTransferCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(fileTransferHandle);
 
 	if (parser)
@@ -512,7 +512,7 @@ void Mission::startPlayerAI (void)
 
 				if (playerID && playerID <= MAX_PLAYERS && playerAI[playerID-1]==0)
 				{
-					createPlayerAI((M_RACE)race, playerID, playerAI[playerID-1]);
+					createPlayerAI((M_RACE)race, playerID, playerAI[playerID-1].addr());
 				}
 			}
 		}
@@ -539,7 +539,7 @@ void Mission::startPlayerAI (void)
 
 				if (playerID && playerID <= MAX_PLAYERS && playerAI[playerID-1]==0)
 				{
-					createPlayerAI((M_RACE)race, playerID, playerAI[playerID-1]);
+					createPlayerAI((M_RACE)race, playerID, playerAI[playerID-1].addr());
 				}
 			}
 		}
@@ -563,7 +563,7 @@ void Mission::loadPlayerAI (struct IFileSystem * inFile, U32 playerID)
 		{
 			if (inFile->SetCurrentDirectory(data.cFileName))
 			{
-				ISPlayerAI::CreateInstance(data.cFileName, playerID, playerAI[playerID-1]);
+				ISPlayerAI::CreateInstance(data.cFileName, playerID, playerAI[playerID-1].addr());
 				if (playerAI[playerID-1])
 				{
 					if (playerAI[playerID-1]->Load(inFile) == 0)
@@ -616,7 +616,7 @@ void Mission::loadPlayerAI (struct IFileSystem * inFile)
 				{
 					loadPlayerAI(inFile, playerID);
 					if (playerAI[playerID-1]==0)		// if load failed
-						createPlayerAI((M_RACE)race, playerID, playerAI[playerID-1]);
+						createPlayerAI((M_RACE)race, playerID, playerAI[playerID-1].addr());
 				}
 			}
 		}
@@ -709,7 +709,7 @@ BOOL32 Mission::Load (const C8 * fileName, IComponentFactory * pParent)
 		if (close() == 0)
 			goto Done;
 
-		if (pParent->CreateInstance(&fdesc, inFile) == GR_OK)
+		if (pParent->CreateInstance(&fdesc, inFile.void_addr()) == GR_OK)
 		{
 			result = Reload();
 		}
@@ -812,7 +812,7 @@ BOOL32 Mission::Save (const C8 * fileName, struct IComponentFactory * pParent)
 	{
 		// file is not writeable
 		COMPTR<IFileSystem> parentFile;
-		if (inFile->GetParentSystem(parentFile) == GR_OK)
+		if (inFile->GetParentSystem(parentFile.addr()) == GR_OK)
 		{
 			COMPTR<IComponentFactory> factory;
 			inFile.free();
@@ -827,7 +827,7 @@ BOOL32 Mission::Save (const C8 * fileName, struct IComponentFactory * pParent)
 				factory = parentFile;
 			parentFile.free();
 
-			if (factory->CreateInstance(&fdesc, inFile) != GR_OK)
+			if (factory->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 			{
 				CQERROR0("Failed to create save file.");
 				goto Done;		// failed
@@ -862,7 +862,7 @@ BOOL32 Mission::Save (const C8 * fileName, struct IComponentFactory * pParent)
 	MGlobals::Save(inFile);		// needs to save last, load first because it's referenced elsewhere
 
 
-	if (inFile!=0 && inFile->QueryInterface("IUTFWriter", pWriter)==GR_OK)
+	if (inFile!=0 && inFile->QueryInterface("IUTFWriter", pWriter.void_addr())==GR_OK)
 	{
 		pWriter->Flush();
 		pWriter.free();
@@ -871,7 +871,7 @@ BOOL32 Mission::Save (const C8 * fileName, struct IComponentFactory * pParent)
 	// re-open the file for read-only
 	{
 		COMPTR<IFileSystem> parentFile;
-		if (inFile->GetParentSystem(parentFile) == GR_OK)
+		if (inFile->GetParentSystem(parentFile.addr()) == GR_OK)
 		{
 			COMPTR<IComponentFactory> factory;
 			inFile.free();
@@ -882,7 +882,7 @@ BOOL32 Mission::Save (const C8 * fileName, struct IComponentFactory * pParent)
 				factory = parentFile;
 			parentFile.free();
 
-			if (factory->CreateInstance(&fdesc, inFile) != GR_OK)
+			if (factory->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 			{
 				CQERROR0("Failed to re-open save file.");
 				goto Done;		// failed
@@ -976,7 +976,7 @@ BOOL32 Mission::QuickSave (const C8 * fileName, struct IComponentFactory * pPare
 	{
 		// file is not writeable
 		COMPTR<IFileSystem> parentFile;
-		if (inFile->GetParentSystem(parentFile) == GR_OK)
+		if (inFile->GetParentSystem(parentFile.addr()) == GR_OK)
 		{
 			COMPTR<IComponentFactory> factory;
 			char buffer[MAX_PATH+4];
@@ -993,7 +993,7 @@ BOOL32 Mission::QuickSave (const C8 * fileName, struct IComponentFactory * pPare
 				factory = parentFile;
 			parentFile.free();
 
-			if (factory->CreateInstance(&fdesc, inFile) != GR_OK)
+			if (factory->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 			{
 				CQERROR0("Failed to create save file.");
 				goto Done;		// failed
@@ -1018,7 +1018,7 @@ BOOL32 Mission::QuickSave (const C8 * fileName, struct IComponentFactory * pPare
 	MUSICMANAGER->Save(inFile);
 	MGlobals::QuickSave(inFile);
 
-	if (inFile!=0 && inFile->QueryInterface("IUTFWriter", pWriter)==GR_OK)
+	if (inFile!=0 && inFile->QueryInterface("IUTFWriter", pWriter.void_addr())==GR_OK)
 		pWriter->Flush();
 
 	SetWindowTitle();
@@ -1100,7 +1100,7 @@ BOOL32 Mission::DynamicSave (const C8 * fileName, struct IComponentFactory * pPa
 	{
 		// file is not writeable
 		COMPTR<IFileSystem> parentFile;
-		if (inFile->GetParentSystem(parentFile) == GR_OK)
+		if (inFile->GetParentSystem(parentFile.addr()) == GR_OK)
 		{
 			COMPTR<IComponentFactory> factory;
 			char buffer[MAX_PATH+4];
@@ -1117,7 +1117,7 @@ BOOL32 Mission::DynamicSave (const C8 * fileName, struct IComponentFactory * pPa
 				factory = parentFile;
 			parentFile.free();
 
-			if (factory->CreateInstance(&fdesc, inFile) != GR_OK)
+			if (factory->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 			{
 				CQERROR0("Failed to create save file.");
 				goto Done;		// failed
@@ -1140,7 +1140,7 @@ BOOL32 Mission::DynamicSave (const C8 * fileName, struct IComponentFactory * pPa
 	OBJLIST->QuickSave(inFile,true);
 	MGlobals::QuickSave(inFile);
 
-	if (inFile!=0 && inFile->QueryInterface("IUTFWriter", pWriter)==GR_OK)
+	if (inFile!=0 && inFile->QueryInterface("IUTFWriter", pWriter.void_addr())==GR_OK)
 		pWriter->Flush();
 
 	SetWindowTitle();
@@ -1421,13 +1421,13 @@ GENRESULT Mission::Notify (U32 message, void *param)
 								// add a new player for the zone to track
 								//
 								char buffer[64];
-								U32 dwSeat;
+								DWORD dwSeat;
 								strncpy(buffer, _localLoadString(IDS_COMPUTER_NAME), sizeof(buffer));
 								ZONESCORE->AddNewPlayer(buffer, 0, MGlobals::GetAllyMask(playerID), ZONESCORE_COMPUTERPLAYER, &dwSeat);
 								MGlobals::SetZoneSeatFromSlot(slotID, dwSeat);
 							}
 							// no more human players, create a computer player
-							createPlayerAI(MGlobals::GetPlayerRace(playerID), playerID, playerAI[playerID-1]);
+							createPlayerAI(MGlobals::GetPlayerRace(playerID), playerID, playerAI[playerID-1].addr());
 						}
 					}
 				}
@@ -1869,7 +1869,7 @@ BOOL32 Mission::SaveAs (const C8 * fileName, struct IComponentFactory * pParent)
 		fdesc.dwShareMode = 0;		// no sharing, faster reads/ writes
 		fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-		if (pParent->CreateInstance(&fdesc, inFile) != GR_OK)
+		if (pParent->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 		{
 			inFile = oldFile;
 			CQERROR0("Failed to create save file.");
@@ -1914,7 +1914,7 @@ BOOL32 Mission::QuickSaveAs (const C8 * fileName, struct IComponentFactory * pPa
 		fdesc.dwShareMode = 0;		// no sharing, faster reads/ writes
 		fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-		if (pParent->CreateInstance(&fdesc, inFile) != GR_OK)
+		if (pParent->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 		{
 			inFile = oldFile;
 			CQERROR0("Failed to create save file.");
@@ -1958,7 +1958,7 @@ BOOL32 Mission::DynamicSaveAs (const C8 * fileName, struct IComponentFactory * p
 		fdesc.dwShareMode = 0;		// no sharing, faster reads/ writes
 		fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-		if (pParent->CreateInstance(&fdesc, inFile) != GR_OK)
+		if (pParent->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 		{
 			inFile = oldFile;
 			CQERROR0("Failed to create save file.");
@@ -1987,7 +1987,7 @@ void Mission::LoadFromFilter()
 	if (DEFAULTS->GetInputFilename(buffer, IDS_MISSION_FILTER))
 	{
 		COMPTR<IFileSystem> filterFile;
-		if (DACOM->CreateInstance(&fdesc, filterFile) == GR_OK)
+		if (DACOM->CreateInstance(&fdesc, filterFile.void_addr()) == GR_OK)
 		{
 			baseObjPercent = 0;
 			totalObjPercent = 0;
@@ -2073,10 +2073,10 @@ BOOL32 Mission::close (void)
 		COMPTR<IDAComponent> pComp;
 		COMPTR<IDrawAgent> slide;
 
-		GENDATA->CreateInstance(CQ_SplashInfo.vfxName, pComp);
-		pComp->QueryInterface("IShapeLoader", loader);
+		GENDATA->CreateInstance(CQ_SplashInfo.vfxName, pComp.addr());
+		pComp->QueryInterface("IShapeLoader", loader.void_addr());
 
-		if( loader->CreateDrawAgent(0,slide) == GR_OK )
+		if( loader->CreateDrawAgent(0,slide.addr()) == GR_OK )
 		{
 			// start the drawing
 			PIPE->clear_buffers(RP_CLEAR_COLOR_BIT|RP_CLEAR_DEPTH_BIT,0);
@@ -2251,7 +2251,7 @@ BOOL32 Mission::SaveParseData (void)
 	fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	char * ptr2;
@@ -2329,7 +2329,7 @@ void Mission::updateNetFile (void)
 			bDownloadNeeded = 0;
 			FILETRANSFER->GetTransferProgress(downloadChannel, &bytesReceived, &totalBytes);
 
-			switch (downloadStatus = FILETRANSFER->CreateFile(downloadChannel, file))
+			switch (downloadStatus = FILETRANSFER->CreateFile(downloadChannel, file.addr()))
 			{
 			case FTS_INITIALIZING:
 			case FTS_INPROGRESS:
@@ -2448,13 +2448,13 @@ BOOL32 Mission::ReloadMission (void)
 	wsprintf(fileNameEx, "%s%s", fileName, ".dmission");
 
 	DAFILEDESC fdesc = fileNameEx;
-	if (SPMAPDIR->CreateInstance(&fdesc, inFile) != GR_OK)
+	if (SPMAPDIR->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 	{
 		// we couldn't find the dmission, load the qmission instead
 		memset(fileNameEx, 0, sizeof(fileNameEx));
 		wsprintf(fileNameEx, "%s%s", fileName, ".qmission");
 
-		if (SPMAPDIR->CreateInstance(&fdesc, inFile) != GR_OK)
+		if (SPMAPDIR->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 		{
 			CQBOMB0("Could not restart the mission");
 			return FALSE;
@@ -2489,7 +2489,7 @@ BOOL32 Mission::Reload (void)
 	// don't create the progress animation if its already around
 	if (ipAnim == 0)
 	{
-		CreateInProgressAnim(ipAnim);
+		CreateInProgressAnim(ipAnim.addr());
 	}
 
 	ipAnim->UpdateString(IDS_PROG_INITMAP);
@@ -2525,7 +2525,7 @@ BOOL32 Mission::Reload (void)
 
 		fdesc.lpImplementation = "UTF";
 	
-		if (SPMAPDIR->CreateInstance(&fdesc, terrainFile) == GR_OK)
+		if (SPMAPDIR->CreateInstance(&fdesc, terrainFile.void_addr()) == GR_OK)
 		{
 			HANDLE _hPrevSymbols = hPrevSymbols;		// save old parse info
 			hPrevSymbols = NULL;
@@ -2681,7 +2681,7 @@ BOOL32 Mission::LoadBriefing (const char * fileName)
 	if (close() == 0)
 		goto Done;
 
-	if (SPMAPDIR->CreateInstance(&fdesc, inFile) != GR_OK)
+	if (SPMAPDIR->CreateInstance(&fdesc, inFile.void_addr()) != GR_OK)
 		goto Done;
 		
 	LoadParseData(inFile);
@@ -2847,7 +2847,7 @@ void Mission::GenerateMultiplayerMap (const struct FULLCQGAME & cqgame, U32 rand
 {
 	// get ready for the load animation...
 	if (ipAnim==0)
-		CreateInProgressAnim(ipAnim);
+		CreateInProgressAnim(ipAnim.addr());
 
 	bUnsavedData = 0;
 	close();
@@ -2979,7 +2979,7 @@ void Mission::EnableEnemyAI (U32 playerID, bool bOn, enum M_RACE race)
 	if (bOn)
 	{  
 		if (!playerAI[playerID-1])
-			createPlayerAI(race, playerID, playerAI[playerID-1]);
+			createPlayerAI(race, playerID, playerAI[playerID-1].addr());
 		
 		playerAI[playerID-1]->Activate(true);
 	}
@@ -2997,7 +2997,7 @@ void Mission::EnableEnemyAI (U32 playerID, bool bOn, const char * szPlayerAIType
 	if (bOn)
 	{  
 		if (!playerAI[playerID-1])
-			ISPlayerAI::CreateInstance(szPlayerAIType, playerID, playerAI[playerID-1]);
+			ISPlayerAI::CreateInstance(szPlayerAIType, playerID, playerAI[playerID-1].addr());
 		
 		playerAI[playerID-1]->Activate(true);
 	}
@@ -3259,7 +3259,7 @@ void Mission::StartProgressAnim (struct IPANIM ** ppAnim)
 	bNetloadProgressAnimation = true;
 	if (ipAnim == 0)
 	{
-		CreateInProgressAnim(ipAnim);
+		CreateInProgressAnim(ipAnim.addr());
 	}
 	ipAnim->AddRef();
 	*ppAnim = ipAnim;
@@ -3472,7 +3472,6 @@ static BOOL32 ParseDefFile (void)
 Done:
 	return result;
 }
-extern "C" void _heap_init (void);
 //--------------------------------------------------------------------------//
 //
 struct _mission : GlobalComponent
@@ -3482,7 +3481,6 @@ struct _mission : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		_heap_init();
 
 		if (CreateParser() == 0 || ParseDefFile() == 0)
 			CQBOMB0("Failed parse of the Data definition file: ..\\dinclude\\Data.h");
@@ -3501,11 +3499,11 @@ struct _mission : GlobalComponent
 		
 		dwLen = GetModuleFileName(hInstance, buffer, sizeof(buffer));
 
-		if (GS->QueryOutgoingInterface("ISystemEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("ISystemEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(MISSION, &mission->systemEventHandle);
-		if (FILETRANSFER->QueryOutgoingInterface("IFileTransferCallback", connection) == GR_OK)
+		if (FILETRANSFER->QueryOutgoingInterface("IFileTransferCallback", connection.addr()) == GR_OK)
 			connection->Advise(MISSION, &mission->fileTransferHandle);
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(MISSION, &mission->eventHandle);
 			FULLSCREEN->SetCallbackPriority(mission, EVENT_PRIORITY_MISSION);
@@ -3550,8 +3548,7 @@ BOOL WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved)
 	{
 		case DLL_PROCESS_ATTACH:
 		{
-			HEAP = HEAP_Acquire();
-			SetDllHeapMsg(hInstance);
+			HEAP_Acquire();
 		}
 		break;
 	}
@@ -3562,7 +3559,6 @@ BOOL WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved)
 //
 void __stdcall MissionResetHeap (IHeap * heap)
 {
-	HEAP = heap;
 }
 //--------------------------------------------------------------------------//
 //

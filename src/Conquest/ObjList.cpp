@@ -121,7 +121,7 @@ extern "C"
 __declspec(dllimport) IHeap * __stdcall GetBatchHeap (void);
 //-----------------------------------------------------------------------------------
 //
-static char *timingNames[TIMING_END] = {
+static const char *timingNames[TIMING_END] = {
 	"Flush",
 	"Render2D",
 	"Background",
@@ -961,7 +961,7 @@ ObjectList::~ObjectList (void)
 
 //	ENGINE->destroy_instance(spotlight_index);
 
-	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (FULLSCREEN && FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
 	// destroy the object list, archetype list ?
@@ -1263,7 +1263,7 @@ void ObjectList::renderGridLines (void)
 
 	// hey, while we're at it, let's draw the footprint for the current system
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(currSystem, map);
+	SECTOR->GetTerrainMap(currSystem, map.addr());
 	map->RenderEdit();
 }
 //--------------------------------------------------------------------------//
@@ -1418,7 +1418,11 @@ void ObjectList::Render (void)
 	else
 	{
 		NUGGETMANAGER->TestVisible(defaults, currentSystem, currentPlayer);
-		RECT rect = { 0x80000000, 0x80000000, 0x80000000, 0x80000000 };
+		RECT rect = {  };
+		rect.left = 0x80000000;
+		rect.right = 0x80000000;
+		rect.bottom = 0x80000000;
+		rect.top = 0x80000000;
 		while (ptr)
 		{
 			ptr->TestVisible(defaults, currentSystem, currentPlayer);
@@ -1833,7 +1837,7 @@ void ObjectList::debug_print (IDebugFontDrawAgent * DEBUGFONT, bool bDetailedRep
 
 		for (i = 0; i < TIMING_PLAYERAI; i++)
 		{
-			char * name = (timingNames[i]) ? timingNames[i] : "?";
+			const char * name = (timingNames[i]) ? timingNames[i] : "?";
 			sprintf(buffer, "%s: %4d", name, timing.do_average(timing.timer_array[i]));
 			DEBUGFONT->StringDraw(0, 8, y, buffer, DCOLOR);
 			y += inc;
@@ -1927,7 +1931,7 @@ void ObjectList::issuePerformanceWarning (bool bWarning)
 		report.addText("\r\nPerformance Report");
 	report.addText(" for machine ");
 	dwBufferSize = sizeof(buffer);
-	GetComputerName(buffer, &dwBufferSize);
+	GetComputerName(buffer, LPDWORD(&dwBufferSize));
 	report.addText(buffer);
 	report.addText("\r\n");
 	sprintf(buffer, "FPS: %.1f\r\n", fps);

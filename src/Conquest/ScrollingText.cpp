@@ -253,7 +253,7 @@ ScrollingText::~ScrollingText (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(handle);
 	}
 
@@ -389,7 +389,7 @@ void ScrollingText::addStringToPlayerChat (const wchar_t * string)
 	CQASSERT(pChatFilterDlg && "Chat Menu is not active");
 
 	COMPTR<IPlayerChat> playerChat;
-	pChatFilterDlg->GetBase()->QueryInterface("IPlayerChat", playerChat);
+	pChatFilterDlg->GetBase()->QueryInterface("IPlayerChat", playerChat.void_addr());
 	CQASSERT(playerChat != NULL);
 
 	playerChat->AddTextString(string);
@@ -401,7 +401,7 @@ void ScrollingText::addStringToPlayerChat (const wchar_t * string, const U32 pla
 	CQASSERT(pChatFilterDlg && "Chat Menu is not active");
 
 	COMPTR<IPlayerChat> playerChat;
-	pChatFilterDlg->GetBase()->QueryInterface("IPlayerChat", playerChat);
+	pChatFilterDlg->GetBase()->QueryInterface("IPlayerChat", playerChat.void_addr());
 	CQASSERT(playerChat != NULL);
 
 	playerChat->AddTextString(string, playerID, dplayID);
@@ -856,17 +856,17 @@ void ScrollingText::reloadFonts (bool bLoad)
 		background	= RGB(0,0,0);	   //| 0xFF000000;		// black	(background color)
 		hFont = CQCreateFont(IDS_TOOLBAR_MONEY_FONT);
 
-		CreateMultilineFontDrawAgent(0, hFont, pen, background, fontAgentText[0]);
+		CreateMultilineFontDrawAgent(0, hFont, pen, background, fontAgentText[0].addr());
 //		CreateFontDrawAgent(hFont, 1, pen, background, fontAgentText[0]);
-		CreateFontDrawAgent(hFont, 0, pen, background, fontAgentPlayer[0]);
+		CreateFontDrawAgent(hFont, 0, pen, background, fontAgentPlayer[0].addr());
 		
 		for (i = 1; i < MAX_LINES_TEXT; i++)
 		{
-			fontAgentText[0]->CreateDuplicate(fontAgentText[i]);
+			fontAgentText[0]->CreateDuplicate(fontAgentText[i].addr());
 		}
 		for (i = 1; i < MAX_LINES_TEXT; i++)
 		{
-			fontAgentPlayer[0]->CreateDuplicate(fontAgentPlayer[i]);
+			fontAgentPlayer[0]->CreateDuplicate(fontAgentPlayer[i].addr());
 		}
 
 	}
@@ -897,7 +897,7 @@ struct _scrollingText : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 	
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(STEXT->GetBase(), &STEXT->handle);
 			FULLSCREEN->SetCallbackPriority(STEXT, EVENT_PRIORITY_TEXTCHAT);

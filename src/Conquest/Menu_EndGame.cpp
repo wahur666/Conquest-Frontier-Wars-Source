@@ -281,8 +281,8 @@ void MenuEndGame::setStateInfo (void)
 	COMPTR<IDAComponent> pBase;
 	COMPTR<IShapeLoader> loader;
 
-	GENDATA->CreateInstance(TAB_VFX, pBase);
-	pBase->QueryInterface("IShapeLoader", loader);
+	GENDATA->CreateInstance(TAB_VFX, pBase.addr());
+	pBase->QueryInterface("IShapeLoader", loader.void_addr());
 
 	// init the tab control
 	tabControl->InitTab(data.tab, this, loader);
@@ -291,7 +291,7 @@ void MenuEndGame::setStateInfo (void)
 	//
 	// put everything into the overview tab
 	//
-	tabControl->GetTabMenu(0, base);
+	tabControl->GetTabMenu(0, base.addr());
 
 	for (i = 0; i < TITLES_O; i++)
 	{
@@ -316,7 +316,7 @@ void MenuEndGame::setStateInfo (void)
 	//
 	// fill out the units tab
 	//
-	tabControl->GetTabMenu(1, base);
+	tabControl->GetTabMenu(1, base.addr());
 
 	for (i = 0; i < TITLES_U; i++)
 	{
@@ -343,7 +343,7 @@ void MenuEndGame::setStateInfo (void)
 	// 
 	// fill out the buildings tab
 	//
-	tabControl->GetTabMenu(2, base);
+	tabControl->GetTabMenu(2, base.addr());
 
 	for (i = 0; i < TITLES_B; i++)
 	{
@@ -369,7 +369,7 @@ void MenuEndGame::setStateInfo (void)
 	//
 	// fill out the resources tab
 	//
-	tabControl->GetTabMenu(3, base);
+	tabControl->GetTabMenu(3, base.addr());
 
 	for (i = 0; i < TITLES_R; i++)
 	{
@@ -633,23 +633,23 @@ void MenuEndGame::init (void)
 	data = 	*((GT_ENDGAME *) GENDATA->GetArchetypeData("MenuEndGame"));
 
 	COMPTR<IDAComponent> pComp;
-	GENDATA->CreateInstance(data.cont.buttonType, pComp);
-	pComp->QueryInterface("IButton2", cont);
+	GENDATA->CreateInstance(data.cont.buttonType, pComp.addr());
+	pComp->QueryInterface("IButton2", cont.void_addr());
 
-	GENDATA->CreateInstance(data.background.staticType, pComp);
-	pComp->QueryInterface("IStatic", background);
+	GENDATA->CreateInstance(data.background.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", background.void_addr());
 
-	GENDATA->CreateInstance(data.banner.staticType, pComp);
-	pComp->QueryInterface("IStatic", banner);
+	GENDATA->CreateInstance(data.banner.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", banner.void_addr());
 
-	GENDATA->CreateInstance(data.list.listboxType, pComp);
-	pComp->QueryInterface("IListbox", list);
+	GENDATA->CreateInstance(data.list.listboxType, pComp.addr());
+	pComp->QueryInterface("IListbox", list.void_addr());
 
-	GENDATA->CreateInstance(data.staticMenu.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticMenu);
+	GENDATA->CreateInstance(data.staticMenu.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticMenu.void_addr());
 
-	GENDATA->CreateInstance(data.staticPlayer.staticType, pComp);
-	pComp->QueryInterface("IStatic", staticPlayer);
+	GENDATA->CreateInstance(data.staticPlayer.staticType, pComp.addr());
+	pComp->QueryInterface("IStatic", staticPlayer.void_addr());
 
 //	GENDATA->CreateInstance(data.staticDescription.staticType, pComp);
 //	pComp->QueryInterface("IStatic", staticDescription);
@@ -657,104 +657,104 @@ void MenuEndGame::init (void)
 	U32 i;
 	for (i = 0; i < MAX_PLAYERS; i++)
 	{
-		GENDATA->CreateInstance(data.staticPlayerArray[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticPlayerArray[i]);
+		GENDATA->CreateInstance(data.staticPlayerArray[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticPlayerArray[i].void_addr());
 	}
 
 	// tab contol stuff
-	GENDATA->CreateInstance(data.tab.tabControlType, pComp);
-	pComp->QueryInterface("ITabControl", tabControl);
+	GENDATA->CreateInstance(data.tab.tabControlType, pComp.addr());
+	pComp->QueryInterface("ITabControl", tabControl.void_addr());
 
 	for (i = 0; i < 5; i++)
 	{
-		GENDATA->CreateInstance(data.overviewTab.staticOverviewTitles[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticOverviewTitles[i]);
+		GENDATA->CreateInstance(data.overviewTab.staticOverviewTitles[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticOverviewTitles[i].void_addr());
 	}
 
 	for (i = 0; i < 6; i++)
 	{
-		GENDATA->CreateInstance(data.unitsTab.staticUnitsTitles[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticUnitsTitles[i]);
+		GENDATA->CreateInstance(data.unitsTab.staticUnitsTitles[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticUnitsTitles[i].void_addr());
 	}
 
 	for (i = 0; i < 6; i++)
 	{
-		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsTitles[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticBuildingsTitles[i]);
+		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsTitles[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticBuildingsTitles[i].void_addr());
 	}
 
 	for (i = 0; i < 4; i++)
 	{
-		GENDATA->CreateInstance(data.resourceTab.staticResourcesTitles[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticResourcesTitles[i]);
+		GENDATA->CreateInstance(data.resourceTab.staticResourcesTitles[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticResourcesTitles[i].void_addr());
 	}
 	
 	for (i = 0; i < MAX_PLAYERS; i++)
 	{
 		// in the overview tab
-		GENDATA->CreateInstance(data.overviewTab.staticOverviewUnits[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticOverviewUnits[i]);
+		GENDATA->CreateInstance(data.overviewTab.staticOverviewUnits[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticOverviewUnits[i].void_addr());
 
-		GENDATA->CreateInstance(data.overviewTab.staticOverviewBuildings[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticOverviewBuildings[i]);
+		GENDATA->CreateInstance(data.overviewTab.staticOverviewBuildings[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticOverviewBuildings[i].void_addr());
 
-		GENDATA->CreateInstance(data.overviewTab.staticOverviewResources[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticOverviewResources[i]);
+		GENDATA->CreateInstance(data.overviewTab.staticOverviewResources[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticOverviewResources[i].void_addr());
 
-		GENDATA->CreateInstance(data.overviewTab.staticOverviewTotals[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticOverviewTotals[i]);
+		GENDATA->CreateInstance(data.overviewTab.staticOverviewTotals[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticOverviewTotals[i].void_addr());
 
 		// in the units tab
-		GENDATA->CreateInstance(data.unitsTab.staticUnitsMade[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticUnitsMade[i]);
+		GENDATA->CreateInstance(data.unitsTab.staticUnitsMade[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticUnitsMade[i].void_addr());
 
-		GENDATA->CreateInstance(data.unitsTab.staticUnitsLost[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticUnitsLost[i]);
+		GENDATA->CreateInstance(data.unitsTab.staticUnitsLost[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticUnitsLost[i].void_addr());
 
-		GENDATA->CreateInstance(data.unitsTab.staticUnitsKills[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticUnitsKills[i]);
+		GENDATA->CreateInstance(data.unitsTab.staticUnitsKills[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticUnitsKills[i].void_addr());
 
-		GENDATA->CreateInstance(data.unitsTab.staticUnitsConverted[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticUnitsConverted[i]);
+		GENDATA->CreateInstance(data.unitsTab.staticUnitsConverted[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticUnitsConverted[i].void_addr());
 
-		GENDATA->CreateInstance(data.unitsTab.staticUnitsAdmirals[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticUnitsAdmirals[i]);
+		GENDATA->CreateInstance(data.unitsTab.staticUnitsAdmirals[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticUnitsAdmirals[i].void_addr());
 
-		GENDATA->CreateInstance(data.unitsTab.staticUnitsTotals[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticUnitsTotals[i]);
+		GENDATA->CreateInstance(data.unitsTab.staticUnitsTotals[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticUnitsTotals[i].void_addr());
 
 		// in the buildings tab
-		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsMade[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticBuildingsMade[i]);
+		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsMade[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticBuildingsMade[i].void_addr());
 
-		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsLost[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticBuildingsLost[i]);
+		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsLost[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticBuildingsLost[i].void_addr());
 
-		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsDestroyed[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticBuildingsDestroyed[i]);
+		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsDestroyed[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticBuildingsDestroyed[i].void_addr());
 
-		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsConverted[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticBuildingsConverted[i]);
+		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsConverted[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticBuildingsConverted[i].void_addr());
 
-		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsTotals[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticBuildingsTotals[i]);
+		GENDATA->CreateInstance(data.buildingsTab.staticBuildingsTotals[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticBuildingsTotals[i].void_addr());
 
 		// in the resources tab
-		GENDATA->CreateInstance(data.resourceTab.staticResourcesCrew[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticResourcesCrew[i]);
+		GENDATA->CreateInstance(data.resourceTab.staticResourcesCrew[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticResourcesCrew[i].void_addr())	;
 
-		GENDATA->CreateInstance(data.resourceTab.staticResourcesOre[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticResourcesOre[i]);
+		GENDATA->CreateInstance(data.resourceTab.staticResourcesOre[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticResourcesOre[i].void_addr());
 
-		GENDATA->CreateInstance(data.resourceTab.staticResourcesGas[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticResourcesGas[i]);
+		GENDATA->CreateInstance(data.resourceTab.staticResourcesGas[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticResourcesGas[i].void_addr());
 
-		GENDATA->CreateInstance(data.resourceTab.staticResourcesTotals[i].staticType, pComp);
-		pComp->QueryInterface("IStatic", staticResourcesTotals[i]);
+		GENDATA->CreateInstance(data.resourceTab.staticResourcesTotals[i].staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticResourcesTotals[i].void_addr());
 	}
 
-		GENDATA->CreateInstance(data.staticTime.staticType, pComp);
-		pComp->QueryInterface("IStatic", staticTime);
+		GENDATA->CreateInstance(data.staticTime.staticType, pComp.addr());
+		pComp->QueryInterface("IStatic", staticTime.void_addr());
 }
 //--------------------------------------------------------------------------//
 //
