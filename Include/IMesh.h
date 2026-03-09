@@ -172,7 +172,7 @@ struct IMesh : public IDAComponent
 	// The material pointer **can** be NULL in which case the facegroup will **not** be
 	// rendered.
 	//
-	virtual GENRESULT COMAPI get_facegroup_material( IMaterial **out_material ) = 0;
+	virtual GENRESULT COMAPI get_facegroup_material( IMaterialC **out_material ) = 0;
 
 	// set_facegroup_material
 	//
@@ -181,7 +181,7 @@ struct IMesh : public IDAComponent
 	//
 	// See the notes above in get_facegroup_material()
 	//
-	virtual GENRESULT COMAPI set_facegroup_material( IMaterial *material ) = 0;
+	virtual GENRESULT COMAPI set_facegroup_material( IMaterialC *material ) = 0;
 
 	// get_facegroup_material_context
 	//

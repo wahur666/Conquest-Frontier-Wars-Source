@@ -133,7 +133,7 @@ struct Material : public IMaterial
 
 	virtual IModifier * CreateModifierFloat(char * name,SINGLE value,IModifier * oldModifier);
 
-	virtual IModifier * CreateModifierColor(char * name,U8 red, U8 green, U8 blue,IModifier * oldModifier);
+	virtual IModifier * CreateModifierColor(const char * name,U8 red, U8 green, U8 blue,IModifier * oldModifier);
 
 	virtual IModifier * CreateModifierRenderState(U32 state, DWORD value,IModifier * oldModifier);
 

@@ -67,7 +67,7 @@ struct DACOM_NO_VTABLE IModifier
 	virtual void AddRef() = 0;
 };
 
-struct DACOM_NO_VTABLE IMaterial2
+struct DACOM_NO_VTABLE IMaterial
 {
 	virtual void DrawVB(IDirect3DVertexBuffer9* VB, IDirect3DIndexBuffer9* IB, int start_vertex, int num_verts, int start_index, int num_indices, IModifier * modList,SINGLE frameTime = 0.0f) = 0;
 	
@@ -139,7 +139,7 @@ struct DACOM_NO_VTABLE IMaterial2
 
 	virtual IModifier * CreateModifierFloat(char * name,SINGLE value,IModifier * oldModifier) = 0;
 
-	virtual IModifier * CreateModifierColor(char * name,U8 red, U8 green, U8 blue,IModifier * oldModifier) = 0;
+	virtual IModifier * CreateModifierColor(const char * name,U8 red, U8 green, U8 blue,IModifier * oldModifier) = 0;
 
 	virtual IModifier * CreateModifierRenderState(U32 state, DWORD value,IModifier * oldModifier) = 0;
 };

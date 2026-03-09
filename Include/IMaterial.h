@@ -64,7 +64,7 @@ struct MaterialContext
 //
 #define IID_IMaterial MAKE_IID("IMaterial",1)
 //
-struct IMaterial : public IDAComponent
+struct IMaterialC : public IDAComponent
 {
 	// initialize
 	//
@@ -113,7 +113,7 @@ struct IMaterial : public IDAComponent
 	//
 	// Make a duplicate of this material.  
 	//
-	virtual GENRESULT COMAPI clone( IMaterial **out_Material ) = 0;
+	virtual GENRESULT COMAPI clone( IMaterialC **out_Material ) = 0;
 
 	// render
 	//

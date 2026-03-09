@@ -19,7 +19,7 @@
 // Set the given material as the material to use on all facegroups on the
 // given mesh.
 //
-HRESULT SetMaterialOnMesh( IMesh *mesh, IMaterial *material )
+HRESULT SetMaterialOnMesh( IMesh *mesh, IMaterialC *material )
 {
 	U32 fgc;
 
@@ -36,7 +36,7 @@ HRESULT SetMaterialOnMesh( IMesh *mesh, IMaterial *material )
 
 //
 
-HRESULT CreateDepthTestedMaterial( IDAComponent *System, IMaterial **out_material )
+HRESULT CreateDepthTestedMaterial( IDAComponent *System, IMaterialC **out_material )
 {
 
 	DACOMDESC desc( "StateMaterial" );
@@ -65,7 +65,7 @@ HRESULT CreateDepthTestedMaterial( IDAComponent *System, IMaterial **out_materia
 
 //
 
-HRESULT CreateTextureViewMaterial( IDAComponent *System, IMaterial **out_material )
+HRESULT CreateTextureViewMaterial( IDAComponent *System, IMaterialC **out_material )
 {
 
 	DACOMDESC desc( "StateMaterial" );

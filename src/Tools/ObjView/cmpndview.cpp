@@ -550,7 +550,7 @@ void AttachCamera( bool set_nearfar )
 
 void RenderUVMapping( IMesh *IM, ITL_TEXTURE_ID tid, TC_WRAPMODE mode, U32 element_bit, int x0, int y0, int dx, int dy ) 
 {
-	COMPTR<IMaterial> mat;
+	COMPTR<IMaterialC> mat;
 	COMPTR<IMaterialProperties> mat_prop;
 	U32 uv_stride, uv_size, uv_count, face_count;
 	const U16 *uv_indices;
@@ -824,7 +824,7 @@ void RenderTexture( U32 texture_num, bool show_mappings )
 
 void RenderMaterials( void )
 {
-	IMaterial *material;
+	IMaterialC *material;
 
 	if( MaterialLib && SUCCEEDED( MaterialLib->get_material( (draw_material & ~HIGH_BIT)-1, &material ) ) ) {
 

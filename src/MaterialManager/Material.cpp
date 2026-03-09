@@ -1079,7 +1079,7 @@ IModifier * Material::CreateModifierFloat(char * name,SINGLE value,IModifier * o
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
 
-IModifier * Material::CreateModifierColor(char * name,U8 red, U8 green, U8 blue,IModifier * oldModifier)
+IModifier * Material::CreateModifierColor(const char * name,U8 red, U8 green, U8 blue,IModifier * oldModifier)
 {
 	Modifier * mod = NULL;
 	if(oldModifier)
