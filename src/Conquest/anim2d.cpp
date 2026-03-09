@@ -135,7 +135,7 @@ void AnimArchetype::load (IFileSystem* fs)
 	}*/
 	
 	CQASSERT(texCnt < 256 && "REALLY big tex anm.  expand arrays?");
-	tex = new U32[texCnt];
+	tex = new LONG_PTR[texCnt];
 	for (unsigned int i = 0;i<texCnt;i++)
 	{
 		if (TEXLIB->has_texture_id(name_ptrs[i]) != GR_OK)		// name is not present yet
@@ -611,7 +611,7 @@ AnimArchetype *Anim2D::create_archetype (char *fileName)
 
 	DAFILEDESC fdesc=fileName;
 	COMPTR<IFileSystem> objFile;
-	if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+	if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 	{
 		if (objFile->SetCurrentDirectory ("Animation"))
 		{

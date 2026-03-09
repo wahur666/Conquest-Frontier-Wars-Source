@@ -57,17 +57,17 @@
 template <class Base>
 struct _NO_VTABLE TFabricator : public Base, IFabricator, IBuildQueue, FAB_SAVELOAD
 {
-	typename typedef Base::INITINFO FABINITINFO;
-	typename typedef Base::SAVEINFO FABSAVEINFO;
+	typedef Base::INITINFO FABINITINFO;
+	typedef Base::SAVEINFO FABSAVEINFO;
 
-	struct UpdateNode       updateNode;
-	struct PhysUpdateNode	physUpdateNode;
-	struct PostRenderNode	postRenderNode;
-	struct InitNode			initNode;
-	struct SaveNode			saveNode;
-	struct LoadNode			loadNode;
-	struct ResolveNode      resolveNode;
-	struct UpgradeNode		upgradeNode;
+	struct Base::UpdateNode       updateNode;
+	struct Base::PhysUpdateNode	physUpdateNode;
+	struct Base::PostRenderNode	postRenderNode;
+	struct Base::InitNode			initNode;
+	struct Base::SaveNode			saveNode;
+	struct Base::LoadNode			loadNode;
+	struct Base::ResolveNode      resolveNode;
+	struct Base::UpgradeNode		upgradeNode;
 
 	//----------------------------------
 	// animation index
@@ -219,14 +219,14 @@ struct _NO_VTABLE TFabricator : public Base, IFabricator, IBuildQueue, FAB_SAVEL
 
 template <class Base>
 TFabricator< Base >::TFabricator() :
-							postRenderNode(this,RenderProc(&TFabricator::fabPostRender)), 
-							updateNode(this, UpdateProc(&TFabricator::updateFab)),
-							physUpdateNode(this, PhysUpdateProc(&TFabricator::physUpdateFab)),
-							initNode(this, CASTINITPROC(&TFabricator::initFabricator)),
-							saveNode(this, CASTSAVELOADPROC(&TFabricator::saveFab)),
-							loadNode(this, CASTSAVELOADPROC(&TFabricator::loadFab)),
-							resolveNode(this, ResolveProc(&TFabricator::resolveFab)),
-							upgradeNode(this, UpgradeProc(CASTINITPROC(&TFabricator::upgradeFab)))
+							postRenderNode(this,Base::RenderProc(&TFabricator::fabPostRender)),
+							updateNode(this, Base::UpdateProc(&TFabricator::updateFab)),
+							physUpdateNode(this, Base::PhysUpdateProc(&TFabricator::physUpdateFab)),
+							initNode(this, Base::castInitProc(Base::InitProc2(&_Cf::initFabricator))),
+							saveNode(this, Base::castSaveLoadProc(Base::SaveLoadProc2(&_Cf::saveFab))),
+							loadNode(this, Base::castSaveLoadProc(Base::SaveLoadProc2(&_Cf::loadFab))),
+							resolveNode(this, Base::ResolveProc(&TFabricator::resolveFab)),
+							upgradeNode(this, Base::UpgradeProc(Base::castInitProc(Base::InitProc2(&_Cf::upgradeFab))))
 {
 	bayDoorIndex = animIndex = loopingAnimIndex = -1;
 	hardpointinfo.orientation.set_identity();
@@ -291,7 +291,7 @@ BOOL32 TFabricator< Base >::updateFab()
 	}
 	updateTime += ELAPSED_TIME;
 
-	if(!bVisible || !bReady || !bBuilding)
+	if(!this->bVisible || !this->bReady || !bBuilding)
 	{
 		if (bWasVisible)
 		{
@@ -331,7 +331,7 @@ TRANSFORM TFabricator< Base >::GetDroneTransform ()
 	TRANSFORM trans;
 //	trans.set_orientation(hardpointinfo.orientation);
 	trans.set_position(hardpointinfo.point);
-	trans = transform.multiply(trans);
+	trans = this->transform.multiply(trans);
 	return trans;
 }
 //---------------------------------------------------------------------------
@@ -380,7 +380,7 @@ void TFabricator< Base >::FabStartBuild(IBuild *newguy)
 	}
 
 	newguy->QueryInterface(IBuildID,buildee,NONSYSVOLATILEPTR);
-	newguy->SetBuilderType(mObjClass);
+	newguy->SetBuilderType(this->mObjClass);
 	newguy->Build(this);
 	//pointless?
 	/*if(drone[0])
@@ -431,7 +431,7 @@ void TFabricator< Base >::FabStartDismantle (IBuild * oldguy)
 	}
 
 	oldguy->QueryInterface(IBuildID,buildee,NONSYSVOLATILEPTR);
-	oldguy->SetBuilderType(mObjClass);
+	oldguy->SetBuilderType(this->mObjClass);
 	oldguy->BeginDismantle(this);
 	
 	//pointless?
@@ -834,7 +834,7 @@ bool TFabricator< Base >::IsUpgradeInQueue ()
 template <class Base>
 void TFabricator< Base >::FailSound(M_RESOURCE_TYPE resType)
 {
-	failSound(resType);
+	this->failSound(resType);
 }
 /*template <class Base>
 void TFabricator< Base >::RecallDrones()
@@ -964,8 +964,8 @@ void TFabricator< Base >::initFabricator (const FABINITINFO & _data)
 		numDrones = _data.builderInfo[0].numDrones;
 	}
 
-	animIndex = ANIM->create_script_inst(_data.animArchetype, instanceIndex, "Sc_build");
-	loopingAnimIndex = ANIM->create_script_inst(_data.animArchetype, instanceIndex, "Sc_construct");
+	animIndex = ANIM->create_script_inst(_data.animArchetype, this->instanceIndex, "Sc_build");
+	loopingAnimIndex = ANIM->create_script_inst(_data.animArchetype, this->instanceIndex, "Sc_construct");
 }
 
 //---------------------------------------------------------------------------

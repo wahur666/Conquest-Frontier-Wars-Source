@@ -1,5 +1,6 @@
 #ifndef TOBJEXTENT_H
 #define TOBJEXTENT_H
+#include "IBlast.h"
 //--------------------------------------------------------------------------//
 //                                                                          //
 //                              TObjCloak.h                                 //
@@ -69,15 +70,15 @@ struct _NO_VTABLE ObjectExtent : public Base, IWeaponTarget, IExplosionOwner, IE
 
 	//S32 numChildren;
 
-	typename typedef Base::INITINFO EXTENTINITINFO;
-	struct InitNode			initNode;
-	struct PostRenderNode	postRenderNode;
+	typedef Base::INITINFO EXTENTINITINFO;
+	struct Base::InitNode			initNode;
+	struct Base::PostRenderNode	postRenderNode;
 
 	//child blasts
 	IBaseObject *childBlastList;
 	
 	ObjectExtent (void) : initNode(this, InitProc(&ObjectExtent::initExtents)),
-		postRenderNode(this,RenderProc(&ObjectExtent::postRenderExtent))
+		postRenderNode(this,Base::RenderProc(&ObjectExtent::postRenderExtent))
 	{
 	}
 
@@ -102,45 +103,45 @@ struct _NO_VTABLE ObjectExtent : public Base, IWeaponTarget, IExplosionOwner, IE
 
 	virtual void SetAliasData (U32 _aliasArch,U8 aliasPlayer)
 	{
-		aliasArchetypeID = _aliasArch;
-		aliasPlayerID = aliasPlayer;
+		this->aliasArchetypeID = _aliasArch;
+		this->aliasPlayerID = aliasPlayer;
 		if (_aliasArch != -1)
 		{
-			if (objMapNode)
-				objMapNode->flags |= OM_MIMIC;
+			if (this->objMapNode)
+				this->objMapNode->flags |= OM_MIMIC;
 //			mc->mi[0]->GetBoundingBox(box);
-			ComputeCorners(box, instanceIndex);
+			this->ComputeCorners(this->box, this->instanceIndex);
 		}
 		else
 		{
-			ComputeCorners(box, instanceIndex);
+			this->ComputeCorners(this->box, this->instanceIndex);
 //			mc.mi[0]->GetBoundingBox(box);
-			if (objMapNode)
-				objMapNode->flags &= ~OM_MIMIC;
+			if (this->objMapNode)
+				this->objMapNode->flags &= ~OM_MIMIC;
 		}
-		boxRadius = __max(box[0], -box[1]);
-		boxRadius = __max(boxRadius, box[2]);
-		boxRadius = __max(boxRadius, -box[3]);
+		this->boxRadius = __max(this->box[0], -this->box[1]);
+		this->boxRadius = __max(this->boxRadius, this->box[2]);
+		this->boxRadius = __max(this->boxRadius, -this->box[3]);
 	}
 
 	virtual void GetAliasData (U32 & _aliasArch,U8 &aliasPlayer)
 	{
-		_aliasArch = aliasArchetypeID;
-		aliasPlayer = aliasPlayerID;
+		_aliasArch = this->aliasArchetypeID;
+		aliasPlayer = this->aliasPlayerID;
 	}
 
 	virtual void CalculateRect (bool bEnableMimic)
 	{
-		if (bEnableMimic && (aliasArchetypeID != -1))
+		if (bEnableMimic && (this->aliasArchetypeID != -1))
 		{
-			ComputeCorners(box, instanceIndex);
+			this->ComputeCorners(this->box, this->instanceIndex);
 		}
 		else
-			ComputeCorners(box, instanceIndex);
+			this->ComputeCorners(this->box, this->instanceIndex);
 		
-		boxRadius = __max(box[0], -box[1]);
-		boxRadius = __max(boxRadius, box[2]);
-		boxRadius = __max(boxRadius, -box[3]);
+		this->boxRadius = __max(this->box[0], -this->box[1]);
+		this->boxRadius = __max(this->boxRadius, this->box[2]);
+		this->boxRadius = __max(this->boxRadius, -this->box[3]);
 	}
 
 	virtual const RECT *GetExtentRect (SINGLE _val);
@@ -202,7 +203,7 @@ void ObjectExtent< Base >::initExtents (const EXTENTINITINFO & data)
 			weight[i] =0;
 		}
 		
-		HARCH archIndex = instanceIndex;
+		HARCH archIndex = this->instanceIndex;
 		Mesh * mesh = REND->get_archetype_mesh(archIndex);
 		
 		for (i=0;i<SLICES;i++)
@@ -283,7 +284,7 @@ void ObjectExtent< Base >::initExtents (const EXTENTINITINFO & data)
 					{
 						Vector vv;
 						if (sliceA == sliceB)
-							vv.set(max(vA.x,vB.x),max(vA.y,vB.y),max(vA.z,vB.z));
+							vv.set(std::max(vA.x,vB.x),std::max(vA.y,vB.y),std::max(vA.z,vB.z));
 						else
 							vv = (vA*abs(sliceB-slice)+vB*abs(sliceA-slice))/abs(sliceB-sliceA);
 						
@@ -453,15 +454,15 @@ template <class Base>
 BOOL32 ObjectExtent< Base >::GetCollisionPosition (Vector &collide_point,Vector &dir,const Vector &start,const Vector &direction)
 {
 	BOOL32 result = FALSE;
-	if (instanceIndex != INVALID_INSTANCE_INDEX)
+	if (this->instanceIndex != INVALID_INSTANCE_INDEX)
 	{
 		
 		struct Ellipse ellipse,tran_ellipse;
 		OBJBOX box;
 		
-		GetObjectBox(box);
+		this->GetObjectBox(box);
 		
-		if (REND->get_archetype_centroid(HARCH(instanceIndex), LODPERCENT, ellipse.center) == 0)
+		if (REND->get_archetype_centroid(HARCH(this->instanceIndex), LODPERCENT, ellipse.center) == 0)
 			CQTRACE10("Centroid not found");
 		
 		ellipse.radius = 0.5*(box[BBOX_MAX_Z]-box[BBOX_MIN_Z]);
@@ -473,7 +474,7 @@ BOOL32 ObjectExtent< Base >::GetCollisionPosition (Vector &collide_point,Vector 
 		ellipse.R.set_identity();
 		//	ellipse.R = transform.get_inverse();
 		
-		ellipse.transform(&tran_ellipse, transform.translation, transform);
+		ellipse.transform(&tran_ellipse, this->transform.translation, this->transform);
 		
 		Vector normdir = direction;
 		normdir.normalize();
@@ -541,10 +542,10 @@ BOOL32 ObjectExtent< Base >::GetCollisionPosition (Vector &collide_point,Vector 
 template <class Base>
 void ObjectExtent< Base >::AttachBlast(PARCHETYPE pBlast,const Vector &pos,const Vector &dir)
 {
-	if (bVisible)
+	if (this->bVisible)
 	{
 		TRANSFORM trans(pos);
-		trans = transform.get_inverse().multiply(trans);
+		trans = this->transform.get_inverse().multiply(trans);
 		IBaseObject *obj;
 		if ((obj = ARCHLIST->CreateInstance(pBlast)) != 0)
 		{
@@ -552,7 +553,7 @@ void ObjectExtent< Base >::AttachBlast(PARCHETYPE pBlast,const Vector &pos,const
 
 			if (obj->QueryInterface(IBlastID, blast))
 			{
-				blast->InitBlast(trans, systemID,this);
+				blast->InitBlast(trans, this->systemID,this);
 			}
 		}
 
@@ -564,10 +565,10 @@ void ObjectExtent< Base >::AttachBlast(PARCHETYPE pBlast,const Vector &pos,const
 template <class Base>
 void ObjectExtent< Base >::AttachBlast(PARCHETYPE pBlast,const Transform & baseTrans)
 {
-	if (bVisible)
+	if (this->bVisible)
 	{
 		TRANSFORM trans(baseTrans);
-		trans = transform.get_inverse().multiply(trans);
+		trans = this->transform.get_inverse().multiply(trans);
 		IBaseObject *obj;
 		if ((obj = ARCHLIST->CreateInstance(pBlast)) != 0)
 		{
@@ -575,7 +576,7 @@ void ObjectExtent< Base >::AttachBlast(PARCHETYPE pBlast,const Transform & baseT
 
 			if (obj->QueryInterface(IBlastID, blast))
 			{
-				blast->InitBlast(trans, systemID,this);
+				blast->InitBlast(trans, this->systemID,this);
 			}
 		}
 

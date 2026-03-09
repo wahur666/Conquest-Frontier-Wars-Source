@@ -44,7 +44,11 @@ extern float Bcr[4][4];/* =
 	{-1.0/2.0,  0.0/2.0,  1.0/2.0,  0.0/2.0},
 	{ 0.0/2.0,  2.0/2.0,  0.0/2.0,  0.0/2.0}
 };*/
+struct Vector2;
 
+Vector2 add(const Vector2&, const Vector2&);
+Vector2 subtract(const Vector2&, const Vector2&);
+Vector2 scale(const Vector2&, SINGLE);
 struct Vector2
 {
 	SINGLE x;
@@ -161,8 +165,8 @@ void AntiMatterArchetype::Notify(U32 message, void *param)
 	case WM_LBUTTONUP:
 		{
 			Vector vec(mouseX,mouseY,0);
-			vec.x = max(vec.x,0);
-			vec.y = max(vec.y,0);
+			vec.x = std::max(vec.x,0.f);
+			vec.y = std::max(vec.y,0.f);
 			if (CAMERA->ScreenToPoint(vec.x, vec.y, 0) != 0)
 			{
 				lastPt.noEdges(vec);
@@ -400,7 +404,7 @@ AntiMatter::~AntiMatter()
 {
 	COMPTR<ITerrainMap> map;
 
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	if (map)
 		unsetTerrainFootprint(map);
 
@@ -506,7 +510,7 @@ BOOL32 AntiMatter::Setup ()
 	BOOL32 result=0;
 	COMPTR<ITerrainMap> map;
 
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	if (map)
 		unsetTerrainFootprint(map);
 
@@ -688,7 +692,7 @@ BOOL32 AntiMatter::Save(IFileSystem *inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 	
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	FRAME_save(save);
@@ -697,7 +701,7 @@ BOOL32 AntiMatter::Save(IFileSystem *inFile)
 		goto Done;
 
 	fdesc.lpFileName = "SegPoints";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (file->WriteFile(0,&numSegPts,sizeof(numSegPts),&dwWritten,0) == 0)
@@ -730,7 +734,7 @@ BOOL32 AntiMatter::Load(IFileSystem *inFile)
 	fdesc.lpFileName = "ANTIMATTER_SAVELOAD";
 	fdesc.lpImplementation = "DOS";
 	
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
 		goto Done;
 	}
@@ -745,7 +749,7 @@ BOOL32 AntiMatter::Load(IFileSystem *inFile)
 	FRAME_load(load);
 
 	fdesc.lpFileName = "SegPoints";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (file->ReadFile(0,&numSegPts,sizeof(numSegPts),&dwRead,0) == 0)
@@ -774,7 +778,7 @@ void AntiMatter::QuickSave (struct IFileSystem * file)
 {
 	CQASSERT(numSegPts > 1);
 
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc {partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_QANTIMATTERLOAD");
@@ -1465,10 +1469,10 @@ void AntiMatter::TestVisible (const USER_DEFAULTS & defaults, const U32 currentS
 		tr = inverseWorldROT->rotate_translate(tr);
 		br = inverseWorldROT->rotate_translate(br);
 		bl = inverseWorldROT->rotate_translate(bl);
-		vx_min = min(tl.x,min(bl.x,min(tr.x,br.x)))-4000;
-		vx_max = max(tl.x,max(bl.x,max(tr.x,br.x)))+4000;
-		vy_min = min(tl.y,min(bl.y,min(tr.y,br.y)))-4000;
-		vy_max = max(tl.y,max(bl.y,max(tr.y,br.y)))+4000;
+		vx_min = std::min(tl.x,std::min(bl.x,std::min(tr.x,br.x)))-4000;
+		vx_max = std::max(tl.x,std::max(bl.x,std::max(tr.x,br.x)))+4000;
+		vy_min = std::min(tl.y,std::min(bl.y,std::min(tr.y,br.y)))-4000;
+		vy_max = std::max(tl.y,std::max(bl.y,std::max(tr.y,br.y)))+4000;
 		for (int i=0;i<numSegPts-1;i++)
 		{
 			Vector vec0 = seg[i].gv;

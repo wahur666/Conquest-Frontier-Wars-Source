@@ -146,7 +146,7 @@ void Tendril::Render()
 		length = 1;
 	}
 	direction /= length;
-	segments = min(ceil(length*0.0012),MAX_SEGMENTS);
+	segments = std::min((int)ceil(length*0.0012),MAX_SEGMENTS);
 	
 	if (distanceCounter > 1)
 	{
@@ -323,7 +323,7 @@ void Tendril::Update()
 		if (!bFeedBack)
 		{
 			length = (end-start).magnitude();
-			segments = min(ceil(length*0.0012),MAX_SEGMENTS);
+			segments = std::min((int)ceil(length*0.0012),MAX_SEGMENTS);
 			frame_ref[0] = rand()%3;
 			for (i=1;i<segments;i++)
 			{
@@ -375,7 +375,7 @@ void Tendril::Init ()
 		
 		
 		length = (end-start).magnitude();
-		segments = min(ceil(length*0.0012),MAX_SEGMENTS);
+		segments = std::min((int)ceil(length*0.0012),MAX_SEGMENTS);
 //		segment_length = length/segments;
 		
 		offset[0] = 0;
@@ -1079,7 +1079,7 @@ ArcCannonFactory::~ArcCannonFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -1088,7 +1088,7 @@ void ArcCannonFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -1119,7 +1119,7 @@ HANDLE ArcCannonFactory::CreateArchetype (const char *szArchname, OBJCLASS objCl
 			fdesc.lpImplementation = "UTF";
 			
 			
-			if (OBJECTDIR->CreateInstance(&fdesc, file) != GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 			{
 				CQERROR1("Failed to open file %s", fdesc.lpFileName);
 				goto Error;

@@ -41,6 +41,8 @@
 #include <FileSys.h>
 #include <ICamera.h>
 
+#include "Search.hpp"
+
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 /*static void Transform_to_4x4 (float m[16], const Transform &t)

@@ -57,13 +57,12 @@ private:
 	SINGLE instanceRadius;
 	Vector instanceCenter;
 public:
+	typedef Base::SAVEINFO TRANSSAVEINFO;
+	typedef Base::INITINFO TRANSINITINFO;
 
-	typename typedef Base::SAVEINFO TRANSSAVEINFO;
-	typename typedef Base::INITINFO TRANSINITINFO;
-
-	struct SaveNode			saveNode;
-	struct LoadNode         loadNode;
-	struct InitNode			initNode;
+	struct Base::SaveNode  saveNode;
+	struct Base::LoadNode  loadNode;
+	struct Base::InitNode  initNode;
 
 	//----------------------------------
 	
@@ -204,9 +203,9 @@ public:
 //
 template <class Base> 
 ObjectTransform< Base >::ObjectTransform (void) :
-					saveNode(this, SaveLoadProc(&ObjectTransform::saveTransform)),
-					loadNode(this, SaveLoadProc(&ObjectTransform::loadTransform)),
-					initNode(this, InitProc(&ObjectTransform::initTransform))
+					saveNode(this, Base::SaveLoadProc(&ObjectTransform::saveTransform)),
+					loadNode(this, Base::SaveLoadProc(&ObjectTransform::loadTransform)),
+					initNode(this, Base::InitProc(&ObjectTransform::initTransform))
 {
 	instanceMesh = 0;
 	instanceIndex = -1;

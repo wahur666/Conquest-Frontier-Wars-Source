@@ -20,6 +20,8 @@
 #ifndef RENDERER_H
 #include "Renderer.h"
 #endif
+#include "Objlist.h"
+#include "Sector.h"
 
 //#ifndef MATERIAL_H
 //#include "Material.h"
@@ -110,19 +112,19 @@
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectBuild : public Base, IBuild, BUILD_SAVELOAD
 {
-	struct PreRenderNode	preRenderNode;
-	struct PostRenderNode   postRenderNode;
-	struct UpdateNode       updateNode;
-	struct PhysUpdateNode	physUpdateNode;
-	struct SaveNode			saveNode;
-	struct LoadNode         loadNode;
-	struct ExplodeNode      explodeNode;
-	struct ResolveNode		resolveNode;
-	struct InitNode			initNode;
-	struct PreDestructNode	destructNode;
-		
-	typename typedef Base::SAVEINFO BUILDSAVEINFO;
-	typename typedef Base::INITINFO BUILDINITINFO;
+	struct Base::PreRenderNode	preRenderNode;
+	struct Base::PostRenderNode   postRenderNode;
+	struct Base::UpdateNode       updateNode;
+	struct Base::PhysUpdateNode	physUpdateNode;
+	struct Base::SaveNode			saveNode;
+	struct Base::LoadNode         loadNode;
+	struct Base::ExplodeNode      explodeNode;
+	struct Base::ResolveNode		resolveNode;
+	struct Base::InitNode			initNode;
+	struct Base::PreDestructNode	destructNode;
+
+	typedef Base::SAVEINFO BUILDSAVEINFO;
+	typedef Base::INITINFO BUILDINITINFO;
 	//----------------------------------	
 	OBJPTR<IBuildEffect> buildEffectObj;
 	
@@ -185,16 +187,16 @@ struct _NO_VTABLE ObjectBuild : public Base, IBuild, BUILD_SAVELOAD
 //
 template <class Base> 
 ObjectBuild< Base >::ObjectBuild (void) :
-					preRenderNode(this, RenderProc(&ObjectBuild::buildPreRender)),
-					postRenderNode(this, RenderProc(&ObjectBuild::buildPostRender)),
-					updateNode(this, UpdateProc(&ObjectBuild::updateBuild)),
-					physUpdateNode(this, PhysUpdateProc(&ObjectBuild::physUpdateBuild)),
-					saveNode(this, SaveLoadProc(&ObjectBuild::saveBuild)),
-					loadNode(this, SaveLoadProc(&ObjectBuild::loadBuild)),
-					explodeNode(this, ExplodeProc(&ObjectBuild::explodeBuild)),
-					resolveNode(this, ResolveProc(&ObjectBuild::resolveBuild)),
-					initNode(this, InitProc(&ObjectBuild::buildInit)),
-					destructNode(this, PreDestructProc(&ObjectBuild::preDestructBuild))
+					preRenderNode(this, Base::RenderProc(&ObjectBuild::buildPreRender)),
+					postRenderNode(this, Base::RenderProc(&ObjectBuild::buildPostRender)),
+					updateNode(this, Base::UpdateProc(&ObjectBuild::updateBuild)),
+					physUpdateNode(this, Base::PhysUpdateProc(&ObjectBuild::physUpdateBuild)),
+					saveNode(this, Base::SaveLoadProc(&ObjectBuild::saveBuild)),
+					loadNode(this, Base::SaveLoadProc(&ObjectBuild::loadBuild)),
+					explodeNode(this, Base::ExplodeProc(&ObjectBuild::explodeBuild)),
+					resolveNode(this, Base::ResolveProc(&ObjectBuild::resolveBuild)),
+					initNode(this, Base::InitProc(&ObjectBuild::buildInit)),
+					destructNode(this, Base::PreDestructProc(&ObjectBuild::preDestructBuild))
 
 {
 	building = 0;
@@ -232,12 +234,12 @@ void ObjectBuild< Base >::markChild (INSTANCE_INDEX parentIdx)
 template <class Base>
 void ObjectBuild< Base >::Build (IFabricator *_fab)
 {
-	SetColors();
+	this->SetColors();
 //	CQASSERT(!numFabWorking);
 	hullPointsAdded=0;
-	hullPointsFinish = hullPointsMax;
-	hullPoints = 0;
-	if(objClass == OC_PLATFORM)
+	hullPointsFinish = this->hullPointsMax;
+	this->hullPoints = 0;
+	if(this->objClass == OC_PLATFORM)
 	{
 		OBJPTR<IJumpPlat> plat;
 		static_cast<IBaseObject *>(this)->QueryInterface(IJumpPlatID,plat);
@@ -247,7 +249,7 @@ void ObjectBuild< Base >::Build (IFabricator *_fab)
 		}
 	}
 
-	SetReady(false); 
+	this->SetReady(false);
 	bReverseBuild = false;
 	building = 1;
 	whole = 0;
@@ -269,7 +271,7 @@ void ObjectBuild< Base >::Build (IFabricator *_fab)
 		}
 	}
 */
-	SetVisibilityFlags(fab.Ptr()->GetVisibilityFlags());
+	this->SetVisibilityFlags(fab.Ptr()->GetVisibilityFlags());
 	emissiveMask = true;
 }
 //---------------------------------------------------------------------------
@@ -299,7 +301,7 @@ void ObjectBuild< Base >::AddFabToBuild (IFabricator * _fab)
 	if (buildEffectObj)
 	{
 		buildEffectObj->AddFabricator(_fab);
-		U32 buildTime = (pInitData->buildTime*(1.0-MGlobals::GetAIBonus(playerID)));
+		U32 buildTime = (this->pInitData->buildTime*(1.0-MGlobals::GetAIBonus(this->playerID)));
 		buildEffectObj->SetBuildRate(buildTime?(1.0f/buildTime):1.0);
 	}
 
@@ -342,21 +344,21 @@ void ObjectBuild< Base >::EndBuild (bool bAborting)
 		
 		if (bAborting == FALSE)
 		{
-			if((mObjClass != M_HARVEST) 
-				&&	(mObjClass != M_GALIOT) &&(mObjClass != M_SIPHON))
-				supplies = supplyPointsMax;
-			SetReady(true);
+			if((this->mObjClass != M_HARVEST)
+				&&	(this->mObjClass != M_GALIOT) &&(this->mObjClass != M_SIPHON))
+				this->supplies = this->supplyPointsMax;
+			this->SetReady(true);
 			emitterPause = 2.0;
-			if(objClass == OC_PLATFORM)
+			if(this->objClass == OC_PLATFORM)
 			{
-				PLATFORM_ALERT(this, dwMissionID, constructComplete,SUB_CONSTRUCTION_COMP, pInitData->displayName,ALERT_PLATFORM_BUILD);
+				PLATFORM_ALERT(this, this->dwMissionID, constructComplete,SUB_CONSTRUCTION_COMP, this->pInitData->displayName,ALERT_PLATFORM_BUILD);
 			}
 			else
 			{
-				SPACESHIP_ALERT(this, dwMissionID, constructComplete,SUB_CONSTRUCTION_COMP, pInitData->displayName,ALERT_UNIT_BUILT);
+				SPACESHIP_ALERT(this, this->dwMissionID, constructComplete,SUB_CONSTRUCTION_COMP, this->pInitData->displayName,ALERT_UNIT_BUILT);
 			}
 
-			MScript::RunProgramsWithEvent(CQPROGFLAG_OBJECTCONSTRUCTED, dwMissionID);
+			MScript::RunProgramsWithEvent(CQPROGFLAG_OBJECTCONSTRUCTED, this->dwMissionID);
 
 			if (buildEffectObj)
 			{
@@ -373,7 +375,7 @@ void ObjectBuild< Base >::EndBuild (bool bAborting)
 		{
 			if(THEMATRIX->IsMaster())
 			{
-				THEMATRIX->ObjectTerminated(GetPartID());
+				THEMATRIX->ObjectTerminated(this->GetPartID());
 			}
 			fabID = 0;
 		}
@@ -389,7 +391,7 @@ void ObjectBuild< Base >::CancelBuild()
 	if(building)
 	{
 		bReverseBuild = true;
-		U32 buildTime = (pInitData->buildTime*(1.0-MGlobals::GetAIBonus(playerID)));
+		U32 buildTime = (this->pInitData->buildTime*(1.0-MGlobals::GetAIBonus(this->playerID)));
 		if (buildEffectObj)
 			buildEffectObj->SetBuildRate(buildTime?-5.0/buildTime:-5.0);
 
@@ -414,11 +416,11 @@ void ObjectBuild< Base>::EnableCompletion ()
 //	buildAgentID = agentID;
 	if(THEMATRIX->IsMaster())
 	{
-		U32 newHull = hullPoints +( hullPointsFinish-hullPointsAdded);
-		if(newHull > hullPointsMax)
-			newHull = hullPointsMax;
-		hullPoints = newHull;
-		if(objClass == OC_PLATFORM)
+		U32 newHull = this->hullPoints +( hullPointsFinish-hullPointsAdded);
+		if(newHull > this->hullPointsMax)
+			newHull = this->hullPointsMax;
+		this->hullPoints = newHull;
+		if(this->objClass == OC_PLATFORM)
 		{
 			OBJPTR<IJumpPlat> plat;
 			static_cast<IBaseObject *>(this)->QueryInterface(IJumpPlatID,plat);
@@ -446,7 +448,7 @@ SINGLE ObjectBuild< Base>::GetBuildProgress (U32 & stallType)
 {
 	stallType = IActiveButton::NO_STALL;
 
-	U32 buildTime = (pInitData->buildTime*(1.0-MGlobals::GetAIBonus(playerID)));
+	U32 buildTime = (this->pInitData->buildTime*(1.0-MGlobals::GetAIBonus(this->playerID)));
 	if(bReverseBuild)
 	{
 		return 1.0-(buildTime?((SINGLE)timeSpent)/buildTime:0.0);
@@ -464,7 +466,7 @@ template <class Base>
 SINGLE ObjectBuild< Base>::GetBuildDisplayProgress (U32 & stallType)
 {
 	stallType = IActiveButton::NO_STALL;
-	U32 buildTime = (pInitData->buildTime*(1.0-MGlobals::GetAIBonus(playerID)));
+	U32 buildTime = (this->pInitData->buildTime*(1.0-MGlobals::GetAIBonus(this->playerID)));
 	return buildTime?((SINGLE)timeSpent)/buildTime:1.0;
 }
 //---------------------------------------------------------------------------
@@ -519,18 +521,18 @@ void ObjectBuild< Base>::BeginDismantle(IBaseObject * _fab)
 {
 	bDismantle = true;
 	building = true;
-	SetReady(false);
-	if(bSelected)
+	this->SetReady(false);
+	if(this->bSelected)
 		OBJLIST->UnselectObject(this);
 	bReverseBuild = true;
 	whole = false;
 
-	U32 buildTime = (pInitData->buildTime*(1.0-MGlobals::GetAIBonus(playerID)));
+	U32 buildTime = (this->pInitData->buildTime*(1.0-MGlobals::GetAIBonus(this->playerID)));
 	timeSpent = buildTime;
 
 //	percent = GetTrueHullPoints()/hullPointsMax;
 
-	hullPointsAdded = hullPoints;
+	hullPointsAdded = this->hullPoints;
 	hullPointsFinish = hullPointsAdded;
 
 	OBJPTR<IFabricator> fab;
@@ -664,7 +666,7 @@ void ObjectBuild< Base >::buildPreRender (void)
 {
 	if(emissiveMask)
 	{
-		if(!bReady)
+		if(!this->bReady)
 		{
 		/*	for (int i=0;i<mc.numChildren;i++)
 			{
@@ -754,7 +756,7 @@ void ObjectBuild< Base >::buildPreRender (void)
 template <class Base> 
 void ObjectBuild< Base >::buildPostRender (void)
 {
-	if (!whole && !bExploding)
+	if (!whole && !this->bExploding)
 		if (buildEffectObj)
 			buildEffectObj.Ptr()->Render();
 /*	if (!whole && !bExploding)
@@ -794,7 +796,7 @@ BOOL32 ObjectBuild< Base >::updateBuild (void)
 {
 	if (building)
 	{
-		U32 buildTime = (pInitData->buildTime*(1.0-MGlobals::GetAIBonus(playerID)));
+		U32 buildTime = (this->pInitData->buildTime*(1.0-MGlobals::GetAIBonus(this->playerID)));
 		OBJPTR<IBuildQueue> queue;
 		IBaseObject *obj1;
 		obj1 = OBJLIST->FindObject(fabID);
@@ -805,7 +807,7 @@ BOOL32 ObjectBuild< Base >::updateBuild (void)
 			if (queue)
 				queue->FabGetProgress(stallType);
 		}
-		if (objClass == OC_PLATFORM || ((SECTOR->SystemInSupply(systemID,playerID) || bReverseBuild) && (stallType!=IActiveButton::NO_MONEY)))
+		if (this->objClass == OC_PLATFORM || ((SECTOR->SystemInSupply(this->systemID,this->playerID) || bReverseBuild) && (stallType!=IActiveButton::NO_MONEY)))
 		{
 			SINGLE industryBonus = 1.0;
 			if(obj1)
@@ -842,18 +844,18 @@ BOOL32 ObjectBuild< Base >::updateBuild (void)
 			if (buildEffectObj)
 				buildEffectObj->SetBuildPercent(buildTime?timeSpent/buildTime:1.0);
 			//buildTimer = newTimer;
-			if (bReverseBuild || (hullPoints != hullPointsMax))
+			if (bReverseBuild || (this->hullPoints != this->hullPointsMax))
 			{
-				S32 oldHull = hullPoints;
+				S32 oldHull = this->hullPoints;
 				S32 newHull = oldHull +( (buildTime?timeSpent/buildTime:1.0)*hullPointsFinish-hullPointsAdded);
 				if(newHull < 0)
 					newHull = 0;
-				if(newHull > hullPointsMax)
-					newHull = hullPointsMax;
+				if(newHull > this->hullPointsMax)
+					newHull = this->hullPointsMax;
 				if(THEMATRIX->IsMaster())
 				{
-					hullPoints = newHull;
-					if(objClass == OC_PLATFORM)
+					this->hullPoints = newHull;
+					if(this->objClass == OC_PLATFORM)
 					{
 						OBJPTR<IJumpPlat> plat;
 						static_cast<IBaseObject *>(this)->QueryInterface(IJumpPlatID,plat);
@@ -888,7 +890,7 @@ BOOL32 ObjectBuild< Base >::updateBuild (void)
 template <class Base>
 void ObjectBuild< Base >::physUpdateBuild (SINGLE dt)
 {
-	if (!bExploding)
+	if (!this->bExploding)
 	{
 		if (buildEffectObj)
 			buildEffectObj->PhysicalUpdate(dt);
@@ -907,21 +909,21 @@ void ObjectBuild< Base >::physUpdateBuild (SINGLE dt)
 template <class Base>
 void ObjectBuild< Base >::failSound(M_RESOURCE_TYPE resType)
 {
-	if(objClass == OC_PLATFORM)
+	if(this->objClass == OC_PLATFORM)
 	{
 		switch(resType)
 		{
 		case M_GAS:
-			GENPLATFORMCOMM(notEnoughGas,SUB_NO_GAS);
+			UNITCOMM->PlayCommMessage(this, this->dwMissionID, (((size_t)((&(((UNITSOUNDS::SPEECH::GENPLATFORM *)0)->notEnoughGas))+0)) / sizeof(M_STRING)), 4511,this->pInitData->displayName);
 			break;
 		case M_METAL:
-			GENPLATFORMCOMM(notEnoughMetal,SUB_NO_METAL);
+			UNITCOMM->PlayCommMessage(this, this->dwMissionID, (((size_t)((&(((UNITSOUNDS::SPEECH::GENPLATFORM *)0)->notEnoughMetal))+0)) / sizeof(M_STRING)), 4513,this->pInitData->displayName);
 			break;
 		case M_CREW:
-			GENPLATFORMCOMM(notEnoughCrew,SUB_NO_CREW);
+			UNITCOMM->PlayCommMessage(this, this->dwMissionID, (((size_t)((&(((UNITSOUNDS::SPEECH::GENPLATFORM *)0)->notEnoughCrew))+0)) / sizeof(M_STRING)), 4512,this->pInitData->displayName);
 			break;
 		case M_COMMANDPTS:
-			GENPLATFORMCOMM(notEnoughCommandPoints, SUB_NO_CP);
+			UNITCOMM->PlayCommMessage(this, this->dwMissionID, (((size_t)((&(((UNITSOUNDS::SPEECH::GENPLATFORM *)0)->notEnoughCommandPoints))+0)) / sizeof(M_STRING)), 4510,this->pInitData->displayName);
 			break;
 		}
 	}
@@ -930,16 +932,16 @@ void ObjectBuild< Base >::failSound(M_RESOURCE_TYPE resType)
 		switch(resType)
 		{
 		case M_GAS:
-			FABRICATORCOMM(notEnoughGas,SUB_NO_GAS);
+			UNITCOMM->PlayCommMessage(this, this->dwMissionID, (((size_t)((&(((UNITSOUNDS::SPEECH::FABRICATOR *)0)->notEnoughGas))+0)) / sizeof(M_STRING)), 4511,this->pInitData->displayName );
 			break;
 		case M_METAL:
-			FABRICATORCOMM(notEnoughMetal,SUB_NO_METAL);
+			UNITCOMM->PlayCommMessage(this, this->dwMissionID, (((size_t)((&(((UNITSOUNDS::SPEECH::FABRICATOR *)0)->notEnoughMetal))+0)) / sizeof(M_STRING)), 4513,this->pInitData->displayName );
 			break;
 		case M_CREW:
-			FABRICATORCOMM(notEnoughCrew,SUB_NO_CREW);
+			UNITCOMM->PlayCommMessage(this, this->dwMissionID, (((size_t)((&(((UNITSOUNDS::SPEECH::FABRICATOR *)0)->notEnoughCrew))+0)) / sizeof(M_STRING)), 4512,this->pInitData->displayName );
 			break;
 		case M_COMMANDPTS:
-			FABRICATORCOMM(notEnoughCommandPoints, SUB_NO_CP);
+			UNITCOMM->PlayCommMessage(this, this->dwMissionID, (((size_t)((&(((UNITSOUNDS::SPEECH::FABRICATOR *)0)->notEnoughCommandPoints))+0)) / sizeof(M_STRING)), 4510,this->pInitData->displayName );
 			break;
 		}
 	}
@@ -958,7 +960,7 @@ void ObjectBuild< Base >::explodeBuild (bool bExplode)
 template <class Base>
 void ObjectBuild< Base >::preDestructBuild (void)
 {
-	if(!bReady && fabID && building)
+	if(!this->bReady && fabID && building)
 	{
 		OBJPTR<IFabricator> fab;
 		IBaseObject *obj1;

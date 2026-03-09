@@ -53,7 +53,7 @@ struct RGBA
 struct AnimArchetype
 {
 	ARCHETYPE_INDEX id;
-	U32 *tex;
+	LONG_PTR *tex;
 	SINGLE delay;
 	U8 texCnt;
 

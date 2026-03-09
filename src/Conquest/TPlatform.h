@@ -589,7 +589,7 @@ Platform<SaveStruct,InitStruct>::~Platform (void)
 	}
 
 	COMPTR<ITerrainMap> terrainMap;
-	SECTOR->GetTerrainMap(systemID, terrainMap);
+	SECTOR->GetTerrainMap(systemID, terrainMap.addr());
 	undoFootprintInfo(terrainMap);
 
 	//root stuff
@@ -623,7 +623,7 @@ BOOL32 Platform<SaveStruct,InitStruct>::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -677,7 +677,7 @@ BOOL32 Platform<SaveStruct,InitStruct>::Load (struct IFileSystem * inFile)
 #endif
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -722,7 +722,7 @@ void Platform<SaveStruct,InitStruct>::ResolveAssociations (void)
 template <class SaveStruct, class InitStruct>
 void Platform<SaveStruct,InitStruct>::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc {partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_PLATFORM_QLOAD");
@@ -884,7 +884,7 @@ template <class SaveStruct, class InitStruct>
 void Platform<SaveStruct,InitStruct>::ReceiveDeathPacket()
 {
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	undoFootprintInfo(map);
 	OBJLIST->DeferredDestruction(dwMissionID);
 }
@@ -1400,7 +1400,7 @@ void Platform<SaveStruct,InitStruct>::killPlatform()
 	THEMATRIX->SendPlatformDeath(dwMissionID);
 	bPlatRealyDead = true;
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	undoFootprintInfo(map);
 	OBJLIST->DeferredDestruction(dwMissionID);
 }
@@ -2138,7 +2138,7 @@ SINGLE Platform<SaveStruct,InitStruct>::TestHighlight (const RECT & rect)
 				_rect.top = center_y - radius;
 				_rect.bottom = center_y + radius;
 
-				RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+				RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 
 				if ((bVisible = RectIntersects(_rect, screenRect)) != 0)
 				{
@@ -2185,7 +2185,7 @@ SINGLE Platform<SaveStruct,InitStruct>::TestHighlight (const RECT & rect)
 				_rect.top = center_y - radius;
 				_rect.bottom = center_y + radius;
 
-				RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+				RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 
 				if ((bVisible = RectIntersects(_rect, screenRect)) != 0)
 				{
@@ -2377,7 +2377,7 @@ void Platform<SaveStruct,InitStruct>::DrawHighlighted (void)
 		if (nextHighlighted==0 && OBJLIST->GetHighlightedList()==this)
 		{
 			COMPTR<IFontDrawAgent> pFont;
-			if (OBJLIST->GetUnitFont(pFont) == GR_OK)
+			if (OBJLIST->GetUnitFont(pFont.addr()) == GR_OK)
 			{
 				if (bShowPartName)
 					pFont->SetFontColor(RGB(140,140,180) | 0xFF000000, 0);
@@ -2614,7 +2614,7 @@ void Platform<SaveStruct,InitStruct>::SetPosition(const Vector & vector, U32 new
 	systemID = newSystemID;
 	CQASSERT(systemID && systemID<=MAX_SYSTEMS);
 	COMPTR<ITerrainMap> terrainMap;
-	SECTOR->GetTerrainMap(systemID, terrainMap);
+	SECTOR->GetTerrainMap(systemID, terrainMap.addr());
 	SetTerrainFootprint(terrainMap);
 	
 	if (rootChild)
@@ -2651,7 +2651,7 @@ void Platform<SaveStruct,InitStruct>::SetTransform (const TRANSFORM & transform,
 	if (IsDeepSpacePlatform())
 	{
 		COMPTR<ITerrainMap> terrainMap;
-		SECTOR->GetTerrainMap(systemID, terrainMap);
+		SECTOR->GetTerrainMap(systemID, terrainMap.addr());
 		SetTerrainFootprint(terrainMap);
 	}
 	
@@ -2667,7 +2667,7 @@ void Platform<SaveStruct,InitStruct>::TakeoverSwitchID (U32 newMissionID)
 {
 	// first thing, undo the current footprint
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	undoFootprintInfo(map);
 
 	U32 plId = (MGlobals::GetPlayerFromPartID(dwMissionID));
@@ -2715,7 +2715,7 @@ void Platform<SaveStruct,InitStruct>::undoFootprintInfo (struct ITerrainMap * te
 		COMPTR<ITerrainMap> map;
 
 		if (footprintHistory.systemID != systemID)
-			SECTOR->GetTerrainMap(footprintHistory.systemID, map);
+			SECTOR->GetTerrainMap(footprintHistory.systemID, map.addr());
 		else
 			map = terrainMap;
 		map->UndoFootprint(&footprintHistory.vec[0], 1, footprintHistory.info[0]);
@@ -3059,7 +3059,7 @@ bool PLATFORM_INIT<BT_TYPE>::loadPlatformArchetype (BT_TYPE * data, PARCHETYPE _
 		DAFILEDESC fdesc="tinnard_fire.anm";
 		COMPTR<IFileSystem> objFile;
 		//fdesc.lpFileName = objData->animName;
-		if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 		{
 			damageAnimArch = ANIM2D->create_archetype(objFile);
 		}
@@ -3075,7 +3075,7 @@ bool PLATFORM_INIT<BT_TYPE>::loadPlatformArchetype (BT_TYPE * data, PARCHETYPE _
 		COMPTR<IFileSystem> file;
 		DAFILEDESC fdesc = "smoke.pte";
 
-		if (OBJECTDIR->CreateInstance(&fdesc,file) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc,file.void_addr()) == GR_OK)
 			smoke_archID = ENGINE->create_archetype("smoke.pte",file);
 	}
 
@@ -3136,7 +3136,7 @@ bool PLATFORM_INIT<BT_TYPE>::loadPlatformArchetype (BT_TYPE * data, PARCHETYPE _
 			strcpy(extenpos,".shield");
 			DAFILEDESC fdesc=outName;
 			COMPTR<IFileSystem> objFile;
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 			{
 				smesh = new SMesh;
 				if (smesh->load(objFile))

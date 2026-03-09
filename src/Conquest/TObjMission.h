@@ -52,13 +52,13 @@
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 {
-	typename typedef Base::SAVEINFO MISSIONSAVEINFO;
-	typename typedef Base::INITINFO MISSIONINITINFO;
+	typedef Base::SAVEINFO MISSIONSAVEINFO;
+	typedef Base::INITINFO MISSIONINITINFO;
 
-	struct SaveNode  saveNode;
-	struct LoadNode  loadNode;
-	struct InitNode  initNode;
-	struct RenderNode renderNode;
+	struct Base::SaveNode   saveNode;
+	struct Base::LoadNode   loadNode;
+	struct Base::InitNode   initNode;
+	struct Base::RenderNode renderNode;
 	
 	//
 	// mission data
@@ -66,13 +66,13 @@ struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 	const MISSION_DATA * pInitData;
 
 	ObjectMission (void) :
-					saveNode(this, SaveLoadProc(&ObjectMission::saveMissionData)),
-					loadNode(this, SaveLoadProc(&ObjectMission::loadMissionData)),
-					initNode(this, InitProc(&ObjectMission::initMissionState)),
-					renderNode(this, RenderProc(&ObjectMission::renderMission))
+					saveNode(this, Base::SaveLoadProc(&ObjectMission::saveMissionData)),
+					loadNode(this, Base::SaveLoadProc(&ObjectMission::loadMissionData)),
+					initNode(this, Base::InitProc(&ObjectMission::initMissionState)),
+					renderNode(this, Base::RenderProc(&ObjectMission::renderMission))
 	{
 #ifndef FINAL_RELEASE
-		SetDebugName(partName);
+		Base::SetDebugName(partName);
 #endif  // end !FINAL_RELEASE
 	}
 	
@@ -161,13 +161,13 @@ struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 
 	virtual void PreSelfDestruct (void)
 	{
-		FRAME_preDestruct();
+		this->FRAME_preDestruct();
 	}
 
 	virtual void SelfDestruct (bool bExplode)
 	{
 		UnregisterWatchersForObject(this);
-		FRAME_explode(bExplode);
+		this->FRAME_explode(bExplode);
 		//
 		// if for some reason we are still in the object list, delete self
 		//
@@ -179,22 +179,22 @@ struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 
 	virtual U32 GetPrioritySyncData (void * buffer)
 	{
-		return FRAME_getPrioritySyncData(buffer);
+		return this->FRAME_getPrioritySyncData(buffer);
 	}
 
 	virtual U32 GetGeneralSyncData (void * buffer)
 	{
-		return FRAME_getGeneralSyncData(buffer);
+		return this->FRAME_getGeneralSyncData(buffer);
 	}
 
 	virtual void PutPrioritySyncData (void * buffer, U32 bufferSize, bool bLateDelivery)
 	{
-		FRAME_putPrioritySyncData(buffer, bufferSize, bLateDelivery);
+		this->FRAME_putPrioritySyncData(buffer, bufferSize, bLateDelivery);
 	}
 
 	virtual void PutGeneralSyncData (void * buffer, U32 bufferSize, bool bLateDelivery)
 	{
-		FRAME_putGeneralSyncData(buffer, bufferSize, bLateDelivery);
+		this->FRAME_putGeneralSyncData(buffer, bufferSize, bLateDelivery);
 	}
 
 	virtual void OnOperationCreation (U32 agentID, void *buffer, U32 bufferSize)
@@ -203,12 +203,12 @@ struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 
 	virtual void ReceiveOperationData (U32 agentID, void *buffer, U32 bufferSize)
 	{
-		FRAME_receiveOpData(agentID,buffer,bufferSize);
+		this->FRAME_receiveOpData(agentID,buffer,bufferSize);
 	}
 
 	virtual void OnOperationCancel (U32 agentID)
 	{
-		FRAME_onOpCancel(agentID);
+		this->FRAME_onOpCancel(agentID);
 	}
 
 	virtual void OnStopRequest (U32 agentID)
@@ -217,7 +217,7 @@ struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 
 	virtual void PrepareTakeover (U32 newMissionID, U32 troopID)
 	{
-		FRAME_preTakeover(newMissionID, troopID);
+		this->FRAME_preTakeover(newMissionID, troopID);
 	}
 
 	virtual void TakeoverSwitchID (U32 newMissionID)
@@ -253,7 +253,7 @@ struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 
 	void renderMission()
 	{
-		if(DEFAULTS->GetDefaults()->bInfoHighlights && bHighlight)
+		if(DEFAULTS->GetDefaults()->bInfoHighlights && this->bHighlight)
 		{
 			if(sensorRadius)
 			{
@@ -268,9 +268,9 @@ struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 						admiralSensorMod = 1+flagship->GetSensorBonus(mObjClass,part.pInit->armorData.myArmor);
 					}				
 				}
-				SINGLE bonus = fieldFlags.getSensorDampingMod()*effectFlags.getSensorDampingMod()*admiralSensorMod*SECTOR->GetSectorEffects(playerID,systemID)->getSensorMod();
-				drawRangeCircle(__max(0.75,pInitData->sensorRadius*bonus ),RGB(0,128,0));
-				drawRangeCircle(__max(0.75,sensorRadius*bonus),RGB(0,255,0));
+				SINGLE bonus = this->fieldFlags.getSensorDampingMod()*this->effectFlags.getSensorDampingMod()*admiralSensorMod*SECTOR->GetSectorEffects(playerID,systemID)->getSensorMod();
+				this->drawRangeCircle(__max(0.75,pInitData->sensorRadius*bonus ),RGB(0,128,0));
+				this->drawRangeCircle(__max(0.75,sensorRadius*bonus),RGB(0,255,0));
 			}
 			if(cloakedSensorRadius)
 			{
@@ -285,9 +285,9 @@ struct _NO_VTABLE ObjectMission : public Base, IMissionActor, MISSION_SAVELOAD
 						admiralSensorMod = 1+flagship->GetSensorBonus(mObjClass,part.pInit->armorData.myArmor);
 					}				
 				}
-				SINGLE bonus = fieldFlags.getSensorDampingMod()*effectFlags.getSensorDampingMod()*admiralSensorMod*SECTOR->GetSectorEffects(playerID,systemID)->getSensorMod();
-				drawRangeCircle(pInitData->cloakedSensorRadius*bonus,RGB(128,128,128));
-				drawRangeCircle(cloakedSensorRadius*bonus,RGB(255,255,255));
+				SINGLE bonus = this->fieldFlags.getSensorDampingMod()*this->effectFlags.getSensorDampingMod()*admiralSensorMod*SECTOR->GetSectorEffects(playerID,systemID)->getSensorMod();
+				this->drawRangeCircle(pInitData->cloakedSensorRadius*bonus,RGB(128,128,128));
+				this->drawRangeCircle(cloakedSensorRadius*bonus,RGB(255,255,255));
 			}
 
 		}

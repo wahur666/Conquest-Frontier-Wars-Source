@@ -718,7 +718,7 @@ BOOL32 AEBolt::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -736,7 +736,7 @@ BOOL32 AEBolt::Save (struct IFileSystem * inFile)
 	file->WriteFile(0, &save, sizeof(save), &dwWritten, 0);
 
 	fdesc.lpFileName = "TARGETS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->WriteFile(0,targUnitID,sizeof(U32)*numFound,&dwWritten, 0);
@@ -758,7 +758,7 @@ BOOL32 AEBolt::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0) == 0)
@@ -776,7 +776,7 @@ BOOL32 AEBolt::Load (struct IFileSystem * inFile)
 	targetID = load.targetID;
 
 	fdesc.lpFileName = "TARGETS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (file->ReadFile(0,targUnitID,sizeof(U32)*numFound,&dwRead, 0) == 0)
@@ -887,7 +887,7 @@ AEBoltFactory::~AEBoltFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -896,7 +896,7 @@ void AEBoltFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -921,7 +921,7 @@ HANDLE AEBoltFactory::CreateArchetype (const char *szArchname, OBJCLASS objClass
 			DAFILEDESC fdesc = data->fileName;
 			COMPTR<IFileSystem> objFile;
 
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				TEXLIB->load_library(objFile, 0);
 			else
 				goto Error;

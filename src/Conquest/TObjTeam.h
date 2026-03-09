@@ -1,5 +1,6 @@
 #ifndef TOBJTEAM_H
 #define TOBJTEAM_H
+#include "DEffectOpts.h"
 //--------------------------------------------------------------------------//
 //                                                                          //
 //                              TObjTeam.h                                 //
@@ -52,12 +53,12 @@
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectTeam : public Base
 {
-	struct PreRenderNode preRenderNode;
-	struct PostRenderNode postRenderNode;
-	struct PhysUpdateNode physUpdateNode;
-	struct InitNode      initNode;
+	struct Base::PreRenderNode preRenderNode;
+	struct Base::PostRenderNode postRenderNode;
+	struct Base::PhysUpdateNode physUpdateNode;
+	struct Base::InitNode      initNode;
 
-	typename typedef Base::INITINFO TEAMINITINFO;
+	typedef Base::INITINFO TEAMINITINFO;
 
 	COLORREF currentColor;
 
@@ -88,10 +89,10 @@ struct _NO_VTABLE ObjectTeam : public Base
 //
 template <class Base> 
 ObjectTeam< Base >::ObjectTeam (void) :
-					preRenderNode(this, RenderProc(&ObjectTeam::preRenderTeam)),
-					postRenderNode(this, RenderProc(&ObjectTeam::postRenderTeam)),
-					physUpdateNode(this, PhysUpdateProc(&ObjectTeam::physUpdateTeam)),
-					initNode(this, InitProc(&ObjectTeam::initTeam))
+					preRenderNode(this, Base::RenderProc(&ObjectTeam::preRenderTeam)),
+					postRenderNode(this, Base::RenderProc(&ObjectTeam::postRenderTeam)),
+					physUpdateNode(this, Base::PhysUpdateProc(&ObjectTeam::physUpdateTeam)),
+					initNode(this, Base::InitProc(&ObjectTeam::initTeam))
 {
 	blinkerTexID = 0;
 	colorMod = 0;
@@ -116,7 +117,7 @@ void ObjectTeam< Base >::initTeam (const TEAMINITINFO & data)
 
 	//blinkers
 	if (data.blink_arch)
-		CreateBlinkers(blinkers,data.blink_arch,instanceIndex);
+		CreateBlinkers(blinkers,data.blink_arch,this->instanceIndex);
 
 	blinkerTexID = data.blinkTex;
 }
@@ -126,7 +127,7 @@ template <class Base>
 void ObjectTeam< Base >::preRenderTeam (void)
 {
 	
-	COLORREF color = COLORTABLE[MGlobals::GetColorID(playerID)];
+	COLORREF color = COLORTABLE[MGlobals::GetColorID(this->playerID)];
 
 	if (color != currentColor)
 	{
@@ -140,7 +141,7 @@ void ObjectTeam< Base >::preRenderTeam (void)
 template <class Base> 
 void ObjectTeam< Base >::postRenderTeam (void)
 {
-	if (blinkers != 0 && bReady && bSpecialRender == 0 && ( (!billboardThreshhold) || 
+	if (blinkers != 0 && this->bReady && this->bSpecialRender == 0 && ( (!billboardThreshhold) ||
 		((OBJLIST->GetShipsToRender() <= billboardThreshhold * CQEFFECTS.nFlatShipScale)|| CQEFFECTS.nFlatShipScale == 4) 	))
 	{
 		renderBlinkers();
@@ -204,16 +205,16 @@ void ObjectTeam< Base >::SetColors (void)
 template <class Base> 
 void ObjectTeam< Base >::SetColors (void)
 {	
-	if (bExploding)
+	if (this->bExploding)
 		return;
 	
-	if(instanceMesh)
+	if(this->instanceMesh)
 	{
-		COLORREF color = COLORTABLE[MGlobals::GetColorID(playerID)];
-		U32 maxFG = instanceMesh->GetArchtype()->GetNumFaceGroups();
+		COLORREF color = COLORTABLE[MGlobals::GetColorID(this->playerID)];
+		U32 maxFG = this->instanceMesh->GetArchtype()->GetNumFaceGroups();
 		for(U32 fg = 0; fg < maxFG; ++fg)
 		{
-			IMaterial * mat = instanceMesh->GetArchtype()->GetFaceGroupMaterial(fg);
+			IMaterial * mat = this->instanceMesh->GetArchtype()->GetFaceGroupMaterial(fg);
 			if(mat)
 			{
 				IModifier * modSearch = colorMod;
@@ -234,7 +235,7 @@ void ObjectTeam< Base >::SetColors (void)
 
 			}
 		}
-		instanceMesh->SetModifierList(colorMod);
+		this->instanceMesh->SetModifierList(colorMod);
 	}
 
 //	S32 children[30];

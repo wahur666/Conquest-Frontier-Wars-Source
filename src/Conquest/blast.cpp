@@ -335,7 +335,7 @@ BOOL32 Blast::Update (void)
 				fxpos->obj->QueryInterface(IEffectID,effect);
 				CQASSERT(effect);
 				effect->InitEffect(this,trans,animScale,totalTime);
-				blastRadius = max(blastRadius,effect->GetRadius());
+				blastRadius = std::max(blastRadius,effect->GetRadius());
 				fxpos = fxpos->next;
 			}
 		}
@@ -465,7 +465,7 @@ BOOL32 Blast::InitBlast (const class TRANSFORM & orientation, U32 _systemID, IBa
 				fxpos->obj->QueryInterface(IEffectID,effect);
 				CQASSERT(effect);
 				effect->InitEffect(this,orientation,_animScale,totalTime);
-				blastRadius = max(blastRadius,effect->GetRadius());
+				blastRadius = std::max(blastRadius,effect->GetRadius());
 				fxpos = fxpos->next;
 			}
 		}
@@ -526,7 +526,7 @@ BOOL32 Blast::EditorInitBlast ()
 			VOLPTR(IEffect) effect=fxpos->obj;
 			CQASSERT(effect);
 			effect->EditorInitEffect(this,totalTime);
-			blastRadius = max(blastRadius,effect->GetRadius());
+			blastRadius = std::max(blastRadius,effect->GetRadius());
 			fxpos = fxpos->next;
 		}
 		result = 1;
@@ -738,7 +738,7 @@ BlastManager::~BlastManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 
@@ -750,7 +750,7 @@ void BlastManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}

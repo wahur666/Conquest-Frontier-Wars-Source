@@ -110,4 +110,4 @@ add_subdirectory(Src/Conquest/ZBatcher)
 # ============================================================================
 # GAME EXECUTABLE (Main Project)
 # ============================================================================
-#add_subdirectory(src/Conquest)
+add_subdirectory(src/Conquest)

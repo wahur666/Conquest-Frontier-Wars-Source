@@ -235,16 +235,16 @@ void GetAllChildren (INSTANCE_INDEX instanceIndex,INSTANCE_INDEX *array,S32 &las
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectDamage : public Base, IShipDamage, DAMAGE_SAVELOAD
 {
-	struct PostRenderNode	postRenderNode;
-	struct UpdateNode		updateNode;
-	struct PhysUpdateNode	physUpdateNode;
-	struct InitNode			initNode;
-	struct SaveNode			saveNode;
-	struct LoadNode         loadNode;
-	struct ResolveNode		resolveNode;
+	struct Base::PostRenderNode	postRenderNode;
+	struct Base::UpdateNode		updateNode;
+	struct Base::PhysUpdateNode	physUpdateNode;
+	struct Base::InitNode			initNode;
+	struct Base::SaveNode			saveNode;
+	struct Base::LoadNode         loadNode;
+	struct Base::ResolveNode		resolveNode;
 
-	typename typedef Base::INITINFO DAMAGEINITINFO;
-	typename typedef Base::SAVEINFO DMGSAVEINFO;
+	typedef Base::INITINFO DAMAGEINITINFO;
+	typedef Base::SAVEINFO DMGSAVEINFO;
 	
 	Fire fire[NUM_FIRES];
 	int numFires;

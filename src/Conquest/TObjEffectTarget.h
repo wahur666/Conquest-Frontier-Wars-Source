@@ -29,9 +29,9 @@ struct EffectListenerNode
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectEffectTarget : public Base, IEffectTarget
 {
-	typename typedef Base::INITINFO EFFTARGINITINFO;
+	typedef Base::INITINFO EFFTARGINITINFO;
 
-	struct InitNode       initNode;
+	struct Base::InitNode       initNode;
 //	struct PhysUpdateNode	physUpdateNode;
 
 	EffectListenerNode * listenerList;
@@ -80,7 +80,7 @@ struct _NO_VTABLE ObjectEffectTarget : public Base, IEffectTarget
 //
 template <class Base> 
 ObjectEffectTarget< Base >::ObjectEffectTarget (void) :
-					initNode(this, InitProc(&ObjectEffectTarget::initEffectTarg))
+					initNode(this, Base::InitProc(&ObjectEffectTarget::initEffectTarg))
 //					physUpdateNode(this, PhysUpdateProc(physUpdateEffectTarg))
 {
 	listenerList = NULL;
@@ -103,8 +103,8 @@ ObjectEffectTarget< Base >::~ObjectEffectTarget (void)
 template <class Base>
 void ObjectEffectTarget< Base >::PlayAnimation(const char * animName, bool bLooping)
 {
-	if(instanceMesh)
-		instanceMesh->PlayAnimation(animName,bLooping);
+	if(this->instanceMesh)
+		this->instanceMesh->PlayAnimation(animName,bLooping);
 }
 
 //---------------------------------------------------------------------------
@@ -122,27 +122,27 @@ SINGLE ObjectEffectTarget< Base >::QueryEffectParam(const char* targetEffectPara
 {
 	if(strcmp(targetEffectParam,EP_HULL) == 0)
 	{
-		return hullPoints/hullPointsMax;
+		return this->hullPoints/this->hullPointsMax;
 	}
 	else if(strcmp(targetEffectParam,EP_SUPPLIES) == 0)
 	{
-		return supplies/supplyPointsMax;
+		return this->supplies/this->supplyPointsMax;
 	}
 	else if(strcmp(targetEffectParam,EP_INSUPPLY) == 0)
 	{
-		if(SECTOR->SystemInSupply(systemID,playerID))
+		if(SECTOR->SystemInSupply(this->systemID,this->playerID))
 			return 1.0f;
 		return 0.0f;
 	}
 	else if(strcmp(targetEffectParam,EP_SELECTED) == 0)
 	{
-		if(bSelected)
+		if(this->bSelected)
 			return 1.0f;
 		return 0.0f;
 	}
 	else if(strcmp(targetEffectParam,EP_HIGHLIGHT) == 0)
 	{
-		if(bHighlight)
+		if(this->bHighlight)
 			return 1.0f;
 		return 0.0f;
 	}
@@ -152,7 +152,7 @@ SINGLE ObjectEffectTarget< Base >::QueryEffectParam(const char* targetEffectPara
 	}
 	else if(strcmp(targetEffectParam,EP_ENGINE_POWER) == 0)
 	{
-		return techLevel.engine;
+		return this->techLevel.engine;
 	}
 	return 0.0f;
 }
@@ -196,8 +196,8 @@ void ObjectEffectTarget< Base >::RemoveFromEffectListeners(struct IEffectInstanc
 template <class Base>
 U32 ObjectEffectTarget< Base >::GetHardPointIndex(const char * hpName)
 {
-	if(instanceMesh)
-		return instanceMesh->GetArchtype()->FindHardPointIndex(hpName);
+	if(this->instanceMesh)
+		return this->instanceMesh->GetArchtype()->FindHardPointIndex(hpName);
 	return INVALID_HARD_POINT;
 }
 
@@ -220,7 +220,7 @@ void ObjectEffectTarget< Base >::PositionCallback(const char * string, Transform
 template <class Base>
 void ObjectEffectTarget< Base >::EffectSystemHide(U32 context, bool bSetting)
 {
-	bSpecialRender = bSetting;
+	this->bSpecialRender = bSetting;
 }
 
 //---------------------------------------------------------------------------
@@ -244,7 +244,7 @@ SINGLE ObjectEffectTarget< Base >::GetAnmationCueTime(const char * animName, con
 template <class Base>
 IMeshInstance * ObjectEffectTarget< Base >::GetMesh()
 {
-	return instanceMesh;
+	return this->instanceMesh;
 }
 
 //---------------------------------------------------------------------------

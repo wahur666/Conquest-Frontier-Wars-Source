@@ -1,5 +1,6 @@
 #ifndef TOBJSELECT
 #define TOBJSELECT
+#include "Objlist.h"
 //--------------------------------------------------------------------------//
 //                                                                          //
 //                               TObjSelect.h                               //
@@ -105,9 +106,9 @@
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectSelection : public Base
 {
-	typename typedef Base::INITINFO SELECTINITINFO;
+	typedef Base::INITINFO SELECTINITINFO;
 
-	struct InitNode initNode;
+	struct Base::InitNode initNode;
 	//
 	// corner data
 	//
@@ -138,8 +139,8 @@ struct _NO_VTABLE ObjectSelection : public Base
 
 	void initSelection (const SELECTINITINFO & data)
 	{
-		ENGINE->update_instance(instanceIndex,0,0);
-		ComputeCorners(box, instanceIndex);
+		ENGINE->update_instance(this->instanceIndex,0,0);
+		ComputeCorners(box, this->instanceIndex);
 		boxRadius = __max(box[0], -box[1]);
 		boxRadius = __max(boxRadius, box[2]);
 		boxRadius = __max(boxRadius, -box[3]);
@@ -162,7 +163,7 @@ private:
 //-------------------------------------------------------------------
 //
 template <class Base> 
-ObjectSelection< Base >::ObjectSelection (void) : initNode(this, InitProc(&ObjectSelection::initSelection))
+ObjectSelection< Base >::ObjectSelection (void) : initNode(this, Base::InitProc(&ObjectSelection::initSelection))
 {
 	aliasArchetypeID = -1;
 }
@@ -180,14 +181,14 @@ SINGLE ObjectSelection< Base >::TestHighlight (const RECT & rect)
 {
 	SINGLE closeness = 999999.0f;
 
-	bHighlight = 0;
-	if (bVisible)
+	this->bHighlight = 0;
+	if (this->bVisible)
 	{
-		if ((instanceIndex != INVALID_INSTANCE_INDEX) != 0)
+		if ((this->instanceIndex != INVALID_INSTANCE_INDEX) != 0)
 		{
 			float depth=0, center_x=0, center_y=0, radius=0;
 
-			if ((bVisible = get_pbs(center_x, center_y, radius, depth)) != 0)
+			if ((this->bVisible = get_pbs(center_x, center_y, radius, depth)) != 0)
 			{
 				RECT _rect;
 
@@ -196,9 +197,9 @@ SINGLE ObjectSelection< Base >::TestHighlight (const RECT & rect)
 				_rect.top = center_y - radius;
 				_rect.bottom = center_y + radius;
 
-				RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+				RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 
-				if ((bVisible = RectIntersects(_rect, screenRect)) != 0)
+				if ((this->bVisible = RectIntersects(_rect, screenRect)) != 0)
 				{
 					if(BUILDARCHEID == 0)		// no highlighting in buildmode
 					{
@@ -206,16 +207,16 @@ SINGLE ObjectSelection< Base >::TestHighlight (const RECT & rect)
 						{
 							ViewPoint points[64];
 							int numVerts = sizeof(points) / sizeof(ViewPoint);
-							INSTANCE_INDEX id = instanceIndex;
-							if (aliasArchetypeID != INVALID_INSTANCE_INDEX && bSpecialRender)
+							INSTANCE_INDEX id = this->instanceIndex;
+							if (aliasArchetypeID != INVALID_INSTANCE_INDEX && this->bSpecialRender)
 							{
 								MeshChain *mc;
-								mc = UNBORNMANAGER->GetMeshChain(transform,aliasArchetypeID);
+								mc = UNBORNMANAGER->GetMeshChain(this->transform,aliasArchetypeID);
 								id = mc->mi[0]->instanceIndex;
 							}
 							if (REND->get_instance_projected_bounding_polygon(id, MAINCAM, LODPERCENT, numVerts, points, numVerts, depth))
 							{
-								bHighlight = RectIntersects(rect, points, numVerts);
+								this->bHighlight = RectIntersects(rect, points, numVerts);
 
 								if (rect.left == rect.right && rect.top == rect.bottom)
 									closeness = fabs(rect.left - center_x) * fabs(rect.top - center_y);
@@ -229,9 +230,9 @@ SINGLE ObjectSelection< Base >::TestHighlight (const RECT & rect)
 		}
 	}
 	
-	if(bVisible)
+	if(this->bVisible)
 	{
-		if(objClass == OC_SPACESHIP || objClass == OC_PLATFORM)//right now I only want ships and platforms to count toward the metric
+		if(this->objClass == OC_SPACESHIP || this->objClass == OC_PLATFORM)//right now I only want ships and platforms to count toward the metric
 			OBJLIST->IncrementShipsToRender();
 	}
 	return closeness;
@@ -247,11 +248,11 @@ SINGLE ObjectSelection< Base >::TestHighlight (const RECT & rect)
 template <class Base> 
 void ObjectSelection< Base >::DrawSelected (void)
 {
-	if (bVisible==0 || instanceIndex == INVALID_INSTANCE_INDEX)
+	if (this->bVisible==0 || this->instanceIndex == INVALID_INSTANCE_INDEX)
 		return;
 
 	BATCH->set_state(RPR_BATCH, TRUE);
-	CAMERA->SetModelView(&transform);
+	CAMERA->SetModelView(&this->transform);
 
 	BATCH->set_render_state(D3DRS_CULLMODE,D3DCULL_NONE);
 	DisableTextures();		
@@ -260,7 +261,7 @@ void ObjectSelection< Base >::DrawSelected (void)
 	BATCH->set_render_state(D3DRS_ALPHABLENDENABLE,TRUE);
 	BATCH->set_render_state(D3DRS_SRCBLEND,D3DBLEND_ONE);
 	BATCH->set_render_state(D3DRS_DESTBLEND,D3DBLEND_ONE);
-	const COLORREF color = COLORTABLE[MGlobals::GetColorID(playerID)];
+	const COLORREF color = COLORTABLE[MGlobals::GetColorID(this->playerID)];
 	PB.Color4ub(GetRValue(color)/2,GetGValue(color)/2,GetBValue(color)/2, 180);		// player color
 	
 	const SINGLE TWIDTH  = __min((0.1*(L2-L1)) , 200.0);
@@ -335,7 +336,7 @@ void ObjectSelection< Base >::DrawSelected (void)
 template <class Base> 
 void ObjectSelection< Base >::DrawHighlighted (void)
 {
-	if (bVisible==0)
+	if (this->bVisible==0)
 		return;
 	const USER_DEFAULTS * const pDefaults = DEFAULTS->GetDefaults();
 
@@ -378,7 +379,7 @@ void ObjectSelection< Base >::DrawHighlighted (void)
 		point.y = H2+250.0;
 		point.z = 0;
 
-		CAMERA->PointToScreen(point, &x, &y, &transform);
+		CAMERA->PointToScreen(point, &x, &y, &this->transform);
 		PANE * pane = CAMERA->GetPane();
 
 		if (hull >= 0.0f)
@@ -443,14 +444,14 @@ void ObjectSelection< Base >::DrawHighlighted (void)
 			//
 			// draw the blue (supplies) bar RGB(0,128,225) or blue grey if locked
 			//
-			if ((pDefaults->bCheatsEnabled && DBHOTKEY->GetHotkeyState(IDH_HIGHLIGHT_ALL)) || pDefaults->bEditorMode || playerID == 0 || MGlobals::AreAllies(playerID, MGlobals::GetThisPlayer()))
+			if ((pDefaults->bCheatsEnabled && DBHOTKEY->GetHotkeyState(IDH_HIGHLIGHT_ALL)) || pDefaults->bEditorMode || this->playerID == 0 || MGlobals::AreAllies(this->playerID, MGlobals::GetThisPlayer()))
 			{
 				DA::RectangleHash(pane, x-(TBARLENGTH/2), y+5, x+(TBARLENGTH/2), y+5+2, RGB(128,128,128));
 				if (supplies > 0.0f)
 				{
 //					DA::RectangleFill(pane, x-(TBARLENGTH/2), y+5, x-(TBARLENGTH/2)+S32(TBARLENGTH*supplies), y+5+2, RGB(0,128,255));
 					COLORREF color;
-					if(fieldFlags.suppliesLocked())
+					if(this->fieldFlags.suppliesLocked())
 						color = RGB(180,180,240);
 					else
 						color = RGB(0,128,240);
@@ -477,12 +478,12 @@ void ObjectSelection< Base >::DrawHighlighted (void)
 			}
 		}
 
-		if (nextHighlighted==0 && OBJLIST->GetHighlightedList()==this)
+		if (this->nextHighlighted==0 && OBJLIST->GetHighlightedList()==this)
 		{
 			COMPTR<IFontDrawAgent> pFont;
-			if (OBJLIST->GetUnitFont(pFont) == GR_OK)
+			if (OBJLIST->GetUnitFont(pFont.addr()) == GR_OK)
 			{
-				if (bShowPartName)
+				if (this->bShowPartName)
 					pFont->SetFontColor(RGB(140,140,180) | 0xFF000000, 0);
 				else
 					pFont->SetFontColor(RGB(180,180,180) | 0xFF000000, 0);
@@ -490,7 +491,7 @@ void ObjectSelection< Base >::DrawHighlighted (void)
 				WM->GetCursorPos(x, y);
 				y += IDEAL2REALY(24);
 #ifdef _DEBUG
-				_localAnsiToWide(partName, temp, sizeof(temp));
+				_localAnsiToWide(this->partName, temp, sizeof(temp));
 				pFont->StringDraw(pane, x, y, temp);
 #else
 				if (bShowPartName)
@@ -545,11 +546,11 @@ bool ObjectSelection< Base >::getStats (SINGLE & hull, SINGLE & supplies, U32 & 
 	hull = -1.0f;
 	supplies = -1.0F;
 
-	if ((hullMax = hullPointsMax) != 0)
-		hull = SINGLE(GetDisplayHullPoints()) / SINGLE(hullPointsMax);
+	if ((hullMax = this->hullPointsMax) != 0)
+		hull = SINGLE(this->GetDisplayHullPoints()) / SINGLE(this->hullPointsMax);
 
-	if ((suppliesMax = supplyPointsMax) != 0)
-		supplies = SINGLE(GetDisplaySupplies()) / SINGLE(supplyPointsMax);
+	if ((suppliesMax = this->supplyPointsMax) != 0)
+		supplies = SINGLE(this->GetDisplaySupplies()) / SINGLE(this->supplyPointsMax);
 
 	return (hull >= 0 || supplies >= 0);
 }
@@ -598,22 +599,22 @@ bool ObjectSelection< Base >::get_pbs(float & cx,
 														float & depth)
 {
 	bool result = false;
-	CQASSERT(instanceIndex != INVALID_INSTANCE_INDEX);
+	CQASSERT(this->instanceIndex != INVALID_INSTANCE_INDEX);
 	float obj_rad;
 	Vector wcenter(0,0,0);
 	const Transform *cam2world = CAMERA->GetTransform();
 	if (aliasArchetypeID != INVALID_INSTANCE_INDEX)
-		UNBORNMANAGER->GetBoundingSphere(transform,aliasArchetypeID,obj_rad,wcenter);
+		UNBORNMANAGER->GetBoundingSphere(this->transform,aliasArchetypeID,obj_rad,wcenter);
 	else
-		ENGINE->get_instance_bounding_sphere(instanceIndex,0,&obj_rad,&wcenter);
+		ENGINE->get_instance_bounding_sphere(this->instanceIndex,0,&obj_rad,&wcenter);
 
 	if (obj_rad > 20000)
 	{
-		CQTRACE11("%s moved without update",(char *)partName);
+		CQTRACE11("%s moved without update",(char *)this->partName);
 		obj_rad = 3000;
 	}
 
-	Vector vcenter = cam2world->inverse_rotate_translate(transform*wcenter);
+	Vector vcenter = cam2world->inverse_rotate_translate(this->transform*wcenter);
 				
 	// Make sure object is in front of near plane.
 	if (vcenter.z < -MAINCAM->get_znear())

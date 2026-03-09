@@ -240,7 +240,7 @@ void BlinkersArchetype::ReadINI(const char *filename)
 	COMPTR<IFileSystem> file;
 	DAFILEDESC fdesc;
 	
-	if (CreateProfileParser(filename, parser) == GR_OK)
+	if (CreateProfileParser(filename, parser.addr()) == GR_OK)
 	{
 		if (parser->EnumerateSections (this) == 0)
 		{
@@ -295,7 +295,7 @@ struct Blinkers : IBlinkers
 		::free(ptr);
 	}
 
-	Blinkers::Blinkers();
+	Blinkers();
 	~Blinkers();
 
 	//returns number of points
@@ -363,7 +363,7 @@ GENRESULT CreateBlinkers(COMPTR<IBlinkers> &ibs,struct BlinkersArchetype * arch,
 
 	Blinkers *bs = new DAComponent<Blinkers>;
 
-	GENRESULT result = bs->QueryInterface("IBlinkers",ibs);
+	GENRESULT result = bs->QueryInterface("IBlinkers",ibs.void_addr());
 	bs->blinker = arch->blinker;
 	bs->numBlinkers = arch->numHardpoints;
 	bs->totalTime = arch->totalTime;

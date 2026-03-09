@@ -488,7 +488,7 @@ void BlackHole::warpShip(U32 objMissionID,NETGRIDVECTOR &jumpPos,bool bGenerateP
 			sys = currentTarget;//targetSys[rand()%numTargetSys];
 
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(sys,map);
+			SECTOR->GetTerrainMap(sys,map.addr());
 			RECT rect;
 			SECTOR->GetSystemRect(sys,&rect);
 			U32 width = rect.right-rect.left;
@@ -659,7 +659,7 @@ BOOL32 BlackHole::Update (void)
 						THEMATRIX->SetLongTermState(workingID, true);
 					}
 
-					VOLPTR(IShipMove) ship=actor;
+					VOLPTR(IShipMove) ship=actor.Ptr();
 					ship->PushShipTo(dwMissionID,transform.translation,ship->GetCurrentCruiseVelocity());
 				}
 			}
@@ -924,7 +924,7 @@ void BlackHole::Render()
 			transform = transform *scaleTrans;
 			//ENGINE->render_instance(MAINCAM, instanceIndex, RF_TRANSFORM_LOCAL, &scaleTrans);
 			CAMERA->SetModelView(&transform);
-			RenderPlane(transform,255*(min(1.0,(1.0-ringTimer[c])*3)));
+			RenderPlane(transform,255*(std::min(1.0,(1.0-ringTimer[c])*3)));
 		}
 		
 		transform = trans;
@@ -1045,7 +1045,7 @@ BOOL32 BlackHole::Save (struct IFileSystem * outFile)
 	fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
-	if (outFile->CreateInstance(&fdesc,file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc,file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&d, 0, sizeof(d));
@@ -1072,7 +1072,7 @@ BOOL32 BlackHole::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 	BLACKHOLE_SAVELOAD d;
 
-	if (inFile->CreateInstance(&fdesc,file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc,file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -1101,7 +1101,7 @@ void BlackHole::ResolveAssociations()
 //
 void BlackHole::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc { partName };
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_BLACKHOLE_QLOAD");
@@ -1174,7 +1174,7 @@ void BlackHole::OnOperationCreation (U32 agentID, void *buffer, U32 bufferSize)
 	
 	VOLPTR(IMissionActor) actor=OBJLIST->FindObject(buf->dwMissionID);
 //	actor->PrepareTakeover(buf->dwMissionID,0);
-	VOLPTR(IShipMove) ship=actor;
+	VOLPTR(IShipMove) ship=actor.Ptr();
 	ship->PushShipTo(dwMissionID,transform.translation,ship->GetCurrentCruiseVelocity());
 
 	//you're doomed
@@ -1213,7 +1213,7 @@ void BlackHole::receiveOpData (U32 agentID, void *buffer, U32 bufferSize)
 		{						
 			VOLPTR(IMissionActor) actor=OBJLIST->FindObject(buf->dwMissionID);
 //			actor->PrepareTakeover(buf->dwMissionID,0);
-			VOLPTR(IShipMove) ship=actor;
+			VOLPTR(IShipMove) ship=actor.Ptr();
 			ship->PushShipTo(dwMissionID,transform.translation,ship->GetCurrentCruiseVelocity());
 
 			//you're doomed
@@ -1301,7 +1301,7 @@ BlackHoleManager::~BlackHoleManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 
@@ -1316,7 +1316,7 @@ void BlackHoleManager::Init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -1344,7 +1344,7 @@ HANDLE BlackHoleManager::CreateArchetype(const char *szArchname, OBJCLASS objCla
 				if (strstr(newguy->pData->billboardMesh[i].mesh_name,".3db"))
 				{
 					fdesc = newguy->pData->billboardMesh[i].mesh_name;
-					if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+					if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 						newguy->bb_mesh_archID[i] = ENGINE->create_archetype(fdesc.lpFileName, file);
 					else
 						CQFILENOTFOUND(fdesc.lpFileName);
@@ -1360,7 +1360,7 @@ HANDLE BlackHoleManager::CreateArchetype(const char *szArchname, OBJCLASS objCla
 				else if (strstr(newguy->pData->billboardMesh[i].tex_name,".anm"))
 				{
 					fdesc = newguy->pData->billboardMesh[i].tex_name;
-					if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+					if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 						newguy->bb_anim_arch[i] = ANIM2D->create_archetype(file);
 					else
 						CQFILENOTFOUND(fdesc.lpFileName);
@@ -1373,7 +1373,7 @@ HANDLE BlackHoleManager::CreateArchetype(const char *szArchname, OBJCLASS objCla
 		if (newguy->pData->ringObjectName[0])
 		{
 			fdesc.lpFileName = newguy->pData->ringObjectName;
-			if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 			{
 				newguy->archIndex = ENGINE->create_archetype(fdesc.lpFileName, file);
 			}

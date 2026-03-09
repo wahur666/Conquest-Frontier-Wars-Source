@@ -31,9 +31,9 @@
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectPhysics : public Base
 {
-	struct InitNode			initNode;
-	struct PhysUpdateNode physUpdateNode;
-	typename typedef Base::INITINFO PHYSICSINITINFO;
+	struct Base::InitNode			initNode;
+	struct Base::PhysUpdateNode physUpdateNode;
+	typedef Base::INITINFO PHYSICSINITINFO;
 
 	bool bEnablePhysics;
 
@@ -54,8 +54,8 @@ private:
 //
 template <class Base> 
 ObjectPhysics< Base >::ObjectPhysics (void) :
-					initNode(this, InitProc(&ObjectPhysics::initPhysics)),
-					physUpdateNode(this, PhysUpdateProc(&ObjectPhysics::physUpdatePhysics))
+					initNode(this, Base::InitProc(&ObjectPhysics::initPhysics)),
+					physUpdateNode(this, Base::PhysUpdateProc(&ObjectPhysics::physUpdatePhysics))
 {
 	bEnablePhysics = true;
 }
@@ -76,20 +76,20 @@ void ObjectPhysics< Base >::physUpdatePhysics (SINGLE dt)
 	{
 		Quaternion q;
 		Vector x;
-		Matrix & R = transform;
+		Matrix & R = this->transform;
 
 		q.set(R);
-		x = transform.translation;
+		x = this->transform.translation;
 
 		// recalc center_of_mass
 		if (pArm)
 			x -= R * *pArm;
 		
 		// update position.
-		x += velocity * dt;
+		x += this->velocity * dt;
 
 		// update ang position
-		Quaternion qw(ang_velocity);
+		Quaternion qw(this->ang_velocity);
 		Quaternion qdot = qw * q * 0.5;
 		q.w += qdot.w * dt;
 		q.x += qdot.x * dt;
@@ -101,9 +101,9 @@ void ObjectPhysics< Base >::physUpdatePhysics (SINGLE dt)
 		R = q;
 
 		// now resync position
-		transform.translation = x;
+		this->transform.translation = x;
 		if (pArm)
-			transform.translation += R * *pArm;
+			this->transform.translation += R * *pArm;
 	}
 }
 

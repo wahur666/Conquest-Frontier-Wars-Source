@@ -16,6 +16,8 @@
 #ifndef IOBJECT_H
 #include "IObject.h"
 #endif
+#include "DPlatform.h"
+#include "Sector.h"
 
 #ifndef SUPERTRANS_H
 #include "SuperTrans.h"
@@ -89,14 +91,14 @@ struct _NO_VTABLE ObjectExtension : public Base, IUpgrade, EXTENSION_SAVELOAD
 {
 	ExtensionInfo extension[MAX_EXTENSIONS];
 
-	typename typedef Base::SAVEINFO EXTENDSAVEINFO;
-	typename typedef Base::INITINFO EXTENDINITINFO;
+	typedef Base::SAVEINFO EXTENDSAVEINFO;
+	typedef Base::INITINFO EXTENDINITINFO;
 
 //	struct InitNode			initNode;
-	struct SaveNode			saveNode;
-	struct LoadNode         loadNode;
-	struct PostRenderNode   postRenderNode;
-	struct PhysUpdateNode   physUpdateNode;
+	struct Base::SaveNode			saveNode;
+	struct Base::LoadNode         loadNode;
+	struct Base::PostRenderNode   postRenderNode;
+	struct Base::PhysUpdateNode   physUpdateNode;
 
 	PARCHETYPE buildEffectArch;
 
@@ -140,10 +142,10 @@ struct _NO_VTABLE ObjectExtension : public Base, IUpgrade, EXTENSION_SAVELOAD
 template <class Base> 
 ObjectExtension< Base >::ObjectExtension (void) :
 				//	initNode(this, InitProc(initExtension)),
-					saveNode(this, SaveLoadProc(&ObjectExtension::saveTransform)),
-					loadNode(this, SaveLoadProc(&ObjectExtension::loadTransform)),
-					physUpdateNode(this, PhysUpdateProc(&ObjectExtension::extendPhysUpdate)),
-					postRenderNode(this, RenderProc(&ObjectExtension::extendPostRender))
+					saveNode(this, Base::SaveLoadProc(&ObjectExtension::saveTransform)),
+					loadNode(this, Base::SaveLoadProc(&ObjectExtension::loadTransform)),
+					physUpdateNode(this, Base::PhysUpdateProc(&ObjectExtension::extendPhysUpdate)),
+					postRenderNode(this, Base::RenderProc(&ObjectExtension::extendPostRender))
 {
 }
 //---------------------------------------------------------------------------
@@ -236,7 +238,7 @@ ObjectExtension< Base >::~ObjectExtension (void)
 template <class Base> 
 void ObjectExtension< Base >::initExtension (const EXTENDINITINFO & data)
 {
-	CQASSERT(instanceIndex != -1);
+	CQASSERT(this->instanceIndex != -1);
 
 	buildEffectArch = data.pExtBuildEffect;
 
@@ -279,11 +281,11 @@ void ObjectExtension< Base >::initExtension (const EXTENDINITINFO & data)
 				}
 				if(!found)
 				{
-					if((extension[exCount].addIndex = ENGINE->get_instance_child_next(instanceIndex,0,INVALID_INSTANCE_INDEX)) != INVALID_ARCHETYPE_INDEX)
+					if((extension[exCount].addIndex = ENGINE->get_instance_child_next(this->instanceIndex,0,INVALID_INSTANCE_INDEX)) != INVALID_ARCHETYPE_INDEX)
 					{
 						while(strcmp(exData->addChildName,ENGINE->get_instance_part_name(extension[exCount].addIndex))!=0)
 						{
-							extension[exCount].addIndex = ENGINE->get_instance_child_next(instanceIndex,0,extension[exCount].addIndex);
+							extension[exCount].addIndex = ENGINE->get_instance_child_next(this->instanceIndex,0,extension[exCount].addIndex);
 							if(extension[exCount].addIndex == INVALID_ARCHETYPE_INDEX)
 								break;
 						}
@@ -293,7 +295,7 @@ void ObjectExtension< Base >::initExtension (const EXTENDINITINFO & data)
 						extension[exCount].bDuplicateAdd = false;
 						const JointInfo *temp = ENGINE->get_joint_info(extension[exCount].addIndex);
 						memcpy (&(extension[exCount].addJointInfo),temp,sizeof(JointInfo));
-						ENGINE->destroy_joint(instanceIndex,extension[exCount].addIndex);
+						ENGINE->destroy_joint(this->instanceIndex,extension[exCount].addIndex);
 //						mesh_info->DetachChild(extension[exCount].addIndex,&extension[exCount].add_mesh_info);
 					}
 				}
@@ -322,11 +324,11 @@ void ObjectExtension< Base >::initExtension (const EXTENDINITINFO & data)
 				}
 				if(!found)
 				{
-					if((extension[exCount].removeIndex = ENGINE->get_instance_child_next(instanceIndex,0,INVALID_INSTANCE_INDEX)) != INVALID_ARCHETYPE_INDEX)
+					if((extension[exCount].removeIndex = ENGINE->get_instance_child_next(this->instanceIndex,0,INVALID_INSTANCE_INDEX)) != INVALID_ARCHETYPE_INDEX)
 					{
 						while(strcmp(exData->removeChildName,ENGINE->get_instance_part_name(extension[exCount].removeIndex))!=0)
 						{
-							extension[exCount].removeIndex = ENGINE->get_instance_child_next(instanceIndex,0,extension[exCount].removeIndex);
+							extension[exCount].removeIndex = ENGINE->get_instance_child_next(this->instanceIndex,0,extension[exCount].removeIndex);
 							if(extension[exCount].removeIndex == INVALID_ARCHETYPE_INDEX)
 								break;
 						}
@@ -397,9 +399,9 @@ void ObjectExtension< Base >::loadTransform (EXTENDSAVEINFO & load)
 template <class Base> 
 void ObjectExtension< Base >::extendPhysUpdate (SINGLE dt)
 {
-	if(bVisible && workingExtLevel != -1)
+	if(this->bVisible && workingExtLevel != -1)
 	{
-		bool bPause = !SECTOR->SystemInSupply(systemID,playerID);
+		bool bPause = !SECTOR->SystemInSupply(this->systemID,this->playerID);
 		if (extension[workingExtLevel].addEffect)
 		{
 			extension[workingExtLevel].addEffect->PauseBuildEffect(bPause);
@@ -448,8 +450,8 @@ void ObjectExtension< Base >::SetUpgrade(U32 level)
 		{	
 			if(extension[extensionLevel].addEffect)
 				delete extension[extensionLevel].addEffect;
-			ENGINE->create_joint(instanceIndex,extension[extensionLevel].addIndex,&(extension[extensionLevel].addJointInfo));
-			ENGINE->update_instance(instanceIndex,0,0);
+			ENGINE->create_joint(this->instanceIndex,extension[extensionLevel].addIndex,&(extension[extensionLevel].addJointInfo));
+			ENGINE->update_instance(this->instanceIndex,0,0);
 //			mesh_info->AttachChild(instanceIndex,extension[extensionLevel].add_mesh_info);
 
 		}
@@ -459,7 +461,7 @@ void ObjectExtension< Base >::SetUpgrade(U32 level)
 				delete extension[extensionLevel].removeEffect;
 			else //must still be connected
 			{
-				ENGINE->destroy_joint(instanceIndex,extension[extensionLevel].removeIndex);
+				ENGINE->destroy_joint(this->instanceIndex,extension[extensionLevel].removeIndex);
 //				mesh_info->DetachChild(extension[extensionLevel].removeIndex,&extension[extensionLevel].remove_mesh_info);
 			}
 		}
@@ -468,27 +470,27 @@ void ObjectExtension< Base >::SetUpgrade(U32 level)
 //		mc.numChildren = mesh_info->ListChildren(mc.mi);
 		if(extension[extensionLevel].isArch)
 		{
-			if(pArchetype)
+			if(this->pArchetype)
 			{
 //				U32 oldHull = hullPointsMax;
 				BT_EXTENSION_INFO * exData = (BT_EXTENSION_INFO *) ARCHLIST->GetArchetypeData(
-					((BASE_PLATFORM_DATA *)ARCHLIST->GetArchetypeData(pArchetype))->extension[extensionLevel].extensionName);
-				ARCHLIST->Release(pArchetype, OBJREFNAME);
-				pArchetype = ARCHLIST->LoadArchetype(exData->archetypeName);
-				CQASSERT(pArchetype);
-				ARCHLIST->AddRef(pArchetype, OBJREFNAME);
-				pInitData = &(((BASE_PLATFORM_DATA *) ARCHLIST->GetArchetypeData(pArchetype))->missionData);
+					((BASE_PLATFORM_DATA *)ARCHLIST->GetArchetypeData(this->pArchetype))->extension[extensionLevel].extensionName);
+				ARCHLIST->Release(this->pArchetype, OBJREFNAME);
+				this->pArchetype = ARCHLIST->LoadArchetype(exData->archetypeName);
+				CQASSERT(this->pArchetype);
+				ARCHLIST->AddRef(this->pArchetype, OBJREFNAME);
+				this->pInitData = &(((BASE_PLATFORM_DATA *) ARCHLIST->GetArchetypeData(this->pArchetype))->missionData);
 				MGlobals::UpgradeMissionObj(this);
 //				hullPoints += hullPointsMax-oldHull;
-				if(supplies > supplyPointsMax)
-					supplies = supplyPointsMax;
-				mObjClass = pInitData->mObjClass;
+				if(this->supplies > this->supplyPointsMax)
+					this->supplies = this->supplyPointsMax;
+				this->mObjClass = this->pInitData->mObjClass;
 
-				EXTENDINITINFO * iInfo = static_cast<EXTENDINITINFO *>(ARCHLIST->GetArchetypeHandle(pArchetype));
-				FRAME_upgrade(*iInfo);
+				EXTENDINITINFO * iInfo = static_cast<EXTENDINITINFO *>(ARCHLIST->GetArchetypeHandle(this->pArchetype));
+				Base::FRAME_upgrade(*iInfo);
 			}
 		}
-		SetColors();
+		this->SetColors();
 	}
 }
 //---------------------------------------------------------------------------
@@ -525,7 +527,7 @@ template <class Base>
 void ObjectExtension< Base >::StartUpgrade(U32 level,U32 time)
 {
 #ifdef _DEBUG
-	BASE_PLATFORM_DATA * bdata = (BASE_PLATFORM_DATA *) ARCHLIST->GetArchetypeData(pArchetype);
+	BASE_PLATFORM_DATA * bdata = (BASE_PLATFORM_DATA *) ARCHLIST->GetArchetypeData(this->pArchetype);
 	CQASSERT(stricmp(bdata->fileName,extension[level].fileName) == 0);
 #endif
 
@@ -539,7 +541,7 @@ void ObjectExtension< Base >::StartUpgrade(U32 level,U32 time)
 			if (extension[workingExtLevel].addJointInfo.type == JT_FIXED)
 			{
 				TRANSFORM trans(extension[workingExtLevel].addJointInfo.rel_orientation,extension[workingExtLevel].addJointInfo.rel_position);
-				trans = transform*trans;
+				trans = this->transform*trans;
 				ENGINE->set_transform(extension[workingExtLevel].addIndex,trans);
 				ENGINE->update_instance(extension[workingExtLevel].addIndex,0,0);
 			}
@@ -550,8 +552,8 @@ void ObjectExtension< Base >::StartUpgrade(U32 level,U32 time)
 				
 				JointInfo *j = &extension[workingExtLevel].addJointInfo;
 
-				TRANSFORM trans = transform;
-				const Matrix & pR = transform;
+				TRANSFORM trans = this->transform;
+				const Matrix & pR = this->transform;
 
 				Matrix & cR = trans;
 				Vector & cT = trans.translation;
@@ -574,7 +576,7 @@ void ObjectExtension< Base >::StartUpgrade(U32 level,U32 time)
 		}
 		if(extension[workingExtLevel].removeIndex != INVALID_INSTANCE_INDEX)
 		{
-			ENGINE->destroy_joint(instanceIndex,extension[workingExtLevel].removeIndex);
+			ENGINE->destroy_joint(this->instanceIndex,extension[workingExtLevel].removeIndex);
 //			mesh_info->DetachChild(extension[workingExtLevel].removeIndex,&extension[workingExtLevel].remove_mesh_info);
 
 		//	mesh_info->GetChildInfo(extension[workingExtLevel].removeIndex,&extension[workingExtLevel].remove_mesh_info);
@@ -630,8 +632,8 @@ void ObjectExtension< Base >::CancelUpgrade()
 				extension[workingExtLevel].removeEffect->Done();
 				delete extension[workingExtLevel].removeEffect;
 			}
-			ENGINE->create_joint(instanceIndex,extension[workingExtLevel].removeIndex,&(extension[workingExtLevel].removeJointInfo));
-			ENGINE->update_instance(instanceIndex,0,0);
+			ENGINE->create_joint(this->instanceIndex,extension[workingExtLevel].removeIndex,&(extension[workingExtLevel].removeJointInfo));
+			ENGINE->update_instance(this->instanceIndex,0,0);
 //			mesh_info->AttachChild(instanceIndex,extension[workingExtLevel].remove_mesh_info);
 		}
 	}	
