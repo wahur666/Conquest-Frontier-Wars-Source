@@ -50,7 +50,7 @@
 #include <IParticleManager.h>
 #include <IMeshManager.h>
 
-#include <DPlay.h>
+#include <directx2007aug/DPlay.h>
 
 
 #include <stdlib.h>
@@ -107,7 +107,7 @@ static void clean_up (void)
 	{
 		COMPTR<IHeapBackdoor> door;
 
-		if (HEAP_Acquire()->QueryInterface("IHeapBackdoor", door) == GR_OK)
+		if (HEAP_Acquire()->QueryInterface("IHeapBackdoor", door.void_addr()) == GR_OK)
 		{
 			U32 flags = HEAP_Acquire()->GetHeapFlags();
 
@@ -139,7 +139,7 @@ static void clean_up (void)
 		hMainDC = 0;
 	}
 
-	PB.~PB();			// force early destruction of PB (JY)
+	PB.~PrimitiveBuilder2();			// force early destruction of PB (JY)
 	ENGINE = 0;
 	GS = 0;
 
@@ -209,7 +209,7 @@ static void forceDefaults()
 	U32 result = DEFAULTS->GetStringFromRegistry(NAME_REG_KEY, name, sizeof(name));
 	if(result == 0)
 	{
-		char * szNameAnsi = "Blackwell";
+		const char * szNameAnsi = "Blackwell";
 
 		DEFAULTS->SetStringInRegistry(NAME_REG_KEY, szNameAnsi);
 
@@ -234,7 +234,7 @@ static void forceDefaults()
 		if (DEFAULTS->GetStringFromRegistry(RENDERDEV_REG_KEY, regValue, sizeof(regValue)) == 0)
 			strcpy(regValue, "{00000000-0000-0000-0000-000000000000}");
 
-		DACOM->QueryInterface(IID_IProfileParser, parser);
+		DACOM->QueryInterface(IID_IProfileParser, parser.void_addr());
 
 		// find the first card with 3D capabilites
 		for (i = 0; i < 4; i++)
@@ -611,6 +611,7 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	cqExceptionHandler = ___UnhandledExceptionFilter;
 	setlocale( LC_ALL, "" ); 
 	WNDCLASSEX wc;
+	DWORD messages = DAHEAPFLAG_DEBUGFILL_SNAN|DAHEAPFLAG_GROWHEAP|DAHEAPFLAG_NOHEAPEXPANDMSG;
 
 	HWND hSplash = DoSplashScreen();
 
@@ -651,7 +652,6 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	InitRendSections(cmd_line_ini);
 
-	DWORD messages = DAHEAPFLAG_DEBUGFILL_SNAN|DAHEAPFLAG_GROWHEAP|DAHEAPFLAG_NOHEAPEXPANDMSG;
 #ifdef NDEBUG
 	messages |=	DAHEAPFLAG_NOMSGS;
 #endif
@@ -718,7 +718,7 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	appName[255] = 0;
 	wc.lpszClassName = appName; // "Conquest";
 
-	if (GAME.startup(_hInstance, wc.lpszClassName, exit, 0, &wc) == 0)
+	if (GAME.startup(_hInstance, wc.lpszClassName, WMEXITCB(exit), 0, &wc) == 0)
 		goto Done;
 
 	if (GAME.ENG->QueryInterface(IID_IEngine, (void **) &ENGINE) != GR_OK)

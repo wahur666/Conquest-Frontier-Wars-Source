@@ -11,6 +11,8 @@
 //------------------------------- #INCLUDES --------------------------------//
 //--------------------------------------------------------------------------//
 
+#include "ObjList.h"
+#include "Sector.h"
 #ifndef IOBJECT_H
 #include "IObject.h"
 #endif
@@ -89,20 +91,20 @@ extern TRUEANIMPOS g_trueAnimPos;
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectMove : public Base, private SPACESHIP_SAVELOAD::TOBJMOVE, private IFindPathCallback, public IShipMove
 {
-	struct SaveNode   saveNode;
-	struct LoadNode   loadNode;
-	struct InitNode   initNode;
-	struct UpdateNode updateNode;
-	struct OnOpCancelNode	onOpCancelNode;
-	struct PreTakeoverNode	preTakeoverNode;
-	struct GeneralSyncNode  genSyncNode;
-	struct GeneralSyncNode  genSyncNode2;
-	struct PhysUpdateNode   physUpdateNode;
-	struct ReceiveOpDataNode receiveOpDataNode;
-	struct ExplodeNode		 explodeNode;
+	struct Base::SaveNode   saveNode;
+	struct Base::LoadNode   loadNode;
+	struct Base::InitNode   initNode;
+	struct Base::UpdateNode updateNode;
+	struct Base::OnOpCancelNode	onOpCancelNode;
+	struct Base::PreTakeoverNode	preTakeoverNode;
+	struct Base::GeneralSyncNode  genSyncNode;
+	struct Base::GeneralSyncNode  genSyncNode2;
+	struct Base::PhysUpdateNode   physUpdateNode;
+	struct Base::ReceiveOpDataNode receiveOpDataNode;
+	struct Base::ExplodeNode		 explodeNode;
 
-	typename typedef Base::SAVEINFO MOVESAVEINFO;
-	typename typedef Base::INITINFO MOVEINITINFO;
+	typedef Base::SAVEINFO MOVESAVEINFO;
+	typedef Base::INITINFO MOVEINITINFO;
 
 private:
 	ROCKING_DATA rockingData;
@@ -199,13 +201,13 @@ public:
 	void resetMoveVars (void)
 	{
 		if (moveAgentID!=0)
-			CQBOMB1("Invalid call to resetMoveVars() for part=%s (Ignorable)", (char *)partName);	// should already be completed before this call
+			CQBOMB1("Invalid call to resetMoveVars() for part=%s (Ignorable)", (char *)this->partName);	// should already be completed before this call
 		if (bMoveActive)
 		{
-			currentPosition = transform.translation;
+			currentPosition = this->transform.translation;
 			bMoveActive=0;
 		}
-		velocity.z = 0;
+		this->velocity.z = 0;
 		setCruiseSpeed(0);		// set it back to default
 		setForwardAcceleration(0);	// set it back to default
 		bRotatingBeforeMove = false;
@@ -291,50 +293,50 @@ public:
 	SINGLE getCruiseSpeed (void)
 	{
 		SINGLE fleetMod = 1.0;
-		if(fleetID)
+		if(this->fleetID)
 		{
 			VOLPTR(IAdmiral) flagship;
-			OBJLIST->FindObject(fleetID,TOTALLYVOLATILEPTR,flagship,IAdmiralID);
+			OBJLIST->FindObject(this->fleetID,TOTALLYVOLATILEPTR,flagship,IAdmiralID);
 			if(flagship.Ptr())
 			{
 				MPart part(this);
-				fleetMod = 1 + flagship->GetSpeedBonus(mObjClass,part.pInit->armorData.myArmor);
+				fleetMod = 1 + flagship->GetSpeedBonus(this->mObjClass,part.pInit->armorData.myArmor);
 			}				
 		}
-		SINGLE sectorMod = 1.0 + SECTOR->GetSectorEffects(playerID,systemID)->getSpeedMod();
-		return (maxVelocity*fieldFlags.getSpeedModifier()*effectFlags.getSpeedModifier()*fleetMod*sectorMod);
+		SINGLE sectorMod = 1.0 + SECTOR->GetSectorEffects(this->playerID, this->systemID)->getSpeedMod();
+		return (this->maxVelocity* this->fieldFlags.getSpeedModifier()* this->effectFlags.getSpeedModifier()*fleetMod*sectorMod);
 	}
 
 	void setCruiseSpeed (SINGLE speed)
 	{
 		CQASSERT(speed >= 0);
-		DYNAMICS_DATA dyn = getDynamicsData();
+		DYNAMICS_DATA dyn = this->getDynamicsData();
 
 		if (speed)
 			dyn.maxLinearVelocity = cruiseSpeed = speed;
 		else
-			dyn.maxLinearVelocity = cruiseSpeed = maxVelocity;
+			dyn.maxLinearVelocity = cruiseSpeed = this->maxVelocity;
 
-		setDynamicsData(dyn);
+		this->setDynamicsData(dyn);
 	}
 
 	SINGLE getForwardAcceleration (void)
 	{
-		const DYNAMICS_DATA & dyn = getDynamicsData();
+		const DYNAMICS_DATA & dyn = this->getDynamicsData();
 		return dyn.linearAcceleration;
 	}
 
 	void setForwardAcceleration (SINGLE acceleration)
 	{
 		CQASSERT(acceleration >= 0);
-		DYNAMICS_DATA dyn = getDynamicsData();
+		DYNAMICS_DATA dyn = this->getDynamicsData();
 
 		if (acceleration)
 			dyn.linearAcceleration = groupAcceleration = acceleration;
 		else
 			dyn.linearAcceleration = groupAcceleration = origAcceleration;
 
-		setDynamicsData(dyn);
+		this->setDynamicsData(dyn);
 	}
 
 	void setRandomCruiseDepth (void)
@@ -389,12 +391,12 @@ public:
 	virtual void SetPosition (const Vector & position, U32 newSystemID)
 	{
 		CQASSERT(newSystemID && newSystemID <= MAX_SYSTEMS);
-		bool bNewSystem = (systemID != newSystemID);
-		systemID = newSystemID;
+		bool bNewSystem = (this->systemID != newSystemID);
+		this->systemID = newSystemID;
 		Base::SetPosition(position, newSystemID);
 		if (bNewSystem || isMoveActive()==0)		// don't do this thing on load if we are busy
 		{
-			currentPosition = transform.translation;
+			currentPosition = this->transform.translation;
 			if (bHalfSquare)
 				currentPosition.quarterpos();
 			else
@@ -409,12 +411,12 @@ public:
 	virtual void SetTransform (const TRANSFORM & _transform, U32 newSystemID)
 	{
 		CQASSERT(newSystemID && newSystemID <= MAX_SYSTEMS);
-		bool bNewSystem = (systemID != newSystemID);
-		systemID = newSystemID;
+		bool bNewSystem = (this->systemID != newSystemID);
+		this->systemID = newSystemID;
 		Base::SetTransform(_transform, newSystemID);
 		if (bNewSystem || isMoveActive()==0)		// don't do this thing on load if we are busy
 		{
-			currentPosition = transform.translation;
+			currentPosition = this->transform.translation;
 			if (bHalfSquare)
 				currentPosition.quarterpos();
 			else
@@ -498,19 +500,19 @@ private:
 
 	void updateObjMap (void)
 	{
-		if (systemID && systemID <= MAX_SYSTEMS)		// don't do this in hyperspace
+		if (this->systemID && this->systemID <= MAX_SYSTEMS)		// don't do this in hyperspace
 		{
-			int new_map_square = OBJMAP->GetMapSquare(systemID,transform.translation);
-			if (new_map_square != map_square || map_sys != systemID)
+			int new_map_square = OBJMAP->GetMapSquare(this->systemID,this->transform.translation);
+			if (new_map_square != map_square || map_sys != this->systemID)
 			{
 				OBJMAP->RemoveObjectFromMap(this,map_sys,map_square);
 				map_square = new_map_square;
-				map_sys = systemID;
-				U32 flags = (bDerelict) ? 0 : OM_TARGETABLE;
-				if (aliasPlayerID)
+				map_sys = this->systemID;
+				U32 flags = (this->bDerelict) ? 0 : OM_TARGETABLE;
+				if (this->aliasPlayerID)
 					flags |= OM_MIMIC;
-				objMapNode = OBJMAP->AddObjectToMap(this,map_sys,map_square,flags);
-				CQASSERT(objMapNode);
+				this->objMapNode = OBJMAP->AddObjectToMap(this,map_sys,map_square,flags);
+				CQASSERT(this->objMapNode);
 			}
 		}
 	}
@@ -568,17 +570,17 @@ private:
 //
 template <class Base> 
 ObjectMove<Base>::ObjectMove (void) :
-					physUpdateNode(this, PhysUpdateProc(&ObjectMove::physUpdateMove)),
-					saveNode(this, SaveLoadProc(&ObjectMove::saveMoveState)),
-					loadNode(this, SaveLoadProc(&ObjectMove::loadMoveState)),
-					initNode(this, InitProc(&ObjectMove::initMoveState)),
-					updateNode(this, UpdateProc(&ObjectMove::updateMoveState)),
-					onOpCancelNode(this, OnOpCancelProc(&ObjectMove::onOpCancel)),
-					preTakeoverNode(this, PreTakeoverProc(&ObjectMove::preTakeover)),
-					receiveOpDataNode(this, ReceiveOpDataProc(&ObjectMove::receiveOperationData)),
-					explodeNode(this, ExplodeProc(&ObjectMove::explodeMove)),
-					genSyncNode(this, SyncGetProc(&ObjectMove::getSyncData), SyncPutProc(&ObjectMove::putSyncData)),
-					genSyncNode2(this, SyncGetProc(&ObjectMove::getSyncPatrolData), SyncPutProc(&ObjectMove::putSyncPatrolData))
+					physUpdateNode(this,	Base::PhysUpdateProc(&ObjectMove::physUpdateMove)),
+					saveNode(this,			Base::SaveLoadProc(&ObjectMove::saveMoveState)),
+					loadNode(this,			Base::SaveLoadProc(&ObjectMove::loadMoveState)),
+					initNode(this,			Base::InitProc(&ObjectMove::initMoveState)),
+					updateNode(this,		Base::UpdateProc(&ObjectMove::updateMoveState)),
+					onOpCancelNode(this,	Base::OnOpCancelProc(&ObjectMove::onOpCancel)),
+					preTakeoverNode(this,	Base::PreTakeoverProc(&ObjectMove::preTakeover)),
+					receiveOpDataNode(this, Base::ReceiveOpDataProc(&ObjectMove::receiveOperationData)),
+					explodeNode(this,		Base::ExplodeProc(&ObjectMove::explodeMove)),
+					genSyncNode(this,		Base::SyncGetProc(&ObjectMove::getSyncData), Base::SyncPutProc(&ObjectMove::putSyncData)),
+					genSyncNode2(this,		Base::SyncGetProc(&ObjectMove::getSyncPatrolData), Base::SyncPutProc(&ObjectMove::putSyncPatrolData))
 {
 	bAutoMovement = true;						
 }

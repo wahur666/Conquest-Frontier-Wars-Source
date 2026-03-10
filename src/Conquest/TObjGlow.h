@@ -52,11 +52,11 @@ template <class Base=IBaseObject>
 struct _NO_VTABLE ObjectGlow : public Base
 {
 //	struct PreRenderNode preRenderNode;
-	struct PostRenderNode postRenderNode;
-	struct InitNode	     initNode;
-//	struct UpdateNode	updateNode;
+	struct Base::PostRenderNode postRenderNode;
+	struct Base::InitNode	     initNode;
+//	struct Base::UpdateNode	updateNode;
 
-	typename typedef Base::INITINFO GLOWINITINFO;
+	typedef Base::INITINFO GLOWINITINFO;
 
 	//	Mesh *mesh;
 	//Material *mat;
@@ -164,7 +164,7 @@ void ObjectGlow< Base >::initGlow (const GLOWINITINFO & data)
 	HPEnumerator hardpointEnum;
 	hardpointEnum.that = this;
 //	GDummy();
-	EnumerateHardpoints(instanceIndex,"hp_eglow*",&hardpointEnum);
+	EnumerateHardpoints(this->instanceIndex,"hp_eglow*",&hardpointEnum);
 	for (int i=0;i<MAX_ENGINE_GLOWS;i++)
 	{
 		if (glowSize[i])
@@ -249,13 +249,13 @@ void ObjectGlow< Base >::glowPreRender (void)
 template <class Base> 
 void ObjectGlow< Base >::glowPostRender (void)
 {
-	if (bExploding == 0 && bCloaked == 0 && bSpecialRender == 0 && ( (!billboardThreshhold) || 
-		((OBJLIST->GetShipsToRender() <= billboardThreshhold * CQEFFECTS.nFlatShipScale  ) || CQEFFECTS.nFlatShipScale == 4)
+	if (this->bExploding == 0 && this->bCloaked == 0 && this->bSpecialRender == 0 && ( (!this->billboardThreshhold) ||
+		((OBJLIST->GetShipsToRender() <= this->billboardThreshhold * CQEFFECTS.nFlatShipScale  ) || CQEFFECTS.nFlatShipScale == 4)
 		))
 	{
 	//	GDummy();
 		SINGLE dt = OBJLIST->GetRealRenderTime();
-		if (areThrustersOn())
+		if (this->areThrustersOn())
 		{
 			glow+=0.3*dt;
 			if (glow > 1.0f)
@@ -281,7 +281,7 @@ void ObjectGlow< Base >::glowPostRender (void)
 			BATCH->set_render_state(D3DRS_SRCBLEND,D3DBLEND_ONE);
 			BATCH->set_render_state(D3DRS_DESTBLEND,D3DBLEND_ONE);
 			
-			int tech = techLevel.engine;
+			int tech = this->techLevel.engine;
 			
 			CAMERA->SetModelView();
 			PB.Color3ub(r*glow,g*glow,b*glow);
@@ -293,10 +293,10 @@ void ObjectGlow< Base >::glowPostRender (void)
 				{
 					Vector cpos (CAMERA->GetPosition());
 					
-					Vector look (transform*glowPt[c] - cpos);
+					Vector look (this->transform*glowPt[c] - cpos);
 					
 					Vector worldDir;// (look.y, -look.x, 0);
-					worldDir = transform.rotate(glowDir[c]);
+					worldDir = this->transform.rotate(glowDir[c]);
 					
 					/*#define TOLERANCE 1e-5
 					if (fabs (i.x) < TOLERANCE && fabs (i.y) < TOLERANCE)
@@ -327,7 +327,7 @@ void ObjectGlow< Base >::glowPostRender (void)
 					v0 = 0;
 					v1 = 1;
 					
-					trans.translation = transform*glowPt[c];
+					trans.translation = this->transform*glowPt[c];
 					
 					//long part
 					p[0].set(0,-size,0);

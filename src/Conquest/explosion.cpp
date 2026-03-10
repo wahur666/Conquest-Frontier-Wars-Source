@@ -52,14 +52,14 @@
 
 #include <stdlib.h>
 
-#define RANGE 6000
-#define SMALLRANGE 2000
-#define MAX_ANIMS 12
+constexpr int RANGE = 6000;
+constexpr int SMALLRANGE = 2000;
+constexpr int MAX_ANIMS = 12;
 
-#define FOG_PAUSE 2.0
+constexpr float FOG_PAUSE = 2.0;
 
-#define MAX_SHRAPNEL 48
-#define MAX_BLASTS 48
+constexpr int MAX_SHRAPNEL = 48;
+constexpr int MAX_BLASTS = 48;
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -909,7 +909,7 @@ void Explosion::Separate (IMeshInfoTree *tree)
 //	INSTANCE_INDEX index = tree->GetMeshInfo()->instanceIndex;
 	//ENGINE->destroy_instance(index);
 	SINGLE force = GetMass(tree->GetMeshInfo());
-	int shrapnel_room = min(MAX_SHRAPNEL-shrapnel_cnt,6);
+	int shrapnel_room = std::min(MAX_SHRAPNEL-shrapnel_cnt,6);
 	if (shrapnel_room)
 	{
 		U32 numDebris = ExplodeInstance( tree, force, shrapnel_room, shrapnel_room, &shrapnel[shrapnel_cnt],&shrap_phys[shrapnel_cnt]);
@@ -1198,7 +1198,7 @@ void Explosion::RevealFog (const U32 currentSystem)
 {
 	if (systemID==currentSystem && playerID && MGlobals::AreAllies(playerID, MGlobals::GetThisPlayer()) && timeToLive+FOG_PAUSE > 0)
 	{
-		SINGLE fogFactor = min((timeToLive+FOG_PAUSE)/totalTime,1);
+		SINGLE fogFactor = std::min((timeToLive+FOG_PAUSE)/totalTime,1.f);
 		FOGOFWAR->RevealZone(this, sensorRadius*fogFactor,0);
 	}
 }
@@ -1677,7 +1677,7 @@ ExplosionManager::~ExplosionManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -1687,7 +1687,7 @@ void ExplosionManager::Init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -1713,7 +1713,7 @@ HANDLE ExplosionManager::CreateArchetype(const char *szArchname, OBJCLASS objCla
 		DAFILEDESC fdesc = ((BT_MESH_EXPLOSION *)data)->fireTrail;
 		COMPTR<IFileSystem> file;
 		
-		if (fdesc.lpFileName[0] && OBJECTDIR->CreateInstance(&fdesc,file)==GR_OK)
+		if (fdesc.lpFileName[0] && OBJECTDIR->CreateInstance(&fdesc,file.void_addr())==GR_OK)
 		{
 			TEXLIB->load_library(file, 0);
 			newguy->fireTrail = ENGINE->create_archetype(fdesc.lpFileName, file);

@@ -134,14 +134,14 @@ void CloakEffect::PhysicalUpdate (SINGLE dt)
 		frameCounter += dt*FPS;
 		if (frameCounter > 2.5f)
 			bPing = FALSE;
-		frameCounter = min(frameCounter,3.9f);
+		frameCounter = std::min(frameCounter,3.9f);
 	}
 	else
 	{
 		frameCounter -= dt*FPS;
 		if (frameCounter < 0.5f)
 			bPing = TRUE;
-		frameCounter = max(frameCounter,0.0f);
+		frameCounter = std::max(frameCounter,0.0f);
 	}
 }
 
@@ -235,7 +235,7 @@ CloakEffectManager::~CloakEffectManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -246,7 +246,7 @@ void CloakEffectManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -271,7 +271,7 @@ HANDLE CloakEffectManager::CreateArchetype(const char *szArchname, OBJCLASS objC
 			if (objData->animName)
 			{
 				fdesc.lpFileName = objData->animName;//"cloak_ripple.anm";
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				{
 					newguy->animArch = ANIM2D->create_archetype(objFile);
 				}
@@ -291,7 +291,7 @@ HANDLE CloakEffectManager::CreateArchetype(const char *szArchname, OBJCLASS objC
 			if (objData->objectName)
 			{
 				fdesc.lpFileName = objData->objectName;//"cloakshape.3db";
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				{
 					TEXLIB->load_library(objFile, 0);
 					if ((newguy->archIndex = ENGINE->create_archetype(fdesc.lpFileName, objFile)) == INVALID_ARCHETYPE_INDEX)

@@ -49,16 +49,16 @@
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectCloak : public Base, ICloak, CLOAK_SAVELOAD_BASE
 {
-	typename typedef Base::SAVEINFO CLOAKSAVEINFO;
-	typename typedef Base::INITINFO CLOAKINITINFO;
+	typedef Base::SAVEINFO CLOAKSAVEINFO;
+	typedef Base::INITINFO CLOAKINITINFO;
 
-	struct PreRenderNode  preRenderNode;
-//	struct PostRenderNode postRenderNode;
-	struct InitNode       initNode;
-	struct PhysUpdateNode physUpdateNode;
-	struct SaveNode			saveNode;
-	struct LoadNode         loadNode;
-	struct PreTakeoverNode	preTakeoverNode;
+	struct Base::PreRenderNode  preRenderNode;
+//	struct Base::PostRenderNode postRenderNode;
+	struct Base::InitNode       initNode;
+	struct Base::PhysUpdateNode physUpdateNode;
+	struct Base::SaveNode			saveNode;
+	struct Base::LoadNode         loadNode;
+	struct Base::PreTakeoverNode	preTakeoverNode;
 	
 //	Mesh *cmesh;
 
@@ -105,13 +105,13 @@ struct _NO_VTABLE ObjectCloak : public Base, ICloak, CLOAK_SAVELOAD_BASE
 //
 template <class Base> 
 ObjectCloak< Base >::ObjectCloak (void) :
-					preRenderNode(this, RenderProc(&ObjectCloak::preRenderCloak)),
-				//	postRenderNode(this, RenderProc(cloakPostRender)),
-					initNode(this, InitProc(&ObjectCloak::initCloak)),
-					physUpdateNode(this, PhysUpdateProc(&ObjectCloak::physUpdateCloak)),
-					saveNode(this, SaveLoadProc(&ObjectCloak::saveCloak)),
-					loadNode(this, SaveLoadProc(&ObjectCloak::loadCloak)),
-					preTakeoverNode(this, PreTakeoverProc(&ObjectCloak::preTakeoverCloak))
+					preRenderNode(this,		Base::RenderProc(&ObjectCloak::preRenderCloak)),
+				//	postRenderNode(this,	Base::RenderProc(cloakPostRender)),
+					initNode(this,			Base::InitProc(&ObjectCloak::initCloak)),
+					physUpdateNode(this,	Base::PhysUpdateProc(&ObjectCloak::physUpdateCloak)),
+					saveNode(this,			Base::SaveLoadProc(&ObjectCloak::saveCloak)),
+					loadNode(this,			Base::SaveLoadProc(&ObjectCloak::loadCloak)),
+					preTakeoverNode(this,	Base::PreTakeoverProc(&ObjectCloak::preTakeoverCloak))
 {
 //	cloaking = 0;
 //	bDrawCloaking=TRUE;
@@ -138,7 +138,7 @@ void ObjectCloak< Base >::initCloak (const CLOAKINITINFO & data)
 template <class Base>
 void ObjectCloak< Base >::preRenderCloak()
 {
-	if (bCloaked || (cloakTimer <= 1.0 && cloakTimer > 0))
+	if (this->bCloaked || (cloakTimer <= 1.0 && cloakTimer > 0))
 	{
 		BATCH->set_state(RPR_BATCH,TRUE);
 
@@ -153,7 +153,7 @@ void ObjectCloak< Base >::preRenderCloak()
 		SetupDiffuseBlend(cloakTex,FALSE);
 		BATCH->set_state(RPR_DELAY,1);
 		BATCH->set_state(RPR_STATE_ID,cloakTex);
-		CAMERA->SetModelView(&transform);
+		CAMERA->SetModelView(&this->transform);
 
 		//this needs to be updated
 		RenderCloaked(cloakTex);
@@ -214,15 +214,15 @@ void ObjectCloak< Base >::uncloak (void)
 {
 	bCloaking = false;
 	cloakTimer = CLOAK_TIME;
-	bCloaked = false;
-	bSpecialRender = false;
+	this->bCloaked = false;
+	this->bSpecialRender = false;
 }
 //---------------------------------------------------------------------------
 //
 template <class Base> 
 void ObjectCloak< Base >::preTakeoverCloak (U32 newMissionID, U32 troopID)
 {
-	if(dwMissionID != newMissionID)
+	if(this->dwMissionID != newMissionID)
 	{
 		if(cloakCount)
 		{
@@ -246,7 +246,7 @@ void ObjectCloak< Base >::physUpdateCloak(SINGLE dt)
 	U8 visMask   = GetVisibilityFlags();
 	U8 visible = enemyMask & visMask;*/
 
-	if (bCloakPending && !building)
+	if (bCloakPending && !this->building)
 	{
 		cloak();
 		bCloakPending = 0;
@@ -259,11 +259,11 @@ void ObjectCloak< Base >::physUpdateCloak(SINGLE dt)
 		{
 			if (bCloaking)
 			{
-				bCloaked = 1;
+				this->bCloaked = 1;
 			}
 			else
-				bCloaked = 0;
-			bSpecialRender = bCloaked;
+				this->bCloaked = 0;
+			this->bSpecialRender = this->bCloaked;
 			cloakTimer = 0;
 		}
 
@@ -406,7 +406,7 @@ template <class Base>
 void ObjectCloak< Base >::saveCloak (CLOAKSAVEINFO & save)
 {
 	save.cloak_SL.baseCloak = *static_cast<CLOAK_SAVELOAD_BASE *>(this);
-	save.cloak_SL.bCloaked = bCloaked;
+	save.cloak_SL.bCloaked = this->bCloaked;
 }
 //---------------------------------------------------------------------------
 //
@@ -414,9 +414,9 @@ template <class Base>
 void ObjectCloak< Base >::loadCloak (CLOAKSAVEINFO & load)
 {
 	*static_cast<CLOAK_SAVELOAD_BASE *>(this) = load.cloak_SL.baseCloak;
-	bCloaked = load.cloak_SL.bCloaked;
-	if(bCloaked)
-		bSpecialRender = true;
+	this->bCloaked = load.cloak_SL.bCloaked;
+	if(this->bCloaked)
+		this->bSpecialRender = true;
 }
 //---------------------------------------------------------------------------
 //---------------------------End TObjCloak.h---------------------------------

@@ -75,18 +75,18 @@ struct TObjRepBufferGrid
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectRepair : public Base, IRepairee, REPAIR_SAVELOAD
 {
-	struct UpdateNode       updateNode;
-	struct SaveNode			saveNode;
-	struct LoadNode         loadNode;
-	struct ResolveNode		resolveNode;
-	struct InitNode			initNode;
-	struct PreDestructNode	destructNode;
-	struct OnOpCancelNode	onOpCancelNode;
-	struct PreTakeoverNode	preTakeoverNode;
-	struct ReceiveOpDataNode	receiveOpDataNode;
+	struct Base::UpdateNode       updateNode;
+	struct Base::SaveNode			saveNode;
+	struct Base::LoadNode         loadNode;
+	struct Base::ResolveNode		resolveNode;
+	struct Base::InitNode			initNode;
+	struct Base::PreDestructNode	destructNode;
+	struct Base::OnOpCancelNode	onOpCancelNode;
+	struct Base::PreTakeoverNode	preTakeoverNode;
+	struct Base::ReceiveOpDataNode	receiveOpDataNode;
 		
-	typename typedef Base::SAVEINFO REPAIRSAVEINFO;
-	typename typedef Base::INITINFO REPAIRINITINFO;
+	typedef Base::SAVEINFO REPAIRSAVEINFO;
+	typedef Base::INITINFO REPAIRINITINFO;
 	//----------------------------------
 
 	//the diffent modes involed in a repair operation
@@ -173,15 +173,15 @@ private:
 //
 template <class Base> 
 ObjectRepair< Base >::ObjectRepair (void) :
-					updateNode(this, UpdateProc(&ObjectRepair::updateRepair)),
-					saveNode(this, SaveLoadProc(&ObjectRepair::saveRepair)),
-					loadNode(this, SaveLoadProc(&ObjectRepair::loadRepair)),
-					resolveNode(this, ResolveProc(&ObjectRepair::resolveRepair)),
-					initNode(this, InitProc(&ObjectRepair::repairInit)),
-					destructNode(this, PreDestructProc(&ObjectRepair::preDestructRepair)),
-					onOpCancelNode(this, OnOpCancelProc(&ObjectRepair::cancelRepair)),
-					preTakeoverNode(this,PreTakeoverProc(&ObjectRepair::preTakeover)),
-					receiveOpDataNode(this,ReceiveOpDataProc(&ObjectRepair::receiveOpData))
+					updateNode(this,		Base::UpdateProc(&ObjectRepair::updateRepair)),
+					saveNode(this,			Base::SaveLoadProc(&ObjectRepair::saveRepair)),
+					loadNode(this,			Base::SaveLoadProc(&ObjectRepair::loadRepair)),
+					resolveNode(this,		Base::ResolveProc(&ObjectRepair::resolveRepair)),
+					initNode(this,			Base::InitProc(&ObjectRepair::repairInit)),
+					destructNode(this,		Base::PreDestructProc(&ObjectRepair::preDestructRepair)),
+					onOpCancelNode(this,	Base::OnOpCancelProc(&ObjectRepair::cancelRepair)),
+					preTakeoverNode(this,	Base::PreTakeoverProc(&ObjectRepair::preTakeover)),
+					receiveOpDataNode(this,	Base::ReceiveOpDataProc(&ObjectRepair::receiveOpData))
 {
 	repairHardIndex = -1;
 }
@@ -201,7 +201,7 @@ void ObjectRepair< Base>::RepairYourselfAt (IBaseObject * platform, U32 agentID)
 	{
 		if(platform)
 		{
-			platform->QueryInterface(IRepairPlatformID,repairAtPlatform,playerID);
+			platform->QueryInterface(IRepairPlatformID,repairAtPlatform,this->playerID);
 			if(repairAtPlatform)
 			{
 				repairAgentID = agentID;
@@ -213,9 +213,9 @@ void ObjectRepair< Base>::RepairYourselfAt (IBaseObject * platform, U32 agentID)
 				TObjRepBufferGrid buffer;
 				buffer.command = REPAIR_C_BEGIN_REG;
 				buffer.grid = repPos;
-				THEMATRIX->SendOperationData(repairAgentID,dwMissionID,&buffer,sizeof(buffer));
+				THEMATRIX->SendOperationData(repairAgentID,this->dwMissionID,&buffer,sizeof(buffer));
 
-				moveToPos(repPos);
+				this->moveToPos(repPos);
 			}
 			else
 			{
@@ -225,18 +225,18 @@ void ObjectRepair< Base>::RepairYourselfAt (IBaseObject * platform, U32 agentID)
 				TObjRepBufferGrid buffer;
 				buffer.command = REPAIR_C_BEGIN_MOVE;
 				buffer.grid = repPos;
-				THEMATRIX->SendOperationData(agentID,dwMissionID,&buffer,sizeof(buffer));
+				THEMATRIX->SendOperationData(agentID,this->dwMissionID,&buffer,sizeof(buffer));
 
-				moveToPos(repPos,agentID);
+				this->moveToPos(repPos,agentID);
 			}
 		}
 		else
 		{
 			TObjRepBuffer buffer;
 			buffer.command = REPAIR_C_CANCEL;
-			THEMATRIX->SendOperationData(agentID,dwMissionID,&buffer,sizeof(buffer));
+			THEMATRIX->SendOperationData(agentID,this->dwMissionID,&buffer,sizeof(buffer));
 
-			THEMATRIX->OperationCompleted(agentID,dwMissionID);
+			THEMATRIX->OperationCompleted(agentID,this->dwMissionID);
 		}
 	}
 	else
@@ -257,16 +257,16 @@ void ObjectRepair< Base>::RepairStartReceived(IBaseObject * platform)
 	MGlobals::UpgradeMissionObj(this);//upgrade the tech stuff before starting the repair (the host has alredy)
 	if(platform)
 	{
-		platform->QueryInterface(IRepairPlatformID,repairAtPlatform,playerID);
+		platform->QueryInterface(IRepairPlatformID,repairAtPlatform,this->playerID);
 	}
 	if(repairAtPlatform)
 	{
 		repairAtPlatform->LockDock(this);
 		repairMode = RM_DOCKING;
-		resetMoveVars();
-		disableAutoMovement();
-		rotateShip(0,0,0);
-		setAltitude(0);
+		this->resetMoveVars();
+		this->disableAutoMovement();
+		this->rotateShip(0,0,0);
+		this->setAltitude(0);
 	}
 	else
 	{
@@ -329,7 +329,7 @@ bool ObjectRepair< Base>::moveToRepairPos()
 		Vector v2 = dockTrans.translation-planetPos;
 		v2.normalize();
 
-		Vector v1 = transform.translation-(dockTrans.translation-v2*500);
+		Vector v1 = this->transform.translation-(dockTrans.translation-v2*500);
 		if(v1.fast_magnitude() == 0)
 			return true;
 		v1.normalize();
@@ -338,8 +338,8 @@ bool ObjectRepair< Base>::moveToRepairPos()
 		if(dot_product(v1,v2) >= 0)
 		{
 			Vector targDir;
-			if((dockTrans.get_position()-transform.get_position()).fast_magnitude() >= 2000)
-				targDir = dockTrans.get_position()-transform.get_position();
+			if((dockTrans.get_position()-this->transform.get_position()).fast_magnitude() >= 2000)
+				targDir = dockTrans.get_position()-this->transform.get_position();
 			else
 				targDir = dockTrans.get_k();
 			if(targDir.x == 0 && targDir.y == 0 && targDir.z == 0)
@@ -350,16 +350,16 @@ bool ObjectRepair< Base>::moveToRepairPos()
 			else
 			{
 				targDir.normalize();
-				SINGLE relYaw = get_angle(targDir.x,targDir.y) - transform.get_yaw();
-				relYaw = fixAngle(relYaw);
-				result = rotateShip(relYaw,0,0);
+				SINGLE relYaw = get_angle(targDir.x,targDir.y) - this->transform.get_yaw();
+				relYaw = this->fixAngle(relYaw);
+				result = this->rotateShip(relYaw,0,0);
 				Vector relDir = dockTrans.get_position();
-				relDir -= transform.get_position();
-				moveResult = setPosition(relDir);
+				relDir -= this->transform.get_position();
+				moveResult = this->setPosition(relDir);
 			}
 		}else
 		{
-			v1 = transform.translation-dockTrans.translation;
+			v1 = this->transform.translation-dockTrans.translation;
 			v1.normalize();
 			Vector v3 = cross_product(v1,Vector(0,0,1));
 			v3.normalize();
@@ -367,25 +367,25 @@ bool ObjectRepair< Base>::moveToRepairPos()
 			Vector try2 = planetPos-(v3*6000);
 			if((try1-dockTrans.translation).fast_magnitude() < (try2-dockTrans.translation).fast_magnitude())
 			{
-				Vector targDir = try1 - transform.translation;
+				Vector targDir = try1 - this->transform.translation;
 				targDir.normalize();
-				SINGLE relYaw = get_angle(targDir.x,targDir.y) - transform.get_yaw();
-				relYaw = fixAngle(relYaw);
-				rotateShip(relYaw,0,0);
+				SINGLE relYaw = get_angle(targDir.x,targDir.y) - this->transform.get_yaw();
+				relYaw = this->fixAngle(relYaw);
+				this->rotateShip(relYaw,0,0);
 				Vector relDir = try1;
-				relDir -= transform.get_position();
-				setPosition(relDir);
+				relDir -= this->transform.get_position();
+				this->setPosition(relDir);
 			}
 			else
 			{
-				Vector targDir = try2 - transform.translation;
+				Vector targDir = try2 - this->transform.translation;
 				targDir.normalize();
-				SINGLE relYaw = get_angle(targDir.x,targDir.y) - transform.get_yaw();
-				relYaw = fixAngle(relYaw);
-				rotateShip(relYaw,0,0);
+				SINGLE relYaw = get_angle(targDir.x,targDir.y) - this->transform.get_yaw();
+				relYaw = this->fixAngle(relYaw);
+				this->rotateShip(relYaw,0,0);
 				Vector relDir = try2;
-				relDir -= transform.get_position();
-				setPosition(relDir);
+				relDir -= this->transform.get_position();
+				this->setPosition(relDir);
 			}
 		}
 	}
@@ -397,7 +397,7 @@ bool ObjectRepair< Base>::moveToRepairPos()
 template <class Base>
 bool ObjectRepair< Base>::moveToOldPos()
 {
-	Vector targetPos = getLastGrid();
+	Vector targetPos = this->getLastGrid();
 	bool result = false;
 	bool moveResult = false;
 	if(repairAtPlatform)
@@ -416,7 +416,7 @@ bool ObjectRepair< Base>::moveToOldPos()
 			Vector v2 = targetPos-planetPos;
 			v2.normalize();
 
-			Vector v1 = transform.translation-(planetPos);
+			Vector v1 = this->transform.translation-(planetPos);
 			if(v1.fast_magnitude() == 0)
 				return true;
 			v1.normalize();
@@ -424,19 +424,19 @@ bool ObjectRepair< Base>::moveToOldPos()
 			//if I have a good line of sight go for it
 			if(dot_product(v1,v2) >= 0)
 			{
-				Vector targDir = targetPos-transform.get_position();
+				Vector targDir = targetPos-this->transform.get_position();
 				if(!targDir.fast_magnitude())
 					return true;
 				targDir.normalize();
-				SINGLE relYaw = get_angle(targDir.x,targDir.y) - transform.get_yaw();
-				relYaw = fixAngle(relYaw);
-				result = rotateShip(relYaw,0,0);
+				SINGLE relYaw = get_angle(targDir.x,targDir.y) - this->transform.get_yaw();
+				relYaw = this->fixAngle(relYaw);
+				result = this->rotateShip(relYaw,0,0);
 				Vector relDir = targetPos;
-				relDir -= transform.get_position();
-				moveResult = setPosition(relDir);
+				relDir -= this->transform.get_position();
+				moveResult = this->setPosition(relDir);
 			}else
 			{
-				v1 = transform.translation-targetPos;
+				v1 = this->transform.translation-targetPos;
 				v1.normalize();
 				Vector v3 = cross_product(v1,Vector(0,0,1));
 				v3.normalize();
@@ -444,56 +444,56 @@ bool ObjectRepair< Base>::moveToOldPos()
 				Vector try2 = planetPos-(v3*6000);
 				if((try1-targetPos).fast_magnitude() < (try2-targetPos).fast_magnitude())
 				{
-					Vector targDir = try1 - transform.translation;
+					Vector targDir = try1 - this->transform.translation;
 					targDir.normalize();
-					SINGLE relYaw = get_angle(targDir.x,targDir.y) - transform.get_yaw();
-					relYaw = fixAngle(relYaw);
-					rotateShip(relYaw,0,0);
+					SINGLE relYaw = get_angle(targDir.x,targDir.y) - this->transform.get_yaw();
+					relYaw = this->fixAngle(relYaw);
+					this->rotateShip(relYaw,0,0);
 					Vector relDir = try1;
-					relDir -= transform.get_position();
-					setPosition(relDir);
+					relDir -= this->transform.get_position();
+					this->setPosition(relDir);
 				}
 				else
 				{
-					Vector targDir = try2 - transform.translation;
+					Vector targDir = try2 - this->transform.translation;
 					targDir.normalize();
-					SINGLE relYaw = get_angle(targDir.x,targDir.y) - transform.get_yaw();
-					relYaw = fixAngle(relYaw);
-					rotateShip(relYaw,0,0);
+					SINGLE relYaw = get_angle(targDir.x,targDir.y) - this->transform.get_yaw();
+					relYaw = this->fixAngle(relYaw);
+					this->rotateShip(relYaw,0,0);
 					Vector relDir = try2;
-					relDir -= transform.get_position();
-					setPosition(relDir);
+					relDir -= this->transform.get_position();
+					this->setPosition(relDir);
 				}
 			}
 		}
 		else
 		{
 			//not ideal but we don't have a pointer to the planet we may need to avoid.
-			Vector targDir = targetPos-transform.get_position();
+			Vector targDir = targetPos-this->transform.get_position();
 			if(!targDir.fast_magnitude())
 				return true;
 			targDir.normalize();
-			SINGLE relYaw = get_angle(targDir.x,targDir.y) - transform.get_yaw();
-			relYaw = fixAngle(relYaw);
-			result = rotateShip(relYaw,0,0);
+			SINGLE relYaw = get_angle(targDir.x,targDir.y) - this->transform.get_yaw();
+			relYaw = this->fixAngle(relYaw);
+			result = this->rotateShip(relYaw,0,0);
 			Vector relDir = targetPos;
-			relDir -= transform.get_position();
-			moveResult = setPosition(relDir);
+			relDir -= this->transform.get_position();
+			moveResult = this->setPosition(relDir);
 		}
 	}
 	else
 	{
 		//not ideal but we don't have a pointer to the planet we may need to avoid.
-		Vector targDir = targetPos-transform.get_position();
+		Vector targDir = targetPos-this->transform.get_position();
 		if(!targDir.fast_magnitude())
 			return true;
 		targDir.normalize();
-		SINGLE relYaw = get_angle(targDir.x,targDir.y) - transform.get_yaw();
-		relYaw = fixAngle(relYaw);
-		result = rotateShip(relYaw,0,0);
+		SINGLE relYaw = get_angle(targDir.x,targDir.y) - this->transform.get_yaw();
+		relYaw = this->fixAngle(relYaw);
+		result = this->rotateShip(relYaw,0,0);
 		Vector relDir = targetPos;
-		relDir -= transform.get_position();
-		moveResult = setPosition(relDir);
+		relDir -= this->transform.get_position();
+		moveResult = this->setPosition(relDir);
 	}
 
 	return moveResult && result;
@@ -505,7 +505,7 @@ BOOL32 ObjectRepair< Base>::updateRepair (void)
 {
 	if(repairMode == RM_MOVING_TO_REPAIR)
 	{
-		if(!(isMoveActive()))
+		if(!(this->isMoveActive()))
 		{
 			repairMode = RM_WAITING_TO_REPAIR;
 //			U32 agentID = repairAgentID;
@@ -520,33 +520,33 @@ BOOL32 ObjectRepair< Base>::updateRepair (void)
 			if(THEMATRIX->IsMaster())
 			{
 				MPart repPlat = repairAtPlatform.Ptr();
-				bool bNeedRepair = (repPlat->caps.salvageOk) || ((supplies != supplyPointsMax) && repPlat->caps.supplyOk) || ((hullPoints != hullPointsMax) && repPlat->caps.repairOk);
+				bool bNeedRepair = (repPlat->caps.salvageOk) || ((this->supplies != this->supplyPointsMax) && repPlat->caps.supplyOk) || ((this->hullPoints != this->hullPointsMax) && repPlat->caps.repairOk);
 				if((!bNeedRepair) || (! SECTOR->SystemInSupply(repairAtPlatform.Ptr()->GetSystemID(),repairAtPlatform.Ptr()->GetPlayerID())))
 				{
 					TObjRepBuffer buffer;
 					buffer.command = REPAIR_C_CANCEL;
-					THEMATRIX->SendOperationData(repairAgentID,dwMissionID,&buffer,sizeof(buffer));
+					THEMATRIX->SendOperationData(repairAgentID,this->dwMissionID,&buffer,sizeof(buffer));
 
 					U32 agentID = repairAgentID;
 					repairAtID = 0;
 					repairAtPlatform = 0;
 					repairAgentID = 0;
 					repairMode = RM_NO_MODE;
-					THEMATRIX->OperationCompleted(agentID,dwMissionID);
+					THEMATRIX->OperationCompleted(agentID,this->dwMissionID);
 				}
 				else if(!(repairAtPlatform->IsDockLocked()))
 				{
 					TObjRepBuffer buffer;
 					buffer.command = REPAIR_C_END;
-					THEMATRIX->SendOperationData(repairAgentID,dwMissionID,&buffer,sizeof(buffer));
+					THEMATRIX->SendOperationData(repairAgentID,this->dwMissionID,&buffer,sizeof(buffer));
 					U32 agentID = repairAgentID;
 					repairAgentID = 0;
 
 					repairAtPlatform->LockDock(this);
 					repairMode = RM_DOCKING;
 
-					resetMoveVars();
-					disableAutoMovement();
+					this->resetMoveVars();
+					this->disableAutoMovement();
 					MGlobals::UpgradeMissionObj(this);//upgrade the tech stuff before starting the repair
 					repairAtPlatform->BeginRepairOperation(agentID,this);
 
@@ -562,14 +562,14 @@ BOOL32 ObjectRepair< Base>::updateRepair (void)
 			{
 				TObjRepBuffer buffer;
 				buffer.command = REPAIR_C_CANCEL;
-				THEMATRIX->SendOperationData(repairAgentID,dwMissionID,&buffer,sizeof(buffer));
+				THEMATRIX->SendOperationData(repairAgentID,this->dwMissionID,&buffer,sizeof(buffer));
 
 				U32 agentID = repairAgentID;
 				repairAtID = 0;
 				repairAtPlatform = 0;
 				repairAgentID = 0;
 				repairMode = RM_NO_MODE;
-				THEMATRIX->OperationCompleted(agentID,dwMissionID);
+				THEMATRIX->OperationCompleted(agentID,this->dwMissionID);
 			}
 			else
 			{
@@ -636,8 +636,8 @@ BOOL32 ObjectRepair< Base>::updateRepair (void)
 	}
 	else if(repairMode == RM_DOCKED)
 	{
-		rotateShip(0,0,0);
-		setPosition(Vector(0,0,0));
+		this->rotateShip(0,0,0);
+		this->setPosition(Vector(0,0,0));
 		if(!repairAtPlatform)
 		{
 			//assumes that the platform ended the operation
@@ -672,14 +672,14 @@ BOOL32 ObjectRepair< Base>::updateRepair (void)
 	{
 		TObjRepBuffer buffer;
 		buffer.command = REPAIR_C_CANCEL;
-		THEMATRIX->SendOperationData(repairAgentID,dwMissionID,&buffer,sizeof(buffer));
+		THEMATRIX->SendOperationData(repairAgentID,this->dwMissionID,&buffer,sizeof(buffer));
 
 		U32 agentID = repairAgentID;
 		repairAtID = 0;
 		repairAtPlatform = 0;
 		repairAgentID = 0;
 		repairMode = RM_NO_MODE;
-		THEMATRIX->OperationCompleted(agentID,dwMissionID);
+		THEMATRIX->OperationCompleted(agentID,this->dwMissionID);
 	}
 	return true;
 }
@@ -721,7 +721,7 @@ void ObjectRepair< Base>::receiveOpData(U32 agentID, void * buffer, U32 bufferSi
 				repairMode = RM_MOVING_TO_REPAIR;
 				TObjRepBufferGrid * myBuf = (TObjRepBufferGrid *) buffer;
 
-				moveToPos(myBuf->grid);
+				this->moveToPos(myBuf->grid);
 				break;
 			}
 		case REPAIR_C_BEGIN_MOVE:
@@ -732,7 +732,7 @@ void ObjectRepair< Base>::receiveOpData(U32 agentID, void * buffer, U32 bufferSi
 				repairAtID = 0;
 				repairAtPlatform = 0;
 
-				moveToPos(myBuf->grid,agentID);
+				this->moveToPos(myBuf->grid,agentID);
 				break;
 			}
 		case REPAIR_C_CANCEL:
@@ -742,7 +742,7 @@ void ObjectRepair< Base>::receiveOpData(U32 agentID, void * buffer, U32 bufferSi
 				repairAtPlatform = 0;
 				repairAgentID = 0;
 				repairMode = RM_NO_MODE;
-				THEMATRIX->OperationCompleted(agentID,dwMissionID);
+				THEMATRIX->OperationCompleted(agentID,this->dwMissionID);
 				break;
 			}
 		case REPAIR_C_END:
@@ -762,14 +762,14 @@ void ObjectRepair< Base>::preTakeover (U32 newMissionID, U32 troopID)
 	{
 		TObjRepBuffer buffer;
 		buffer.command = REPAIR_C_CANCEL;
-		THEMATRIX->SendOperationData(repairAgentID,dwMissionID,&buffer,sizeof(buffer));
+		THEMATRIX->SendOperationData(repairAgentID,this->dwMissionID,&buffer,sizeof(buffer));
 
 		U32 agentID = repairAgentID;
 		repairAtID = 0;
 		repairAtPlatform = 0;
 		repairAgentID = 0;
 		repairMode = RM_NO_MODE;
-		THEMATRIX->OperationCompleted(agentID,dwMissionID);
+		THEMATRIX->OperationCompleted(agentID,this->dwMissionID);
 	}
 	else if((repairMode == RM_DOCKING) || (repairMode == RM_DOCKED))
 	{
@@ -787,7 +787,7 @@ void ObjectRepair< Base>::resolveRepair ()
 {
 	if(repairAtID)
 	{
-		OBJLIST->FindObject(repairAtID, playerID, repairAtPlatform, IRepairPlatformID);
+		OBJLIST->FindObject(repairAtID, this->playerID, repairAtPlatform, IRepairPlatformID);
 	}
 }
 //---------------------------------------------------------------------------
@@ -810,7 +810,7 @@ void ObjectRepair< Base >::repairInit(const REPAIRINITINFO & data)
 {
 	HPRepEnumerator hardpointEnum;
 	hardpointEnum.repairHardIndex = INVALID_INSTANCE_INDEX;
-	EnumerateHardpoints(instanceIndex,"hp_supply",&hardpointEnum);
+	EnumerateHardpoints(this->instanceIndex,"hp_supply",&hardpointEnum);
 	if(hardpointEnum.repairHardIndex != INVALID_INSTANCE_INDEX)
 	{
 		repairHardpoint = hardpointEnum.repairHardpoint;
@@ -829,7 +829,7 @@ void ObjectRepair< Base >::repairMasterChange(bool bIsMaster)
 			IBaseObject * platform = OBJLIST->FindObject(repairAtID);
 			if(platform)
 			{
-				platform->QueryInterface(IRepairPlatformID,repairAtPlatform,playerID);
+				platform->QueryInterface(IRepairPlatformID,repairAtPlatform,this->playerID);
 				if(repairAtPlatform)
 				{
 					repairAtID = platform->GetPartID();
@@ -840,9 +840,9 @@ void ObjectRepair< Base >::repairMasterChange(bool bIsMaster)
 					TObjRepBufferGrid buffer;
 					buffer.command = REPAIR_C_BEGIN_REG;
 					buffer.grid = repPos;
-					THEMATRIX->SendOperationData(repairAgentID,dwMissionID,&buffer,sizeof(buffer));
+					THEMATRIX->SendOperationData(repairAgentID,this->dwMissionID,&buffer,sizeof(buffer));
 
-					moveToPos(repPos);
+					this->moveToPos(repPos);
 				}
 				else
 				{
@@ -856,9 +856,9 @@ void ObjectRepair< Base >::repairMasterChange(bool bIsMaster)
 					TObjRepBufferGrid buffer;
 					buffer.command = REPAIR_C_BEGIN_MOVE;
 					buffer.grid = repPos;
-					THEMATRIX->SendOperationData(agentID,dwMissionID,&buffer,sizeof(buffer));
+					THEMATRIX->SendOperationData(agentID,this->dwMissionID,&buffer,sizeof(buffer));
 
-					moveToPos(repPos,agentID);
+					this->moveToPos(repPos,agentID);
 				}
 			}
 			else
@@ -869,9 +869,9 @@ void ObjectRepair< Base >::repairMasterChange(bool bIsMaster)
 
 				TObjRepBuffer buffer;
 				buffer.command = REPAIR_C_CANCEL;
-				THEMATRIX->SendOperationData(agentID,dwMissionID,&buffer,sizeof(buffer));
+				THEMATRIX->SendOperationData(agentID,this->dwMissionID,&buffer,sizeof(buffer));
 
-				THEMATRIX->OperationCompleted(agentID,dwMissionID);
+				THEMATRIX->OperationCompleted(agentID,this->dwMissionID);
 			}
 		}
 	}

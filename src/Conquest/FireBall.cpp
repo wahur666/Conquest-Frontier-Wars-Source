@@ -402,7 +402,7 @@ BOOL32 Fireball::EditorInitEffect ( IBaseObject *_owner,SINGLE lifeTime)
 
 SINGLE Fireball::GetRadius()
 {
-	return max(grow1.magnitude()*spreadFactor,grow2.magnitude()*spreadFactor)+animWidth*1.414;
+	return std::max(grow1.magnitude()*spreadFactor,grow2.magnitude()*spreadFactor)+animWidth*1.414;
 }
 
 void Fireball::SetSpread(Vector _grow1,Vector _grow2,U8 _spreadFactor)
@@ -479,7 +479,7 @@ FireballManager::~FireballManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -490,7 +490,7 @@ void FireballManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -513,7 +513,7 @@ HANDLE FireballManager::CreateArchetype(const char *szArchname, OBJCLASS objClas
 				DAFILEDESC fdesc;
 				COMPTR<IFileSystem> objFile;
 				fdesc.lpFileName = objData->animName;
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				{
 					newguy->animArch = ANIM2D->create_archetype(objFile);
 				}

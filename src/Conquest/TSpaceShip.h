@@ -391,7 +391,7 @@ bool SPACESHIP_INIT<BT_TYPE>::loadSpaceshipArchetype (BT_TYPE * _pData, PARCHETY
 		DAFILEDESC fdesc="tinnard_fire.anm";
 		COMPTR<IFileSystem> objFile;
 		//fdesc.lpFileName = objData->animName;
-		if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 		{
 			damageAnimArch = ANIM2D->create_archetype(objFile);
 		}
@@ -420,7 +420,7 @@ bool SPACESHIP_INIT<BT_TYPE>::loadSpaceshipArchetype (BT_TYPE * _pData, PARCHETY
 		}
 
 		COMPTR<IFileSystem> objFile;
-		if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 		{
 			shieldAnimArch = ANIM2D->create_archetype(objFile);
 		}
@@ -435,7 +435,7 @@ bool SPACESHIP_INIT<BT_TYPE>::loadSpaceshipArchetype (BT_TYPE * _pData, PARCHETY
 	{
 		DAFILEDESC fdesc=pData->shield.fizzAnimName;
 		COMPTR<IFileSystem> objFile;
-		if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 		{
 			shieldFizzAnimArch = ANIM2D->create_archetype(objFile);
 		}
@@ -459,7 +459,7 @@ bool SPACESHIP_INIT<BT_TYPE>::loadSpaceshipArchetype (BT_TYPE * _pData, PARCHETY
 			strcpy(extenpos,".shield");
 			DAFILEDESC fdesc=outName;
 			COMPTR<IFileSystem> objFile;
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 			{
 				smesh = new SMesh;
 				if (smesh->load(objFile))
@@ -483,7 +483,7 @@ bool SPACESHIP_INIT<BT_TYPE>::loadSpaceshipArchetype (BT_TYPE * _pData, PARCHETY
 		COMPTR<IFileSystem> file;
 		DAFILEDESC fdesc = "smoke.pte";
 
-		if (OBJECTDIR->CreateInstance(&fdesc,file) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc,file.void_addr()) == GR_OK)
 			smoke_archID = ENGINE->create_archetype("smoke.pte",file);
 	}
 

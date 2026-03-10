@@ -50,10 +50,10 @@
 template <class Base=IBaseObject> 
 struct _NO_VTABLE ObjectArtifact : public Base, IArtifactHolder
 {
-	struct InitNode	     initNode;
-	struct UpdateNode       updateNode;
+	struct Base::InitNode	     initNode;
+	struct Base::UpdateNode       updateNode;
 
-	typename typedef Base::INITINFO ARTIFACTINITINFO;
+	typedef Base::INITINFO ARTIFACTINITINFO;
 
 	OBJPTR<IArtifact> artifact;
 
@@ -82,8 +82,8 @@ struct _NO_VTABLE ObjectArtifact : public Base, IArtifactHolder
 //
 template <class Base> 
 ObjectArtifact< Base >::ObjectArtifact (void) :
-					initNode(this, InitProc(CASTINITPROC(&ObjectArtifact::initArtifact))),
-					updateNode(this, UpdateProc(&ObjectArtifact::updateArtifact))
+					initNode(this,   Base::InitProc(Base::castInitProc(Base::InitProc2(&_Coa::initArtifact)))),
+					updateNode(this, Base::UpdateProc(&ObjectArtifact::updateArtifact))
 {
 }
 
@@ -156,8 +156,8 @@ void ObjectArtifact< Base >::DestroyArtifact()
 template <class Base>
 void ObjectArtifact< Base >::UseArtifactOn(IBaseObject * target, U32 agentID)
 {
-	//no action taken by default 
-	THEMATRIX->OperationCompleted(agentID,GetPartID());
+	//no action taken by default
+	THEMATRIX->OperationCompleted(agentID,this->GetPartID());
 }
 //---------------------------------------------------------------------------
 //

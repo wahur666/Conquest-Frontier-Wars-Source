@@ -182,7 +182,7 @@ BOOL32 EngineTrail::Update (void)
 	//assuming parent is visible;
 	if (stop != -1)
 	{
-		RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+		RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 		RECT rect;
 		CAMERA->PointToScreen(trailPoints[start],&(rect.left),&(rect.top));
 		CAMERA->PointToScreen(trailPoints[stop],&(rect.right),&(rect.bottom));
@@ -1032,7 +1032,7 @@ EngineTrailManager::~EngineTrailManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 
@@ -1044,7 +1044,7 @@ void EngineTrailManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}

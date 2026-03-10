@@ -134,7 +134,7 @@ void Dust::Render()
 	S32 maxGridY = maxY/GRIDSIZE;
 	S32 minGridY = minY/GRIDSIZE;
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(),map);
+	SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(),map.addr());
 	if(!map)
 		return;
 

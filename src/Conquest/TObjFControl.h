@@ -44,11 +44,11 @@
 template <class Base> 
 struct _NO_VTABLE ObjectFControl : public Base
 {
-	struct UpdateNode       updateNode;
-	struct InitNode			initNode;
-	struct PhysUpdateNode	physUpdateNode;
+	struct Base::UpdateNode       updateNode;
+	struct Base::InitNode			initNode;
+	struct Base::PhysUpdateNode	physUpdateNode;
 
-	typename typedef Base::INITINFO CONTROLINITINFO;
+	typedef Base::INITINFO CONTROLINITINFO;
 
 	SINGLE MAX_FORWARD_VELOCITY;
 
@@ -99,9 +99,9 @@ public:
 //
 template <class Base> 
 ObjectFControl< Base >::ObjectFControl (void) :
-					updateNode(this, UpdateProc(&ObjectFControl::updateDynamics)),
-					initNode(this, InitProc(&ObjectFControl::initDynamics)),
-					physUpdateNode(this, PhysUpdateProc(&ObjectFControl::updateDynamics))
+					updateNode(this, Base::UpdateProc(&ObjectFControl::updateDynamics)),
+					initNode(this, Base::InitProc(&ObjectFControl::initDynamics)),
+					physUpdateNode(this, Base::PhysUpdateProc(&ObjectFControl::updateDynamics))
 {
 }
 //---------------------------------------------------------------------------
@@ -177,8 +177,8 @@ void ObjectFControl< Base >::updateDynamics (SINGLE dt)
 {
 	if (bThrustEnabled)
 	{
-		velocity = transform.get_j() * -MAX_FORWARD_VELOCITY;
-		transform.translation += (velocity * dt);
+		this->velocity = this->transform.get_j() * -MAX_FORWARD_VELOCITY;
+		this->transform.translation += (this->velocity * dt);
 		bRelVecValid = false;
 	}
 	else
@@ -193,10 +193,10 @@ void ObjectFControl< Base >::updateDynamics (SINGLE dt)
 			else
 				bRelVecValid = false;
 
-			velocity = relVec * (speed / relMag);
-			Vector rel = velocity * dt;
+			this->velocity = relVec * (speed / relMag);
+			Vector rel = this->velocity * dt;
 
-			transform.translation += rel;
+			this->transform.translation += rel;
 			relVec -= rel;
 		}
 		else
@@ -213,7 +213,7 @@ void ObjectFControl< Base >::updateDynamics (SINGLE dt)
 				speed = MAX_ANG_VELOCITY;
 				SINGLE angle = speed * dt;
 				relYaw -= angle;
-				transform.rotate_about_k(angle);
+				this->transform.rotate_about_k(angle);
 			}
 			else
 			if (speed < -MAX_ANG_VELOCITY)
@@ -221,11 +221,11 @@ void ObjectFControl< Base >::updateDynamics (SINGLE dt)
 				speed = -MAX_ANG_VELOCITY;
 				SINGLE angle = speed * dt;
 				relYaw -= angle;
-				transform.rotate_about_k(angle);
+				this->transform.rotate_about_k(angle);
 			}
 			else
 			{
-				transform.rotate_about_k(relYaw);
+				this->transform.rotate_about_k(relYaw);
 				relYaw = 0;
 			}
 		}
@@ -237,7 +237,7 @@ void ObjectFControl< Base >::updateDynamics (SINGLE dt)
 				speed = MAX_ANG_VELOCITY;
 				SINGLE angle = speed * dt;
 				relRoll -= angle;
-				transform.rotate_about_j(angle);
+				this->transform.rotate_about_j(angle);
 			}
 			else
 			if (speed < -MAX_ANG_VELOCITY)
@@ -245,11 +245,11 @@ void ObjectFControl< Base >::updateDynamics (SINGLE dt)
 				speed = -MAX_ANG_VELOCITY;
 				SINGLE angle = speed * dt;
 				relRoll -= angle;
-				transform.rotate_about_j(angle);
+				this->transform.rotate_about_j(angle);
 			}
 			else
 			{
-				transform.rotate_about_j(relRoll);
+				this->transform.rotate_about_j(relRoll);
 				relRoll = 0;
 			}
 		}
@@ -261,7 +261,7 @@ void ObjectFControl< Base >::updateDynamics (SINGLE dt)
 				speed = MAX_ANG_VELOCITY;
 				SINGLE angle = speed * dt;
 				relPitch -= angle;
-				transform.rotate_about_i(angle);
+				this->transform.rotate_about_i(angle);
 			}
 			else
 			if (speed < -MAX_ANG_VELOCITY)
@@ -269,11 +269,11 @@ void ObjectFControl< Base >::updateDynamics (SINGLE dt)
 				speed = -MAX_ANG_VELOCITY;
 				SINGLE angle = speed * dt;
 				relPitch -= angle;
-				transform.rotate_about_i(angle);
+				this->transform.rotate_about_i(angle);
 			}
 			else
 			{
-				transform.rotate_about_i(relPitch);
+				this->transform.rotate_about_i(relPitch);
 				relPitch = 0;
 			}
 		}

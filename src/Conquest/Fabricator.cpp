@@ -518,7 +518,7 @@ void Fabricator::BeginMove()
 	{
 		//deep space
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(systemID,map);
+		SECTOR->GetTerrainMap(systemID,map.addr());
 		FootprintInfo footprint;
 		footprint.missionID = dwMissionID|0x10000000;
 		footprint.height =box[2];
@@ -631,7 +631,7 @@ void Fabricator::BeginConstruction (GRIDVECTOR position, U32 dwArchetypeDataID, 
 			if(BANKER->SpendCommandPoints(playerID,workingCost))
 			{
 				COMPTR<ITerrainMap> map;
-				SECTOR->GetTerrainMap(systemID,map);
+				SECTOR->GetTerrainMap(systemID,map.addr());
 				if(map->IsGridEmpty(position,0,false))
 				{
 
@@ -881,7 +881,7 @@ void Fabricator::OnMasterChange (bool bIsMaster)
 				if(!targetPlanetID)
 				{
 					COMPTR<ITerrainMap> map;
-					SECTOR->GetTerrainMap(systemID,map);
+					SECTOR->GetTerrainMap(systemID,map.addr());
 					FootprintInfo footprint;
 					footprint.missionID = dwMissionID|0x10000000;
 					footprint.height =box[2];
@@ -1014,7 +1014,7 @@ void Fabricator::OnMasterChange (bool bIsMaster)
 					//begin Construction Operation
 					SINGLE range = GetGridPosition()-targetPosition;
 					COMPTR<ITerrainMap> map;
-					SECTOR->GetTerrainMap(systemID,map);
+					SECTOR->GetTerrainMap(systemID,map.addr());
 					if((range > (sensorRadius*2)) || (!(map->IsGridEmpty(targetPosition,0,false))))
 					{
 						FABRICATORCOMM(buildImposible,SUB_NO_BUILD);
@@ -1120,7 +1120,7 @@ void Fabricator::OnMasterChange (bool bIsMaster)
 				if(!targetPlanetID)
 				{
 					COMPTR<ITerrainMap> map;
-					SECTOR->GetTerrainMap(systemID,map);
+					SECTOR->GetTerrainMap(systemID,map.addr());
 					FootprintInfo footprint;
 					footprint.missionID = dwMissionID|0x10000000;
 					footprint.height =box[2];
@@ -1282,7 +1282,7 @@ void Fabricator::OnMasterChange (bool bIsMaster)
 				if(!targetPlanetID)
 				{
 					COMPTR<ITerrainMap> map;
-					SECTOR->GetTerrainMap(systemID,map);
+					SECTOR->GetTerrainMap(systemID,map.addr());
 					FootprintInfo footprint;
 					footprint.missionID = dwMissionID|0x10000000;
 					footprint.height =box[2];
@@ -1589,7 +1589,7 @@ BOOL32 Fabricator::updateFabricate (void)
 						if(!targetPlanetID)
 						{
 							COMPTR<ITerrainMap> map;
-							SECTOR->GetTerrainMap(systemID,map);
+							SECTOR->GetTerrainMap(systemID,map.addr());
 							FootprintInfo footprint;
 							footprint.missionID = dwMissionID|0x10000000;
 							footprint.height =box[2];
@@ -1816,7 +1816,7 @@ BOOL32 Fabricator::updateFabricate (void)
 						if(!targetPlanetID)
 						{
 							COMPTR<ITerrainMap> map;
-							SECTOR->GetTerrainMap(systemID,map);
+							SECTOR->GetTerrainMap(systemID,map.addr());
 							FootprintInfo footprint;
 							footprint.missionID = dwMissionID|0x10000000;
 							footprint.height =box[2];
@@ -2002,7 +2002,7 @@ BOOL32 Fabricator::updateFabricate (void)
 						if(!targetPlanetID)
 						{
 							COMPTR<ITerrainMap> map;
-							SECTOR->GetTerrainMap(systemID,map);
+							SECTOR->GetTerrainMap(systemID,map.addr());
 							FootprintInfo footprint;
 							footprint.missionID = dwMissionID|0x10000000;
 							footprint.height =box[2];
@@ -2134,7 +2134,7 @@ BOOL32 Fabricator::updateFabricate (void)
 							//begin Construction Operation
 							SINGLE range = GetGridPosition()-targetPosition;
 							COMPTR<ITerrainMap> map;
-							SECTOR->GetTerrainMap(systemID,map);
+							SECTOR->GetTerrainMap(systemID,map.addr());
 							if((range > (sensorRadius*2)) || (!(map->IsGridEmpty(targetPosition,0,false))))
 							{
 								FABRICATORCOMM(buildImposible, SUB_NO_BUILD);
@@ -2517,7 +2517,7 @@ void Fabricator::preTakeover (U32 newMissionID, U32 troopID)
 				if(!targetPlanetID)
 				{
 					COMPTR<ITerrainMap> map;
-					SECTOR->GetTerrainMap(systemID,map);
+					SECTOR->GetTerrainMap(systemID,map.addr());
 					FootprintInfo footprint;
 					footprint.missionID = dwMissionID|0x10000000;
 					footprint.height =box[2];
@@ -2863,7 +2863,7 @@ void Fabricator::receiveOperationData (U32 agentID, void *buffer, U32 bufferSize
 			if(!targetPlanetID)
 			{
 				COMPTR<ITerrainMap> map;
-				SECTOR->GetTerrainMap(systemID,map);
+				SECTOR->GetTerrainMap(systemID,map.addr());
 				FootprintInfo footprint;
 				footprint.missionID = dwMissionID|0x10000000;
 				footprint.height =box[2];
@@ -3015,7 +3015,7 @@ void Fabricator::receiveOperationData (U32 agentID, void *buffer, U32 bufferSize
 
 			if(workTarg)
 			{
-				MPart part = workTarg;
+				MPart part = workTarg.Ptr();
 				oldHullPoints = part->hullPoints;
 
 				Vector pos,dir;
@@ -3118,7 +3118,7 @@ void Fabricator::receiveOperationData (U32 agentID, void *buffer, U32 bufferSize
 			if(!targetPlanetID)
 			{
 				COMPTR<ITerrainMap> map;
-				SECTOR->GetTerrainMap(systemID,map);
+				SECTOR->GetTerrainMap(systemID,map.addr());
 				FootprintInfo footprint;
 				footprint.missionID = dwMissionID|0x10000000;
 				footprint.height =box[2];
@@ -3204,7 +3204,7 @@ void Fabricator::receiveOperationData (U32 agentID, void *buffer, U32 bufferSize
 			if(!targetPlanetID)
 			{
 				COMPTR<ITerrainMap> map;
-				SECTOR->GetTerrainMap(systemID,map);
+				SECTOR->GetTerrainMap(systemID,map.addr());
 				FootprintInfo footprint;
 				footprint.missionID = dwMissionID|0x10000000;
 				footprint.height =box[2];
@@ -3239,7 +3239,7 @@ void Fabricator::receiveOperationData (U32 agentID, void *buffer, U32 bufferSize
 			if(!targetPlanetID)
 			{
 				COMPTR<ITerrainMap> map;
-				SECTOR->GetTerrainMap(systemID,map);
+				SECTOR->GetTerrainMap(systemID,map.addr());
 				FootprintInfo footprint;
 				footprint.missionID = dwMissionID|0x10000000;
 				footprint.height =box[2];
@@ -3441,7 +3441,7 @@ void Fabricator::onOperationCancel (U32 agentID)
 			if(!targetPlanetID)
 			{
 				COMPTR<ITerrainMap> map;
-				SECTOR->GetTerrainMap(systemID,map);
+				SECTOR->GetTerrainMap(systemID,map.addr());
 				FootprintInfo footprint;
 				footprint.missionID = dwMissionID|0x10000000;
 				footprint.height =box[2];
@@ -3573,7 +3573,7 @@ void Fabricator::preSelfDestruct (void)
 				if(!targetPlanetID)
 				{
 					COMPTR<ITerrainMap> map;
-					SECTOR->GetTerrainMap(systemID,map);
+					SECTOR->GetTerrainMap(systemID,map.addr());
 					FootprintInfo footprint;
 					footprint.missionID = dwMissionID|0x10000000;
 					footprint.height =box[2];
@@ -3802,7 +3802,7 @@ FabricatorFactory::~FabricatorFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -3811,7 +3811,7 @@ void FabricatorFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

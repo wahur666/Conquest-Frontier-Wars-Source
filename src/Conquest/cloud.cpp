@@ -156,7 +156,7 @@ struct Cloudzone
 	SINGLE alpha[9];
 };
 
-template DefaultArchetype<BT_MINEFIELD_DATA>;
+// template DefaultArchetype<BT_MINEFIELD_DATA>;
 
 template <class Type>
 DefaultArchetype<Type>::DefaultArchetype()
@@ -298,7 +298,7 @@ void DefaultArchetype<Type>::EndEdit()
 	IField *obj;
 	
 	
-	obj = (IField *)ARCHLIST->CreateInstance(pArchetype);
+	obj = (IField *)ARCHLIST->CreateInstance(this->pArchetype);
 	if (obj==0)
 		return;
 
@@ -677,7 +677,7 @@ AsteroidField::~AsteroidField (void)
 	for (i=0;i<numRoids;i++)
 		ANIM2D->destroy_instance(roids[i]);*/
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	if(map)
 		unsetTerrainFootprint(map);
 
@@ -1182,10 +1182,10 @@ void AsteroidField::TestVisible (const USER_DEFAULTS & defaults, const U32 curre
 		tr = inverseWorldROT->rotate_translate(tr);
 		br = inverseWorldROT->rotate_translate(br);
 		bl = inverseWorldROT->rotate_translate(bl);
-		vx_min = min(tl.x,min(bl.x,min(tr.x,br.x)))-4000;
-		vx_max = max(tl.x,max(bl.x,max(tr.x,br.x)))+4000;
-		vy_min = min(tl.y,min(bl.y,min(tr.y,br.y)))-4000;
-		vy_max = max(tl.y,max(bl.y,max(tr.y,br.y)))+4000;
+		vx_min = std::min(tl.x,std::min(bl.x,std::min(tr.x,br.x)))-4000;
+		vx_max = std::max(tl.x,std::max(bl.x,std::max(tr.x,br.x)))+4000;
+		vy_min = std::min(tl.y,std::min(bl.y,std::min(tr.y,br.y)))-4000;
+		vy_max = std::max(tl.y,std::max(bl.y,std::max(tr.y,br.y)))+4000;
 		for (unsigned int i=0;i<numSquares;i++)
 		{
 			if (squares[i].x+HFTS > vx_min && squares[i].x-HFTS < vx_max)
@@ -1351,7 +1351,7 @@ BOOL32 AsteroidField::Save(IFileSystem *inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 	
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 //	if (file->WriteFile(0, &numRoids, sizeof(numRoids), &dwWritten, 0) == 0)
 //		goto Done;
@@ -1375,7 +1375,7 @@ BOOL32 AsteroidField::Save(IFileSystem *inFile)
 	delete [] sq;
 
 	fdesc.lpFileName = "ASTEROIDFIELD_SAVELOAD";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	//memcpy(&save, static_cast<ASTEROIDFIELD_SAVELOAD *>(this), sizeof(ASTEROIDFIELD_SAVELOAD));
@@ -1422,7 +1422,7 @@ BOOL32 AsteroidField::Load(IFileSystem *inFile)
 	fdesc.lpFileName = "Data";
 	fdesc.lpImplementation = "DOS";
 	
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 	
 	if (file->ReadFile(0, &numSquares, sizeof(numSquares), &dwRead, 0) == 0)
@@ -1438,7 +1438,7 @@ BOOL32 AsteroidField::Load(IFileSystem *inFile)
 	U8 buffer[1024];
 
 	fdesc.lpFileName = "ASTEROIDFIELD_SAVELOAD";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
 		goto Done;
 	}
@@ -1501,7 +1501,7 @@ void AsteroidField::ResolveAssociations()
 
 void AsteroidField::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc { partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_QFIELDLOAD");
@@ -1694,7 +1694,7 @@ BOOL32 AsteroidField::Setup()//struct XYCoord *_squares,U32 _numSquares)
 	int i,j;
 
 	CQASSERT(systemID);
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 
 	if (gvec)
 		unsetTerrainFootprint(map);
@@ -2271,7 +2271,7 @@ Nebula::Nebula (void)
 Nebula::~Nebula (void)
 {
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	if(map)
 		unsetTerrainFootprint(map);
 
@@ -2303,7 +2303,7 @@ BOOL32 Nebula::Setup()//struct XYCoord *_squares,U32 _numSquares)
 	COMPTR<ITerrainMap> map;
 
 	CQASSERT(systemID);
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 
 	if (gvec)
 		unsetTerrainFootprint(map);
@@ -2815,9 +2815,9 @@ BOOL32 Nebula::OnScreen()
 	CAMERA->PaneToPoints(tl,tr,br,bl);
 	for (i=0;i<numSquares;i++)
 	{
-		if (squares[i].x+HFTS > min(bl.x,tr.x) && squares[i].x-HFTS < max(tl.x,br.x))
+		if (squares[i].x+HFTS > std::min(bl.x,tr.x) && squares[i].x-HFTS < std::max(tl.x,br.x))
 		{
-			if (squares[i].y+HFTS > min(bl.y,tr.y) && squares[i].y-HFTS < max(tl.y,br.y))
+			if (squares[i].y+HFTS > std::min(bl.y,tr.y) && squares[i].y-HFTS < std::max(tl.y,br.y))
 			{
 				onScreen = TRUE;
 			}
@@ -2839,10 +2839,10 @@ void Nebula::TestVisible (const USER_DEFAULTS & defaults, const U32 currentSyste
 		tr = inverseWorldROT->rotate_translate(tr);
 		br = inverseWorldROT->rotate_translate(br);
 		bl = inverseWorldROT->rotate_translate(bl);
-		vx_min = min(tl.x,min(bl.x,min(tr.x,br.x)))-4000;
-		vx_max = max(tl.x,max(bl.x,max(tr.x,br.x)))+4000;
-		vy_min = min(tl.y,min(bl.y,min(tr.y,br.y)))-4000;
-		vy_max = max(tl.y,max(bl.y,max(tr.y,br.y)))+4000;
+		vx_min = std::min(tl.x,std::min(bl.x,std::min(tr.x,br.x)))-4000;
+		vx_max = std::max(tl.x,std::max(bl.x,std::max(tr.x,br.x)))+4000;
+		vy_min = std::min(tl.y,std::min(bl.y,std::min(tr.y,br.y)))-4000;
+		vy_max = std::max(tl.y,std::max(bl.y,std::max(tr.y,br.y)))+4000;
 		for (unsigned int i=0;i<numSquares;i++)
 		{
 			if (squares[i].x+HFTS > vx_min && squares[i].x-HFTS < vx_max)
@@ -3063,7 +3063,7 @@ BOOL32 Nebula::Save(IFileSystem *inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memcpy(&save, static_cast<BASE_NEBULA_SAVELOAD *>(this), sizeof(BASE_NEBULA_SAVELOAD));
@@ -3092,7 +3092,7 @@ BOOL32 Nebula::Load(IFileSystem *inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(buffer, 0, sizeof(buffer));
@@ -3127,7 +3127,7 @@ void Nebula::ResolveAssociations()
 
 void Nebula::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc {partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_QFIELDLOAD");
@@ -3287,7 +3287,7 @@ SINGLE Nebula::getEdgeScale(const Vector &pos)
 							if (dist < 0.75*HFTS)
 								return 1.0f;
 
-							return max(0.0f,((HFTS-dist)/(0.25*HFTS)));
+							return std::max(0.0,((HFTS-dist)/(0.25*HFTS)));
 						}
 					}
 				}
@@ -3490,8 +3490,8 @@ struct DACOM_NO_VTABLE FieldManager : public IFieldManager, IEventCallback, IObj
 
 	void Init();
 
-	static BOOL CALLBACK NameDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
-	static BOOL CALLBACK FieldListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static LPARAM CALLBACK NameDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LPARAM CALLBACK FieldListDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	//IFieldManager
 	virtual void DeleteField(IField *field);
@@ -3564,12 +3564,12 @@ FieldManager::~FieldManager()
 	{
 		
 		
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 
@@ -3884,12 +3884,12 @@ void FieldManager::Init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &eventHandle);
 	}
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -3897,17 +3897,17 @@ void FieldManager::Init()
 	initializeResources();
 }
 
-BOOL FieldManager::NameDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT FieldManager::NameDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	char *nameStr = (char *) GetWindowLong(hwnd, DWL_USER);
+	char *nameStr = (char *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 
 	switch (message)
 	{
 	case WM_INITDIALOG:
 		{
-			SetWindowLong(hwnd, DWL_USER, lParam);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
 			nameStr = (char *)lParam;
 			SetDlgItemText(hwnd,IDC_EDIT1,nameStr);
@@ -3948,11 +3948,11 @@ BOOL FieldManager::NameDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lPara
 	return result;
 }
 
-BOOL FieldManager::FieldListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LPARAM FieldManager::FieldListDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
 	//FieldNode * fieldList = (FieldNode *)GetWindowLong(hwnd, DWL_USER);
-	FieldManager *fieldmgr = (FieldManager *)GetWindowLong(hwnd, DWL_USER);
+	FieldManager *fieldmgr = (FieldManager *)GetWindowLongPtr(hwnd, DWLP_USER);
 //	char newName[32];
 
 	switch (message)
@@ -3961,7 +3961,7 @@ BOOL FieldManager::FieldListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG 
 		{
 			HWND hList = GetDlgItem(hwnd,IDC_LIST1);
 
-			SetWindowLong(hwnd, DWL_USER, lParam);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
 			fieldmgr = (FieldManager *)lParam;
 
@@ -4218,7 +4218,7 @@ GENRESULT FieldManager::Notify (U32 message, void *param)
 			if (!managing)
 			{
 				managing = TRUE;
-				dialog = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_FIELDLIST), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) FieldListDlgProc, LPARAM(this));
+				dialog = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_FIELDLIST), hMainWindow, DLGPROC(FieldListDlgProc), LPARAM(this));
 				SetParent(dialog,0);
 				ShowWindow(dialog,SW_SHOWNORMAL);
 				SetWindowPos(dialog,HWND_NOTOPMOST, 20, 20, 0, 0, SWP_NOZORDER|SWP_NOSIZE);
@@ -4397,7 +4397,7 @@ HANDLE FieldManager::CreateArchetype(const char *szArchname, OBJCLASS objClass, 
 								
 								fdesc.lpImplementation = "UTF";
 								
-								if (OBJECTDIR->CreateInstance(&fdesc, file) != GR_OK)
+								if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 								{
 									CQFILENOTFOUND(fdesc.lpFileName);
 									delete dArch;

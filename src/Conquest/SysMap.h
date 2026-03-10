@@ -82,9 +82,9 @@ struct DACOM_NO_VTABLE ISystemMap : public IDAComponent
 	virtual void DrawPlayerIcon(Vector worldPos,SINGLE worldSize,U32 iconID,U32 playerID) = 0;
 
 //these functions are for registering icon types with the sysmap
-	virtual U32 RegisterIcon(char * filename) = 0;
+	virtual U32 RegisterIcon(const char * filename) = 0;
 
-	virtual U32 RegisterPlayerIcon(char * filename) = 0;
+	virtual U32 RegisterPlayerIcon(const char * filename) = 0;
 
 	virtual U32 GetPadding(U32 systemID) = 0;
 

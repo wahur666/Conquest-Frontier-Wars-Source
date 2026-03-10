@@ -47,11 +47,11 @@
 template <class Base> 
 struct _NO_VTABLE ObjectControl : public Base, DYNAMICS_DATA
 {
-	struct UpdateNode       updateNode;
-	struct InitNode			initNode;
-	struct PhysUpdateNode	physUpdateNode;
+	struct Base::UpdateNode       updateNode;
+	struct Base::InitNode			initNode;
+	struct Base::PhysUpdateNode	physUpdateNode;
 
-	typename typedef Base::INITINFO CONTROLINITINFO;
+	typedef Base::INITINFO CONTROLINITINFO;
 
 	//----------------------------------
 	
@@ -61,9 +61,9 @@ struct _NO_VTABLE ObjectControl : public Base, DYNAMICS_DATA
 
 	bool rotateShip (SINGLE relYaw, SINGLE relRoll, SINGLE relPitch)
 	{
-		targetYaw   = fixAngle(transform.get_yaw() + relYaw);
-		targetRoll  = fixAngle(transform.get_roll() + relRoll);
-		targetPitch = fixAngle(transform.get_pitch() + relPitch);
+		targetYaw   = fixAngle(this->transform.get_yaw() + relYaw);
+		targetRoll  = fixAngle(this->transform.get_roll() + relRoll);
+		targetPitch = fixAngle(this->transform.get_pitch() + relPitch);
 		bAngleValid = true;
 
 		if (fabs(relYaw) > 0.1 || fabs(relRoll) > 0.1 || fabs(relPitch) > 0.1)
@@ -83,18 +83,18 @@ struct _NO_VTABLE ObjectControl : public Base, DYNAMICS_DATA
 	{
 		if (bPositionValid == false)
 		{
-			targetPos = transform.translation;
+			targetPos = this->transform.translation;
 			targetPos.z += relAltitude;
 		}
 		else
-			targetPos.z = transform.translation.z + relAltitude;
+			targetPos.z = this->transform.translation.z + relAltitude;
 
 		bPositionValid = true;
 	}
 
 	bool setPosition (const Vector & relPosition)
 	{
-		targetPos = transform.translation;
+		targetPos = this->transform.translation;
 		targetPos += relPosition;
 		bPositionValid = true;
 
@@ -251,9 +251,9 @@ private:
 //
 template <class Base> 
 ObjectControl< Base >::ObjectControl (void) :
-					updateNode(this, UpdateProc(&ObjectControl::updateControl)),
-					initNode(this, InitProc(&ObjectControl::initControl)),
-					physUpdateNode(this, PhysUpdateProc(&ObjectControl::physUpdateControl))
+					updateNode(this, Base::UpdateProc(&ObjectControl::updateControl)),
+					initNode(this, Base::InitProc(&ObjectControl::initControl)),
+					physUpdateNode(this, Base::PhysUpdateProc(&ObjectControl::physUpdateControl))
 {
 }
 //---------------------------------------------------------------------------

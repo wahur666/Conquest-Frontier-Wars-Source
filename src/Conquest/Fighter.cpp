@@ -1800,7 +1800,7 @@ IBaseObject * Fighter::checkFutureCollision (void)
 	COMPTR<ITerrainMap> map;
 	TCallback callback(this);
 
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	getVFXPoints(points, transform, getDynamicsData().maxLinearVelocity);
 	if (patrolState == KAMIKAZE)
 		callback.kamikazeTarget = (target!=0) ? target.Ptr()->GetPartID() : 0;
@@ -2318,7 +2318,7 @@ FighterFactory::~FighterFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -2327,7 +2327,7 @@ void FighterFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -2346,7 +2346,7 @@ HANDLE FighterFactory::CreateArchetype (const char *szArchname, OBJCLASS objClas
 		DAFILEDESC fdesc = data->fileName;
 		COMPTR<IFileSystem> objFile;
 
-		if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 			TEXLIB->load_library(objFile, 0);
 		else
 			goto Error;

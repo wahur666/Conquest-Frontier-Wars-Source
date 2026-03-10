@@ -16,6 +16,11 @@
 #ifndef ICAMERA_H
 #include <ICamera.h>
 #endif
+#include "ObjList.h"
+#include "OpAgent.h"
+#include "Sector.h"
+#include "TSmartPointer.h"
+#include "Search.hpp"
 
 #ifndef _INC_STDLIB
 #include <stdlib.h>
@@ -48,17 +53,17 @@ struct _NO_VTABLE ObjectWarp : public Base, WARP_SAVELOAD
 
 //	struct PreRenderNode	preRenderNode;
 //	struct PostRenderNode   postRenderNode;
-	struct PhysUpdateNode   physUpdateNode;
-	struct UpdateNode		updateNode;
-	struct ExplodeNode      explodeNode;
-	struct SaveNode			saveNode;
-	struct LoadNode			loadNode;
-	struct ResolveNode		resolveNode;
-	struct InitNode			initNode;
-	struct OnOpCancelNode	onOpCancelNode;
+	struct Base::PhysUpdateNode   physUpdateNode;
+	struct Base::UpdateNode		updateNode;
+	struct Base::ExplodeNode      explodeNode;
+	struct Base::SaveNode			saveNode;
+	struct Base::LoadNode			loadNode;
+	struct Base::ResolveNode		resolveNode;
+	struct Base::InitNode			initNode;
+	struct Base::OnOpCancelNode	onOpCancelNode;
 
-	typename typedef Base::SAVEINFO WARPSAVEINFO;
-	typename typedef Base::INITINFO WARPINITINFO;
+	typedef Base::SAVEINFO WARPSAVEINFO;
+	typedef Base::INITINFO WARPINITINFO;
 
 	OBJPTR<IJumpGate> targetGate;
 	OBJPTR<IJumpGate> inTargetGate;
@@ -110,14 +115,14 @@ private:
 //
 template <class Base> 
 ObjectWarp< Base >::ObjectWarp (void) :
-			physUpdateNode(this, PhysUpdateProc(&ObjectWarp::updateWarp)),
-			explodeNode(this, ExplodeProc(&ObjectWarp::explodeWarp)),
-			saveNode(this, SaveLoadProc(&ObjectWarp::saveWarpState)),
-			loadNode(this, SaveLoadProc(&ObjectWarp::loadWarpState)),
-			resolveNode(this, ResolveProc(&ObjectWarp::resolveWarpState)),
-			onOpCancelNode(this, OnOpCancelProc(&ObjectWarp::onOpCancelWarp)),
-			initNode(this, InitProc(&ObjectWarp::initWarp)),
-			updateNode(this, UpdateProc(&ObjectWarp::handleWarpUpdate))
+			physUpdateNode(this, Base::PhysUpdateProc(&ObjectWarp::updateWarp)),
+			explodeNode(this, Base::ExplodeProc(&ObjectWarp::explodeWarp)),
+			saveNode(this, Base::SaveLoadProc(&ObjectWarp::saveWarpState)),
+			loadNode(this, Base::SaveLoadProc(&ObjectWarp::loadWarpState)),
+			resolveNode(this, Base::ResolveProc(&ObjectWarp::resolveWarpState)),
+			onOpCancelNode(this, Base::OnOpCancelProc(&ObjectWarp::onOpCancelWarp)),
+			initNode(this, Base::InitProc(&ObjectWarp::initWarp)),
+			updateNode(this, Base::UpdateProc(&ObjectWarp::handleWarpUpdate))
 {
 }
 //---------------------------------------------------------------------------
@@ -126,7 +131,7 @@ template <class Base>
 BOOL32 ObjectWarp< Base >::handleWarpUpdate (void)
 {
 	if (warpStage != WS_NONE)
-		bEnablePhysics = 1;
+		this->bEnablePhysics = 1;
 	return 1;
 }
 //---------------------------------------------------------------------------
@@ -135,9 +140,9 @@ template <class Base>
 void ObjectWarp< Base >::handleWarp (WARP_STAGE ws)
 {
 	SINGLE relYaw=0;
-	if (pTrailType && systemID==SECTOR->GetCurrentSystem() && FOGOFWAR->CheckVisiblePosition(transform.translation))	// don't bother if off screen
+	if (pTrailType && this->systemID==SECTOR->GetCurrentSystem() && FOGOFWAR->CheckVisiblePosition(this->transform.translation))	// don't bother if off screen
 	{
-		IBaseObject *trail = CreateTrail(pTrailType,this,transform.translation+warpVector*(warpRadius-400),systemID);
+		IBaseObject *trail = CreateTrail(pTrailType,this,this->transform.translation+warpVector*(warpRadius-400),this->systemID);
 		OBJLIST->AddObject(trail);
 	}
 
@@ -147,12 +152,12 @@ void ObjectWarp< Base >::handleWarp (WARP_STAGE ws)
 		
 		warpSpeed = 1000;
 		
-		SINGLE yaw = transform.get_yaw();
+		SINGLE yaw = this->transform.get_yaw();
 		SINGLE desiredYaw = get_angle(warpVector.x,warpVector.y);
-		relYaw = fixAngle(desiredYaw-yaw);
+		relYaw = this->fixAngle(desiredYaw-yaw);
 	}
 
-	rotateShip(relYaw, 0, 0);
+	this->rotateShip(relYaw, 0, 0);
 }
 
 //
@@ -169,7 +174,7 @@ BOOL32 ObjectWarp< Base >::doWarp (SINGLE dt)
 {
 	BOOL32 bWarping = TRUE;
 
-	Vector pos = ENGINE->get_position(instanceIndex);
+	Vector pos = ENGINE->get_position(this->instanceIndex);
 	Vector dp = pos - gatePosition;
 	SINGLE zStretch=1.0;
 	Vector svec(1,1,1),svec2(0,0,0);
@@ -181,7 +186,7 @@ BOOL32 ObjectWarp< Base >::doWarp (SINGLE dt)
 		{
 			// WARP IS DONE. SHIP SHOULD BE CHANGED TO NEW SYSTEM, etc.
 			bWarping = FALSE;
-			velocity.zero();
+			this->velocity.zero();
 			warpStage = WS_NONE;
 			startWarpIn();
 		}
@@ -191,11 +196,11 @@ BOOL32 ObjectWarp< Base >::doWarp (SINGLE dt)
 
 	if (warpStage == WS_PRE_WARP)
 	{
-		SINGLE yaw = transform.get_yaw();
+		SINGLE yaw = this->transform.get_yaw();
 		SINGLE desiredYaw = get_angle(warpVector.x,warpVector.y);
-		SINGLE relYaw = fixAngle(desiredYaw-yaw);
+		SINGLE relYaw = this->fixAngle(desiredYaw-yaw);
 
-		if (rotateShip(relYaw, 0, 0))		// are we facing the jumpgate?
+		if (this->rotateShip(relYaw, 0, 0))		// are we facing the jumpgate?
 		{
 			warpStage = WS_WARP_OUT;
 			warpTimer = JUMP_TIME;
@@ -218,14 +223,14 @@ BOOL32 ObjectWarp< Base >::doWarp (SINGLE dt)
 			//MOVE SHIP TO "0 SPACE"
 			warpStage = WS_LIMBO;
 			U32 sysID = inTargetGate.Ptr()->GetSystemID();
-			SECTOR->RevealSystem(sysID,playerID);
-			FOGOFWAR->RevealBlackZone(playerID,sysID,inTargetGate.Ptr()->GetPosition(),5000.0/GRIDSIZE);
-			SetSystemID(sysID | HYPER_SYSTEM_MASK);
+			SECTOR->RevealSystem(sysID,this->playerID);
+			FOGOFWAR->RevealBlackZone(this->playerID,sysID,inTargetGate.Ptr()->GetPosition(),5000.0/GRIDSIZE);
+			this->SetSystemID(sysID | HYPER_SYSTEM_MASK);
 			// update the map with our latest location
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(systemID, map);
+			SECTOR->GetTerrainMap(this->systemID, map);
 			if (map)
-				SetTerrainFootprint(map);
+				this->SetTerrainFootprint(map);
 
 			UnregisterSystemVolatileWatchersForObject(this);
 
@@ -247,13 +252,13 @@ BOOL32 ObjectWarp< Base >::doWarp (SINGLE dt)
 		{
 			bWarping = FALSE;
 			warpStage = WS_NONE;
-			velocity = warpVector*stop_speed;
-			ang_velocity.zero();
-			THEMATRIX->OperationCompleted2(warpAgentID, dwMissionID);
-			CQTRACEM2("%s completed jump to system %d", (char*)partName, systemID);
+			this->velocity = warpVector*stop_speed;
+			this->ang_velocity.zero();
+			THEMATRIX->OperationCompleted2(warpAgentID, this->dwMissionID);
+			CQTRACEM2("%s completed jump to system %d", (char*)this->partName, this->systemID);
 			GRIDVECTOR grid;
-			grid = transform.translation + velocity;
-			moveToPos(grid);		// reestablish a grid location
+			grid = this->transform.translation + this->velocity;
+			this->moveToPos(grid);		// reestablish a grid location
 			goto Done;
 		}
 	}
@@ -262,14 +267,14 @@ BOOL32 ObjectWarp< Base >::doWarp (SINGLE dt)
 	CQASSERT (warpTimer >= 0);
 
 	svec.set(1,1, zStretch);
-	svec2.set(0,0,box[BBOX_MAX_Z]);
+	svec2.set(0,0,this->box[this->BBOX_MAX_Z]);
 	
 	warpAccelerate(dt);
 
 	SINGLE stretchRatio;
 	stretchRatio = dp.magnitude()/warpRadius;
 	svec.set(stretchRatio, stretchRatio, zStretch*stretchRatio);
-	svec2.set(0,0,box[BBOX_MAX_Z]);
+	svec2.set(0,0,this->box[this->BBOX_MAX_Z]);
 
 	scaleTrans.d[0][0] = svec.x;
 	scaleTrans.d[1][1] = svec.y;
@@ -321,7 +326,7 @@ void ObjectWarp< Base >::warpAccelerate (SINGLE dt)
 				ang_velocity = angVel;
 			}*/
 			warpSpeed += acceleration*dt;
-			Vector dir = gatePosition - transform.translation;
+			Vector dir = gatePosition - this->transform.translation;
 			if(dir.x == 0.0 && dir.y == 0.0  && dir.z == 0.0  )
 				dir = Vector(0,1,0);
 			dir.normalize();
@@ -329,7 +334,7 @@ void ObjectWarp< Base >::warpAccelerate (SINGLE dt)
 		}
 	}
 
-	velocity = vel;
+	this->velocity = vel;
 }
 
 //---------------------------------------------------------------------------
@@ -340,8 +345,8 @@ void ObjectWarp< Base >::updateWarp (SINGLE dt)
 	if (warpStage != WS_NONE)
 	{
 		doWarp(dt);
-		disableAutoMovement();
-		DEBUG_resetInputCounter();			// no movement needed while warping!
+		this->disableAutoMovement();
+		this->DEBUG_resetInputCounter();			// no movement needed while warping!
 	}
 	
 	/*if (warpStage != WS_NONE && warpStage != WS_SPECIAL)
@@ -412,7 +417,7 @@ void ObjectWarp< Base >::recalcVisibilityOnWarpIn (void)
 	IBaseObject * obj = OBJLIST->GetObjectList(), *end=0;
 	while (obj)
 	{
-		if (obj->GetSystemID() == systemID)
+		if (obj->GetSystemID() == this->systemID)
 			obj->CastVisibleArea();
 		end = obj;
 		obj = obj->next;
@@ -421,7 +426,7 @@ void ObjectWarp< Base >::recalcVisibilityOnWarpIn (void)
 	obj = end;
 	while (obj)
 	{
-		if (obj->GetSystemID() == systemID)
+		if (obj->GetSystemID() == this->systemID)
 			obj->UpdateVisibilityFlags();
 		obj = obj->prev;
 	}
@@ -438,8 +443,8 @@ void ObjectWarp< Base >::startWarpIn ()
 	trans.set_k(-facing);
 	trans.set_i(Vector(facing.y,-facing.x,0));
 	trans.translation = gatePosition;
-	SetTransform(trans, inTargetGate.Ptr()->GetSystemID());
-	ENGINE->update_instance(instanceIndex,0,0);
+	this->SetTransform(trans, inTargetGate.Ptr()->GetSystemID());
+	ENGINE->update_instance(this->instanceIndex,0,0);
 
 	warpStage = WS_WARP_IN;
 
@@ -452,7 +457,7 @@ void ObjectWarp< Base >::startWarpIn ()
 
 	warpSpeed = acceleration*JUMP_TIME;
 
-	velocity = warpSpeed*warpInVector;
+	this->velocity = warpSpeed*warpInVector;
 
 	handleWarp(WS_WARP_IN);
 	recalcVisibilityOnWarpIn();
@@ -514,11 +519,11 @@ void ObjectWarp< Base >::useJumpgate (IBaseObject * outgate, IBaseObject * ingat
 {
 	if (warpAgentID!=0)
 	{
-		CQBOMB4("%s initiating jump to system %d, oldAgent=%d, newAgent=%d", (char*)partName, ingate->GetSystemID(), warpAgentID, agentID);
+		CQBOMB4("%s initiating jump to system %d, oldAgent=%d, newAgent=%d", (char*)this->partName, ingate->GetSystemID(), warpAgentID, agentID);
 	}
-	ingate->SetVisibleToPlayer(playerID);		// make remote side visible immediately
+	ingate->SetVisibleToPlayer(this->playerID);		// make remote side visible immediately
 
-	resetMoveVars();
+	this->resetMoveVars();
 	scaleTrans.set_identity();
 
 	outgate->QueryInterface(IJumpGateID, targetGate, NONSYSVOLATILEPTR);
@@ -547,7 +552,7 @@ void ObjectWarp< Base >::useJumpgate (IBaseObject * outgate, IBaseObject * ingat
 
 
 	gatePosition = targetGate.Ptr()->GetPosition();
-	warpVector = gatePosition-transform.translation;
+	warpVector = gatePosition-this->transform.translation;
 	if(warpVector.x == 0.0 && warpVector.y == 0.0  && warpVector.z == 0.0  )
 		warpVector = Vector(0,1,0);
 	warpRadius = warpVector.magnitude();
@@ -564,7 +569,7 @@ void ObjectWarp< Base >::useJumpgate (IBaseObject * outgate, IBaseObject * ingat
 	releaseTime = inTargetGate->JumpIn(this,time,warpInVector);
 	handleWarp(WS_PRE_WARP);
 
-	disableAutoMovement();
+	this->disableAutoMovement();
 
 
 
@@ -577,7 +582,7 @@ void ObjectWarp< Base >::useJumpgate (IBaseObject * outgate, IBaseObject * ingat
 	//SetTransform(trans);
 
 	warpAgentID = agentID;
-	CQTRACEM3("%s initiating jump to system %d, agent=%d", (char*)partName, ingate->GetSystemID(), agentID);
+	CQTRACEM3("%s initiating jump to system %d, agent=%d", (char*)this->partName, ingate->GetSystemID(), agentID);
 }
 //---------------------------------------------------------------------------
 //
@@ -638,7 +643,7 @@ void ObjectWarp< Base >::resolveWarpState (void)
 	if (warpStage == WS_WARP_OUT)
 	{
 		gatePosition = targetGate.Ptr()->GetPosition();
-		warpVector = gatePosition-transform.translation;
+		warpVector = gatePosition-this->transform.translation;
 		warpVector.normalize();
 	}
 
@@ -664,20 +669,22 @@ void ObjectWarp< Base >::onOpCancelWarp (U32 agentID)
 template <class Base>
 void ObjectWarp< Base >::setModelScale(INSTANCE_INDEX instanceIndex,Vector scale,Vector scale_origin)
 {
-	ENGINE->set_instance_property(instanceIndex, "Stretch", &scale);
-	ENGINE->set_instance_property(instanceIndex, "StretchPoint", &scale_origin);
+	//TODO: This code was not finished so it will be commented out
+	__debugbreak();
+	// ENGINE->set_instance_property(instanceIndex, "Stretch", &scale);
+	// ENGINE->set_instance_property(instanceIndex, "StretchPoint", &scale_origin);
 
-	INSTANCE_INDEX lastChild = INVALID_INSTANCE_INDEX,child;
-	while ((child = MODEL->get_child(instanceIndex,lastChild)) != INVALID_INSTANCE_INDEX)
-	{
-		Transform parentTrans = ENGINE->get_transform(instanceIndex);
-		Transform invChildTrans = ENGINE->get_transform(child).get_transpose();
-		Vector childPos = ENGINE->get_position(child);
-		Vector scale_origin2 = invChildTrans*(parentTrans.translation-childPos+parentTrans.rotate(scale_origin));
-		Vector scale2;
-		setModelScale(child,scale,scale_origin2);
-		lastChild = child;
-	}
+	// INSTANCE_INDEX lastChild = INVALID_INSTANCE_INDEX,child;
+	// while ((child = MODEL->get_child(instanceIndex,lastChild)) != INVALID_INSTANCE_INDEX)
+	// {
+	// 	Transform parentTrans = ENGINE->get_transform(instanceIndex);
+	// 	Transform invChildTrans = ENGINE->get_transform(child).get_transpose();
+	// 	Vector childPos = ENGINE->get_position(child);
+	// 	Vector scale_origin2 = invChildTrans*(parentTrans.translation-childPos+parentTrans.rotate(scale_origin));
+	// 	Vector scale2;
+	// 	setModelScale(child,scale,scale_origin2);
+	// 	lastChild = child;
+	// }
 }
 //---------------------------------------------------------------------------
 //---------------------------End TObjWarp.h----------------------------------

@@ -1653,7 +1653,7 @@ void SysMap::DrawPlayerIcon(Vector worldPos,SINGLE worldSize,U32 _iconID,U32 pla
 }
 //--------------------------------------------------------------------------//
 //
-U32 SysMap::RegisterIcon(char * filename)
+U32 SysMap::RegisterIcon(const char * filename)
 {
 	CQASSERT(numIcons < MAX_ICONS);
 	iconId[numIcons] = TMANAGER->CreateTextureFromFile(filename, TEXTURESDIR, DA::BMP, PF_4CC_DAOT);		// create opaque texture
@@ -1664,7 +1664,7 @@ U32 SysMap::RegisterIcon(char * filename)
 }
 //--------------------------------------------------------------------------//
 //
-U32 SysMap::RegisterPlayerIcon(char * filename)
+U32 SysMap::RegisterPlayerIcon(const char * filename)
 {
 	CQASSERT(numPlayerIcons < MAX_ICONS);
 	playerIconId[0][numPlayerIcons] = TMANAGER->CreateTextureFromFile(filename, TEXTURESDIR, DA::BMP, PF_4CC_DAOT);		// create opaque texture

@@ -179,7 +179,7 @@ struct CommTrack : ICommTrack, IEventCallback, TRACKDATA
 
 	void update (U32 dt);
 
-	static void CommTrack::printCmdQueue (U32 dwMissionID, TrackingNode * node, char *buffer);
+	static void printCmdQueue (U32 dwMissionID, TrackingNode * node, char *buffer);
 
 	IDAComponent * getBase (void)
 	{
@@ -187,14 +187,14 @@ struct CommTrack : ICommTrack, IEventCallback, TRACKDATA
 	}
 
 
-	static BOOL CALLBACK dlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static LRESULT CALLBACK dlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 //----------------------------------------------------------------------------------------------
 //
 CommTrack::~CommTrack (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
 	DEFAULTS->SetDataInRegistry(szRegKey, static_cast<TRACKDATA *>(this), sizeof(TRACKDATA));
@@ -220,7 +220,7 @@ GENRESULT CommTrack::Notify (U32 message, void *param)
 		switch (LOWORD(msg->wParam))
 		{
 		case IDM_COMMAND_TRACKING:
-			DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG14), hMainWindow, dlgProc, (LPARAM) this);
+			DialogBoxParam(hResource, MAKEINTRESOURCE(IDD_DIALOG14), hMainWindow, DLGPROC(dlgProc), (LPARAM) this);
 			break;
 		}
 		break;  // end case WM_COMMAND
@@ -378,10 +378,10 @@ U32 CommTrack::getCommandCount (U32 dwMissionID)
 }
 //--------------------------------------------------------------------------//
 //
-BOOL CommTrack::dlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT CommTrack::dlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	CommTrack * track = (CommTrack *) GetWindowLong(hwnd, DWL_USER);
+	CommTrack * track = (CommTrack *) GetWindowLongPtr(hwnd, DWLP_USER);
 //	NM_UPDOWN * pnmud;
 
 	switch (message)
@@ -389,8 +389,8 @@ BOOL CommTrack::dlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
 	case WM_INITDIALOG:
 		{
 			HWND hItem;
-			SetWindowLong(hwnd, DWL_USER, lParam);
-			track = (CommTrack *) GetWindowLong(hwnd, DWL_USER);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+			track = (CommTrack *) GetWindowLongPtr(hwnd, DWLP_USER);
 
 			SetDlgItemInt(hwnd, IDC_EDIT1, track->NODE_LIFETIME / 1000, 0);
 			hItem = GetDlgItem(hwnd, IDC_SPIN1);
@@ -477,7 +477,7 @@ struct _commtrack : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(ct->getBase(), &ct->eventHandle);
 
 		if (DEFAULTS->GetDataFromRegistry(szRegKey, static_cast<TRACKDATA *>(ct), sizeof(TRACKDATA)) != sizeof(TRACKDATA) || ct->version != TRACK_VERSION)

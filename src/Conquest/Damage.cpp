@@ -55,55 +55,21 @@ typedef SPACESHIP_INIT<BASE_SPACESHIP_DATA> BASESHIPINIT;
 
 //--------------------------------------------------------------------------//
 //
-template ObjectDamage
-			<ObjectBuild
-		        <ObjectExtent
-		         <ObjectWarp
-			      <ObjectMove
-				   <ObjectSelection
-					<ObjectMission
-					 <ObjectPhysics
-					  <ObjectControl
-					   <ObjectTransform
-					    <ObjectFrame<struct IBaseObject,struct SPACESHIP_SAVELOAD, BASESHIPINIT> >
-					   >
-					  > 
-					 > 
-					> 
-				   >
-				  >
-				 >
-				 >
-				>;
 
 typedef PLATFORM_INIT<BASE_PLATFORM_DATA> BASEPLATINIT;
 
-template ObjectDamage
-			<ObjectBuild
-			<ObjectExtension
-			 <ObjectExtent
-			  <ObjectSelection
-			   <ObjectMission
-			    <ObjectTransform
-			     <ObjectFrame<IBaseObject,BASE_PLATFORM_SAVELOAD,BASEPLATINIT> >
-				>
-			   >
-			  >
-			 >
-			 >
-			>;
 
 //---------------------------------------------------------------------------
 //
 template <class Base> 
 ObjectDamage< Base >::ObjectDamage (void) :
-					saveNode(this, SaveLoadProc(&ObjectDamage::saveDamage)),
-					loadNode(this, SaveLoadProc(&ObjectDamage::loadDamage)),
-					postRenderNode(this, RenderProc(&ObjectDamage::damagePostRender)),
-					updateNode(this, UpdateProc(&ObjectDamage::updateDamage)),
-					initNode(this, InitProc(&ObjectDamage::initDamage)),
-					physUpdateNode(this, PhysUpdateProc(&ObjectDamage::physUpdateDamage)),
-					resolveNode(this, ResolveProc(&ObjectDamage::resolveDamage))
+					saveNode(this,		Base::SaveLoadProc(&ObjectDamage::saveDamage)),
+					loadNode(this,		Base::SaveLoadProc(&ObjectDamage::loadDamage)),
+					postRenderNode(this,Base::RenderProc(&ObjectDamage::damagePostRender)),
+					updateNode(this,	Base::UpdateProc(&ObjectDamage::updateDamage)),
+					initNode(this,		Base::InitProc(&ObjectDamage::initDamage)),
+					physUpdateNode(this,Base::PhysUpdateProc(&ObjectDamage::physUpdateDamage)),
+					resolveNode(this,	Base::ResolveProc(&ObjectDamage::resolveDamage))
 {
 	threshold = 0.5;
 	U8 i;
@@ -137,13 +103,13 @@ void ObjectDamage< Base >::GetNextDamageSpot (Vector & vect, Vector & dir)
 		if (lastRepairSlot != -1)
 		{
 			vect = damageSave[lastRepairSlot].pos;
-			dir = (GetPosition()-vect).normalize();
+			dir = (this->GetPosition()-vect).normalize();
 		}
 	}
 	if(lastRepairSlot == -1)
 	{
 		OBJBOX box;
-		GetObjectBox(box);
+		this->GetObjectBox(box);
 
 		vect = Vector(0,box[2],0);
 		dir = Vector(0,0,1);
@@ -251,10 +217,10 @@ void ObjectDamage< Base >::initDamage (const DAMAGEINITINFO & data)
 		
 	}*/
 
-	if (extentData->bX)
-		sizeFactor = (box[BBOX_MAX_X]-box[BBOX_MIN_X])*0.00025;
+	if (this->extentData->bX)
+		sizeFactor = (this->box[BBOX_MAX_X]-this->box[BBOX_MIN_X])*0.00025;
 	else
-		sizeFactor = (box[BBOX_MAX_Y]-box[BBOX_MIN_Y])*0.00025;
+		sizeFactor = (this->box[BBOX_MAX_Y]-this->box[BBOX_MIN_Y])*0.00025;
 
 	lastDamage = 0.72;
 
@@ -310,7 +276,7 @@ void ObjectDamage< Base >::damagePostRender (void)
 		if (fire[i].index != INVALID_INSTANCE_INDEX)
 		{
 			cnt++;
-			ENGINE->set_transform(fire[i].index,transform.multiply(fire[i].trans));
+			ENGINE->set_transform(fire[i].index,this->transform.multiply(fire[i].trans));
 			ENGINE->render_instance(MAINCAM,fire[i].index,0,LODPERCENT,0,0);
 		}
 		i++;
@@ -357,19 +323,19 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 	if(!bUpdateDamage)
 		return 1;
 
-	if (bExploding || instanceIndex == INVALID_INSTANCE_INDEX)
+	if (this->bExploding || this->instanceIndex == INVALID_INSTANCE_INDEX)
 		goto UpdateOnly;
 
 	SINGLE hull;
 
-	if (hullPointsMax)
-		hull = (SINGLE)hullPoints / (SINGLE)hullPointsMax;
+	if (this->hullPointsMax)
+		hull = (SINGLE)this->hullPoints / (SINGLE)this->hullPointsMax;
 	else 
 		hull = 1.0F;
 
 
 //repair stuff
-	if (building && hull > lastDamage && lastDamage <= 0.6f)
+	if (this->building && hull > lastDamage && lastDamage <= 0.6f)
 	{
 		lastDamage += 0.12f;
 		Vector dummy,dummy2;
@@ -397,7 +363,7 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 
 	timer++;
 	U8 i;
-	if ((timer%8 == 0 && rand()%5==0) && hull < 0.25 && bReady)
+	if ((timer%8 == 0 && rand()%5==0) && hull < 0.25 && this->bReady)
 	{
 		S8 slot=-1;
 		int i=0;
@@ -430,7 +396,7 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 			
 
 			Vector src = damageSave[choice].pos;
-			if (extentData->bX)
+			if (this->extentData->bX)
 			{
 			//	pos = (src.z-_min)/(box[BBOX_MAX_Z]-_min);
 				pos = src.x;
@@ -441,8 +407,8 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 				pos = src.y;
 			}
 
-			const RECT *rect = GetExtentRect(pos);
-			if (extentData->bX)
+			const RECT *rect = this->GetExtentRect(pos);
+			if (this->extentData->bX)
 			{
 				fire[slot].trans.translation.x = pos;
 				if (src.y < 0.8*rect->left)
@@ -467,7 +433,7 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 		}
 
 	}
-	if ((timer%6 == 4 && rand()%2 == 0) && hull < 0.5 && bReady)
+	if ((timer%6 == 4 && rand()%2 == 0) && hull < 0.5 && this->bReady)
 	{
 		/*S8 slot=-1;
 
@@ -483,7 +449,7 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 			/*numFires++;
 			CQASSERT(numFires <= NUM_FIRES);*/
 			IBaseObject *obj = ARCHLIST->CreateInstance(pSparkBlast);
-			AddChildBlast(obj);
+			this->AddChildBlast(obj);
 
 			Transform trans;
 			//SINGLE pos = _min+(min_slice+1)*_step+(BBOX_MAX__slice-min_slice-2)*_step*rand()/RAND_BBOX_MAX_;
@@ -499,7 +465,7 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 			
 
 			Vector src = damageSave[choice].pos;
-			if (extentData->bX)
+			if (this->extentData->bX)
 			{
 		//		pos = (src.z-_min)/(box[BBOX_MAX_Z]-_min);
 				pos = src.x;
@@ -510,8 +476,8 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 				pos = src.y;
 			}
 
-			const RECT *rect = GetExtentRect(pos);
-			if (extentData->bX)
+			const RECT *rect = this->GetExtentRect(pos);
+			if (this->extentData->bX)
 			{
 				trans.translation.x = pos;
 				if (src.y < 0.8*rect->left)
@@ -546,7 +512,7 @@ BOOL32 ObjectDamage< Base >::updateDamage (void)
 
 			if (obj->QueryInterface(IBlastID,blast))
 			{
-				blast->InitBlast(trans,systemID,this,0.2+box[BBOX_MAX_Z]/4500.0);
+				blast->InitBlast(trans,this->systemID,this,0.2+this->box[BBOX_MAX_Z]/4500.0);
 			}
 		//}
 	}
@@ -571,7 +537,7 @@ UpdateOnly:
 		i++;
 	}
 
-	IBaseObject *pos = childBlastList,*last=NULL;
+	IBaseObject *pos = this->childBlastList,*last=NULL;
 	while (pos)
 	{
 		if (pos->Update()==0)
@@ -585,10 +551,10 @@ UpdateOnly:
 			}
 			else
 			{
-				childBlastList = pos->next;
+				this->childBlastList = pos->next;
 				pos->next = 0;		// so objlist wont do bad things (jy)
 				delete pos;
-				pos = childBlastList;
+				pos = this->childBlastList;
 			}
 		}
 		else
@@ -599,33 +565,33 @@ UpdateOnly:
 	}
 
 	//SHIELD STUFF
-	if (fieldFlags.shieldsInoperable() == bShieldsUp)
+	if (this->fieldFlags.shieldsInoperable() == bShieldsUp)
 	{
 		bShieldsUp = !bShieldsUp;
 		if (fizzSound==0)
 			fizzSound = SFXMANAGER->Open(fizzSoundID);
-		SFXMANAGER->Play(fizzSound, systemID, &transform.translation);
+		SFXMANAGER->Play(fizzSound, this->systemID, &this->transform.translation);
 		shieldDownTimer = 1.0;
 	}
 
-	if (fieldFlags.bHades && bVisible)
+	if (this->fieldFlags.bHades && this->bVisible)
 	{
 		if (timer%20 == 0) //BAD
 		{
-			FIELDMGR->CreateFieldBlast(this,Vector(0,0,0),systemID);
+			FIELDMGR->CreateFieldBlast(this,Vector(0,0,0),this->systemID);
 		}
 	}
 	
 	//apply damage each second, based on the really lame timer mechanism that now infects every ship
-	if (fieldFlags.damagePerTwentySeconds)
+	if (this->fieldFlags.damagePerTwentySeconds)
 	{
-		S32 quantumTime1 = floor((coarseTimer*fieldFlags.damagePerTwentySeconds)/20.0f);
+		S32 quantumTime1 = floor((coarseTimer*this->fieldFlags.damagePerTwentySeconds)/20.0f);
 		coarseTimer += ELAPSED_TIME;
-		S32 quantumTime2 = floor((coarseTimer*fieldFlags.damagePerTwentySeconds)/20.0f);
+		S32 quantumTime2 = floor((coarseTimer*this->fieldFlags.damagePerTwentySeconds)/20.0f);
 		if (coarseTimer > 100.0)
 			coarseTimer -= 100.0;
 		if (quantumTime2-quantumTime1)
-			ApplyAOEDamage(0,quantumTime2-quantumTime1);
+			this->ApplyAOEDamage(0,quantumTime2-quantumTime1);
 	}
 
 	return 1;
@@ -656,7 +622,7 @@ void ObjectDamage< Base >::physUpdateDamage(SINGLE dt)
 		i++;
 	}
 
-	IBaseObject *pos = childBlastList;
+	IBaseObject *pos = this->childBlastList;
 	while (pos)
 	{
 		pos->PhysicalUpdate(dt);
@@ -686,7 +652,7 @@ void ObjectDamage< Base >::physUpdateDamage(SINGLE dt)
 template <class Base>
 void ObjectDamage< Base >::resolveDamage()
 {
-	bShieldsUp = (!fieldFlags.shieldsInoperable());
+	bShieldsUp = (!this->fieldFlags.shieldsInoperable());
 }
 //---------------------------------------------------------------------------
 //
@@ -694,9 +660,9 @@ template <class Base>
 void ObjectDamage< Base >::CreateShieldHit(const Vector & pos, const Vector &dir,Vector &collide_point,U32 damage)
 {
 #if 1
-	if (bUseSMeshAsShield && bShieldsUp && hullPoints >= 0.3*hullPointsMax)
+	if (bUseSMeshAsShield && bShieldsUp && this->hullPoints >= 0.3*this->hullPointsMax)
 	{
-		if (smesh && shieldAnimArch && !fieldFlags.shieldsInoperable())
+		if (smesh && shieldAnimArch && !this->fieldFlags.shieldsInoperable())
 		{
 			GenerateShieldHit(pos,dir,collide_point,damage);
 			numShieldHits++;
@@ -998,16 +964,16 @@ void ObjectDamage< Base >::GenerateShieldHit(const Vector & pos,const Vector &di
 			//	scaleTrans.d[2][2] = SHIELD_SCALE;
 			
 			//TRANSFORM trans = scaleTrans*transform;
-			Vector opos = transform.inverse_rotate_translate(pos);
-			Vector odir = transform.inverse_rotate(dir);
+			Vector opos = this->transform.inverse_rotate_translate(pos);
+			Vector odir = this->transform.inverse_rotate(dir);
 			opos = opos/SHIELD_SCALE;
 			odir.normalize();
-			if (GetModelCollisionPosition(collide_point,norm,pos-dir*1000, dir))
+			if (this->GetModelCollisionPosition(collide_point,norm,pos-dir*1000, dir))
 			{
 				
 				//the following two lines are necessary if GetModelCollisionPosition returns world space
-				collide_point = transform.inverse_rotate_translate(collide_point);
-				norm = transform.inverse_rotate(norm);
+				collide_point = this->transform.inverse_rotate_translate(collide_point);
+				norm = this->transform.inverse_rotate(norm);
 				
 				Vector base_i,base_j;
 				base_i.set(-norm.y,norm.x,0);
@@ -1079,7 +1045,7 @@ void ObjectDamage< Base >::GenerateShieldHit(const Vector & pos,const Vector &di
 					
 					//define BBOX_MAX__DIST 800.0
 					
-					SINGLE BBOX_MAX__DIST = 400+box[BBOX_MAX_Z]*0.15;
+					SINGLE BBOX_MAX__DIST = 400+this->box[BBOX_MAX_Z]*0.15;
 					
 					n[0] = smesh->v_list[smesh->f_list[t].v[0]].n;
 					n[1] = smesh->v_list[smesh->f_list[t].v[1]].n;
@@ -1148,10 +1114,10 @@ void ObjectDamage< Base >::GenerateShieldHit(const Vector & pos,const Vector &di
 				}
 				shieldHitPolys[slot]->poly_cnt = next_poly;
 				shieldHitPolys[slot]->timer = 1.0;
-				Vector cp_global = transform*collide_point;
+				Vector cp_global = this->transform*collide_point;
 				if (shieldSound[slot]==0)
 					shieldSound[slot] = SFXMANAGER->Open(shieldSoundID);
-				SFXMANAGER->Play(shieldSound[slot], systemID, &cp_global);
+				SFXMANAGER->Play(shieldSound[slot], this->systemID, &cp_global);
 			}
 		}
 	}
@@ -1175,7 +1141,7 @@ void ObjectDamage< Base >::renderShieldHits()
 	Vector v[3];
 	TexCoord t[3];
 	
-	int tech = MGlobals::GetUpgradeLevel(playerID,UG_SHIELDS,race);
+	int tech = MGlobals::GetUpgradeLevel(this->playerID,UG_SHIELDS,this->race);
 
 
 	TRANSFORM scaleTrans;
@@ -1214,7 +1180,7 @@ void ObjectDamage< Base >::renderShieldHits()
 	BATCH->set_render_state(D3DRS_SRCBLEND,D3DBLEND_ONE);
 	BATCH->set_render_state(D3DRS_DESTBLEND,D3DBLEND_ONE);
 
-	TRANSFORM trans = transform*scaleTrans;
+	TRANSFORM trans = this->transform*scaleTrans;
 //	trans.rotate_about_j(PI);
 	CAMERA->SetModelView(&trans);
 	SetupDiffuseBlend(shieldAnimArch->frames[0].texture,TRUE);
@@ -1299,7 +1265,7 @@ void ObjectDamage< Base >::renderShieldHits()
 template <class Base>
 void ObjectDamage< Base >::renderShield()
 {
-	int tech = MGlobals::GetUpgradeLevel(playerID,UG_SHIELDS,race);
+	int tech = MGlobals::GetUpgradeLevel(this->playerID,UG_SHIELDS,this->race);
 
 	Vector v[3];
 	
@@ -1310,7 +1276,7 @@ void ObjectDamage< Base >::renderShield()
 
 	DisableTextures();
 
-	TRANSFORM trans = transform*scaleTrans;
+	TRANSFORM trans = this->transform*scaleTrans;
 	//trans.rotate_about_j(PI);
 	CAMERA->SetModelView(&trans);
 
@@ -1343,7 +1309,7 @@ void ObjectDamage< Base >::renderShield()
 template <class Base>
 void ObjectDamage< Base >::renderShieldDown()
 {
-	int tech = MGlobals::GetUpgradeLevel(playerID,UG_SHIELDS,race);
+	int tech = MGlobals::GetUpgradeLevel(this->playerID,UG_SHIELDS,this->race);
 
 	Vector v[3];
 	TexCoord t[3];
@@ -1353,7 +1319,7 @@ void ObjectDamage< Base >::renderShieldDown()
 	scaleTrans.d[1][1] = shieldScale.y*(1+0.1*tech);
 	scaleTrans.d[2][2] = shieldScale.z*(1+0.1*tech);
 
-	TRANSFORM trans = transform*scaleTrans;
+	TRANSFORM trans = this->transform*scaleTrans;
 	//trans.rotate_about_j(PI);
 
 	BATCH->set_state(RPR_BATCH,TRUE);
@@ -1423,7 +1389,7 @@ void ObjectDamage< Base >::renderShieldDown()
 template <class Base>
 void ObjectDamage< Base >::renderShieldUp(int texID)
 {	
-	int tech = MGlobals::GetUpgradeLevel(playerID,UG_SHIELDS,race);
+	int tech = MGlobals::GetUpgradeLevel(this->playerID,UG_SHIELDS,this->race);
 
 	Vector v[3];
 	TexCoord t[3];
@@ -1433,7 +1399,7 @@ void ObjectDamage< Base >::renderShieldUp(int texID)
 	scaleTrans.d[1][1] = shieldScale.y*(1+0.1*tech);
 	scaleTrans.d[2][2] = shieldScale.z*(1+0.1*tech);
 
-	TRANSFORM trans = transform*scaleTrans;
+	TRANSFORM trans = this->transform*scaleTrans;
 	//trans.rotate_about_j(PI);
 
 	BATCH->set_state(RPR_BATCH,TRUE);
@@ -1503,9 +1469,9 @@ void ObjectDamage< Base >::renderShieldUp(int texID)
 template <class Base>
 void ObjectDamage< Base >::getScale()
 {
-	shieldScale.x = 1/(box[BBOX_MAX_X]-box[BBOX_MIN_X]);
-	shieldScale.y = 1/(box[BBOX_MAX_Y]-box[BBOX_MIN_Y]);
-	shieldScale.z = 1/(box[BBOX_MAX_Z]-box[BBOX_MIN_Z]);
+	shieldScale.x = 1/(this->box[BBOX_MAX_X]-this->box[BBOX_MIN_X]);
+	shieldScale.y = 1/(this->box[BBOX_MAX_Y]-this->box[BBOX_MIN_Y]);
+	shieldScale.z = 1/(this->box[BBOX_MAX_Z]-this->box[BBOX_MIN_Z]);
 
 	shieldScale.normalize();
 
@@ -1722,7 +1688,7 @@ void ObjectDamage< Base >::DamageSpot (U32 spot)
 template <class Base>
 void ObjectDamage< Base >::RegisterDamage(Vector pos,U32 amount)
 {
-	if (bExploding)
+	if (this->bExploding)
 		return;
 
 	S32 newRecord=-1;
@@ -1730,21 +1696,21 @@ void ObjectDamage< Base >::RegisterDamage(Vector pos,U32 amount)
 	bool bApplied = 0;
 	Vector pos2 = pos;//transform.inverse_rotate_translate(pos);
 
-	if (extentData->bX)
+	if (this->extentData->bX)
 	{
-		if (pos2.x < box[BBOX_MIN_X])
-			pos2.x = box[BBOX_MIN_X];
+		if (pos2.x < this->box[BBOX_MIN_X])
+			pos2.x = this->box[BBOX_MIN_X];
 	
-		if (pos2.x > box[BBOX_MAX_X])
-			pos2.x = box[BBOX_MAX_X];
+		if (pos2.x > this->box[BBOX_MAX_X])
+			pos2.x = this->box[BBOX_MAX_X];
 	}
 	else
 	{
-		if (pos2.y < box[BBOX_MIN_Y])
-			pos2.y = box[BBOX_MIN_Y];
+		if (pos2.y < this->box[BBOX_MIN_Y])
+			pos2.y = this->box[BBOX_MIN_Y];
 	
-		if (pos2.y > box[BBOX_MAX_Y])
-			pos2.y = box[BBOX_MAX_Y];
+		if (pos2.y > this->box[BBOX_MAX_Y])
+			pos2.y = this->box[BBOX_MAX_Y];
 	}
 
 	SINGLE dist[DAMAGE_RECORDS];
@@ -1806,8 +1772,8 @@ void ObjectDamage< Base >::RegisterDamage(Vector pos,U32 amount)
 	if (appliedSlot != -1)
 	{
 		SINGLE hull;
-		if (hullPointsMax)
-			hull = (SINGLE)hullPoints / (SINGLE)hullPointsMax;
+		if (this->hullPointsMax)
+			hull = (SINGLE)this->hullPoints / (SINGLE)this->hullPointsMax;
 		else 
 			hull = 1.0F;
 		
@@ -1825,12 +1791,12 @@ void ObjectDamage< Base >::RegisterDamage(Vector pos,U32 amount)
 					OBJPTR<IBlast> blast;
 					if (obj->QueryInterface(IBlastID,blast))
 					{
-						blast->InitBlast(Transform(pos2), systemID,this);
+						blast->InitBlast(Transform(pos2), this->systemID,this);
 					}
-					IBaseObject *blastPos = childBlastList;
+					IBaseObject *blastPos = this->childBlastList;
 					if (!blastPos)
 					{
-						childBlastList = obj;
+						this->childBlastList = obj;
 					}
 					else
 					{

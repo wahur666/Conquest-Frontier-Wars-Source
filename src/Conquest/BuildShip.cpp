@@ -903,7 +903,7 @@ BuildShipFactory::~BuildShipFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -912,7 +912,7 @@ void BuildShipFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -940,7 +940,7 @@ HANDLE BuildShipFactory::CreateArchetype (const char *szArchname, OBJCLASS objCl
 				ARCHLIST->AddRef(result->pExplosion, OBJREFNAME);
 			}
  
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				TEXLIB->load_library(objFile, 0);
 			else
 				goto Error;
@@ -955,7 +955,7 @@ HANDLE BuildShipFactory::CreateArchetype (const char *szArchname, OBJCLASS objCl
 				DAFILEDESC fdesc;
 				COMPTR<IFileSystem> objFile;
 				fdesc.lpFileName = data->sparkAnim;
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				{
 					result->sparkAnmArch = ANIM2D->create_archetype(objFile);
 					result->sparkAnmArch->delay = data->sparkDelay;
