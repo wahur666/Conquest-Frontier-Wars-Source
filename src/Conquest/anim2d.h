@@ -176,7 +176,7 @@ struct DACOM_NO_VTABLE IAnim2D : public IDAComponent
 {
 	virtual GENRESULT COMAPI Initialize (void) = 0;
 
-	virtual AnimArchetype * create_archetype (char *fileName) = 0;
+	virtual AnimArchetype * create_archetype (const char *fileName) = 0;
 
 	virtual AnimArchetype * create_archetype (struct IFileSystem *parent) = 0;
 

@@ -201,7 +201,7 @@ bool Troopship::checkLOS (void)	// with targetPos
 	COMPTR<ITerrainMap> map;
 	TCallback callback;
 
-	SECTOR->GetTerrainMap(GetSystemID(), map);
+	SECTOR->GetTerrainMap(GetSystemID(), map.addr());
  
 	if (map->TestSegment(GetGridPosition(), target.Ptr()->GetGridPosition(), &callback) == false)
 	{
@@ -364,10 +364,10 @@ bool Troopship::doAssault (bool bIsMaster)
 	CQASSERT(target != NULL && target->GetSystemID() == systemID && (bIsMaster==0 || attackAgentID==0));
 
 	// do the takeover
-	VOLPTR(IMissionActor) victim = target;
+	VOLPTR(IMissionActor) victim = target.Ptr();
 	CQASSERT(victim != 0);
 
-	MPartNC part = target;
+	MPartNC part = target.Ptr();
 
 	if (bIsMaster && ((target->GetPlayerID() == playerID) || (!(part->bReady))) )
 	{
@@ -652,7 +652,7 @@ TroopshipFactory::~TroopshipFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -661,7 +661,7 @@ void TroopshipFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

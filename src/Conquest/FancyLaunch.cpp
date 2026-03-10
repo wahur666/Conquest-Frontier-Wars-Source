@@ -41,7 +41,7 @@
 
 #include <stdlib.h>
 
-#include "Search.hpp"
+#include "Search.h"
 
 #define MAX_TENDRILS 5 
 

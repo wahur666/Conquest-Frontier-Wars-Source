@@ -94,7 +94,7 @@ add_executable(Conquest
         Repulsor.cpp
         RepulsorWave.cpp
         ScriptObject.cpp
-        Search.asm
+        Search.h
         Sector.cpp
         SellPlat.cpp
         SimpleMesh.cpp
@@ -194,7 +194,7 @@ target_link_libraries(Conquest PRIVATE
         odbccp32.lib
         COMCTL32.lib
         DXGuid.lib
-        d3dx.lib
+        d3dx9.lib
 )
 # ============================================================================
 # IDE PROPERTIES
@@ -202,6 +202,7 @@ target_link_libraries(Conquest PRIVATE
 set_target_properties(Conquest PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         FOLDER "Applications"
+        WIN32_EXECUTABLE TRUE
 )
 
 

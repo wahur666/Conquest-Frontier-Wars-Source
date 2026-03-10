@@ -76,19 +76,19 @@ BOOL32 SMesh::save(const char *fileName)
 	fdesc.dwShareMode = 0;
 	DWORD dwWritten;
 
-	if (DACOM->CreateInstance(&fdesc,file) != GR_OK)
+	if (DACOM->CreateInstance(&fdesc,file.void_addr()) != GR_OK)
 		goto Done;
 
 	fdesc.lpFileName = "Faces";
 	fdesc.lpImplementation = "DOS";
-	if (file->CreateInstance(&fdesc,file2) != GR_OK)
+	if (file->CreateInstance(&fdesc,file2.void_addr()) != GR_OK)
 		goto Done;
 
 	file2->WriteFile(0,&f_cnt,sizeof(f_cnt),&dwWritten);
 	file2->WriteFile(0,f_list,sizeof(SFace)*f_cnt,&dwWritten);
 
 	fdesc.lpFileName = "Vertices";
-	if (file->CreateInstance(&fdesc,file2) != GR_OK)
+	if (file->CreateInstance(&fdesc,file2.void_addr()) != GR_OK)
 		goto Done;
 
 	file2->WriteFile(0,&v_cnt,sizeof(v_cnt),&dwWritten);
@@ -112,12 +112,12 @@ BOOL32 SMesh::load(const char *fileName)
 	fdesc.dwShareMode = 0;
 	DWORD dwRead;
 
-	if (DACOM->CreateInstance(&fdesc,file) != GR_OK)
+	if (DACOM->CreateInstance(&fdesc,file.void_addr()) != GR_OK)
 		goto Done;
 
 	fdesc.lpFileName = "Faces";
 	fdesc.lpImplementation = "DOS";
-	if (file->CreateInstance(&fdesc,file2) != GR_OK)
+	if (file->CreateInstance(&fdesc,file2.void_addr()) != GR_OK)
 		goto Done;
 
 	file2->ReadFile(0,&f_cnt,sizeof(f_cnt),&dwRead);
@@ -125,7 +125,7 @@ BOOL32 SMesh::load(const char *fileName)
 	file2->ReadFile(0,f_list,sizeof(SFace)*f_cnt,&dwRead);
 
 	fdesc.lpFileName = "Vertices";
-	if (file->CreateInstance(&fdesc,file2) != GR_OK)
+	if (file->CreateInstance(&fdesc,file2.void_addr()) != GR_OK)
 		goto Done;
 
 	file2->ReadFile(0,&v_cnt,sizeof(v_cnt),&dwRead);
@@ -147,7 +147,7 @@ BOOL32 SMesh::load(IFileSystem *file)
 
 	fdesc.lpFileName = "Faces";
 	fdesc.lpImplementation = "DOS";
-	if (file->CreateInstance(&fdesc,file2) != GR_OK)
+	if (file->CreateInstance(&fdesc,file2.void_addr()) != GR_OK)
 		goto Done;
 
 	file2->ReadFile(0,&f_cnt,sizeof(f_cnt),&dwRead);
@@ -155,7 +155,7 @@ BOOL32 SMesh::load(IFileSystem *file)
 	file2->ReadFile(0,f_list,sizeof(SFace)*f_cnt,&dwRead);
 
 	fdesc.lpFileName = "Vertices";
-	if (file->CreateInstance(&fdesc,file2) != GR_OK)
+	if (file->CreateInstance(&fdesc,file2.void_addr()) != GR_OK)
 		goto Done;
 
 	file2->ReadFile(0,&v_cnt,sizeof(v_cnt),&dwRead);

@@ -541,7 +541,7 @@ void UnbornMeshList::Render()
 					if(platData->type == PC_JUMPPLAT)
 					{
 						COMPTR<ITerrainMap> map;
-						SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(),map);
+						SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(),map.addr());
 						if(map)
 						{
 							JumpCallback jumpCallback;
@@ -557,7 +557,7 @@ void UnbornMeshList::Render()
 						if(platData->slotsNeeded == 0)//deep space
 						{
 							COMPTR<ITerrainMap> map;
-							SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(),map);
+							SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(),map.addr());
 							if(map)
 							{
 								if(IsFullGrid(BUILDARCHEID))
@@ -584,7 +584,7 @@ void UnbornMeshList::Render()
 						else
 						{
 							COMPTR<ITerrainMap> map;
-							SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(),map);
+							SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(),map.addr());
 							if(map)
 							{
 								PlanetCallback planetCallback;
@@ -716,7 +716,7 @@ void UnbornMeshList::addToQueue(U32 fabID,U32 opID, U32 archID, Vector position,
 		node->trans.translation = vect;
 
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(node->systemID, map);
+		SECTOR->GetTerrainMap(node->systemID, map.addr());
 
 		FootprintInfo fpi;
 		fpi.flags = TERRAIN_HALFSQUARE | TERRAIN_DESTINATION | TERRAIN_WILLBEPLAT;
@@ -762,7 +762,7 @@ void UnbornMeshList::removeFromQueue(FabQueueStruct * node,FabQueueStruct * prev
 		else //deep space platform
 		{
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(node->systemID, map);
+			SECTOR->GetTerrainMap(node->systemID, map.addr());
 
 			GRIDVECTOR vect;
 			vect = node->trans.translation;

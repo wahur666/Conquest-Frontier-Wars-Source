@@ -283,7 +283,7 @@ BOOL32 Tractor::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (target==0)
@@ -310,7 +310,7 @@ BOOL32 Tractor::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -800,7 +800,7 @@ TractorManager::~TractorManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -810,7 +810,7 @@ void TractorManager::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(GetBase(), &factoryHandle);
 }
 //--------------------------------------------------------------------------
@@ -836,7 +836,7 @@ HANDLE TractorManager::CreateArchetype(const char *szArchname, OBJCLASS objClass
 			fdesc.lpImplementation = "UTF";
 			
 			
-			if (OBJECTDIR->CreateInstance(&fdesc, file) != GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 			{
 				CQERROR1("Failed to open file %s", fdesc.lpFileName);
 				goto Error;

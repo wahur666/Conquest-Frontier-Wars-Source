@@ -344,7 +344,7 @@ void TerranBuild::SetupMesh (IBaseObject *fab,IBaseObject *obj,struct IMeshInfoT
 		{
 			mc[c]->bWhole = FALSE;
 			//this depends on 100% LOD here
-			girderBuildAhead[c] = min(MAX_GIRDER_FACES,mc[c]->mr->face_cnt);
+			girderBuildAhead[c] = std::min((U16)MAX_GIRDER_FACES,mc[c]->mr->face_cnt);
 			//every mesh now has the "new child" time associated with it
 			totalClicks += NEW_CHILD;
 			totalClicks += (girderBuildAhead[c]+mc[c]->mr->face_cnt)*ONE_FACE;
@@ -390,7 +390,7 @@ void TerranBuild::SetupMesh (IBaseObject *fab,IMeshInfoTree *mesh_info,SINGLE _t
 		{
 			mc[c]->bWhole = FALSE;
 			//this depends on 100% LOD here
-			girderBuildAhead[c] = min(MAX_GIRDER_FACES,mc[c]->mr->face_cnt);
+			girderBuildAhead[c] = std::min((U16)MAX_GIRDER_FACES,mc[c]->mr->face_cnt);
 			//every mesh now has the "new child" time associated with it
 			totalClicks += NEW_CHILD;
 			totalClicks += (girderBuildAhead[c]+mc[c]->mr->face_cnt)*ONE_FACE;
@@ -451,7 +451,7 @@ void TerranBuild::ReBuild ()
 				//in actual faces or girders
 				S32 nextFace = (thisClicks-childTimes[c]-NEW_CHILD-girderBuildAhead[c]*ONE_FACE)/ONE_FACE;
 				CQASSERT(nextFace <= mc[c]->mr->face_cnt);
-				S32 invisibleFace = min(nextFace+girderBuildAhead[c],mc[c]->mr->face_cnt);
+				S32 invisibleFace = std::min(nextFace+girderBuildAhead[c],(S32)mc[c]->mr->face_cnt);
 				S32 i;
 				for (i=0;i<nextFace;i++)
 				{
@@ -459,7 +459,7 @@ void TerranBuild::ReBuild ()
 					mc[c]->faceRenders[face.abs_index] &= ~FS__HIDDEN;
 					mc[c]->faceRenders[face.abs_index] &= ~FS__BUILDING;
 				}
-				for (i=max(nextFace,0);i<invisibleFace;i++)
+				for (i=std::max(nextFace,(S32)0);i<invisibleFace;i++)
 				{
 					FaceLookup &face = faceLookup[c][i];
 					mc[c]->faceRenders[face.abs_index] &= ~FS__HIDDEN;
@@ -467,7 +467,7 @@ void TerranBuild::ReBuild ()
 				}
 
 				if(timeForDroneMove())
-					sendDrones(c,max(0,invisibleFace-1));
+					sendDrones(c,std::max((S32)0,invisibleFace-1));
 			}
 		}
 		else
@@ -502,9 +502,9 @@ void TerranBuild::ReBuild ()
 				S32 nextFace = (thisClicks-childTimes[c]-NEW_CHILD-girderBuildAhead[c]*ONE_FACE)/ONE_FACE;
 				
 				//find first still invisible face
-				S32 invisibleFace = min(nextFace+girderBuildAhead[c],mc[c]->mr->face_cnt);
+				S32 invisibleFace = std::min(nextFace+girderBuildAhead[c],(S32)mc[c]->mr->face_cnt);
 				int i;
-				for (i=max(0,nextFace);i<invisibleFace;i++)
+				for (i=std::max((S32)0,nextFace);i<invisibleFace;i++)
 				{
 					FaceLookup &face = faceLookup[c][i];
 					mc[c]->faceRenders[face.abs_index] &= ~FS__HIDDEN;
@@ -517,7 +517,7 @@ void TerranBuild::ReBuild ()
 					mc[c]->faceRenders[face.abs_index] &= ~FS__BUILDING;
 				}
 				if(timeForDroneMove())
-					sendDrones(c,max(0,invisibleFace-1));
+					sendDrones(c,std::max((U32)0,(U32)invisibleFace-1));
 			}
 		}
 		lastChild = c;
@@ -722,8 +722,8 @@ void TerranBuild::composeGirders ()
 					v[2] = mc[c]->mr->pos_list[face.pos_offset+face.group->index_list[face.index*3+2]];
 					
 					SINGLE dy,dx;
-					dy = max(max(v[0].y,v[1].y),v[2].y)-min(min(v[0].y,v[1].y),v[2].y);
-					dx = max(max(v[0].x,v[1].x),v[2].x)-min(min(v[0].x,v[1].x),v[2].x);
+					dy = std::max(std::max(v[0].y,v[1].y),v[2].y)-std::min(std::min(v[0].y,v[1].y),v[2].y);
+					dx = std::max(std::max(v[0].x,v[1].x),v[2].x)-std::min(std::min(v[0].x,v[1].x),v[2].x);
 #define TEXFACTOR 0.003
 
 					int tc_set;
@@ -987,7 +987,7 @@ TerranBuildFactory::~TerranBuildFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -996,7 +996,7 @@ void TerranBuildFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

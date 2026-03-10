@@ -20,7 +20,7 @@
 #include "OpAgent.h"
 #include "Sector.h"
 #include "TSmartPointer.h"
-#include "Search.hpp"
+#include "Search.h"
 
 #ifndef _INC_STDLIB
 #include <stdlib.h>

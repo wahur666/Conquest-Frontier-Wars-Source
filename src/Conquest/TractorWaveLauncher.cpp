@@ -324,7 +324,7 @@ BOOL32 TractorWaveLauncher::Update (void)
 					//use obj map test segment ot find targets
 
 					COMPTR<ITerrainMap> map;
-					SECTOR->GetTerrainMap(owner.Ptr()->GetSystemID(),map);
+					SECTOR->GetTerrainMap(owner.Ptr()->GetSystemID(),map.addr());
 					if(map)
 					{
 						Vector center = owner.Ptr()->GetPosition();
@@ -881,7 +881,7 @@ TractorWaveLauncherFactory::~TractorWaveLauncherFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -890,7 +890,7 @@ void TractorWaveLauncherFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

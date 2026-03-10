@@ -386,7 +386,7 @@ StreakManager::~StreakManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -397,7 +397,7 @@ void StreakManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -420,7 +420,7 @@ HANDLE StreakManager::CreateArchetype(const char *szArchname, OBJCLASS objClass,
 				DAFILEDESC fdesc;
 				COMPTR<IFileSystem> objFile;
 				fdesc.lpFileName = objData->animName;
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				{
 					newguy->animArch = ANIM2D->create_archetype(objFile);
 				}

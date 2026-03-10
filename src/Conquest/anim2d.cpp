@@ -496,7 +496,7 @@ struct DACOM_NO_VTABLE Anim2D : public IAnim2D
 
 	virtual GENRESULT COMAPI Initialize (void);
 
-	virtual AnimArchetype * create_archetype (char *fileName);
+	virtual AnimArchetype * create_archetype (const char *fileName);
 
 	virtual AnimArchetype * create_archetype (struct IFileSystem *parent);
 
@@ -605,7 +605,7 @@ GENRESULT Anim2D::Initialize (void)
 	return GR_OK;
 }
 
-AnimArchetype *Anim2D::create_archetype (char *fileName)
+AnimArchetype *Anim2D::create_archetype (const char *fileName)
 {
 	AnimArchetype *result = 0;
 

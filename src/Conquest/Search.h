@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef SEARCH_H
+#define SEARCH_H
+#pragma once
 
 #include <string.h>
 #include <math.h>
@@ -16,7 +18,7 @@ static constexpr double angle_pos90 = 1.5707963267948966;   // 90 degrees (1.57 
 // dwordsearch: Search for a DWORD value in a buffer
 // Returns pointer to matching DWORD, or NULL if not found
 //--------------------------------------------------------------------------
-const U32* dwordsearch(U32 len, U32 value, const U32* buffer)
+inline const U32* dwordsearch(U32 len, U32 value, const U32* buffer)
 {
     if (len == 0)
         return NULL;
@@ -34,7 +36,7 @@ const U32* dwordsearch(U32 len, U32 value, const U32* buffer)
 // unmemchr: Find first non-matching BYTE
 // Returns pointer to first non-matching byte, or NULL if all match
 //--------------------------------------------------------------------------
-void* unmemchr(const void* ptr, int c, int size)
+inline void* unmemchr(const void* ptr, int c, int size)
 {
     const unsigned char* buffer = (const unsigned char*)ptr;
     unsigned char value = (unsigned char)c;
@@ -51,7 +53,7 @@ void* unmemchr(const void* ptr, int c, int size)
 //--------------------------------------------------------------------------
 // clearmemFPU: Clear memory to zero using FPU (32-byte aligned)
 //--------------------------------------------------------------------------
-void clearmemFPU(void* ptr, int size)
+inline void clearmemFPU(void* ptr, int size)
 {
     int num_32byte_blocks = size / 32;
     unsigned char* mem = (unsigned char*)ptr;
@@ -70,7 +72,7 @@ void clearmemFPU(void* ptr, int size)
 //--------------------------------------------------------------------------
 // get_angle (double version): Calculate atan2(x, y)
 //--------------------------------------------------------------------------
-double get_angle_double(const double* x, const double* y)
+inline double get_angle_double(const double* x, const double* y)
 {
     if (*y == 0.0)
     {
@@ -86,7 +88,7 @@ double get_angle_double(const double* x, const double* y)
 //--------------------------------------------------------------------------
 // get_angle (float version): Calculate atan2(x, y)
 //--------------------------------------------------------------------------
-float get_angle(float x, float y)
+inline float get_angle(float x, float y)
 {
     if (y == 0.0f)
     {
@@ -102,7 +104,7 @@ float get_angle(float x, float y)
 //--------------------------------------------------------------------------
 // ftol: Convert float to long (replacement for standard C routine)
 //--------------------------------------------------------------------------
-long ftol(double d)
+inline long ftol(double d)
 {
     long result = (long)d;
     double remainder = d - result;
@@ -122,7 +124,7 @@ long ftol(double d)
 //--------------------------------------------------------------------------
 // rmemcpy: Reverse memory copy (copy from end to start)
 //--------------------------------------------------------------------------
-void* rmemcpy(void* dest, const void* src, int size)
+inline void* rmemcpy(void* dest, const void* src, int size)
 {
     unsigned char* d = (unsigned char*)dest + size - 1;
     const unsigned char* s = (const unsigned char*)src + size - 1;
@@ -138,3 +140,5 @@ void* rmemcpy(void* dest, const void* src, int size)
 //--------------------------------------------------------------------------
 //                        END Search.c
 //--------------------------------------------------------------------------
+
+#endif

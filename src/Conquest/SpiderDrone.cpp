@@ -855,14 +855,14 @@ SpiderDroneFactory::~SpiderDroneFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 
 	if (GS)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 }
@@ -872,10 +872,10 @@ void SpiderDroneFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		CQASSERT(eventHandle==0);
 		connection->Advise(GetBase(), &eventHandle);
@@ -906,7 +906,7 @@ HANDLE SpiderDroneFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 				ARCHLIST->AddRef(result->pExplosion, OBJREFNAME);
 			}
  
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				TEXLIB->load_library(objFile, 0);
 			else
 				goto Error;
@@ -921,7 +921,7 @@ HANDLE SpiderDroneFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 				DAFILEDESC fdesc;
 				COMPTR<IFileSystem> objFile;
 				fdesc.lpFileName = data->sparkAnim;
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				{
 					result->sparkAnmArch = ANIM2D->create_archetype(objFile);
 				}

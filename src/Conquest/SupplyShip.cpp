@@ -165,7 +165,7 @@ struct _NO_VTABLE SupplyShip : public SpaceShip<SUPPLYSHIP_SAVELOAD, SUPPLYSHIP_
 
 	/* SpaceShip methods */
 	
-	void SupplyShip::ResolveAssociations (void);
+	void ResolveAssociations (void);
 
 	virtual const char * getSaveStructName (void) const
 	{
@@ -278,7 +278,7 @@ bool SupplyShip::checkLOS (TCallback & callback, IBaseObject * targ)	// with tar
 {
 	COMPTR<ITerrainMap> map;
 
-	SECTOR->GetTerrainMap(GetSystemID(), map);
+	SECTOR->GetTerrainMap(GetSystemID(), map.addr());
 
 	return map->TestSegment(GetGridPosition(),targ->GetGridPosition(), &callback);
 }
@@ -1035,7 +1035,7 @@ SupplyShipFactory::~SupplyShipFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -1044,7 +1044,7 @@ void SupplyShipFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

@@ -19,7 +19,7 @@
 #include "pch.h"
 #include <globals.h>
 
-#include "Search.hpp"
+#include "Search.h"
 #include "SuperTrans.h"
 
 //SINGLE PI_RADIANS = 3.141592654 / 180.0;

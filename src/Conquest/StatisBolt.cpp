@@ -246,7 +246,7 @@ void StasisTendril::Render(U8 alpha)
 		length = direction.magnitude();
 	}
 	direction /= length;
-	segments = min(ceil(length*0.0008),MAX_SEGMENTS);
+	segments = std::min((int)ceil(length*0.0008),MAX_SEGMENTS);
 
 	if (FOGOFWAR->CheckVisiblePosition(start) || target.Ptr()->IsVisibleToPlayer(MGlobals::GetThisPlayer()) ||
 	    (DEFAULTS->GetDefaults()->bVisibilityRulesOff || DEFAULTS->GetDefaults()->bEditorMode) )
@@ -288,7 +288,7 @@ void StasisTendril::Render(U8 alpha)
 		Vector ptEnd;
 
 		S32 posibleSeg = segments-segmentDrawn;
-		for (c = max(posibleSeg,0) ; c <= segments; c++)
+		for (c = std::max(posibleSeg,(S32)0) ; c <= segments; c++)
 		{
 			SINGLE t;
 			if(c== 0)
@@ -740,7 +740,7 @@ BOOL32 StasisBolt::Update (void)
 		if(THEMATRIX->IsMaster() && !bFreeTargets)
 		{
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(systemID,map);
+			SECTOR->GetTerrainMap(systemID,map.addr());
 
 			for(U32 count = 0; count < numSquares; ++count)
 			{
@@ -1499,7 +1499,7 @@ BOOL32 StasisBolt::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -1528,7 +1528,7 @@ BOOL32 StasisBolt::Load (struct IFileSystem * inFile)
 	Vector anmPos;
 	
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0) == 0)
@@ -1917,7 +1917,7 @@ StasisBoltFactory::~StasisBoltFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -1926,7 +1926,7 @@ void StasisBoltFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -1952,7 +1952,7 @@ HANDLE StasisBoltFactory::CreateArchetype (const char *szArchname, OBJCLASS objC
 			DAFILEDESC fdesc = data->fileName;
 			COMPTR<IFileSystem> objFile;
 
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				TEXLIB->load_library(objFile, 0);
 			else
 				goto Error;
@@ -1986,7 +1986,7 @@ HANDLE StasisBoltFactory::CreateArchetype (const char *szArchname, OBJCLASS objC
 			DAFILEDESC anmdesc;
 			COMPTR<IFileSystem> anmFile;
 			anmdesc.lpFileName = "stasis.anm";
-			if (OBJECTDIR->CreateInstance(&anmdesc, anmFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&anmdesc, anmFile.void_addr()) == GR_OK)
 			{
 				result->stasisAnm = ANIM2D->create_archetype(anmFile);
 			}

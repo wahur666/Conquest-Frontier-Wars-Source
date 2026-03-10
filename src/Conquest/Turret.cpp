@@ -52,6 +52,8 @@
 
 #include <stdlib.h>
 
+#include "Search.h"
+
 struct TurretArchetype 
 {
 	PARCHETYPE pArchetype;
@@ -350,7 +352,7 @@ void Turret::init (TurretArchetype * _hArchetype)
 	REFIRE_PERIOD = data->refirePeriod;
 	CQASSERT(REFIRE_PERIOD!=0);
 	supplyCost = data->supplyCost;
-	refireDelay = max((float(rand()) / RAND_MAX) * REFIRE_PERIOD,-data->warmUpBlast.triggerTime);
+	refireDelay = std::max((float(rand()) / RAND_MAX) * REFIRE_PERIOD,-data->warmUpBlast.triggerTime);
 	CQASSERT(REFIRE_PERIOD >= -data->warmUpBlast.triggerTime && "Warmup anim trigger time is longer than refire");
 
 	flashedFor = 0;
@@ -539,7 +541,7 @@ BOOL32 Turret::Update (void)
 		{
 			if (owner.Ptr()->bVisible && bStartedFiring && refireDelay+hArchetype->data->warmUpBlast.triggerTime <= 0 && warmUpBlast==0 && owner->UseSupplies(0,0))
 			{
-				refireDelay = max(refireDelay,-hArchetype->data->warmUpBlast.triggerTime);
+				refireDelay = std::max(refireDelay,-hArchetype->data->warmUpBlast.triggerTime);
 
 				//do the visual
 				if(bVisible || target.Ptr()->bVisible)
@@ -721,7 +723,7 @@ void Turret::AttackObject (IBaseObject * _target)
 		_target->QueryInterface(IBaseObjectID, target, GetPlayerID());
 
 		if (bStartedFiring == 0)
-			refireDelay = max(refireDelay,-hArchetype->data->warmUpBlast.triggerTime);
+			refireDelay = std::max(refireDelay,-hArchetype->data->warmUpBlast.triggerTime);
 	}
 }
 //---------------------------------------------------------------------------
@@ -1248,7 +1250,7 @@ TurretFactory::~TurretFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -1257,7 +1259,7 @@ void TurretFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

@@ -47,7 +47,7 @@
 
 #include <stdlib.h>
 
-#include "Search.hpp"
+#include "Search.h"
 
 struct AirDefenseArchetype
 {

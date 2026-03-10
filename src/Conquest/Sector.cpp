@@ -155,7 +155,7 @@ public:
 	BOOL32 SetStateIfYou(U32 startID,U32 finishID,U32 state);
 	System *GetOtherSystem(System *thisSystem);
 //	U32 GetID();
-	void GenerateJumpsXY(System *A,System *B,const Vector &a,const Vector &b, char * jumpArch);
+	void GenerateJumpsXY(System *A,System *B,const Vector &a,const Vector &b, const char * jumpArch);
 	
 	GateLink *next,*last;
 	IBaseObject *jump1,*jump2;
@@ -410,8 +410,8 @@ struct DACOM_NO_VTABLE Sector : public ISector,
 	U32 pathLength;
 	U32 menuID;
 	BOOL32 bIgnoreUpdate;
-	U32 mapTextureID;
-	U32 drawTextureID;
+	LONG_PTR mapTextureID;
+	LONG_PTR drawTextureID;
 	U32 mapTexW, mapTexH;
 
 	wchar_t toolTip[64];
@@ -669,7 +669,7 @@ void GetBMPImage(IImageReader **bmpReader,const char *filename)
 	
 	fdesc.lpImplementation = "DOS";
 	
-	if (TEXTURESDIR->CreateInstance(&fdesc, file) != GR_OK)
+	if (TEXTURESDIR->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		CQBOMB1("Required file ""%s"" not found.", fdesc.lpFileName);
 
 	hMapping = file->CreateFileMapping();
@@ -745,7 +745,7 @@ void Sector::loadTextures (bool bEnable)
 void Sector::loadInterface(IShapeLoader *loader)
 {
 	COMPTR<IToolbar> toolbar;
-	if (TOOLBAR && TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+	if (TOOLBAR && TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 	{
 		toolbar->GetSectorMapRect(sector_map_left,sector_map_top,sector_map_right,sector_map_bottom);\
 	}
@@ -768,7 +768,7 @@ Sector::~Sector (void)
 
 	if (TOOLBAR)
 	{
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -1116,7 +1116,7 @@ Sector::Load (struct IFileSystem * inFile)
 	if (inFile->SetCurrentDirectory("\\MT_SECTOR_SAVELOAD") == 0)
 		goto Done;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0,buffer,sizeof(buffer),&dwRead);
@@ -1272,7 +1272,7 @@ Sector::Load (struct IFileSystem * inFile)
 	{
 		RECT rect;
 		CQASSERT(sysPos->d.id && sysPos->d.id <= MAX_SYSTEMS);
-		CreateTerrainMap(terrainMap[sysPos->d.id]);
+		CreateTerrainMap(terrainMap[sysPos->d.id].addr());
 		GetSystemRect(sysPos->d.id,&rect);
 		terrainMap[sysPos->d.id]->SetWorldRect(rect);
 		sysPos = sysPos->next;
@@ -1724,7 +1724,7 @@ Sector::Save(IFileSystem *outFile)
 	}
 
 	fdesc.lpFileName = "Sector";
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->WriteFile(0,&save,sizeof(MT_SECTOR_SAVELOAD),&dwWritten);
@@ -1817,7 +1817,7 @@ Sector::New (void)
 	updateViewer();
 
 	numSystems = 1;
-	CreateTerrainMap(terrainMap[1]);
+	CreateTerrainMap(terrainMap[1].addr());
 	terrainMap[0] = dummyMap;
 	
 	RECT sysRect;
@@ -2078,7 +2078,7 @@ BOOL32 Sector::createViewer (void)
 	ddesc.memory = static_cast<SECTOR_DATA *>(this);
 	ddesc.memoryLength = sizeof(SECTOR_DATA);
 
-	if (DACOM->CreateInstance(&ddesc, doc) == GR_OK)
+	if (DACOM->CreateInstance(&ddesc, doc.void_addr()) == GR_OK)
 	{
 		VIEWDESC vdesc;
 		HWND hwnd;
@@ -2087,7 +2087,7 @@ BOOL32 Sector::createViewer (void)
 		vdesc.doc = doc;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if (PARSER->CreateInstance(&vdesc, viewer) == GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
@@ -3338,7 +3338,7 @@ U32 Sector::CreateSystem (U32 xPos, U32 yPos, U32 width, U32 height)
 
 	++numSystems;
 	CQASSERT(numSystems && numSystems <= MAX_SYSTEMS);
-	CreateTerrainMap(terrainMap[numSystems]);
+	CreateTerrainMap(terrainMap[numSystems].addr());
 
 	lastSystem->d.id = numSystems;
 
@@ -3798,7 +3798,7 @@ GateLink::GetOtherSystem(System *thisSystem)
 	return NULL;
 }
 
-void GateLink::GenerateJumpsXY(System *A,System *B,const Vector &a,const Vector &b, char * jumpArch)
+void GateLink::GenerateJumpsXY(System *A,System *B,const Vector &a,const Vector &b, const char * jumpArch)
 {
 	jump1 = MGlobals::CreateInstance(ARCHLIST->LoadArchetype(jumpArch),MGlobals::CreateNewPartID(0));
 	jump2 = MGlobals::CreateInstance(ARCHLIST->LoadArchetype(jumpArch),MGlobals::CreateNewPartID(0));
@@ -4137,7 +4137,7 @@ void System::View (void)
 
 				COMPTR<IDocument> saveLoadDir;
 				COMPTR<IDocument> baseDir;
-				if (GENDATA->GetDataFile(baseDir) == GR_OK)
+				if (GENDATA->GetDataFile(baseDir.addr()) == GR_OK)
 				{
 					baseDir->CreateDirectory("\\GT_SYSTEM_KIT");
 
@@ -4145,7 +4145,7 @@ void System::View (void)
 					fdesc.dwDesiredAccess = GENERIC_READ |GENERIC_WRITE;
 					
 
-					baseDir->CreateInstance(&fdesc,saveLoadDir);
+					baseDir->CreateInstance(&fdesc,saveLoadDir.void_addr());
 
 					COMPTR<IDocument> saveFile;
 
@@ -4154,7 +4154,7 @@ void System::View (void)
 					fdesc.dwDesiredAccess = GENERIC_READ |GENERIC_WRITE;
 					fdesc.lpImplementation = "DOS";
 
-					if(saveLoadDir->CreateInstance(&fdesc,saveFile) == GR_OK)
+					if(saveLoadDir->CreateInstance(&fdesc,saveFile.void_addr()) == GR_OK)
 					{
 						U32 written;
 						GT_SYSTEM_KIT result = SECTOR->GetSystemLightKit(d.id);
@@ -4214,7 +4214,7 @@ struct _sector : GlobalComponent
 		minfo.fMask = MIIM_ID | MIIM_TYPE;
 		minfo.fType = MFT_STRING;
 		minfo.wID = IDS_VIEWSECTOR;
-		minfo.dwTypeData = "Sector";
+		minfo.dwTypeData = LPSTR("Sector");
 		minfo.cch = 6;	// length of string "Sector"
 			
 		if (InsertMenuItem(hMenu, 0x7FFE, 1, &minfo))
@@ -4222,10 +4222,10 @@ struct _sector : GlobalComponent
 
 		sector->initializeResources();
 
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(SECTOR, &sector->eventHandle);
 
-		CreateDummyTerrainMap(sector->dummyMap);
+		CreateDummyTerrainMap(sector->dummyMap.addr());
 		sector->terrainMap[0] = sector->dummyMap;
 
 		SECTOR_DATA tmpData;

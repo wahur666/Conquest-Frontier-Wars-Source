@@ -67,7 +67,7 @@ set(MISSION_SOURCES
         ../ruse.cpp
         ../RuseMap.cpp
         ../ScrollingText.cpp
-        ../Search.hpp
+        ../Search.h
         ../SuperTrans.cpp
         ../UnitComm.cpp
 )

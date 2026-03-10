@@ -586,7 +586,7 @@ void WormholeLauncher::DoCreateWormhole(U32 systemID)
 		if(numTargets)
 		{
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(targetSystemID,map);
+			SECTOR->GetTerrainMap(targetSystemID,map.addr());
 			RECT rect;
 			SECTOR->GetSystemRect(targetSystemID,&rect);
 			U32 width = rect.right-rect.left;
@@ -740,7 +740,7 @@ WormholeLauncherFactory::~WormholeLauncherFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -749,7 +749,7 @@ void WormholeLauncherFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

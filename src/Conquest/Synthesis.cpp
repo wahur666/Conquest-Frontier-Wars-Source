@@ -333,7 +333,7 @@ void Synthesis::PhysicalUpdate (SINGLE dt)
 		
 		if (stage == SYN_ZAP)
 		{
-			SINGLE progress = min(timer/ZAP_TIME,1.0f);
+			SINGLE progress = std::min(timer/ZAP_TIME,1.0f);
 			if (progress == 1.0f)
 				stage = SYN_APPROACH;
 		}
@@ -446,7 +446,7 @@ BOOL32 Synthesis::Update ()
 	#define ABSORB_TIME 1.0f
 	if (stage == SYN_ABSORB)
 	{
-		SINGLE progress = min(timer/ABSORB_TIME,1.0f);
+		SINGLE progress = std::min(timer/ABSORB_TIME,1.0f);
 		if (progress == 1.0f)
 		{
 			//owner->LauncherCancelAttack();
@@ -462,8 +462,10 @@ BOOL32 Synthesis::Update ()
 			owner = 0;
 			MPartNC targetPart(target.Ptr());
 			//finish
-			targetPart->hullPoints = min(targetPart->hullPointsMax,targetPart->hullPoints+(hullPointsPer*targetPart->hullPointsMax));
-			targetPart->supplies = min(targetPart->supplyPointsMax,targetPart->supplies+(suppliesPer*targetPart->supplyPointsMax));
+			U16 hullPoints = targetPart->hullPoints+(hullPointsPer*targetPart->hullPointsMax);
+			targetPart->hullPoints = std::min(targetPart->hullPointsMax, hullPoints);
+			U16 supplies = targetPart->supplies+(suppliesPer*targetPart->supplyPointsMax);
+			targetPart->supplies = std::min(targetPart->supplyPointsMax, supplies);
 			return 0;
 		}
 	}
@@ -494,7 +496,7 @@ void Synthesis::Render (void)
 
 		if (stage == SYN_ABSORB)
 		{
-			SINGLE progress = min(timer/ABSORB_TIME,1.0f);
+			SINGLE progress = std::min(timer/ABSORB_TIME,1.0f);
 			Vector split_z = Vector(0,0,-shipLength/2+shipLength*progress);
 			split_z = transform*split_z;
 			TreeRenderPortionZAlign(mc->mi,mc->numChildren,split_z);
@@ -545,8 +547,8 @@ void Synthesis::renderZap()
 
 	end = target.Ptr()->GetPosition();
 
-	SINGLE progress = min(timer/ZAP_TIME,1.0);
-#define FLARE 0.7
+	SINGLE progress = std::min(timer/ZAP_TIME,1.0f);
+	constexpr float FLARE = 0.7f;
 
 	Vector dir= end-start;
 	SINGLE length = dir.magnitude();
@@ -568,7 +570,7 @@ void Synthesis::renderZap()
 
 #define TILE 0.01
 
-	SINGLE dist = min(progress,FLARE)*length;
+	SINGLE dist = std::min(progress,FLARE)*length;
 	//draw some
 	v_list[0].pos = start-i*BM_WIDTH;
 	v_list[0].color = 0;
@@ -634,7 +636,7 @@ void Synthesis::renderZap()
 //
 void Synthesis::renderShield()
 {
-	VOLPTR(IShipDamage) shipDamage = target;
+	VOLPTR(IShipDamage) shipDamage = target.Ptr();
 	SMesh *smesh = shipDamage->GetShieldMesh();
 	if (smesh == 0)
 		return;
@@ -770,7 +772,7 @@ void Synthesis::InitLauncher (IBaseObject * _owner, S32 ownerIndex, S32 animArch
 	CQASSERT(_owner);
 	_owner->QueryInterface(ILaunchOwnerID,owner,LAUNCHVOLATILEPTR);
 
-	VOLPTR(IExtent) extentObj = owner;
+	VOLPTR(IExtent) extentObj = owner.Ptr();
 	CQASSERT(extentObj);
 
 //	mc = &extentObj->GetMeshChain();
@@ -876,7 +878,7 @@ BOOL32 Synthesis::Save (struct IFileSystem * outFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -903,7 +905,7 @@ BOOL32 Synthesis::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -959,7 +961,7 @@ void Synthesis::shootTarget()
 	//	ENGINE->set_instance_handler(owner.ptr->GetObjectIndex(),this);
 	//	ENGINE->set_transform(instanceIndex,trans);
 
-		VOLPTR(IShipMove) smove = owner;
+		VOLPTR(IShipMove) smove = owner.Ptr();
 		CQASSERT(smove);
 		smove->RemoveFromMap();
 
@@ -979,7 +981,7 @@ void Synthesis::shootTarget()
 	else if(!THEMATRIX->IsMaster())
 	{
 		OBJLIST->RemoveObject(owner.Ptr());
-		VOLPTR(IShipMove) smove = owner;
+		VOLPTR(IShipMove) smove = owner.Ptr();
 		CQASSERT(smove);
 		smove->RemoveFromMap();
 		delete owner.Ptr();
@@ -1052,7 +1054,7 @@ SynthesisManager::~SynthesisManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -1063,7 +1065,7 @@ void SynthesisManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -1096,7 +1098,7 @@ HANDLE SynthesisManager::CreateArchetype(const char *szArchname, OBJCLASS objCla
 			COMPTR<IFileSystem> objFile;
 			
 			fdesc.lpFileName = "geo_sphere_tex.3db";
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 			{
 				if ((newguy->archIndex = ENGINE->create_archetype(fdesc.lpFileName, objFile)) == INVALID_ARCHETYPE_INDEX)
 				{

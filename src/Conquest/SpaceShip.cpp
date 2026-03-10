@@ -64,17 +64,6 @@
 
 //--------------------------------------------------------------------------//
 
-template SpaceShip<struct SUPPLYSHIP_SAVELOAD, SUPPLYSHIP_INIT>;
-template SpaceShip<struct FABRICATOR_SAVELOAD, FABRICATOR_INIT>;
-template SpaceShip<struct GUNBOAT_SAVELOAD, GUNBOAT_INIT>;
-template SpaceShip<struct HARVEST_SAVELOAD, HARVEST_INIT>;
-template SpaceShip<struct MINELAYER_SAVELOAD, MINELAYER_INIT>;
-template SpaceShip<struct FLAGSHIP_SAVELOAD, FLAGSHIP_INIT>;
-template SpaceShip<struct TROOPSHIP_SAVELOAD, TROOPSHIP_INIT>;
-// these should not be spaceships:
-template SpaceShip<struct RECONPROBE_SAVELOAD, RECONPROBE_INIT>;
-//template SpaceShip<struct TORPEDO_SAVELOAD, TORPEDO_INIT>;
-
 //global ship texture ID one for all kinds of ships
 U32 shipMapTex = -1;
 U32 shipMapTexRef = 0;
@@ -488,7 +477,7 @@ void SpaceShip<SaveStruct,InitStruct>::renderSpaceShip (void)
 		PB.Vertex3f(W2, H2, L2);
 		PB.End();
 */
-	SINGLE Z = min(H1, H2) - 100;
+	SINGLE Z = std::min(H1, H2) - 100;
 	Vector ctr((W2+W1)/2.0f, 0, (L2+L1)/2.0f);
 
 	Vector end(W1, 0, L1);
@@ -651,9 +640,9 @@ void FreakTexture (U32 texID,S16 gamma,SINGLE contrast)
 					r = (*pixel >> data.pf.rl) << data.pf.rr;
 					g = (*pixel >> data.pf.gl) << data.pf.gr;
 					b = (*pixel >> data.pf.bl) << data.pf.br;
-					r = min(gamma+r*contrast,255);
-					g = min(gamma+g*contrast,255);
-					b = min(gamma+b*contrast,255);
+					r = std::min(gamma+r*contrast,255.f);
+					g = std::min(gamma+g*contrast,255.f);
+					b = std::min(gamma+b*contrast,255.f);
 					*pixel = (r >> data.pf.rr) << data.pf.rl;
 					*pixel |= (g >> data.pf.gr) << data.pf.gl;
 					*pixel |= (b >> data.pf.br) << data.pf.bl;
@@ -670,9 +659,9 @@ void FreakTexture (U32 texID,S16 gamma,SINGLE contrast)
 				g = colors[i].g*contrast+gamma;
 				b = colors[i].b*contrast+gamma;
 				
-				colors[i].r = max(0,min(r,255));
-				colors[i].g = max(0,min(g,255));
-				colors[i].b = max(0,min(b,255));
+				colors[i].r = std::max((S16)0,std::min(r,(S16)255));
+				colors[i].g = std::max((S16)0,std::min(g,(S16)255));
+				colors[i].b = std::max((S16)0,std::min(b,(S16)255));
 			}
 			PIPE->set_texture_palette(texID,0,256,colors);
 		}
@@ -799,7 +788,7 @@ void SpaceShip<SaveStruct,InitStruct>::explodeSpaceShip (bool bExplode)
 		}
 		
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(systemID, map);
+		SECTOR->GetTerrainMap(systemID, map.addr());
 		undoFootprintInfo(map);
 	}
 }
@@ -913,7 +902,7 @@ BOOL32 SpaceShip<SaveStruct,InitStruct>::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -950,7 +939,7 @@ BOOL32 SpaceShip<SaveStruct,InitStruct>::Load (struct IFileSystem * inFile)
 #endif
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -1468,7 +1457,7 @@ void SpaceShip<SaveStruct,InitStruct>::DrawFleetMoniker (bool bAllShips)
 		int xpos = x-(TBARLENGTH/2);
 
 		COMPTR<IFontDrawAgent> pFont;
-		if (OBJLIST->GetUnitFont(pFont) == GR_OK)
+		if (OBJLIST->GetUnitFont(pFont.addr()) == GR_OK)
 		{
 			pFont->SetFontColor(color | 0xFF000000, 0);
 			pFont->StringDraw(pane, xpos-8, y-2, buffer);

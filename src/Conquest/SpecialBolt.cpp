@@ -377,7 +377,7 @@ SpecialBoltManager::~SpecialBoltManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -387,7 +387,7 @@ void SpecialBoltManager::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(GetBase(), &factoryHandle);
 }
 //--------------------------------------------------------------------------
@@ -423,7 +423,7 @@ HANDLE SpecialBoltManager::CreateArchetype(const char *szArchname, OBJCLASS objC
 				
 				DAFILEDESC fdesc = data->fileName;
 				COMPTR<IFileSystem> file;
-				if (OBJECTDIR->CreateInstance(&fdesc,file) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc,file.void_addr()) == GR_OK)
 					TEXLIB->load_library(file, 0);
 				
 				if (file != 0 && (newguy->archIndex = ENGINE->create_archetype(((BT_SPECIALBOLT_DATA *)data)->fileName, file)) != INVALID_ARCHETYPE_INDEX)

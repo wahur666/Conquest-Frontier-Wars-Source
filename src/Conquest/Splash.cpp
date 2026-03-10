@@ -60,7 +60,7 @@ static HANDLE loadbitmap (void)
 }
 //--------------------------------------------------------------------------//
 //
-static BOOL CALLBACK splashDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+static LRESULT CALLBACK splashDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
 
@@ -105,7 +105,7 @@ HWND __stdcall DoSplashScreen (void)
 	HWND result;
 	MSG msg;
 
-	result = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_DIALOG9), hMainWindow, splashDlgProc, NULL);
+	result = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_DIALOG9), hMainWindow, DLGPROC(splashDlgProc), NULL);
 
 	//
 	// Serve message queue

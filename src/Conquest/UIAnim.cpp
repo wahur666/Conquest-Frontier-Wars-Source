@@ -160,7 +160,7 @@ struct _NO_VTABLE UIAnim : public ObjectTransform<ObjectFrame<IBaseObject,struct
 
 	virtual void SetRelativeTransform (const class TRANSFORM &_trans);
 
-	bool UIAnim::get_projected_bounding_sphere(	float & cx,
+	bool get_projected_bounding_sphere(	float & cx,
 										  float & cy,
 										  float & radius,
 										  float & depth);
@@ -282,7 +282,7 @@ BOOL32 UIAnim::InitBlast (const class TRANSFORM & orientation, U32 _systemID, IB
 		animObj->QueryInterface(IEffectID,effect);
 		CQASSERT(effect);
 		effect->InitEffect(this,orientation,_animScale,totalTime);
-		ui_animRadius = max(ui_animRadius,effect->GetRadius());
+		ui_animRadius = std::max(ui_animRadius,effect->GetRadius());
 
 		result = 1;
 	}
@@ -318,7 +318,7 @@ BOOL32 UIAnim::EditorInitUIAnim ()
 		animObj->QueryInterface(IEffectID,effect);
 		CQASSERT(effect);
 		effect->EditorInitEffect(this,totalTime);
-		ui_animRadius = max(ui_animRadius,effect->GetRadius());
+		ui_animRadius = std::max(ui_animRadius,effect->GetRadius());
 
 		result = 1;
 	}
@@ -479,7 +479,7 @@ UIAnimManager::~UIAnimManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 
@@ -491,7 +491,7 @@ void UIAnimManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}

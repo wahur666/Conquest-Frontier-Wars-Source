@@ -16,7 +16,7 @@
 #ifndef IOBJECT_H
 #include "IObject.h"
 #endif
-#include "Search.hpp"
+#include "Search.h"
 
 #ifndef CQTRACE_H
 #include "CQTrace.h"

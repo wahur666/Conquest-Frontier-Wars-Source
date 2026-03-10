@@ -425,7 +425,7 @@ struct InfoList
 
 	void reset (void)
 	{
-		BlockAllocator<Type>::SUBNODE * node = pList;
+		typename BlockAllocator<Type>::SUBNODE * node = pList;
 		while (node)
 		{
 			pList = node->pNext;
@@ -437,7 +437,7 @@ struct InfoList
 
 	void add (const Type & data)
 	{
-		BlockAllocator<Type>::SUBNODE * node = blockAlloc.alloc();
+		typename BlockAllocator<Type>::SUBNODE * node = blockAlloc.alloc();
 
 		*(static_cast<Type *>(node)) = data;
 		
@@ -1099,7 +1099,7 @@ struct MapMatrix
 		int deltaX = abs(src.x - dst.x);
 		int deltaY = abs(src.y - dst.y);
 
-		return DIAGONAL_LENGTH*(min(deltaX, deltaY)) + AXIAL_LENGTH * abs(deltaX - deltaY);
+		return DIAGONAL_LENGTH*(std::min(deltaX, deltaY)) + AXIAL_LENGTH * abs(deltaX - deltaY);
 	}
 
 	SINGLE GetDistance (CellRef src, CellRef dst)

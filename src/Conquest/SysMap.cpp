@@ -217,8 +217,8 @@ struct DACOM_NO_VTABLE SysMap : public ISystemMap,
 	S32 x_cent,y_cent;
 
 	//new gdi draw stuff
-	U32 terrainTex[MAX_SYSTEMS]; //the cached terrain texture
-	U32 unitTex[MAX_SYSTEMS]; // the real texture
+	LONG_PTR terrainTex[MAX_SYSTEMS]; //the cached terrain texture
+	LONG_PTR unitTex[MAX_SYSTEMS]; // the real texture
 	U32 texInit; //current systems 
 	SINGLE lastUpdateTime[MAX_SYSTEMS]; //last game time update
 	bool bInMapRender;//true if our hdc is valid and it is safe to call map render functions
@@ -234,7 +234,7 @@ struct DACOM_NO_VTABLE SysMap : public ISystemMap,
 	U32 numIcons;
 	U32 iconId[MAX_ICONS];
 	U32 numPlayerIcons;
-	U32 playerIconId[MAX_PLAYERS][MAX_PLAYER_ICONS];
+	LONG_PTR playerIconId[MAX_PLAYERS][MAX_PLAYER_ICONS];
 
 	AnimInstance * waypointAnim;
 	AnimArchetype * waypointArch;
@@ -326,9 +326,9 @@ struct DACOM_NO_VTABLE SysMap : public ISystemMap,
 
 	virtual void DrawPlayerIcon(Vector worldPos,SINGLE worldSize,U32 iconID,U32 playerID);
 
-	virtual U32 RegisterIcon(char * filename);
+	virtual U32 RegisterIcon(const char *filename);
 
-	virtual U32 RegisterPlayerIcon(char * filename);
+	virtual U32 RegisterPlayerIcon(const char * filename);
 
 	virtual U32 GetPadding(U32 systemID);
 
@@ -483,7 +483,7 @@ SysMap::~SysMap (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (TOOLBAR && TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (TOOLBAR && TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
 	DEFAULTS->SetDataInRegistry(szRegKey, static_cast<SYSMAP_DATA *>(this), sizeof(SYSMAP_DATA));
@@ -745,7 +745,7 @@ GENRESULT SysMap::Notify (U32 message, void *param)
 		{
 			COMPTR<IToolbar> toolbar;
 
-			if (TOOLBAR && TOOLBAR->QueryInterface("IToolbar", toolbar) == GR_OK)
+			if (TOOLBAR && TOOLBAR->QueryInterface("IToolbar", toolbar.void_addr()) == GR_OK)
 			{
 				toolbar->GetSystemMapRect(sysmap_left,sysmap_top,sysmap_right,sysmap_bottom);\
 			}
@@ -1841,7 +1841,7 @@ void SysMap::Save(struct IFileSystem * outFile)
 		fdesc.dwCreationDistribution = CREATE_ALWAYS;
 		
 		fdesc.lpFileName = "SysMap";
-		if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+		if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 			return;
 
 		U32 numAnim = 0;
@@ -1876,7 +1876,7 @@ void SysMap::Load(struct IFileSystem * inFile)
 	if (inFile->SetCurrentDirectory("\\SysMapSaveload") == 0)
 		return;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		return;
 
 	file->ReadFile(0,&lastAnimID,sizeof(U32),&dwRead);
@@ -2574,7 +2574,7 @@ BOOL32 SysMap::createViewer (void)
 	ddesc.memory = static_cast<SYSMAP_DATA *>(this);
 	ddesc.memoryLength = sizeof(SYSMAP_DATA);
 
-	if (DACOM->CreateInstance(&ddesc, doc) == GR_OK)
+	if (DACOM->CreateInstance(&ddesc, doc.void_addr()) == GR_OK)
 	{
 		VIEWDESC vdesc;
 		HWND hwnd;
@@ -2583,7 +2583,7 @@ BOOL32 SysMap::createViewer (void)
 		vdesc.doc = doc;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if (PARSER->CreateInstance(&vdesc, viewer) == GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
@@ -2918,11 +2918,11 @@ void SysMap::onMouseWheel (S32 zDelta)
 	x_cent = map_pos.x+diff.x*oldZoom/zoom;
 	y_cent = map_pos.y+diff.y*oldZoom/zoom;
 
-	x_cent = max(0,x_cent);
-	y_cent = max(0,y_cent);
+	x_cent = std::max((S32)0,x_cent);
+	y_cent = std::max((S32)0,y_cent);
 
-	x_cent = min(sctr_sizex,x_cent);
-	y_cent = min(sctr_sizey,y_cent);
+	x_cent = std::min(sctr_sizex,x_cent);
+	y_cent = std::min(sctr_sizey,y_cent);
 
 	MakeFullScreenMapTrans();
 
@@ -2945,16 +2945,16 @@ void SysMap::onFullScreenScroll (const Vector & dir)
 	SECTOR->GetSectorCenter(&sctr_sizex,&sctr_sizey);
 	sctr_sizex*=2;
 	sctr_sizey*=2;
-	S32 deltaPos = max(sctr_sizey,sctr_sizex);
+	S32 deltaPos = std::max(sctr_sizey,sctr_sizex);
 
 	x_cent += realDir.x * (deltaPos/30);
 	y_cent += realDir.y * (deltaPos/30);
 
-	x_cent = max(0,x_cent);
-	y_cent = max(0,y_cent);
+	x_cent = std::max((S32)0,x_cent);
+	y_cent = std::max((S32)0,y_cent);
 
-	x_cent = min(sctr_sizex,x_cent);
-	y_cent = min(sctr_sizey,y_cent);
+	x_cent = std::min(sctr_sizex,x_cent);
+	y_cent = std::min(sctr_sizey,y_cent);
 
 	MakeFullScreenMapTrans();
 
@@ -3479,13 +3479,13 @@ struct _sysmap : GlobalComponent
 		minfo.fMask = MIIM_ID | MIIM_TYPE;
 		minfo.fType = MFT_STRING;
 		minfo.wID = IDS_VIEWSYSMAP;
-		minfo.dwTypeData = "SysMap";
+		minfo.dwTypeData = LPSTR("SysMap");
 		minfo.cch = 6;	// length of string "SysMap"
 			
 		if (InsertMenuItem(hMenu, 0x7FFE, 1, &minfo))
 			sysmap->menuID = IDS_VIEWSYSMAP;
 
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(SYSMAP, &sysmap->eventHandle);
 
 		sysmap->initializeResources();
