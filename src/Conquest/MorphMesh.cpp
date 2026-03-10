@@ -34,7 +34,9 @@ float Bcr[4][4] =
 	{-1.0/2.0,  0.0/2.0,  1.0/2.0,  0.0/2.0},
 	{ 0.0/2.0,  2.0/2.0,  0.0/2.0,  0.0/2.0}
 };
-
+struct ControlPoint;
+ControlPoint add(const ControlPoint & v1, const ControlPoint & v2);
+ControlPoint scale(const ControlPoint & v, SINGLE s);
 struct ControlPoint
 {
 	SINGLE time;
@@ -244,7 +246,7 @@ BOOL32 MorphMeshArchetype::ProfileCallback(struct IProfileParser2 * parser, cons
 					{
 						CQASSERT(cnt < MAX_TARGETS && "Too many morph targets");
 						fdesc = buffer;
-						if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+						if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 						{
 							anims[currentAnim].mesh_id[cnt] = ENGINE->create_archetype(fdesc.lpFileName, file);
 							if (anims[currentAnim].mesh_id[cnt] != -1)
@@ -355,7 +357,7 @@ BOOL32 MorphMeshArchetype::ReadINI(char *filename)
 
 	COMPTR<IProfileParser2> parser;
 
-	if (CreateProfileParser(filename, parser) == GR_OK)
+	if (CreateProfileParser(filename, parser.addr()) == GR_OK)
 	{
 		if (parser->EnumerateSections(this) == 0)
 		{
@@ -467,7 +469,7 @@ struct AnimQueue
 	bool bLooping;
 	AnimQueue *next;
 
-	AnimQueue::AnimQueue()
+	AnimQueue()
 	{
 		next = NULL;
 	}
@@ -501,7 +503,7 @@ struct MorphMesh : IMorphMesh
 		::free(ptr);
 	}
 
-	MorphMesh::MorphMesh();
+	MorphMesh();
 	~MorphMesh();
 
 	virtual SINGLE GetMorphPos(Mesh **mesh0,Mesh **mesh1);
@@ -943,7 +945,7 @@ GENRESULT CreateMorphMesh(COMPTR<IMorphMesh> &imm,struct MorphMeshArchetype * ar
 {
 	MorphMesh *mm = new DAComponent<MorphMesh>;
 
-	GENRESULT result = mm->QueryInterface("IMorphMesh",imm);
+	GENRESULT result = mm->QueryInterface("IMorphMesh",imm.void_addr());
 	mm->anims = arch->anims;
 	mm->numAnims = arch->numAnims;
 	mm->Release();

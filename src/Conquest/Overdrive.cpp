@@ -146,7 +146,7 @@ BOOL32 Overdrive::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -171,7 +171,7 @@ BOOL32 Overdrive::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -211,7 +211,7 @@ void Overdrive::PhysicalUpdate (SINGLE dt)
 {
 	Vector dir = destPos-owner->GetPosition();
 	SINGLE mag = dir.magnitude();
-	mag = min(dt*data->speed/mag,1);
+	mag = std::min(dt*data->speed/mag,1.f);
 	VOLPTR(IPhysicalObject) ship;
 	if ((ship = owner) != 0)
 		ship->SetPosition(owner->GetPosition()+dir*mag, owner->GetSystemID());
@@ -316,7 +316,7 @@ OverdriveManager::~OverdriveManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -326,7 +326,7 @@ void OverdriveManager::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(GetBase(), &factoryHandle);
 }
 //--------------------------------------------------------------------------

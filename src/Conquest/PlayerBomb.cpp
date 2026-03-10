@@ -668,7 +668,7 @@ BOOL32 PlayerBomb::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -696,7 +696,7 @@ BOOL32 PlayerBomb::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -720,7 +720,7 @@ void PlayerBomb::ResolveAssociations()
 //
 void PlayerBomb::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc { partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_PLAYERBOMB_QLOAD");
@@ -870,7 +870,7 @@ PlayerBombFactory::~PlayerBombFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 
 }
@@ -880,7 +880,7 @@ void PlayerBombFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 
 }
@@ -903,7 +903,7 @@ HANDLE PlayerBombFactory::CreateArchetype (const char *szArchname, OBJCLASS objC
 			
 			fdesc.lpImplementation = "UTF";
 			
-			if (OBJECTDIR->CreateInstance(&fdesc, file) != GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 			{
 				CQFILENOTFOUND(fdesc.lpFileName);
 				goto Error;

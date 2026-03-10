@@ -159,7 +159,7 @@ struct _NO_VTABLE Bolt : public ObjectRender<ObjectTransform<ObjectFrame<IBaseOb
 			_rect.top = screenY - 15;
 			_rect.bottom = screenY + 15;
 			
-			RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+			RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 			
 			bVisible = RectIntersects(_rect, screenRect);
 		}
@@ -593,7 +593,7 @@ struct _NO_VTABLE Missile : public ObjectRender<ObjectPhysics<ObjectTransform<Ob
 			_rect.top = screenY - 15;
 			_rect.bottom = screenY + 15;
 			
-			RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+			RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 			
 			bVisible = RectIntersects(_rect, screenRect);
 		}
@@ -1282,7 +1282,7 @@ void Missile::TurnOffTrail()
 		timeToLive = 4.0f;
 		COMPTR<IParticleSystem> IPS;
 		
-		if(ENGINE->query_instance_interface( trailIndex, IID_IParticleSystem, (IDAComponent **)(void **)IPS ) == GR_OK)
+		if(ENGINE->query_instance_interface( trailIndex, IID_IParticleSystem, (IDAComponent **)IPS.void_addr() ) == GR_OK)
 		{
 			ParticleSystemParameters psp;
 			IPS->get_parameters( &psp );
@@ -1361,7 +1361,7 @@ ProjectileManager::~ProjectileManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -1371,7 +1371,7 @@ void ProjectileManager::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(GetBase(), &factoryHandle);
 }
 //--------------------------------------------------------------------------
@@ -1415,7 +1415,7 @@ HANDLE ProjectileManager::CreateArchetype(const char *szArchname, OBJCLASS objCl
 				
 				DAFILEDESC fdesc = data->fileName;
 				COMPTR<IFileSystem> file;
-				if (OBJECTDIR->CreateInstance(&fdesc,file) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc,file.void_addr()) == GR_OK)
 					TEXLIB->load_library(file, 0);
 				
 			/*	if (file != 0 && (newguy->archIndex = ENGINE->create_archetype(((BT_PROJECTILE_DATA *)data)->fileName, file)) != INVALID_ARCHETYPE_INDEX)

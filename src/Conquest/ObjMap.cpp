@@ -217,10 +217,10 @@ int ObjMap::GetSquaresNearPoint(U32 systemID,const Vector &pos,int radius,int *r
 	int posY = F2LONG(pos.y);
 	int cnt=0;
 	S32 minX,maxX,minY,maxY;
-	minX=max((posX-radius)/SQUARE_SIZE,0);
-	minY=max((posY-radius)/SQUARE_SIZE,0);
-	maxX=min(((posX+radius-1)/SQUARE_SIZE)+1,maps[systemID-1].width);
-	maxY=min(((posY+radius-1)/SQUARE_SIZE)+1,maps[systemID-1].width);
+	minX=std::max((posX-radius)/SQUARE_SIZE,0);
+	minY=std::max((posY-radius)/SQUARE_SIZE,0);
+	maxX=std::min(((posX+radius-1)/SQUARE_SIZE)+1,maps[systemID-1].width);
+	maxY=std::min(((posY+radius-1)/SQUARE_SIZE)+1,maps[systemID-1].width);
 //	CQASSERT(minX < maps[systemID-1].width);
 //	CQASSERT(minY < maps[systemID-1].width);
 	for (int i=minX;i<maxX;i++)

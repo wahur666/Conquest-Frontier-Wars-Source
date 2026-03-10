@@ -27,15 +27,7 @@
 typedef SPACESHIP_INIT<BASE_SPACESHIP_DATA> BASESHIPINIT;
 //--------------------------------------------------------------------------//
 //
-template ObjectControl<ObjectTransform
-					    <ObjectFrame<struct IBaseObject,struct SPACESHIP_SAVELOAD, BASESHIPINIT> >
-					    >;
 
-template ObjectControl<ObjectTransform
-						<ObjectFrame<IBaseObject,FIGHTER_SAVELOAD,BASE_FIGHTER_INIT> >
-						>;
-//---------------------------------------------------------------------------
-//
 static bool bUpdateControl = true;
 template <class Base> 
 BOOL32 ObjectControl< Base >::updateControl (void)
@@ -50,7 +42,7 @@ BOOL32 ObjectControl< Base >::updateControl (void)
 	{
 		bFinalVelocityValid = bOPositionValid = bOAngleValid = bAngleValid = false;
 		bPositionValid = true;
-		targetPos = transform.translation;
+		targetPos = this->transform.translation;
 	}
 		
 	if (bOAngleValid)
@@ -77,9 +69,9 @@ BOOL32 ObjectControl< Base >::updateControl (void)
 	//
 	if (bAngleValid)
 	{
-		SINGLE diff = fixAngle(targetYaw - transform.get_yaw());
+		SINGLE diff = fixAngle(targetYaw - this->transform.get_yaw());
 		SINGLE vel;
-		SINGLE coast = calculateCoastingDistance(-ang_velocity.z, angAcceleration, ELAPSED_TIME);
+		SINGLE coast = calculateCoastingDistance(-this->ang_velocity.z, angAcceleration, ELAPSED_TIME);
 
 		SINGLE newdiff = fixAngle(diff - coast);
 
@@ -90,9 +82,9 @@ BOOL32 ObjectControl< Base >::updateControl (void)
 		if (vel < -maxAngVelocity)
 			vel = -maxAngVelocity;
 
-		vel = limitAcceleration(-ang_velocity.z, vel, angAcceleration, ELAPSED_TIME);
+		vel = limitAcceleration(-this->ang_velocity.z, vel, angAcceleration, ELAPSED_TIME);
 
-		ang_velocity.z = -vel;
+		this->ang_velocity.z = -vel;
 
 		// see if we're about to go too far
 		if (diff > 0)
@@ -100,19 +92,19 @@ BOOL32 ObjectControl< Base >::updateControl (void)
 			SINGLE newvel = diff / ELAPSED_TIME;
 
 			if (newvel < vel)		// we're going too fast!
-				ang_velocity.z = -newvel;
+				this->ang_velocity.z = -newvel;
 		}
 		else
 		{
 			SINGLE newvel = diff / ELAPSED_TIME;
 
 			if (newvel > vel)		// we're going too fast!
-				ang_velocity.z = -newvel;
+				this->ang_velocity.z = -newvel;
 		}
 		//
 		// now do roll
 		//
-		diff = fixAngle(targetRoll - transform.get_roll());
+		diff = fixAngle(targetRoll - this->transform.get_roll());
 		vel = REALTIME_FRAMERATE * diff;
 		if (vel > maxAngVelocity*ANG_SCALE)
 			vel = maxAngVelocity*ANG_SCALE;
@@ -120,11 +112,11 @@ BOOL32 ObjectControl< Base >::updateControl (void)
 		if (vel < -maxAngVelocity*ANG_SCALE)
 			vel = -maxAngVelocity*ANG_SCALE;
 
-		SINGLE oldVel = -dot_product(ang_velocity, transform.get_j());
-		ang_velocity -= transform.get_j() * (vel - oldVel);	// subtract because k is backwards
+		SINGLE oldVel = -this->dot_product(this->ang_velocity, this->transform.get_j());
+		this->ang_velocity -= this->transform.get_j() * (vel - oldVel);	// subtract because k is backwards
 
 		// now do pitch
-		diff = fixAngle(targetPitch - transform.get_pitch());
+		diff = fixAngle(targetPitch - this->transform.get_pitch());
 		vel = REALTIME_FRAMERATE * diff;
 		if (vel > maxAngVelocity*ANG_SCALE)
 			vel = maxAngVelocity*ANG_SCALE;
@@ -132,15 +124,15 @@ BOOL32 ObjectControl< Base >::updateControl (void)
 		if (vel < -maxAngVelocity*ANG_SCALE)
 			vel = -maxAngVelocity*ANG_SCALE;
 
-		oldVel = dot_product(ang_velocity, transform.get_i());
-		ang_velocity += transform.get_i() * (vel - oldVel);
+		oldVel = this->dot_product(this->ang_velocity, this->transform.get_i());
+		this->ang_velocity += this->transform.get_i() * (vel - oldVel);
 	}
 
 //DoneAngle:
 
 	if (bPositionValid)
 	{
-		Vector distance = targetPos - transform.translation;
+		Vector distance = targetPos - this->transform.translation;
 		SINGLE diff = distance.fast_magnitude();
 		SINGLE vel;
 
@@ -153,7 +145,7 @@ BOOL32 ObjectControl< Base >::updateControl (void)
 		else
 		{
 			// we are close enough for highway work, just set position and call it a day
-			transform.translation = targetPos;
+			this->transform.translation = targetPos;
 			vel = diff = 0;
 		}
 
@@ -166,9 +158,9 @@ BOOL32 ObjectControl< Base >::updateControl (void)
 		}
 
 		if (diff > 1)
-			velocity = distance * (vel / diff);
+			this->velocity = distance * (vel / diff);
 		else
-			velocity.zero();
+			this->velocity.zero();
 	}
 
 
@@ -176,11 +168,11 @@ Done:
 	// debugging
 	if (bPositionValid==0)
 	{
-		if (bExploding==0)
+		if (this->bExploding==0)
 		{
 			noInputCountA++;
 			if (noInputCountA == 3)
-				CQBOMB1("Object 0x%X is floating away...(ignorable)", GetPartID());
+				CQBOMB1("Object 0x%X is floating away...(ignorable)", this->GetPartID());
 		}
 	}
 	else
@@ -188,11 +180,11 @@ Done:
 
 	if (bAngleValid==0 && bDestabilize==0)
 	{
-		if (bExploding==0)
+		if (this->bExploding==0)
 		{
 			noInputCountB++;
 			if (noInputCountB == 3)
-				CQBOMB1("Object 0x%X is tumbling...(ignorable)", GetPartID());
+				CQBOMB1("Object 0x%X is tumbling...(ignorable)", this->GetPartID());
 		}
 	}
 	else
@@ -219,14 +211,14 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 {
 	const USER_DEFAULTS * const pDefaults = DEFAULTS->GetDefaults();
 
-	if (bVisible==0 || pDefaults->bCheapMovement || (pDefaults->bConstUpdateRate && pDefaults->gameSpeed!=0))
+	if (this->bVisible==0 || pDefaults->bCheapMovement || (pDefaults->bConstUpdateRate && pDefaults->gameSpeed!=0))
 		return;
 
 	if (bDestabilize)
 	{
 		bFinalVelocityValid = bOPositionValid = bOAngleValid = bAngleValid = false;
 		bPositionValid = true;
-		targetPos = transform.translation;
+		targetPos = this->transform.translation;
 	}
 		
 	if (bOAngleValid)
@@ -249,9 +241,9 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 
 	if (bAngleValid)
 	{
-		SINGLE diff = fixAngle(targetYaw - transform.get_yaw());
+		SINGLE diff = fixAngle(targetYaw - this->transform.get_yaw());
 		SINGLE vel;
-		SINGLE coast = calculateCoastingDistance(-ang_velocity.z, angAcceleration, dt);
+		SINGLE coast = calculateCoastingDistance(-this->ang_velocity.z, angAcceleration, dt);
 
 		SINGLE newdiff = fixAngle(diff - coast);
 
@@ -262,9 +254,9 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 		if (vel < -maxAngVelocity)
 			vel = -maxAngVelocity;
 
-		vel = limitAcceleration(-ang_velocity.z, vel, angAcceleration, dt);
+		vel = limitAcceleration(-this->ang_velocity.z, vel, angAcceleration, dt);
 
-		ang_velocity.z = -vel;
+		this->ang_velocity.z = -vel;
 
 		// see if we're about to go too far
 		if (diff > 0)
@@ -272,22 +264,22 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 			SINGLE newvel = diff / dt;
 
 			if (newvel < vel)		// we're going too fast!
-				ang_velocity.z = -newvel;
+				this->ang_velocity.z = -newvel;
 		}
 		else
 		{
 			SINGLE newvel = diff / dt;
 
 			if (newvel > vel)		// we're going too fast!
-				ang_velocity.z = -newvel;
+				this->ang_velocity.z = -newvel;
 		}
 
 
 		//
 		// now do roll
 		//
-		diff = fixAngle(targetRoll - transform.get_roll());
-		SINGLE oldVel = -dot_product(ang_velocity, transform.get_j());
+		diff = fixAngle(targetRoll - this->transform.get_roll());
+		SINGLE oldVel = -this->dot_product(this->ang_velocity, this->transform.get_j());
 		coast = calculateCoastingDistance(oldVel, angAcceleration*ANG_SCALE, dt);
 		newdiff = fixAngle(diff - coast);
 
@@ -317,13 +309,13 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 				vel = newvel;
 		}
 
-		ang_velocity -= transform.get_j() * (vel - oldVel);	// subtract because k is backwards
+		this->ang_velocity -= this->transform.get_j() * (vel - oldVel);	// subtract because k is backwards
 
 		//
 		// now do pitch
 		//
-		diff = fixAngle(targetPitch - transform.get_pitch());
-		oldVel = dot_product(ang_velocity, transform.get_i());
+		diff = fixAngle(targetPitch - this->transform.get_pitch());
+		oldVel = this->dot_product(this->ang_velocity, this->transform.get_i());
 		coast = calculateCoastingDistance(oldVel, angAcceleration*ANG_SCALE, dt);
 		newdiff = fixAngle(diff - coast);
 		
@@ -352,7 +344,7 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 				vel = newvel;
 		}
 
-		ang_velocity += transform.get_i() * (vel - oldVel);
+		this->ang_velocity += this->transform.get_i() * (vel - oldVel);
 		
 	}
 
@@ -361,10 +353,10 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 		//
 		// first do the z difference
 		//
-		Vector distance = targetPos - transform.translation;
+		Vector distance = targetPos - this->transform.translation;
 		SINGLE diff = distance.z;
-		SINGLE oldVel = velocity.z;
-		velocity.z = 0;
+		SINGLE oldVel = this->velocity.z;
+		this->velocity.z = 0;
 		SINGLE old2DVel;
 		SINGLE coast = calculateCoastingDistance(oldVel, linearAcceleration*ZXLATE_SCALE, dt);
 		SINGLE newdiff = diff - coast;
@@ -379,7 +371,7 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 			if (dir.x || dir.y)
 				dir.normalize();
 
-			old2DVel = dot_product(dir, velocity);
+			old2DVel = dot_product(dir, this->velocity);
 		}
 
 		vel = newdiff / dt;
@@ -407,7 +399,7 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 				vel = newvel;
 		}
 
-		velocity.z = vel;
+		this->velocity.z = vel;
 		
 		//
 		// now do the 2D portion of the velocity
@@ -450,9 +442,9 @@ void ObjectControl< Base >::physUpdateControl (SINGLE dt)
 				vel = newvel;
 		}
 
-		velocity.x = velocity.y = 0;
+		this->velocity.x = this->velocity.y = 0;
 		if (diff > 1)
-			velocity += distance * (vel / diff);
+			this->velocity += distance * (vel / diff);
 	}
 
 	bPhysicalUpdateHappened = true;

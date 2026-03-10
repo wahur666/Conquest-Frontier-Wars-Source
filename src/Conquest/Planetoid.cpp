@@ -1013,7 +1013,7 @@ void Planetoid::enableTerrainFootprint (bool bEnable)
 
 	// get the TerrainMap pointer
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(GetSystemID(), map);
+	SECTOR->GetTerrainMap(GetSystemID(), map.addr());
 
 	if (bEnable)
 	{
@@ -1741,7 +1741,7 @@ BOOL32 Planetoid::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -1769,7 +1769,7 @@ BOOL32 Planetoid::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -1800,7 +1800,7 @@ void Planetoid::ResolveAssociations()
 //
 void Planetoid::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc {partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_PLANET_QLOAD");
@@ -2361,7 +2361,7 @@ static void load_global_slots (void)
 	{
 		COMPTR<IFileSystem> file;
 		DAFILEDESC fdesc = "slotholder.3db";
-		if (OBJECTDIR->CreateInstance(&fdesc,file) != GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc,file.void_addr()) != GR_OK)
 			CQFILENOTFOUND(fdesc.lpFileName);
 
 		HARCH archeID;
@@ -2389,7 +2389,7 @@ static void load_global_slots (void)
 	{
 		COMPTR<IFileSystem> file;
 		DAFILEDESC fdesc = "planet_inside.3db";
-		if (OBJECTDIR->CreateInstance(&fdesc,file) != GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc,file.void_addr()) != GR_OK)
 			CQFILENOTFOUND(fdesc.lpFileName);
 
 		HARCH archeID;
@@ -2529,14 +2529,14 @@ PlanetFactory::~PlanetFactory (void)
 
 	unload_global_slots();
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 
 	if (GS)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -2549,10 +2549,10 @@ void PlanetFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		CQASSERT(eventHandle==0);
 		connection->Advise(GetBase(), &eventHandle);
@@ -2601,48 +2601,48 @@ HANDLE PlanetFactory::CreateArchetype (const char *szArchname, OBJCLASS objClass
 			GENDATA->AddRef(pPlanetFontType);
 
 			COMPTR<IDAComponent> pBase;
-			GENDATA->CreateInstance(pPlanetFontType, pBase);
+			GENDATA->CreateInstance(pPlanetFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pPlanetFont1);
+			pBase->QueryInterface("IFontDrawAgent", pPlanetFont1.void_addr());
 			pPlanetFont1->SetFontColor(RGB(255,255,255)| 0xFF000000,0);
 
-			GENDATA->CreateInstance(pPlanetFontType, pBase);
+			GENDATA->CreateInstance(pPlanetFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pPlanetFont2);
+			pBase->QueryInterface("IFontDrawAgent", pPlanetFont2.void_addr());
 			pPlanetFont2->SetFontColor(RGB(255,255,255)| 0xFF000000,0);
 
-			GENDATA->CreateInstance(pPlanetFontType, pBase);
+			GENDATA->CreateInstance(pPlanetFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pPlanetFont3);
+			pBase->QueryInterface("IFontDrawAgent", pPlanetFont3.void_addr());
 			pPlanetFont3->SetFontColor(RGB(255,255,255)| 0xFF000000,0);
 
-			GENDATA->CreateInstance(pPlanetFontType, pBase);
+			GENDATA->CreateInstance(pPlanetFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pPlanetFont4);
+			pBase->QueryInterface("IFontDrawAgent", pPlanetFont4.void_addr());
 			pPlanetFont4->SetFontColor(RGB(255,255,255)| 0xFF000000,0);
 
-			GENDATA->CreateInstance(pPlanetFontType, pBase);
+			GENDATA->CreateInstance(pPlanetFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pPlanetFont5);
+			pBase->QueryInterface("IFontDrawAgent", pPlanetFont5.void_addr());
 			pPlanetFont5->SetFontColor(RGB(255,255,255)| 0xFF000000,0);
 
-			GENDATA->CreateInstance(pPlanetFontType, pBase);
+			GENDATA->CreateInstance(pPlanetFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pPlanetFont6);
+			pBase->QueryInterface("IFontDrawAgent", pPlanetFont6.void_addr());
 			pPlanetFont6->SetFontColor(RGB(255,255,255)| 0xFF000000,0);
 
-			GENDATA->CreateInstance(pPlanetFontType, pBase);
+			GENDATA->CreateInstance(pPlanetFontType, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pPlanetFont8);
+			pBase->QueryInterface("IFontDrawAgent", pPlanetFont8.void_addr());
 			pPlanetFont8->SetFontColor(RGB(255,255,255)| 0xFF000000,0);
 
 			pPlanetFontType2 = GENDATA->LoadArchetype("Font!!PlanetTitle");
 			CQASSERT(pPlanetFontType2);
 			GENDATA->AddRef(pPlanetFontType2);
 
-			GENDATA->CreateInstance(pPlanetFontType2, pBase);
+			GENDATA->CreateInstance(pPlanetFontType2, pBase.addr());
 			CQASSERT(pBase!=0);
-			pBase->QueryInterface("IFontDrawAgent", pPlanetFont7);
+			pBase->QueryInterface("IFontDrawAgent", pPlanetFont7.void_addr());
 			pPlanetFont7->SetFontColor(RGB(65,212,228)| 0xFF000000,0);
 
 			pPlanetShapeType = GENDATA->LoadArchetype("VFXShape!!PlanetBar");
@@ -2651,19 +2651,19 @@ HANDLE PlanetFactory::CreateArchetype (const char *szArchname, OBJCLASS objClass
 
 			COMPTR<IShapeLoader> pPlanetShapeLoader;
 
-			GENDATA->CreateInstance(pPlanetShapeType, pBase);
-			pBase->QueryInterface("IShapeLoader", pPlanetShapeLoader);
+			GENDATA->CreateInstance(pPlanetShapeType, pBase.addr());
+			pBase->QueryInterface("IShapeLoader", pPlanetShapeLoader.void_addr());
 			
-			pPlanetShapeLoader->CreateDrawAgent(0, planetShape[0]);
-			pPlanetShapeLoader->CreateDrawAgent(1, planetShape[1]);
-			pPlanetShapeLoader->CreateDrawAgent(2, planetShape[2]);
-			pPlanetShapeLoader->CreateDrawAgent(3, planetShape[3]);
-			pPlanetShapeLoader->CreateDrawAgent(4, metalShape);
-			pPlanetShapeLoader->CreateDrawAgent(5, gasShape);
-			pPlanetShapeLoader->CreateDrawAgent(6, crewShape);
-			pPlanetShapeLoader->CreateDrawAgent(7, t_backgroundShape);
-			pPlanetShapeLoader->CreateDrawAgent(8, m_backgroundShape);
-			pPlanetShapeLoader->CreateDrawAgent(9, s_backgroundShape);
+			pPlanetShapeLoader->CreateDrawAgent(0, planetShape[0].addr());
+			pPlanetShapeLoader->CreateDrawAgent(1, planetShape[1].addr());
+			pPlanetShapeLoader->CreateDrawAgent(2, planetShape[2].addr());
+			pPlanetShapeLoader->CreateDrawAgent(3, planetShape[3].addr());
+			pPlanetShapeLoader->CreateDrawAgent(4, metalShape.addr());
+			pPlanetShapeLoader->CreateDrawAgent(5, gasShape.addr());
+			pPlanetShapeLoader->CreateDrawAgent(6, crewShape.addr());
+			pPlanetShapeLoader->CreateDrawAgent(7, t_backgroundShape.addr());
+			pPlanetShapeLoader->CreateDrawAgent(8, m_backgroundShape.addr());
+			pPlanetShapeLoader->CreateDrawAgent(9, s_backgroundShape.addr());
 		}
 
 		PLANETTEXMEMUSED += (TEXMEMORYUSED-lastTexMem);
@@ -2676,7 +2676,7 @@ HANDLE PlanetFactory::CreateArchetype (const char *szArchname, OBJCLASS objClass
 
 			COMPTR<IFileSystem> file;
 			
-			if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 			{
 				 result->teraRingAnim = ANIM2D->create_archetype(file);
 			}
@@ -2791,7 +2791,7 @@ void PlanetFactory::loadTextures (bool bLoad)
 	{
 		DAFILEDESC fdesc = "point.anm";
 		COMPTR<IFileSystem> file;
-		if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 		{
 			pointAnimArch = ANIM2D->create_archetype(file);
 		}

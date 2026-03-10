@@ -865,9 +865,9 @@ struct DACOM_NO_VTABLE ObjectList : public IObjectList,
 
 	void removeObject (IBaseObject *obj);
 
-	BOOL CALLBACK loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	LRESULT CALLBACK loadArchDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	static BOOL CALLBACK _loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static LRESULT CALLBACK _loadArchDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	void flushUnusedArchetypes (void);
 
@@ -2476,73 +2476,74 @@ BOOL32 ObjectList::EnumerateArchetypeData (struct IArchetypeEnum * enumerator)
 //#define _ARCHTTIMER_
 PARCHETYPE ObjectList::LoadArchetype (const C8 *name)
 {
-	PARCHETYPE result;
+    PARCHETYPE result;
 
-	if ((result = GetArchetype(name)) == 0)
-	{
+    if ((result = GetArchetype(name)) == 0)
+    {
 #ifdef _ARCHTTIMER_
-		U64 pretick, posttick;
-		QueryPerformanceCounter((LARGE_INTEGER *)&pretick);
+        U64 pretick, posttick;
+        QueryPerformanceCounter((LARGE_INTEGER *)&pretick);
 #endif
-		ARCHDATATYPE * dataType;
-		
-		if ((dataType = getArchDataType(name)) != 0)
-		{
-			CONNECTION_NODE<IObjectFactory> *node= point2.pClientList;
-			HANDLE handle=0;
+        ARCHDATATYPE * dataType;
 
-			result = new ARCHNODE;
-			result->prev=0;
-			if ((result->next=archList) != 0)
-				archList->prev = result;
-			result->archDataType = dataType;
-			archList = result;
+        if ((dataType = getArchDataType(name)) != 0)
+        {
+            HANDLE handle = 0;
+            IObjectFactory* winner = nullptr;
 
-			CURSOR->SetBusy(1);
-			
-			while (node)
-			{
-				if ((handle = node->client->CreateArchetype(dataType->name, dataType->objData->objClass, dataType->objData)) != 0)
-					break;
-				node = node->pNext;
-			}
+            result = new ARCHNODE;
+            result->prev = 0;
+            if ((result->next = archList) != 0)
+                archList->prev = result;
+            result->archDataType = dataType;
+            archList = result;
 
-			if (node)
-			{
-				result->factory = node->client;
-				result->hArchetype = handle;
-			}
-			else
-			{
-				unloadArchetype(result);
-				result = 0;
-				CQERROR1("No provider found for '%s'", dataType->name);
-			}
+            CURSOR->SetBusy(1);
 
-			CURSOR->SetBusy(0);
+            for (auto* client : point2.clients)
+            {
+                if ((handle = client->CreateArchetype(dataType->name, dataType->objData->objClass, dataType->objData)) != 0)
+                {
+                    winner = client;
+                    break;
+                }
+            }
+
+            if (winner)
+            {
+                result->factory = winner;
+                result->hArchetype = handle;
+            }
+            else
+            {
+                unloadArchetype(result);
+                result = 0;
+                CQERROR1("No provider found for '%s'", dataType->name);
+            }
+
+            CURSOR->SetBusy(0);
 #ifdef _ARCHTTIMER_
-		U64 clockFrequency;
-		QueryPerformanceCounter((LARGE_INTEGER *)&posttick);
-		QueryPerformanceFrequency((LARGE_INTEGER *) &clockFrequency);
+            U64 clockFrequency;
+            QueryPerformanceCounter((LARGE_INTEGER *)&posttick);
+            QueryPerformanceFrequency((LARGE_INTEGER *) &clockFrequency);
 
-		DOUBLE loadtime = posttick-pretick;
-		DOUBLE freq = clockFrequency;
-		loadtime = loadtime/freq;
-		SINGLE singleTime = (SINGLE)loadtime;
-		char buffer[256];
-		sprintf(buffer,"***Archlist Load:%s Time:%f\n",dataType->name,singleTime);
-		OutputDebugString(buffer);
-
+            DOUBLE loadtime = posttick - pretick;
+            DOUBLE freq = clockFrequency;
+            loadtime = loadtime / freq;
+            SINGLE singleTime = (SINGLE)loadtime;
+            char buffer[256];
+            sprintf(buffer, "***Archlist Load:%s Time:%f\n", dataType->name, singleTime);
+            OutputDebugString(buffer);
 #endif
-		}
-		else
-		{
-			if (name[0])
-				CQERROR1("Invalid archetype name: '%s'", name);
-		}
-	}
+        }
+        else
+        {
+            if (name[0])
+                CQERROR1("Invalid archetype name: '%s'", name);
+        }
+    }
 
-	return result;
+    return result;
 }
 //-------------------------------------------------------------------
 //
@@ -2663,7 +2664,6 @@ IBaseObject * ObjectList::CreateUIAnim (UIANIMTYPE type,const Vector &vec)
 GENRESULT ObjectList::Notify (U32 message, void *param)
 {
 	MSG *msg = (MSG *) param;
-	CONNECTION_NODE<IEventCallback> *node= point.pClientList;
 	static bool bIgnore = false;
 
 	switch (message)
@@ -2918,11 +2918,10 @@ GENRESULT ObjectList::Notify (U32 message, void *param)
 		EVENTSYS->Send(CQE_NEW_SELECTION, static_cast<ObjectList *>(this));
 		break;
 	}
-		
-	while (node)
+
+	for (auto* client : point.clients)
 	{
-		node->client->Notify(message, param);
-		node = node->pNext;
+		client->Notify(message, param);
 	}
 
 	return GR_OK;
@@ -3003,14 +3002,14 @@ Top:
 }
 //-------------------------------------------------------------------
 //
-BOOL ObjectList::_loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT ObjectList::_loadArchDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	ObjectList * _this;
 
 	if (message == WM_INITDIALOG)
-		SetWindowLong(hwnd, DWL_USER, lParam);
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 	
-	if ((_this = (ObjectList *) GetWindowLong(hwnd, DWL_USER)) != 0)
+	if ((_this = (ObjectList *) GetWindowLongPtr(hwnd, DWLP_USER)) != 0)
 		return _this->loadArchDlgProc(hwnd, message, wParam, lParam);
 
 	return 0;
@@ -3033,7 +3032,7 @@ static BOOL32 GuardedEnableWindow (HWND hwnd, BOOL bEnable)
 //
 static LONG CALLBACK editControlProcedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
 {
- 	WNDPROC oldProc = (WNDPROC) GetWindowLong(hwnd, GWL_USERDATA);
+ 	WNDPROC oldProc = (WNDPROC) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 	switch (message)
 	{
@@ -3185,7 +3184,7 @@ struct loadDlgSaveStruct : WINDOWPLACEMENT
 		length = sizeof(*this);
 	}
 };
-BOOL ObjectList::loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT ObjectList::loadArchDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
 
@@ -3202,11 +3201,11 @@ BOOL ObjectList::loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lPa
 			loadDlgSaveStruct loadStruct;
 
 			HWND hPartName = GetDlgItem(hwnd, IDC_PART_NAME);
-			if ((oldProc = (WNDPROC) GetWindowLong(hPartName, GWL_WNDPROC)) != 0)
+			if ((oldProc = (WNDPROC) GetWindowLongPtr(hPartName, GWLP_WNDPROC)) != 0)
 			{
 				SetWindowText(hPartName, "");
-				SetWindowLong(hPartName, GWL_USERDATA, (LONG) oldProc);
-				SetWindowLong(hPartName, GWL_WNDPROC, (LONG) editControlProcedure);
+				SetWindowLongPtr(hPartName, GWLP_USERDATA, (LONG_PTR) oldProc);
+				SetWindowLongPtr(hPartName, GWLP_WNDPROC, (LONG_PTR) editControlProcedure);
 			}
 			setTextForSelection(hwnd);
 
@@ -3230,7 +3229,7 @@ BOOL ObjectList::loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lPa
 			EnableMenuItem(hMenu, SC_CLOSE, MF_BYCOMMAND|MF_GRAYED); 
 			EnableMenuItem(hMenu, SC_MAXIMIZE, MF_BYCOMMAND|MF_GRAYED); 
 			EnableMenuItem(hMenu, SC_SIZE, MF_BYCOMMAND|MF_GRAYED); 
-			SetWindowLong(hwnd, DWL_MSGRESULT, 0);
+			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 0);
 			result = 1;
 		}
 		break;
@@ -3257,7 +3256,7 @@ BOOL ObjectList::loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lPa
 				{
 				case NM_RETURN:
 					PostMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 0), 0);
-					SetWindowLong(hwnd, DWL_MSGRESULT, 1);
+					SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 1);
 					result = 1;
 					break;
 				case TVN_KEYDOWN:
@@ -3269,7 +3268,7 @@ BOOL ObjectList::loadArchDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lPa
 						case VK_TAB:
 //						case VK_RETURN:
 							PostMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 0), 0);
-							SetWindowLong(hwnd, DWL_MSGRESULT, 1);
+							SetWindowLongPtr(hwnd, DWLP_MSGRESULT, 1);
 							result = 1;
 							break;
 						}
@@ -3425,7 +3424,7 @@ BOOL32 ObjectList::Save (struct IFileSystem * outFile)
 
 			outFile->CreateDirectory(buffer);
 
-			if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+			if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 				goto Done;
 
 			BOOL32 saveOk = pSaveLoad->Save(file);
@@ -3452,7 +3451,7 @@ BOOL32 ObjectList::Save (struct IFileSystem * outFile)
 		fdesc.dwShareMode = 0;
 		fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-		if (outFile->CreateInstance(&fdesc, file) == GR_OK)
+		if (outFile->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 		{
 			DWORD dwWritten;
 			file->WriteFile(0, &saveCounter, sizeof(saveCounter), &dwWritten, 0);
@@ -3510,7 +3509,7 @@ BOOL32 ObjectList::QuickSave (struct IFileSystem * outFile, bool bDynamicsOnly)
 					goto Done;
 				}
 
-				if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+				if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 					goto Done;
 
 				pSaveLoad->QuickSave(file);
@@ -3533,7 +3532,7 @@ BOOL32 ObjectList::QuickSave (struct IFileSystem * outFile, bool bDynamicsOnly)
 		fdesc.dwShareMode = 0;
 		fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-		if (outFile->CreateInstance(&fdesc, file) == GR_OK)
+		if (outFile->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 		{
 			DWORD dwWritten;
 			file->WriteFile(0, &saveCounter, sizeof(saveCounter), &dwWritten, 0);
@@ -3705,7 +3704,7 @@ BOOL32 ObjectList::Load (struct IFileSystem * inFile,bool bNoDynamics, bool bOnl
 		{
 			fdesc.lpFileName = data.cFileName;
 			fdesc.hFindFirst = handle;
-			if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+			if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 				break;
 
 			if ((node = LoadArchetype(data.cFileName)) != 0)
@@ -3718,7 +3717,7 @@ BOOL32 ObjectList::Load (struct IFileSystem * inFile,bool bNoDynamics, bool bOnl
 					COMPTR<IFileSystem> file2;
 					fdesc.lpFileName = data.cFileName;
 					fdesc.hFindFirst = handle;
-					if (file->CreateInstance(&fdesc, file2) != GR_OK)		// file2 ->saveLoadType
+					if (file->CreateInstance(&fdesc, file2.void_addr()) != GR_OK)		// file2 ->saveLoadType
 						break;
 					else
 					{
@@ -3762,7 +3761,7 @@ BOOL32 ObjectList::Load (struct IFileSystem * inFile,bool bNoDynamics, bool bOnl
 		{
 			fdesc.lpFileName = data.cFileName;
 			fdesc.hFindFirst = handle;
-			if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+			if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 				break;
 
 			if ((node = LoadArchetype(data.cFileName)) != 0)
@@ -3795,7 +3794,7 @@ BOOL32 ObjectList::Load (struct IFileSystem * inFile,bool bNoDynamics, bool bOnl
 						COMPTR<IFileSystem> file2;
 						fdesc.lpFileName = data.cFileName;
 						fdesc.hFindFirst = handle;
-						if (file->CreateInstance(&fdesc, file2) != GR_OK)		// file2 ->saveLoadType
+						if (file->CreateInstance(&fdesc, file2.void_addr()) != GR_OK)		// file2 ->saveLoadType
 							break;
 						else
 						{
@@ -3948,7 +3947,7 @@ static void get_total_bytes (IFileSystem * file, U32 & dataSize, U32 & numFiles)
 					{
 						COMPTR<IFileSystem> pNewFile;
 						// traverse subdirectory
-						if (file->CreateInstance(&fdesc, pNewFile) == GR_OK)
+						if (file->CreateInstance(&fdesc, pNewFile.void_addr()) == GR_OK)
 						{
 							get_total_bytes(pNewFile, dataSize, numFiles);
 						}
@@ -4013,7 +4012,7 @@ static void load_bytes (IFileSystem * file, ARCHDATA * archData, U32 & checkSum)
 					if (strcmp(data.cFileName, "Parsed Files"))
 					{
 						COMPTR<IFileSystem> pNewFile;
-						if (file->CreateInstance(&fdesc, pNewFile) == GR_OK)
+						if (file->CreateInstance(&fdesc, pNewFile.void_addr()) == GR_OK)
 						{
 							load_bytes(pNewFile, archData, checkSum);
 						}
@@ -4055,10 +4054,10 @@ BOOL32 ObjectList::loadTypesData (void)
 	U32 dataSize=0, numFiles=0, checkSum=0;
 	BOOL32 result = 0;
 
-	if (DACOM->CreateInstance(&fdesc, file) != GR_OK)
+	if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
 		fdesc.lpFileName = "..\\DB\\GameTypes.db";
-		if (DACOM->CreateInstance(&fdesc, file) != GR_OK)
+		if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		{
 			CQFILENOTFOUND(fdesc.lpFileName);
 			goto Done;
@@ -4076,7 +4075,7 @@ BOOL32 ObjectList::loadTypesData (void)
 
 	if (hDlgBox)
 		SendMessage(hDlgBox, WM_CLOSE, 0, 0);
-	hDlgBox = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_DIALOG2), hMainWindow, _loadArchDlgProc, (LPARAM) this);
+	hDlgBox = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_DIALOG2), hMainWindow, DLGPROC(_loadArchDlgProc), (LPARAM) this);
 
 	result = 1;
 Done:
@@ -5063,8 +5062,8 @@ void ObjectList::createUnitFont (void)
 	if ((pFontType = GENDATA->LoadArchetype("Font!!ObjectType")) != 0)
 	{
 		COMPTR<IDAComponent> pComp;
-		if (GENDATA->CreateInstance(pFontType, pComp) == GR_OK)
-			pComp->QueryInterface("IFontDrawAgent", unitFont);
+		if (GENDATA->CreateInstance(pFontType, pComp.addr()) == GR_OK)
+			pComp->QueryInterface("IFontDrawAgent", unitFont.void_addr());
 	}
 	CQASSERT(unitFont!=0);
 }
@@ -5122,7 +5121,7 @@ struct _olist : GlobalComponent
 		if (list->loadTypesData() == 0)
 			CQBOMB0("Load failed on game database.");
 
-		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (FULLSCREEN->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		{
 			connection->Advise(OBJLIST, &list->eventHandle);
 			FULLSCREEN->SetCallbackPriority(list, EVENT_PRIORITY_OBJLIST);

@@ -35,19 +35,6 @@ typedef SPACESHIP_INIT<BASE_SPACESHIP_DATA> BASESHIPINIT;
 // TODO:  Move Patrol to a separate sync function
 // TODO:  no autoattack for gunboat when bRecallFighters==true
 
-//--------------------------------------------------------------------------//
-//
-template ObjectMove<ObjectSelection
-					<ObjectMission
-					 <ObjectPhysics
-					  <ObjectControl
-					   <ObjectTransform
-					     <ObjectFrame<struct IBaseObject,struct SPACESHIP_SAVELOAD, BASESHIPINIT> >
-					   >
-					  > 
-					 >
-					> 
-				   >;
 
 //----------------------------------------------------------------------------
 //
@@ -60,12 +47,12 @@ void ObjectMove<Base>::SetTerrainFootprint (struct ITerrainMap * terrainMap)
 	//
 	// calculate new footprint
 	//
-	if (bReady && systemID<=MAX_SYSTEMS)
+	if (this->bReady && this->systemID<=MAX_SYSTEMS)
 	{
 		footprint.info[0].flags = footprint.info[1].flags = bHalfSquare ? TERRAIN_HALFSQUARE : TERRAIN_FULLSQUARE; 
-		footprint.info[0].height = footprint.info[1].height = box[2];		// maxy
-		footprint.info[0].missionID = footprint.info[1].missionID = dwMissionID;
-		footprint.systemID = systemID;
+		footprint.info[0].height = footprint.info[1].height = this->box[2];		// maxy
+		footprint.info[0].missionID = footprint.info[1].missionID = this->dwMissionID;
+		footprint.systemID = this->systemID;
 
 		if (isMoveActive())
 		{
@@ -92,7 +79,7 @@ void ObjectMove<Base>::SetTerrainFootprint (struct ITerrainMap * terrainMap)
 			}
 
 			// set the grid vector for the footprintf
-			footprint.vec[0] = transform.translation;
+			footprint.vec[0] = this->transform.translation;
 			footprint.vec[1] = pathList[0];
 			footprint.numEntries = 2;
 		}
@@ -142,7 +129,7 @@ void ObjectMove<Base>::undoFootprintInfo (struct ITerrainMap * terrainMap)
 	{
 		COMPTR<ITerrainMap> map;
 
-		if (footprintHistory.systemID != systemID)
+		if (footprintHistory.systemID != this->systemID)
 			SECTOR->GetTerrainMap(footprintHistory.systemID, map);
 		else
 			map = terrainMap;
@@ -158,7 +145,7 @@ void ObjectMove<Base>::undoFootprintInfo (struct ITerrainMap * terrainMap)
 	if (OBJMAP && map_sys && map_sys <= MAX_SYSTEMS)
 	{
 		OBJMAP->RemoveObjectFromMap(this,map_sys,map_square);
-		objMapNode = 0;
+		this->objMapNode = 0;
 		map_sys = map_square = 0;
 	}
 }
@@ -171,7 +158,7 @@ bool ObjectMove<Base>::testPassible (const struct GRIDVECTOR & pos)
 	COMPTR<ITerrainMap> map;
 	bool result;
 
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(this->systemID, map);
 
 	if ((result=map->TestSegment(GetGridPosition(), pos, &callback)) == false)
 		result = callback.gridPos.isMostlyEqual(pos);
@@ -193,7 +180,7 @@ BOOL32 ObjectMove<Base>::updateMoveState (void)
 	if (overrideMode != OVERRIDE_NONE)
 	{
 		IBaseObject * obj = OBJLIST->FindObject(overrideAttackerID);
-		if (obj == 0 || obj->GetSystemID() != systemID)
+		if (obj == 0 || obj->GetSystemID() != this->systemID)
 		{
 			if (overrideMode == OVERRIDE_PUSH)
 				cancelPush();
@@ -202,19 +189,19 @@ BOOL32 ObjectMove<Base>::updateMoveState (void)
 		}
 	}
 
-	if (bMoveDisabled==0 && effectFlags.canMove())
+	if (this->bMoveDisabled==0 && this->effectFlags.canMove())
 	{
-		if (isAutoMovementEnabled() && bReady)
+		if (isAutoMovementEnabled() && this->bReady)
 		{
 			bNoDynamics=0;
 			//
 			// set the correct velocity
 			//
-			if (bExploding==0)
+			if (this->bExploding==0)
 			{
-				restoreDynamicsData();
+				this->restoreDynamicsData();
 
-				SINGLE maxV = maxVelocity;
+				SINGLE maxV = this->maxVelocity;
 				
 				if(slowMove && (moveAgentID || jumpAgentID)) //find the slowest guy in the group.
 				{
@@ -242,18 +229,18 @@ BOOL32 ObjectMove<Base>::updateMoveState (void)
 				}
 
 				SINGLE fleetMod = 1.0;
-				if(fleetID)
+				if(this->fleetID)
 				{
 					VOLPTR(IAdmiral) flagship;
-					OBJLIST->FindObject(fleetID,TOTALLYVOLATILEPTR,flagship,IAdmiralID);
+					OBJLIST->FindObject(this->fleetID,TOTALLYVOLATILEPTR,flagship,IAdmiralID);
 					if(flagship.Ptr())
 					{
 						MPart part(this);
-						fleetMod = 1 + flagship->GetSpeedBonus(mObjClass, part.pInit->armorData.myArmor);
+						fleetMod = 1 + flagship->GetSpeedBonus(this->mObjClass, part.pInit->armorData.myArmor);
 					}				
 				}
-				SINGLE sectorMod = 1.0 + SECTOR->GetSectorEffects(playerID,systemID)->getSpeedMod();
-				setCruiseSpeed(maxV*completionModifier()*fieldFlags.getSpeedModifier()*effectFlags.getSpeedModifier()*fleetMod*sectorMod);
+				SINGLE sectorMod = 1.0 + SECTOR->GetSectorEffects(this->playerID,this->systemID)->getSpeedMod();
+				setCruiseSpeed(maxV*completionModifier()*this->fieldFlags.getSpeedModifier()*this->effectFlags.getSpeedModifier()*fleetMod*sectorMod);
 
 				if (isMovingToJump())
 					doJumpPreparation();
@@ -262,77 +249,77 @@ BOOL32 ObjectMove<Base>::updateMoveState (void)
 					doPathMove();
 				else
 				{
-					if (bVisible && LODPERCENT != 0)
+					if (this->bVisible && LODPERCENT != 0)
 						rockTheBoat();
 					else
 					if (overrideMode == OVERRIDE_NONE)
 					{
 						bNoDynamics=1;
-						velocity.zero();
-						ang_velocity.zero();
-						DEBUG_resetInputCounter();
+						this->velocity.zero();
+						this->ang_velocity.zero();
+						this->DEBUG_resetInputCounter();
 					}
 					else
 					{
-						rotateShip(0, 0-transform.get_roll(), 0-transform.get_pitch());
+						rotateShip(0, 0-this->transform.get_roll(), 0-this->transform.get_pitch());
 						setAltitude(0);
 					}
 				}
 			}
 		}
 		else
-		if (bReady)				// let rotates happen when not on screen
+		if (this->bReady)				// let rotates happen when not on screen
 		{
-			restoreDynamicsData();
+			this->restoreDynamicsData();
 			bNoDynamics=0;
 		}
 		else
 		{
-			DEBUG_resetInputCounter();
+			this->DEBUG_resetInputCounter();
 		}
 	}
-	else if(((!effectFlags.bDestabilizer) && (effectFlags.bStasis)) || bMoveDisabled) // if (hPart->moveAbility==0)
+	else if(((!this->effectFlags.bDestabilizer) && (this->effectFlags.bStasis)) || this->bMoveDisabled) // if (hPart->moveAbility==0)
 	{
 		bNoDynamics=1;
-		velocity.zero();
-		DEBUG_resetInputCounter();
-		if(effectFlags.canMove())
-			ang_velocity.zero();
-		if (effectFlags.canMove() && goalPosition!=currentPosition && THEMATRIX->IsMaster()==0)
+		this->velocity.zero();
+		this->DEBUG_resetInputCounter();
+		if(this->effectFlags.canMove())
+			this->ang_velocity.zero();
+		if (this->effectFlags.canMove() && goalPosition!=currentPosition && THEMATRIX->IsMaster()==0)
 		{
-			SetPosition(goalPosition, systemID);
+			SetPosition(goalPosition, this->systemID);
 			currentPosition = goalPosition;
 		}
 	}
 
-	if (bOrigAutoMovement && bReady && bMoveDisabled==0 && overrideMode != OVERRIDE_NONE)
+	if (bOrigAutoMovement && this->bReady && this->bMoveDisabled==0 && overrideMode != OVERRIDE_NONE)
 	{
 		switch (overrideMode)
 		{
 		case OVERRIDE_PUSH:
-			restoreLinearDynamicsData();
-			setAbsOverridePosition(overrideDest, overrideSpeed);
+			this->restoreLinearDynamicsData();
+			this->setAbsOverridePosition(overrideDest, overrideSpeed);
 			bNoDynamics = 0;
 			break;
 		case OVERRIDE_DESTABILIZE:
-			setDestabilize();
-			bNoDynamics = (bVisible==0 || LODPERCENT == 0);
+			this->setDestabilize();
+			bNoDynamics = (this->bVisible==0 || LODPERCENT == 0);
 			break;
 		case OVERRIDE_ORIENT:
-			overrideAbsShipRotate(overrideYaw, 0, 0);
+			this->overrideAbsShipRotate(overrideYaw, 0, 0);
 			bNoDynamics = 0;
 			break;
 		}
 	}
 
-	bEnablePhysics = (bReady && bNoDynamics==0);
-	if (bEnablePhysics && !bExploding)
+	this->bEnablePhysics = (this->bReady && bNoDynamics==0);
+	if (this->bEnablePhysics && !this->bExploding)
 	{
 		// update the map with our latest location
 		// we may have moved outside our square because of various external forces,
 		// or because we are pathfinding to a new location.
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(systemID, map);
+		SECTOR->GetTerrainMap(this->systemID, map);
 		if (map)
 			SetTerrainFootprint(map);
 	}
@@ -371,11 +358,11 @@ static inline void getVFXPoints2 (VFX_POINT points[2], const TRANSFORM & transfo
 template <class Base> 
 bool ObjectMove<Base>::doMove (const Vector & goalPos)
 {
-	Vector pos = transform.get_position();
+	Vector pos = this->transform.get_position();
 	SINGLE relYaw, relRoll, relPitch;
-	SINGLE yaw   = transform.get_yaw();
-	SINGLE roll  = transform.get_roll();
-	SINGLE pitch = transform.get_pitch();
+	SINGLE yaw   = this->transform.get_yaw();
+	SINGLE roll  = this->transform.get_roll();
+	SINGLE pitch = this->transform.get_pitch();
 	bool bContinuing = (bPathOverflow || pathLength > 1);
 	Vector goal=goalPos;
 
@@ -386,22 +373,22 @@ bool ObjectMove<Base>::doMove (const Vector & goalPos)
 	goal.z = 0;
 	const SINGLE goalMag = goal.magnitude();
 
-	relYaw = fixAngle(get_angle(goal.x, goal.y) - yaw);
+	relYaw = this->fixAngle(get_angle(goal.x, goal.y) - yaw);
 
 #if 1
-	if (goalMag < boxRadius)
+	if (goalMag < this->boxRadius)
 	{
 		bool result;
 
 		relRoll = -roll;
-		goal.z = cruiseDepth - transform.translation.z;
+		goal.z = cruiseDepth - this->transform.translation.z;
 		if (bContinuing)
-			result = (setPosition(goal, getDynamicsData().maxLinearVelocity) != 0);
+			result = (setPosition(goal, this->getDynamicsData().maxLinearVelocity) != 0);
 		else
 			result = (setPosition(goal) != 0);
 		
-		SINGLE sidleDist = dot_product(goal, transform.get_i());
-		if (fabs(sidleDist) > getDynamicsData().maxLinearVelocity)
+		SINGLE sidleDist = dot_product(goal, this->transform.get_i());
+		if (fabs(sidleDist) > this->getDynamicsData().maxLinearVelocity)
 		{
 			if (sidleDist < 0)
 				relRoll -= 5.0 * MUL_DEG_TO_RAD;
@@ -411,7 +398,7 @@ bool ObjectMove<Base>::doMove (const Vector & goalPos)
 		}
 
 		goal.z = 0;
-		if (goalMag < box[4]-box[5])		// don't spin if very near goal
+		if (goalMag < this->box[4]-this->box[5])		// don't spin if very near goal
 			relYaw = 0;
 		rotateShip(relYaw, relRoll, 0 - pitch);
 		return result;
@@ -422,18 +409,18 @@ bool ObjectMove<Base>::doMove (const Vector & goalPos)
 	{
 		if (bContinuing)
 		{
-			setPosition(goal, maxLinearVelocity);
+			setPosition(goal, this->maxLinearVelocity);
 			setThrustersOn();
 		}
 		else
 		{
 			SINGLE coast;
 
-			coast = calculateCoastingDistance(getDynamicsData().maxLinearVelocity, getDynamicsData().linearAcceleration, ELAPSED_TIME);
+			coast = this->calculateCoastingDistance(this->getDynamicsData().maxLinearVelocity, this->getDynamicsData().linearAcceleration, ELAPSED_TIME);
 
 			if (coast < goalMag)	// not there yet
 			{
-				setPosition(goal, maxLinearVelocity);
+				setPosition(goal, this->maxLinearVelocity);
 				setThrustersOn();
 			}
 			else
@@ -442,23 +429,23 @@ bool ObjectMove<Base>::doMove (const Vector & goalPos)
 			}
 		}
 
-		setAltitude(cruiseDepth - transform.translation.z);
-		if (cruiseDepth - transform.translation.z < -800)
+		setAltitude(cruiseDepth - this->transform.translation.z);
+		if (cruiseDepth - this->transform.translation.z < -800)
 			relPitch = (-10.0 * MUL_DEG_TO_RAD) - pitch;	// pitch down
 		else
 			relPitch = 0 - pitch;
 	}
 	else
 	{
-		if (bVisible)
+		if (this->bVisible)
 		{
-			Vector diff=velocity/2;
-			diff.z = cruiseDepth - transform.translation.z;
+			Vector diff=this->velocity/2;
+			diff.z = cruiseDepth - this->transform.translation.z;
 
 			setPosition(diff);
 		}
 		else
-			setAltitude(cruiseDepth - transform.translation.z);
+			setAltitude(cruiseDepth - this->transform.translation.z);
 		relPitch = (5.0 * MUL_DEG_TO_RAD) - pitch;
 		bRotatingBeforeMove = true;
 	}
@@ -480,10 +467,10 @@ bool ObjectMove<Base>::doMove (const Vector & goalPos)
 
 	rotateShip(relYaw, relRoll, relPitch);
 
-	if (goalMag < -box[5])
+	if (goalMag < -this->box[5])
 	{
 		// return early if we are not at the last stop (cut corners)
-		if (pathLength>1 || bPathOverflow || velocity.magnitude() < 5.0)
+		if (pathLength>1 || bPathOverflow || this->velocity.magnitude() < 5.0)
 			return true;
 	}
 	return false;
@@ -497,8 +484,8 @@ void ObjectMove<Base>::onPathComplete (void)
 	{
 		if (moveAgentID)
 		{
-			THEMATRIX->SendOperationData(moveAgentID, dwMissionID, &currentPosition, sizeof(currentPosition));
-			THEMATRIX->OperationCompleted2(moveAgentID, dwMissionID);
+			THEMATRIX->SendOperationData(moveAgentID, this->dwMissionID, &currentPosition, sizeof(currentPosition));
+			THEMATRIX->OperationCompleted2(moveAgentID, this->dwMissionID);
 			bSyncNeeded = 0;
 		}
 		GRIDVECTOR savedVec = currentPosition;
@@ -513,10 +500,10 @@ void ObjectMove<Base>::onPathComplete (void)
 template <class Base> 
 bool ObjectMove<Base>::fleetRotationCheck (void)
 {
-	if(fleetID)
+	if(this->fleetID)
 	{
 		VOLPTR(IAdmiral) flagship;
-		OBJLIST->FindObject(fleetID,TOTALLYVOLATILEPTR,flagship,IAdmiralID);
+		OBJLIST->FindObject(this->fleetID,TOTALLYVOLATILEPTR,flagship,IAdmiralID);
 		if(flagship.Ptr())
 		{
 			if(flagship->IsInLockedFormation())
@@ -526,7 +513,7 @@ bool ObjectMove<Base>::fleetRotationCheck (void)
 				bFinalMove = 1;
 				COMPTR<ITerrainMap> map;
 
-				SECTOR->GetTerrainMap(systemID, map);
+				SECTOR->GetTerrainMap(this->systemID, map);
 				GRIDVECTOR from = GetGridPosition();
 				SetPath(map, &from, 1);
 
@@ -548,13 +535,13 @@ bool ObjectMove<Base>::doPathMove (void)
 	if (isMoveActive() && pathLength >= 1)
 	{
 		CQASSERT(pathLength >= 1);
-		bool bNext = ((bPathOverflow || pathLength > 1) && pathList[pathLength-1].isMostlyEqual(GRIDVECTOR::Create(transform.translation)));
+		bool bNext = ((bPathOverflow || pathLength > 1) && pathList[pathLength-1].isMostlyEqual(GRIDVECTOR::Create(this->transform.translation)));
 		if (bMockRotate)
 		{
 			// rotate to position, if already there call onPathComplete
-			SINGLE relYaw = mockRotationAngle - transform.get_yaw();
+			SINGLE relYaw = mockRotationAngle - this->transform.get_yaw();
 			Vector relPos = pathList[pathLength-1]+slopOffset;
-			relPos -= transform.translation;
+			relPos -= this->transform.translation;
 
 			if (relYaw < -PI)
 				relYaw += PI*2;
@@ -589,7 +576,7 @@ bool ObjectMove<Base>::doPathMove (void)
 				COMPTR<ITerrainMap> map;
 				GRIDVECTOR from = GetGridPosition();
 
-				SECTOR->GetTerrainMap(systemID, map);
+				SECTOR->GetTerrainMap(this->systemID, map);
 				U32 flags = bHalfSquare ? TERRAIN_FP_HALFSQUARE : TERRAIN_FP_FULLSQUARE; 
 				if (bPathOverflow==0)	// did we receive the full path last time?
 					bFinalMove = 1;
@@ -602,7 +589,7 @@ bool ObjectMove<Base>::doPathMove (void)
 					bool bParked = map->IsParkedAtGrid(from, dwMissionID, bHalfSquare==0);
 				#endif
 
-				if (map->FindPath(from, goalPosition, dwMissionID, flags, this) == 0)
+				if (map->FindPath(from, goalPosition, this->dwMissionID, flags, this) == 0)
 				{
 					if(fleetRotationCheck())
 						onPathComplete();
@@ -639,21 +626,21 @@ void ObjectMove<Base>::doJumpPreparation (void)
 	setAltitude(0);
 	// check bRecallFighters here, so that we don't actually move to a grid
 	// position while we are waiting to assemble.
-	bool bMoveResult = (isMoveActive() == 0) || (bRecallFighters == true) || doPathMove();
+	bool bMoveResult = (isMoveActive() == 0) || (this->bRecallFighters == true) || doPathMove();
 
-	if ((bRecallFighters == false) && (bMoveResult == false))
+	if ((this->bRecallFighters == false) && (bMoveResult == false))
 	{
 		// first stage, moving towards jumpgate
 		// do a distance check and a line-of-sight
 		GRIDVECTOR gridpos = GetGridPosition();
 		SINGLE fdist = gridpos - jumpToPosition;
-		if (fdist < __min(3, sensorRadius))
+		if (fdist < __min(3, this->sensorRadius))
 		{
 			// we are less than 3 grid units away
 			if (testPassible(jumpToPosition) == true)
 			{
 				resetMoveVars();
-				bRecallFighters = true;
+				this->bRecallFighters = true;
 			}
 		}
 	}
@@ -669,18 +656,18 @@ void ObjectMove<Base>::doJumpPreparation (void)
 			if (THEMATRIX->IsMaster())
 			{
 				resetMoveVars();
-				THEMATRIX->SendOperationData(jumpAgentID, dwMissionID, &currentPosition, sizeof(currentPosition));
-				THEMATRIX->OperationCompleted2(jumpAgentID, dwMissionID);
+				THEMATRIX->SendOperationData(jumpAgentID, this->dwMissionID, &currentPosition, sizeof(currentPosition));
+				THEMATRIX->OperationCompleted2(jumpAgentID, this->dwMissionID);
 				bSyncNeeded = 0;
-				bRecallFighters = false;
+				this->bRecallFighters = false;
 				THEMATRIX->FlushOpQueueForUnit(this);
 				if (CQFLAGS.bTraceMission)
-					CQTRACE11("Jump failed for unit \"%s\"", (char *)partName);
+					CQTRACE11("Jump failed for unit \"%s\"", (char *)this->partName);
 			}
 		}
 		else
 		{
-			bRecallFighters = true;
+			this->bRecallFighters = true;
 
 			GRIDVECTOR goal_pos  = jumpToPosition;
 
@@ -691,15 +678,15 @@ void ObjectMove<Base>::doJumpPreparation (void)
 			}
 			else
 			{
-				Vector goal = goal_pos.cornerpos() - transform.translation;
-				SINGLE relYaw = get_angle(goal.x, goal.y) - transform.get_yaw();
+				Vector goal = goal_pos.cornerpos() - this->transform.translation;
+				SINGLE relYaw = get_angle(goal.x, goal.y) - this->transform.get_yaw();
 				if (relYaw < -PI)
 					relYaw += PI*2;
 				else
 				if (relYaw > PI)
 					relYaw -= PI*2;
 
-				rotateShip(relYaw, 0 - transform.get_roll(), 0 - transform.get_pitch());
+				rotateShip(relYaw, 0 - this->transform.get_roll(), 0 - this->transform.get_pitch());
 
 				bMoveResult = (fabs(relYaw) < 15 * MUL_DEG_TO_RAD);
 			}
@@ -709,8 +696,8 @@ void ObjectMove<Base>::doJumpPreparation (void)
 			if (bMoveResult && THEMATRIX->IsMaster())
 			{
 				resetMoveVars();
-				THEMATRIX->SendOperationData(jumpAgentID, dwMissionID, &currentPosition, sizeof(currentPosition));
-				THEMATRIX->OperationCompleted2(jumpAgentID, dwMissionID);
+				THEMATRIX->SendOperationData(jumpAgentID, this->dwMissionID, &currentPosition, sizeof(currentPosition));
+				THEMATRIX->OperationCompleted2(jumpAgentID, this->dwMissionID);
 				bSyncNeeded = 0;
 			}
 		}
@@ -728,7 +715,7 @@ ObjectMove<Base>::~ObjectMove (void)
 
 		if (SECTOR)
 		{
-			SECTOR->GetTerrainMap(systemID, map);
+			SECTOR->GetTerrainMap(this->systemID, map);
 			if (map)
 				undoFootprintInfo(map);
 		}
@@ -743,14 +730,14 @@ void ObjectMove<Base>::rockTheBoat (void)
 {
 	SINGLE relRoll, relAlt;
 
-	SINGLE roll  = transform.get_roll();
-	SINGLE pitch = transform.get_pitch();
+	SINGLE roll  = this->transform.get_roll();
+	SINGLE pitch = this->transform.get_pitch();
 
 	if (bRollTooHigh)
 	{
-		restoreDynamicsData();
+		this->restoreDynamicsData();
 
-		bEnablePhysics = 1;
+		this->bEnablePhysics = 1;
 		bool rotresult = rotateShip(0, 0 - roll, 0 - pitch);
 		if (++tooHighCounter > U8(REALTIME_FRAMERATE+1) && rotresult)
 			bRollTooHigh = 0;
@@ -771,15 +758,15 @@ void ObjectMove<Base>::rockTheBoat (void)
 			relRoll = -rockingData.rockAngMax - roll;
 
 		if (bAltUp)
-			relAlt = rockingData.rockLinearMax - transform.translation.z;
+			relAlt = rockingData.rockLinearMax - this->transform.translation.z;
 		else
-			relAlt = -rockingData.rockLinearMax - transform.translation.z;
+			relAlt = -rockingData.rockLinearMax - this->transform.translation.z;
 
-		relRoll = fixAngle(relRoll);
+		relRoll = this->fixAngle(relRoll);
 
-		setDynamicsData(rockingData);
-		if (fabs(ang_velocity.z) > 10*MUL_DEG_TO_RAD || fabs(roll) > rockingData.rockAngMax*2 || fabs(pitch) > rockingData.rockAngMax*2)
-			restoreAngDynamicsData();
+		this->setDynamicsData(rockingData);
+		if (fabs(this->ang_velocity.z) > 10*MUL_DEG_TO_RAD || fabs(roll) > rockingData.rockAngMax*2 || fabs(pitch) > rockingData.rockAngMax*2)
+			this->restoreAngDynamicsData();
 
 		rotateShip(0, relRoll, 0 - pitch);
 		if (fabs(relRoll) < rockingData.rockAngMax*0.1)
@@ -794,8 +781,8 @@ void ObjectMove<Base>::rockTheBoat (void)
 template <class Base> 
 void ObjectMove<Base>::moveToPos (const GRIDVECTOR & pos, U32 agentID, bool bSlowMove)
 {
-	CQASSERT(bExploding == false || agentID == false);
-	if(bExploding)
+	CQASSERT(this->bExploding == false || agentID == false);
+	if(this->bExploding)
 		return;
 
 	COMPTR<ITerrainMap> map;
@@ -805,7 +792,7 @@ void ObjectMove<Base>::moveToPos (const GRIDVECTOR & pos, U32 agentID, bool bSlo
 //	if (moveAgentID!=0)
 //		CQBOMB1("Invalid call to moveToPos() for part=%s (Ignorable)", (char *)partName);	// should already be completed before this call
 #endif
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(this->systemID, map);
 	pathLength = 0;
 	goalPosition = pos;
 	U32 flags = bHalfSquare ? TERRAIN_FP_HALFSQUARE : TERRAIN_FP_FULLSQUARE; 
@@ -822,7 +809,7 @@ void ObjectMove<Base>::moveToPos (const GRIDVECTOR & pos, U32 agentID, bool bSlo
 	bFinalMove = 0;
 	bMoveActive=1;
 
-	if (map->FindPath(from, goalPosition, dwMissionID, flags, this) == 0)
+	if (map->FindPath(from, goalPosition, this->dwMissionID, flags, this) == 0)
 	{	
 #if (defined(_JASON) || defined(_SEAN))
 		if (bParked == false)
@@ -832,7 +819,7 @@ void ObjectMove<Base>::moveToPos (const GRIDVECTOR & pos, U32 agentID, bool bSlo
 		// if the user asked us to move, then sidle over a bit
 		//
 
-		if (agentID && (GRIDVECTOR(g_trueAnimPos.gridVec) == pos) && (g_trueAnimPos.gridVec.systemID == systemID))
+		if (agentID && (GRIDVECTOR(g_trueAnimPos.gridVec) == pos) && (g_trueAnimPos.gridVec.systemID == this->systemID))
 		{
 			bMockRotate = true;
 			SetPath(map, &from, 1);
@@ -840,10 +827,10 @@ void ObjectMove<Base>::moveToPos (const GRIDVECTOR & pos, U32 agentID, bool bSlo
 
 			bool bFoundMockAngle = false;
 
-			if(fleetID)
+			if(this->fleetID)
 			{
 				VOLPTR(IAdmiral) flagship;
-				OBJLIST->FindObject(fleetID,TOTALLYVOLATILEPTR,flagship,IAdmiralID);
+				OBJLIST->FindObject(this->fleetID,TOTALLYVOLATILEPTR,flagship,IAdmiralID);
 				if(flagship.Ptr())
 				{
 					if(flagship->IsInLockedFormation())
@@ -860,14 +847,14 @@ void ObjectMove<Base>::moveToPos (const GRIDVECTOR & pos, U32 agentID, bool bSlo
 			if(!bFoundMockAngle)
 			{
 				// calculate the mock rotate angle
-				Vector vecDiff = g_trueAnimPos.pos - transform.translation;
+				Vector vecDiff = g_trueAnimPos.pos - this->transform.translation;
 				mockRotationAngle =  TRANSFORM::get_yaw(vecDiff);
 			}
 
 			//
 			// calc slop offset based on where the user clicked
 			//
-			slopOffset = g_trueAnimPos.pos - transform.translation;
+			slopOffset = g_trueAnimPos.pos - this->transform.translation;
 			slopOffset.fast_normalize();
 			slopOffset *= ((rand() & 127) + (rand() & 127)) * maxMoveSlop * (1.0 / 256.0);
 		}
@@ -905,7 +892,7 @@ void ObjectMove<Base>::moveToJump (IBaseObject * jumpgate, U32 agentID, bool bSl
 	moveToPos(jumpToPosition);
 	slowMove = bSlowMove;
 
-	bRecallFighters = false;
+	this->bRecallFighters = false;
 }
 //---------------------------------------------------------------------------
 //
@@ -913,17 +900,17 @@ template <class Base>
 void ObjectMove< Base >::loadMoveState (MOVESAVEINFO & load)
 {
 	*static_cast<SPACESHIP_SAVELOAD::TOBJMOVE *> (this) = load.tobjmove;
-	DYNAMICS_DATA dyn = getDynamicsData();
+	DYNAMICS_DATA dyn = this->getDynamicsData();
 	if (cruiseSpeed)
 		dyn.maxLinearVelocity = cruiseSpeed;
 	else
-		dyn.maxLinearVelocity = cruiseSpeed = maxVelocity;
+		dyn.maxLinearVelocity = cruiseSpeed = this->maxVelocity;
 	if (groupAcceleration)
 		dyn.angAcceleration = groupAcceleration;
 	else
 		groupAcceleration = origAcceleration;
 
-	setDynamicsData(dyn);
+	this->setDynamicsData(dyn);
 }
 //---------------------------------------------------------------------------
 //
@@ -945,13 +932,13 @@ void ObjectMove< Base >::initMoveState (const MOVEINITINFO & data)
 
 	bRollUp = ((rand() & 1) == 0);
 	bAltUp = ((rand() & 1) == 0);
-	DYNAMICS_DATA dyn = getDynamicsData();
+	DYNAMICS_DATA dyn = this->getDynamicsData();
 
-	cruiseSpeed = dyn.maxLinearVelocity = maxVelocity = data.pData->missionData.maxVelocity;
+	cruiseSpeed = dyn.maxLinearVelocity = this->maxVelocity = data.pData->missionData.maxVelocity;
 	groupAcceleration = origAcceleration = dyn.linearAcceleration;
-	setDynamicsData(dyn);
+	this->setDynamicsData(dyn);
 
-	if ((maxMoveSlop = HALFGRID/2 - boxRadius) >= 0)
+	if ((maxMoveSlop = HALFGRID/2 - this->boxRadius) >= 0)
 		bHalfSquare = true;
 	else
 	{
@@ -973,13 +960,13 @@ void ObjectMove< Base >::onOpCancel (U32 agentID)
 	{
 		jumpAgentID = 0;
 	}
-	bRecallFighters = false;
+	this->bRecallFighters = false;
 	bPatroling = false;
 
 	if (isMoveActive() && THEMATRIX->IsMaster())
 	{
 		GRIDVECTOR vec;
-		vec = transform.translation+(velocity/2);
+		vec = this->transform.translation+(this->velocity/2);
 		moveToPos(vec);		// end in a predictable location
 	}
 }
@@ -991,23 +978,23 @@ void ObjectMove< Base >::preTakeover (U32 newMissionID, U32 troopID)
 	if(moveAgentID)
 	{
 		if (THEMATRIX->IsMaster())
-			THEMATRIX->SendOperationData(moveAgentID, dwMissionID, NULL, 0);
-		THEMATRIX->OperationCompleted2(moveAgentID,dwMissionID);
+			THEMATRIX->SendOperationData(moveAgentID, this->dwMissionID, NULL, 0);
+		THEMATRIX->OperationCompleted2(moveAgentID,this->dwMissionID);
 	}
 	if (jumpAgentID)
 	{
 		if (THEMATRIX->IsMaster())
-			THEMATRIX->SendOperationData(jumpAgentID, dwMissionID, NULL, 0);
-		THEMATRIX->OperationCompleted2(jumpAgentID,dwMissionID);
+			THEMATRIX->SendOperationData(jumpAgentID, this->dwMissionID, NULL, 0);
+		THEMATRIX->OperationCompleted2(jumpAgentID,this->dwMissionID);
 	}
 
-	bRecallFighters = false;
+	this->bRecallFighters = false;
 	bPatroling = false;
 
 	if (isMoveActive() && THEMATRIX->IsMaster())
 	{
 		GRIDVECTOR vec;
-		vec = transform.translation+(velocity/2);
+		vec = this->transform.translation+(this->velocity/2);
 		moveToPos(vec);		// end in a predictable location
 	}
 	else
@@ -1022,14 +1009,14 @@ void ObjectMove<Base>::receiveOperationData (U32 agentID, void *buffer, U32 buff
 	{
 		if (buffer)
 			putSyncData(buffer, bufferSize, false);
-		THEMATRIX->OperationCompleted2(moveAgentID,dwMissionID);
+		THEMATRIX->OperationCompleted2(moveAgentID,this->dwMissionID);
 	}
 	if (jumpAgentID && jumpAgentID==agentID)
 	{
 		if (buffer)
 			putSyncData(buffer, bufferSize, false);
 
-		THEMATRIX->OperationCompleted2(jumpAgentID,dwMissionID);
+		THEMATRIX->OperationCompleted2(jumpAgentID,this->dwMissionID);
 	}
 }
 //---------------------------------------------------------------------------
@@ -1043,7 +1030,7 @@ void ObjectMove<Base>::explodeMove (bool bExplode)
 
 		if (SECTOR)
 		{
-			SECTOR->GetTerrainMap(systemID, map);
+			SECTOR->GetTerrainMap(this->systemID, map);
 			if (map)
 				undoFootprintInfo(map);
 		}
@@ -1165,14 +1152,14 @@ void ObjectMove<Base>::TakeoverSwitchID (U32 newMissionID)
 {
 	// first thing, undo the current footprint
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(this->systemID, map);
 	undoFootprintInfo(map);
 
 
-	OBJLIST->RemovePartID(this, dwMissionID);
-	dwMissionID = newMissionID;
+	OBJLIST->RemovePartID(this, this->dwMissionID);
+	this->dwMissionID = newMissionID;
 
-	OBJLIST->AddPartID(this, dwMissionID);
+	OBJLIST->AddPartID(this, this->dwMissionID);
 
 	UnregisterWatchersForObject(this);
 
@@ -1187,7 +1174,7 @@ GRIDVECTOR ObjectMove<Base>::GetGridPosition (void) const
 	if (currentPosition.isZero() || overrideMode != OVERRIDE_NONE)	// can happen if unit is not built yet, or is being pushed around
 	{
 		GRIDVECTOR vec;
-		vec = transform.translation;
+		vec = this->transform.translation;
 		return vec;
 	}
 	else
@@ -1208,22 +1195,22 @@ GRIDVECTOR ObjectMove<Base>::findValidGridPosition (void) const
 	GRIDVECTOR vec;
 	COMPTR<ITerrainMap> map;
 
-	vec = transform.translation;
+	vec = this->transform.translation;
 	if (bHalfSquare)
 		vec.quarterpos();
 	else
 		vec.centerpos();
 
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(this->systemID, map);
 	if (map->IsGridValid(vec))
 		return vec;
 	else
 	{
 		// back up along our path
-		Vector pos = currentPosition - transform.translation;
+		Vector pos = currentPosition - this->transform.translation;
 		pos.fast_normalize();
 		pos *= GRIDSIZE/2;
-		pos += transform.translation;
+		pos += this->transform.translation;
 		vec = pos;
 		if (bHalfSquare)
 			vec.quarterpos();
@@ -1242,7 +1229,7 @@ template <class Base>
 void ObjectMove<Base>::calcSlopOffset (void)
 {
 	SINGLE angle = (SINGLE(rand() & 255) / 256 * 360 * MUL_DEG_TO_RAD);
-	slopOffset = TRANSFORM::rotate_about_z(transform.get_k(), angle);		// yaw 
+	slopOffset = TRANSFORM::rotate_about_z(this->transform.get_k(), angle);		// yaw
 	slopOffset *= ((rand() & 127) + (rand() & 127)) * maxMoveSlop * (1.0 / 256.0);
 }
 //---------------------------------------------------------------------------
@@ -1250,26 +1237,26 @@ void ObjectMove<Base>::calcSlopOffset (void)
 template <class Base> 
 void ObjectMove< Base >::physUpdateMove (SINGLE dt)
 {
-	ANIM->update_instance(instanceIndex,dt); //my solution for now is to go back to updating all moving objects every frame
+	ANIM->update_instance(this->instanceIndex,dt); //my solution for now is to go back to updating all moving objects every frame
 
-	if (bVisible && !bReady)
+	if (this->bVisible && !this->bReady)
 	{
-		ENGINE->update_instance(instanceIndex, 0, dt);
+		ENGINE->update_instance(this->instanceIndex, 0, dt);
 	}
 	else
-	if (bEnablePhysics)
-		ENGINE->update_instance(instanceIndex, 0, 0);		// 0 dt means "just update tree"
+	if (this->bEnablePhysics)
+		ENGINE->update_instance(this->instanceIndex, 0, 0);		// 0 dt means "just update tree"
 }
 //----------------------------------------------------------------------------
 //
 template <class Base> 
 void ObjectMove< Base >::TESTING_shudder (const Vector & dir, SINGLE mag)
 {
-	if (bVisible && fabs(transform.get_roll()) < 10 * MUL_DEG_TO_RAD)
+	if (this->bVisible && fabs(this->transform.get_roll()) < 10 * MUL_DEG_TO_RAD)
 	{
-		restoreDynamicsData();
-		mag *= (getDynamicsData().angAcceleration*0.12);
-		SINGLE angle = transform.get_yaw() - TRANSFORM::get_yaw(dir);
+		this->restoreDynamicsData();
+		mag *= (this->getDynamicsData().angAcceleration*0.12);
+		SINGLE angle = this->transform.get_yaw() - TRANSFORM::get_yaw(dir);
 		if (angle < -PI)
 			angle += PI*2;
 		else
@@ -1278,7 +1265,7 @@ void ObjectMove< Base >::TESTING_shudder (const Vector & dir, SINGLE mag)
 		if (angle < 0)
 			mag = -mag;
 		mag *= 1.0 - ((fabs(fabs(angle)-(MUL_DEG_TO_RAD * 90.0)) / (MUL_DEG_TO_RAD * 90.0)));
-		ang_velocity += transform.get_k() * mag;		//  take 1/3 second to stop velocity
+		this->ang_velocity += this->transform.get_k() * mag;		//  take 1/3 second to stop velocity
 		bRollTooHigh = 1;		// current roll is too much
 		tooHighCounter = 0;
 	}
@@ -1293,7 +1280,7 @@ void ObjectMove< Base >::PushShip (U32 attackerID, const Vector & direction, SIN
 	overrideSpeed = velMag;
 	Vector dir = direction;
 	dir *= (GRIDSIZE / direction.magnitude());
-	Vector position = transform.translation;
+	Vector position = this->transform.translation;
 
 	while (1)
 	{
@@ -1326,7 +1313,7 @@ void ObjectMove< Base >::DestabilizeShip (U32 attackerID)
 		cancelPush();
 	overrideAttackerID = attackerID;
 	overrideMode = OVERRIDE_DESTABILIZE;
-	setDestabilize();		// have this take affect immediately!
+	this->setDestabilize();		// have this take affect immediately!
 }
 //----------------------------------------------------------------------------
 //
@@ -1364,10 +1351,10 @@ template <class Base>
 void ObjectMove< Base >::RemoveFromMap (void)
 {
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(this->systemID, map);
 	if (map)
 		undoFootprintInfo(map);
-	bExploding = true;
+	this->bExploding = true;
 }
 
 template <class Base> 
@@ -1385,9 +1372,9 @@ void ObjectMove< Base >::pushShipTo (const Vector & position)
 	TestPushLOSCallback callback;
 	COMPTR<ITerrainMap> map;
 
-	CQASSERT(systemID && systemID <= MAX_SYSTEMS);
+	CQASSERT(this->systemID && this->systemID <= MAX_SYSTEMS);
 
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(this->systemID, map);
 
 	GRIDVECTOR toPos;
 	toPos = position;
@@ -1410,7 +1397,7 @@ void ObjectMove< Base >::cancelPush (void)
 	if (isMoveActive()==0 && THEMATRIX->IsMaster())
 	{
 		GRIDVECTOR vec;
-		vec = transform.translation+(velocity/2);
+		vec = this->transform.translation+(this->velocity/2);
 		moveToPos(vec);		// end in a predictable location
 	}
 }
@@ -1458,7 +1445,7 @@ struct FootprintQuickList : ITerrainSegCallback
 		return( count < MAX );
 	}
 
-	bool hasFootprint( Info& _test )
+	bool hasFootprint(const Info& _test )
 	{
 		for( U32 i = 0; i < count; i++ )
 		{
@@ -1522,7 +1509,7 @@ void ObjectMove< Base >::scriptingUpdate( FootprintHistory& _oldFootprint, Footp
 		{
 			// send a Ship is Exiting message to scripting here
 			ScriptParameterList params;
-			params.Push( dwMissionID, "shipID" );
+			params.Push( this->dwMissionID, "shipID" );
 			params.Push( fqlLast.list[i].fpi.missionID, "regionID" );
 
 			SCRIPTING->CallScriptEvent( SE_SHIP_EXIT, &params );
@@ -1537,7 +1524,7 @@ void ObjectMove< Base >::scriptingUpdate( FootprintHistory& _oldFootprint, Footp
 		{
 			// send a Ship is Entering message to scripting here
 			ScriptParameterList params;
-			params.Push( dwMissionID, "shipID" );
+			params.Push( this->dwMissionID, "shipID" );
 			params.Push( fqlNext.list[i].fpi.missionID, "regionID" );
 
 			SCRIPTING->CallScriptEvent( SE_SHIP_ENTER, &params );

@@ -1303,7 +1303,7 @@ BOOL32 RefinePlat::update (void)
 					bool bOrderAutoHarvest = false;
 
 					OBJPTR<IBaseObject> baseBuild;
-					VOLPTR(IHarvest) harvest = buildee;
+					VOLPTR(IHarvest) harvest = buildee.Ptr();
 					if(buildee)
 					{
 						if(!buildee->IsReversing())
@@ -2426,7 +2426,7 @@ RefinePlatFactory::~RefinePlatFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -2435,7 +2435,7 @@ void RefinePlatFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

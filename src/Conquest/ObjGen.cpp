@@ -145,7 +145,7 @@ ObjGenerator::~ObjGenerator (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 }
 //-------------------------------------------------------------------
@@ -584,7 +584,7 @@ void ObjGenerator::update (void)
 
 			// if we are are already over something, than put up the ban
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map);
+			SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map.addr());
 			if (map != NULL)
 			{
 				GRIDVECTOR grid;
@@ -851,7 +851,7 @@ void ObjGenerator::editorAddObject (S32 x, S32 y)
 
 		// the object has to initialize its footprint
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map);
+		SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map.addr());
 		if (map)
 		{
 			rtObject->SetTerrainFootprint(map);
@@ -892,7 +892,7 @@ void ObjGenerator::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &eventHandle);
 
 	initializeResources();

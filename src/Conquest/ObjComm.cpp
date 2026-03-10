@@ -862,7 +862,7 @@ ObjectComm::~ObjectComm (void)
 		hsndSpecialDenied = NULL;
 	}
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 }
 //-------------------------------------------------------------------
@@ -2353,7 +2353,7 @@ bool ObjectComm::determineCursorModeNoHilight (const IBaseObject * selected, con
 				{
 					// not explored, anything inside the system is ok
 					COMPTR<ITerrainMap> map;
-					SECTOR->GetTerrainMap(currentSystem, map);
+					SECTOR->GetTerrainMap(currentSystem, map.addr());
 					GRIDVECTOR gpos;
 					gpos = pos;
 					if(map->IsGridInSystem(gpos))
@@ -2368,7 +2368,7 @@ bool ObjectComm::determineCursorModeNoHilight (const IBaseObject * selected, con
 					COMPTR<ITerrainMap> map;
 					GRIDVECTOR gpos;
 					gpos = pos;
-					SECTOR->GetTerrainMap(currentSystem, map);
+					SECTOR->GetTerrainMap(currentSystem, map.addr());
 					if (map->IsOkForBuilding(gpos, bIsVisible, false))
 						mode = CMS_BUILD_SPACE;
 					else
@@ -5287,7 +5287,7 @@ void ObjectComm::handleMovePos (S32 x, S32 y, WPARAM wParam)
 			// reset the footprint in the sector map
 			COMPTR<ITerrainMap> map;
 			U32 systemID = SECTOR->GetCurrentSystem();
-			SECTOR->GetTerrainMap(systemID, map);
+			SECTOR->GetTerrainMap(systemID, map.addr());
 			if (map)
 			{
 				IBaseObject * objList = OBJLIST->GetObjectList();
@@ -5469,7 +5469,7 @@ bool ObjectComm::testAreaAccess (const Vector & pos)
 	GRIDVECTOR vec;
 	vec = pos;
 
-	SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map);
+	SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map.addr());
 
 	return map->TestSegment(vec, vec, &callback);
 }
@@ -5976,7 +5976,7 @@ void ObjectComm::handleEditorMove (void)
 
 	// if we are are already over something, than put up the ban
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map);
+	SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map.addr());
 	if (map != NULL)
 	{
 		GRIDVECTOR grid;
@@ -6057,7 +6057,7 @@ struct _objcomm : GlobalComponent
 	{
 		COMPTR<IDAConnectionPoint> connection;
 
-		if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Advise(comm->getBase(), &comm->eventHandle);
 
 		comm->initializeResources();

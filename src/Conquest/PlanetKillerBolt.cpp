@@ -280,7 +280,7 @@ void PKBolt::PhysicalUpdate (SINGLE dt)
 			bDamagePlats = true;
 			bShockOn = true;
 			shockTime = 0;
-			VOLPTR(IPlanet) planet = target;
+			VOLPTR(IPlanet) planet = target.Ptr();
 			if(planet)
 			{
 				Vector hitDir = target->GetPosition()-GetPosition();
@@ -316,7 +316,7 @@ BOOL32 PKBolt::Update (void)
 	{
 		if(!bShockOn)
 			bReadyToDelete = true;
-		VOLPTR(IPlanet) planet = target;
+		VOLPTR(IPlanet) planet = target.Ptr();
 		if(planet)
 		{
 			for(U32 i = 0; i < 12; ++i)
@@ -567,7 +567,7 @@ BOOL32 PKBolt::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -596,7 +596,7 @@ BOOL32 PKBolt::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0) == 0)
@@ -731,7 +731,7 @@ PKBoltFactory::~PKBoltFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -740,7 +740,7 @@ void PKBoltFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -765,7 +765,7 @@ HANDLE PKBoltFactory::CreateArchetype (const char *szArchname, OBJCLASS objClass
 			DAFILEDESC fdesc = data->fileName;
 			COMPTR<IFileSystem> objFile;
 
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				TEXLIB->load_library(objFile, 0);
 			else
 				goto Error;

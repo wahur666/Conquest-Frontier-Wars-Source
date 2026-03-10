@@ -408,7 +408,7 @@ BOOL32 RepellentCloud::Update (void)
 	if(THEMATRIX->IsMaster() && !bFreeTargets)
 	{
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(systemID,map);
+		SECTOR->GetTerrainMap(systemID,map.addr());
 
 		for(U32 count = 0; count < numSquares; ++count)
 		{
@@ -1012,7 +1012,7 @@ BOOL32 RepellentCloud::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -1040,7 +1040,7 @@ BOOL32 RepellentCloud::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0) == 0)
@@ -1364,7 +1364,7 @@ RepellentCloudFactory::~RepellentCloudFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -1373,7 +1373,7 @@ void RepellentCloudFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

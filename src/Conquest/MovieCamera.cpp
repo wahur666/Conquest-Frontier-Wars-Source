@@ -315,7 +315,7 @@ BOOL32 MovieCamera::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -343,7 +343,7 @@ BOOL32 MovieCamera::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -369,7 +369,7 @@ void MovieCamera::ResolveAssociations (void)
 //
 void MovieCamera::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc {partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_QCAMERALOAD");
@@ -524,7 +524,7 @@ struct DACOM_NO_VTABLE MovieCameraFactory : public IObjectFactory, IEventCallbac
 		::free(ptr);
 	}
 
-	static BOOL CALLBACK CameraListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static LRESULT CALLBACK CameraListDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	// IObjectFactory methods 
 
@@ -553,10 +553,10 @@ MovieCameraFactory::~MovieCameraFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Unadvise(eventHandle);
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -569,12 +569,12 @@ void MovieCameraFactory::init (void)
 
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		connection->Advise(getBase(), &eventHandle);
 	}
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 
 	initializeResources();
@@ -618,7 +618,7 @@ HANDLE MovieCameraFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 		DAFILEDESC fdesc = data->fileName;
 		COMPTR<IFileSystem> objFile;
 
-		if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 			TEXLIB->load_library(objFile, 0);
 		else
 			goto Error;
@@ -677,7 +677,7 @@ GENRESULT MovieCameraFactory::Notify (U32 message, void *param)
 		case IDH_CAMERA_LIST:
 			{
 				bCameraMode = TRUE;
-				HWND dialog = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_CAMERA_LIST), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) CameraListDlgProc, LPARAM(this));
+				HWND dialog = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_CAMERA_LIST), hMainWindow, DLGPROC(CameraListDlgProc), LPARAM(this));
 				ShowWindow(dialog,SW_SHOWNORMAL);
 				SetWindowPos(dialog,HWND_NOTOPMOST, 20, 20, 0, 0, SWP_NOZORDER|SWP_NOSIZE);
 			}
@@ -762,10 +762,10 @@ GENRESULT MovieCameraFactory::Notify (U32 message, void *param)
 }
 //-------------------------------------------------------------------
 //
-BOOL MovieCameraFactory::CameraListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT MovieCameraFactory::CameraListDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	MovieCameraFactory *cameraMgr = (MovieCameraFactory *)GetWindowLong(hwnd, DWL_USER);
+	MovieCameraFactory *cameraMgr = (MovieCameraFactory *)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	switch (message)
 	{
@@ -773,7 +773,7 @@ BOOL MovieCameraFactory::CameraListDlgProc (HWND hwnd, UINT message, UINT wParam
 		{
 			HWND hList = GetDlgItem(hwnd,IDC_CL_LIST);
 
-			SetWindowLong(hwnd, DWL_USER, lParam);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
 			cameraMgr = (MovieCameraFactory *)lParam;
 
@@ -933,7 +933,7 @@ BOOL MovieCameraFactory::CameraListDlgProc (HWND hwnd, UINT message, UINT wParam
 				if(bViewingCam)
 				{
 					CQFLAGS.bMovieMode = false;
-					EVENTSYS->Send(CQE_MOVIE_MODE,false);
+					EVENTSYS->Send(CQE_MOVIE_MODE,(void*)false);
 
 					bViewingCam = false;
 					SECTOR->SetCurrentSystem(cameraMgr->oldSystemID);
@@ -1033,15 +1033,6 @@ struct CamSpot
     void * operator new (size_t size)
 	{
 		void * result = calloc(size, 1);
-		{
-			DWORD dwAddr;
-			__asm
-			{
-				mov eax, DWORD PTR [EBP+4]
-				mov DWORD PTR dwAddr, eax
-			}
-			HEAP_Acquire()->SetBlockOwner(result, dwAddr);
-		}
 		return result;
 	}
 
@@ -1186,7 +1177,7 @@ MovieCameraManager::~MovieCameraManager()
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 };
@@ -1557,7 +1548,7 @@ BOOL32 MovieCameraManager::Save (struct IFileSystem * outFile)
 	
 	fdesc.lpFileName = "MovieManager";
 
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->WriteFile(0,&savePos,sizeof(savePos),&dwWritten);
@@ -1620,7 +1611,7 @@ BOOL32 MovieCameraManager::Load (struct IFileSystem * inFile)
 	U32 numSpots;
 	U8 lastOn;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0,&savePos,sizeof(savePos),&dwRead);
@@ -1747,7 +1738,7 @@ void MovieCameraManager::init()
 	bTracking = false;
 
 	COMPTR<IDAConnectionPoint> connection;
-	if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (TOOLBAR->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &eventHandle);
 }
 //--------------------------------------------------------------------------//

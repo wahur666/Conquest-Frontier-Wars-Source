@@ -410,7 +410,7 @@ BOOL32 ScriptObject::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -437,7 +437,7 @@ BOOL32 ScriptObject::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -475,7 +475,7 @@ void ScriptObject::ResolveAssociations()
 //
 void ScriptObject::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc {partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_SCRIPTOBJECT_QLOAD");
@@ -651,7 +651,7 @@ ScriptObjectFactory::~ScriptObjectFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -660,7 +660,7 @@ void ScriptObjectFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -680,7 +680,7 @@ HANDLE ScriptObjectFactory::CreateArchetype (const char *szArchname, OBJCLASS ob
 		DAFILEDESC fdesc = data->fileName;
 		COMPTR<IFileSystem> objFile;
 
-		if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 			TEXLIB->load_library(objFile, 0);
 		else
 			goto Error;

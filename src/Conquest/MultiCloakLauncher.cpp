@@ -256,7 +256,7 @@ BOOL32 MultiCloakLauncher::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	save = *static_cast<MULTICLOAK_LAUNCHER_SAVELOAD *>(this);
@@ -280,7 +280,7 @@ BOOL32 MultiCloakLauncher::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -321,7 +321,7 @@ bool MultiCloakLauncher::checkSupplies()
 void MultiCloakLauncher::enableCloak(bool bEnabled)
 {
 	CQASSERT(bEnabled != bCloakEnabled);
-	VOLPTR(ICloak) cloakShip = owner;
+	VOLPTR(ICloak) cloakShip = owner.Ptr();
 	cloakShip->EnableCloak(bEnabled);
 	bCloakEnabled = bEnabled;
 }
@@ -434,7 +434,7 @@ MultiCloakLauncherFactory::~MultiCloakLauncherFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -443,7 +443,7 @@ void MultiCloakLauncherFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

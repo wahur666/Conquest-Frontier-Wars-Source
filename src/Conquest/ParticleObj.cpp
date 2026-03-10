@@ -229,7 +229,7 @@ SINGLE ParticleObj::GetRadius()
 
 	COMPTR<IParticleSystem> IPS;
 
-	if(ENGINE->query_instance_interface( instanceIndex, IID_IParticleSystem, (IDAComponent **)(void **)IPS ) == GR_OK)
+	if(ENGINE->query_instance_interface( instanceIndex, IID_IParticleSystem, (IDAComponent **)IPS.void_addr() ) == GR_OK)
 	{
 		ParticleSystemParameters psp;
 		IPS->get_parameters( &psp );
@@ -309,7 +309,7 @@ ParticleObjManager::~ParticleObjManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -320,7 +320,7 @@ void ParticleObjManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -340,7 +340,7 @@ HANDLE ParticleObjManager::CreateArchetype(const char *szArchname, OBJCLASS objC
 			
 			COMPTR<IFileSystem> objFile;
 			DAFILEDESC fdesc = objData->fileName;
-			if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				newguy->archIndex = ENGINE->create_archetype(fdesc.lpFileName,objFile);
 
 			if (newguy->archIndex == INVALID_ARCHETYPE_INDEX)

@@ -282,7 +282,7 @@ void AnimNugget::TestVisible (const USER_DEFAULTS & defaults, const U32 currentS
 		_rect.top = screenY - 15;
 		_rect.bottom = screenY + 15;
 		
-		RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+		RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 		
 		bVisible = RectIntersects(_rect, screenRect);
 	}
@@ -569,7 +569,7 @@ void AnimNugget::DrawHighlighted (void)
 	if ((nextHighlighted==0) && (OBJLIST->GetHighlightedList()==this))
 	{
 		COMPTR<IFontDrawAgent> pFont;
-		OBJLIST->GetUnitFont(pFont);
+		OBJLIST->GetUnitFont(pFont.addr());
 
 		pFont->SetFontColor(RGB(180,180,180) | 0xFF000000, 0);
 		wchar_t temp[M_MAX_STRING];
@@ -1040,7 +1040,7 @@ NuggetManager::~NuggetManager()
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 }
@@ -1548,7 +1548,7 @@ void NuggetManager::Save(IFileSystem * outFile)
 	
 	fdesc.lpFileName = "NuggetManager";
 
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		return;
 
 	AnimNugget * nugget;
@@ -1591,7 +1591,7 @@ void NuggetManager::Load(IFileSystem * inFile)
 	COMPTR<IFileSystem> file;
 	U32 dwRead;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		return;
 
 	U32 num, i;
@@ -1625,7 +1625,7 @@ void NuggetManager::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 	
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		CQASSERT(eventHandle==0);
 		connection->Advise(getBase(), &eventHandle);
@@ -1736,7 +1736,7 @@ NuggetFactory::~NuggetFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 
 }
@@ -1746,7 +1746,7 @@ void NuggetFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 
 }
@@ -1769,7 +1769,7 @@ HANDLE NuggetFactory::CreateArchetype (const char *szArchname, OBJCLASS objClass
 			
 			fdesc.lpImplementation = "UTF";
 			
-			if (OBJECTDIR->CreateInstance(&fdesc, file) != GR_OK)
+			if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 			{
 				CQFILENOTFOUND(fdesc.lpFileName);
 				goto Error;
@@ -1781,7 +1781,7 @@ HANDLE NuggetFactory::CreateArchetype (const char *szArchname, OBJCLASS objClass
 				DAFILEDESC fdesc = data->nugget_mesh;
 				COMPTR<IFileSystem> objFile;
 
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 					TEXLIB->load_library(objFile, 0);
 				else
 				{

@@ -707,7 +707,7 @@ PlasmaBoltManager::~PlasmaBoltManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -717,7 +717,7 @@ void PlasmaBoltManager::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(GetBase(), &factoryHandle);
 }
 //--------------------------------------------------------------------------
@@ -763,7 +763,7 @@ HANDLE PlasmaBoltManager::CreateArchetype(const char *szArchname, OBJCLASS objCl
 					DAFILEDESC fdesc;
 					COMPTR<IFileSystem> objFile;
 					fdesc.lpFileName = data->animName;
-					if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+					if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 					{
 						newguy->animArch = ANIM2D->create_archetype(objFile);
 					}
@@ -779,7 +779,7 @@ HANDLE PlasmaBoltManager::CreateArchetype(const char *szArchname, OBJCLASS objCl
 
 				DAFILEDESC fdesc = data->fileName;
 				COMPTR<IFileSystem> file;
-				if (OBJECTDIR->CreateInstance(&fdesc,file) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc,file.void_addr()) == GR_OK)
 					TEXLIB->load_library(file, 0);
 				
 				if (file != 0 && (newguy->archIndex = ENGINE->create_archetype(((BT_PROJECTILE_DATA *)data)->fileName, file)) != INVALID_ARCHETYPE_INDEX)
