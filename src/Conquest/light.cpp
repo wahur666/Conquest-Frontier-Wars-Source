@@ -78,7 +78,7 @@ CQLight::CQLight (void)
 	bLogicalOn = false;
 	systemID = 0;
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		connection->Advise(static_cast<IEventCallback *>(this), &callbackHandle);
 	}
@@ -95,7 +95,7 @@ CQLight::~CQLight (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(callbackHandle);
 	}
 	ILights::ReleaseEngineID(engineID);
@@ -458,7 +458,7 @@ SINGLE GameLight::TestHighlight (const RECT & rect)
 			_rect.top = F2LONG(center_y - radius);
 			_rect.bottom = F2LONG(center_y + radius);
 
-			RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+			RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 
 			if (RectIntersects(_rect, screenRect) != 0)
 			{
@@ -796,7 +796,7 @@ BOOL32 GameLight::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 	
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	GetBaseLight(&save);
@@ -819,7 +819,7 @@ BOOL32 GameLight::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -1092,7 +1092,7 @@ struct DACOM_NO_VTABLE Lights : public IEventCallback, DocumentClient, IObjectFa
 
 //	BOOL32 RegBmp(char *fileName);
 
-	static BOOL CALLBACK LightListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam);
+	static LRESULT CALLBACK LightListDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	virtual void loadTextures (bool bEnable);
 
@@ -1140,13 +1140,13 @@ Lights::~Lights (void)
 	COMPTR<IDAConnectionPoint> connection;
 	if (GS)
 	{
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 
@@ -1243,18 +1243,18 @@ BOOL32 Lights::CreateViewer (void)
 	minfo.fMask = MIIM_ID | MIIM_TYPE;
 	minfo.fType = MFT_STRING;
 	minfo.wID = IDS_VIEWLIGHTS;
-	minfo.dwTypeData = "Lights";
+	minfo.dwTypeData = LPSTR("Lights");
 	minfo.cch = strlen(minfo.dwTypeData);
 		
 	if (InsertMenuItem(hMenu, 0x7FFE, 1, &minfo))
 		menuID = IDS_VIEWLIGHTS;
 
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &eventHandle);
 	}
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -1289,7 +1289,7 @@ BOOL32 Lights::CreateViewer (void)
 	ddesc.memory = &lightData;
 	ddesc.memoryLength = sizeof(lightData);
 
-	if (DACOM->CreateInstance(&ddesc, doc) == GR_OK)
+	if (DACOM->CreateInstance(&ddesc, doc.void_addr()) == GR_OK)
 	{
 		VIEWDESC vdesc;
 		HWND hwnd;
@@ -1298,7 +1298,7 @@ BOOL32 Lights::CreateViewer (void)
 		vdesc.doc = doc;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if (PARSER->CreateInstance(&vdesc, viewer) == GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
@@ -1350,7 +1350,7 @@ GENRESULT Lights::Notify (U32 message, void *param)
 		{
 		case IDH_LIGHTS:
 			{
-				HWND dialog = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_FIELDLIST), hMainWindow, (int (__stdcall *)(struct HWND__ *,unsigned int,unsigned int,long)) LightListDlgProc, LPARAM(this));
+				HWND dialog = CreateDialogParam(hResource, MAKEINTRESOURCE(IDD_FIELDLIST), hMainWindow, DLGPROC(LightListDlgProc), LPARAM(this));
 				SetParent(dialog,hMainWindow);
 				ShowWindow(dialog,SW_SHOWNORMAL);
 				SetWindowPos(dialog,HWND_NOTOPMOST, 20, 20, 0, 0, SWP_NOZORDER|SWP_NOSIZE);
@@ -1464,11 +1464,11 @@ void Lights::loadTextures (bool bEnable)
 	}*/
 }
 
-BOOL Lights::LightListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT Lights::LightListDlgProc (HWND hwnd, UINT message,WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
 	//FieldNode * fieldList = (FieldNode *)GetWindowLong(hwnd, DWL_USER);
-	Lights *lightmgr = (Lights *)GetWindowLong(hwnd, DWL_USER);
+	Lights *lightmgr = (Lights *)GetWindowLongPtr(hwnd, DWLP_USER);
 	char newName[32];
 
 	switch (message)
@@ -1477,7 +1477,7 @@ BOOL Lights::LightListDlgProc (HWND hwnd, UINT message, UINT wParam, LONG lParam
 		{
 			HWND hList = GetDlgItem(hwnd,IDC_LIST1);
 
-			SetWindowLong(hwnd, DWL_USER, lParam);
+			SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
 			lightmgr = (Lights *)lParam;
 
@@ -1776,7 +1776,7 @@ void Lights::ActivateAmbientLight(const Vector &_spot)
 		spot.y = 63*GRIDSIZE;
 
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map);
+	SECTOR->GetTerrainMap(SECTOR->GetCurrentSystem(), map.addr());
 	GRIDVECTOR gv;
 	//conversion here
 	gv.bigGridSquare(spot);
@@ -1895,7 +1895,7 @@ HANDLE Lights::CreateArchetype (const char *szArchname, OBJCLASS objClass, void 
 		DAFILEDESC fdesc = "light.3db";
 		COMPTR<IFileSystem> objFile;
 		
-		if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 			TEXLIB->load_library(objFile, 0);
 		else
 			goto Error;

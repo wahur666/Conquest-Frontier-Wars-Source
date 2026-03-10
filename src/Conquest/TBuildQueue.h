@@ -54,13 +54,13 @@
 template <class Base>
 struct _NO_VTABLE TBuildQueue : public Base, IBuildQueue, BUILDQUEUE_SAVELOAD
 {
-	typename typedef Base::INITINFO BQINITINFO;
-	typename typedef Base::SAVEINFO BQSAVEINFO;
+	typedef Base::INITINFO BQINITINFO;
+	typedef Base::SAVEINFO BQSAVEINFO;
 
-	struct InitNode			initNode;
-	struct SaveNode			saveNode;
-	struct LoadNode			loadNode;
-	struct ResolveNode      resolveNode;
+	struct Base::InitNode			initNode;
+	struct Base::SaveNode			saveNode;
+	struct Base::LoadNode			loadNode;
+	struct Base::ResolveNode      resolveNode;
 
 	U32 maxQueueSize;
 	U32 nextIndex;
@@ -125,10 +125,10 @@ struct _NO_VTABLE TBuildQueue : public Base, IBuildQueue, BUILDQUEUE_SAVELOAD
 
 template <class Base>
 TBuildQueue< Base >::TBuildQueue() :
-							initNode(this, CASTINITPROC(&TBuildQueue::initBuildQueue)),
-							saveNode(this, CASTSAVELOADPROC(&TBuildQueue::saveFab)),
-							loadNode(this, CASTSAVELOADPROC(&TBuildQueue::loadFab)),
-							resolveNode(this, ResolveProc(&TBuildQueue::resolveFab))
+							initNode(this,		Base::castInitProc(Base::InitProc2(&_Cq::initBuildQueue))),
+							saveNode(this,		Base::castSaveLoadProc(Base::SaveLoadProc2(&_Cq::saveFab))),
+							loadNode(this,		Base::castSaveLoadProc(Base::SaveLoadProc2(&_Cq::loadFab))),
+							resolveNode(this,	Base::ResolveProc(&TBuildQueue::resolveFab))
 {
 }
 //---------------------------------------------------------------------------
@@ -186,7 +186,7 @@ bool TBuildQueue< Base >::IsUpgradeInQueue ()
 template <class Base>
 void TBuildQueue< Base >::FailSound(M_RESOURCE_TYPE resType)
 {
-	failSound(resType);
+	this->failSound(resType);
 }
 //---------------------------------------------------------------------------
 //

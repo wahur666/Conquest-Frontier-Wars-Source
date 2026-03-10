@@ -795,7 +795,7 @@ BOOL32 Gunboat::updateBoat (void)
 
 		if (bSpecialAttack==0 && bArtifactUse==0)		// don't cancel attacks for special attacks
 		{
-			MPart part = target;
+			MPart part = target.Ptr();
 			if (part.isValid()==0 || part->hullPoints==0)
 				cancelAttack();
 			else
@@ -1409,7 +1409,7 @@ void Gunboat::OnAllianceChange (U32 allyMask)
 			U32 dummy;
 			U8 hisPlayerID=0;
 			
-			VOLPTR(IExtent) extentObj = target;
+			VOLPTR(IExtent) extentObj = target.Ptr();
 			
 			if (extentObj)
 			{
@@ -2536,7 +2536,7 @@ bool Gunboat::TestLOS (const struct GRIDVECTOR & pos)
 	COMPTR<ITerrainMap> map;
 	bool result;
 
-	SECTOR->GetTerrainMap(GetSystemID(), map);
+	SECTOR->GetTerrainMap(GetSystemID(), map.addr());
 
 	if ((result=map->TestSegment(GetGridPosition(), pos, &callback)) == false)
 		result = callback.gridPos.isMostlyEqual(pos);
@@ -2840,7 +2840,7 @@ bool Gunboat::checkLOS (TCallback & callback)	// with targetPos
 {
 	COMPTR<ITerrainMap> map;
 
-	SECTOR->GetTerrainMap(GetSystemID(), map);
+	SECTOR->GetTerrainMap(GetSystemID(), map.addr());
  
 	if (map->TestSegment(GetGridPosition(), target.Ptr()->GetGridPosition(), &callback) == false)
 	{
@@ -3135,7 +3135,7 @@ GunboatFactory::~GunboatFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -3144,7 +3144,7 @@ void GunboatFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

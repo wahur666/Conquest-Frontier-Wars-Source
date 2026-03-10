@@ -309,8 +309,8 @@ struct _NO_VTABLE Gunplat : Platform<GUNPLAT_SAVELOAD, GUNPLAT_INIT>,
 			{
 				U32 dummy;
 				U8 hisPlayerID=0;
-				
-				VOLPTR(IExtent) extentObj = target;
+
+				VOLPTR(IExtent) extentObj = target.Ptr();
 				
 				if (extentObj)
 				{
@@ -720,7 +720,7 @@ BOOL32 Gunplat::updateTargeting (void)
 	{
 		CQASSERT(attackAgentID);
 
-		MPart part = target;
+		MPart part = target.Ptr();
 		if (part.isValid()==0 || part->hullPoints==0)
 			cancelAttack();
 		else
@@ -2128,7 +2128,7 @@ bool Gunplat::TestLOS (const struct GRIDVECTOR & pos)
 	COMPTR<ITerrainMap> map;
 	bool bResult;
 
-	SECTOR->GetTerrainMap(GetSystemID(), map);
+	SECTOR->GetTerrainMap(GetSystemID(), map.addr());
 	callback.buildPlanetID = buildPlanetID;
 
 	if ((bResult = map->TestSegment(GetGridPosition(), pos, &callback)) == false)
@@ -2147,7 +2147,7 @@ bool Gunplat::checkLOS (TCallback & callback)	// with targetPos
 		return FALSE;
 
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(GetSystemID(), map);
+	SECTOR->GetTerrainMap(GetSystemID(), map.addr());
 
 	if (map->TestSegment(GetGridPosition(), target.Ptr()->GetGridPosition(), &callback) == false)
 	{
@@ -2344,7 +2344,7 @@ GunplatFactory::~GunplatFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -2353,7 +2353,7 @@ void GunplatFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

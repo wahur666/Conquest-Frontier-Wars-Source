@@ -47,7 +47,7 @@ struct KamikazeWing : FighterWing
 {
 	virtual void init (PARCHETYPE pArchetype, PARCHETYPE _pFighterType);
 
-	virtual void KamikazeWing::updateFlightDeck (void);
+	virtual void updateFlightDeck (void);
 
 	virtual void AttackObject (IBaseObject * obj,BOOL32 bSpecialAttack);
 
@@ -401,7 +401,7 @@ KamikazeWingFactory::~KamikazeWingFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -410,7 +410,7 @@ void KamikazeWingFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

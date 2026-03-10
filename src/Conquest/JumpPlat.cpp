@@ -376,7 +376,7 @@ void JumpPlat::ParkYourself (IBaseObject * jumpgate)
 		// the object has to initialize its footprint
 		COMPTR<ITerrainMap> map;
 		SECTOR->RevealSystem(jump2->GetSystemID(),playerID);
-		SECTOR->GetTerrainMap(jump2->GetSystemID(), map);
+		SECTOR->GetTerrainMap(jump2->GetSystemID(), map.addr());
 		if (map)
 		{
 			baseSib->SetTerrainFootprint(map);
@@ -553,7 +553,7 @@ void JumpPlat::killPlatform (void)
 		THEMATRIX->SendPlatformDeath(dwMissionID);
 		bPlatRealyDead = true;
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(systemID, map);
+		SECTOR->GetTerrainMap(systemID, map.addr());
 		undoFootprintInfo(map);
 		OBJLIST->DeferredDestruction(dwMissionID);
 	}
@@ -673,7 +673,7 @@ JumpPlatFactory::~JumpPlatFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -682,7 +682,7 @@ void JumpPlatFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

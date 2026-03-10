@@ -896,7 +896,7 @@ void Flagship::OnFleetShipDamaged (IBaseObject * victim, U32 attackerID)
 {
 	if (targetID == 0 && mode != MOVING)
 	{
-		MPart part = targets[0];
+		MPart part = targets[0].Ptr();
 		if (part.isValid() == 0)
 		{
 			idleTimer = -1;
@@ -2065,7 +2065,7 @@ void Flagship::updateGroupNormal(FleetGroup * group)
 				int cnt1 = 0;
 				int cnt2 = 0;
 				IBaseObject * targ = NULL;
-				MPart part1 = group->ai.targets[1];
+				MPart part1 = group->ai.targets[1].Ptr();
 
 				for (U32 i = 0; i < nAvailableGunboats; i++)
 				{
@@ -2276,7 +2276,7 @@ void Flagship::updateGroupRover(FleetGroup * group)
 				int cnt1 = 0;
 				int cnt2 = 0;
 				IBaseObject * targ = NULL;
-				MPart part1 = group->ai.targets[1];
+				MPart part1 = group->ai.targets[1].Ptr();
 
 				for (U32 i = 0; i < nAvailableGunboats; i++)
 				{
@@ -2435,7 +2435,7 @@ void Flagship::updateGroupSpotter(FleetGroup * group)
 				int cnt1 = 0;
 				int cnt2 = 0;
 				IBaseObject * targ = NULL;
-				MPart part1 = group->ai.targets[1];
+				MPart part1 = group->ai.targets[1].Ptr();
 
 				for (U32 i = 0; i < nAvailableGunboats; i++)
 				{
@@ -2544,7 +2544,7 @@ void Flagship::updateGroupStriker(FleetGroup * group)
 				int cnt2 = 0;
 				int cnt3 = 0;
 				IBaseObject * targ = NULL;
-				MPart part1 = group->ai.targets[1];
+				MPart part1 = group->ai.targets[1].Ptr();
 
 				for (U32 i = 0; i < nAvailableGunboats; i++)
 				{
@@ -3085,8 +3085,8 @@ IBaseObject * Flagship::FleetShipTargetDestroyed (IBaseObject * ship)
 
 		if(admiralTactic == AT_DEFEND || admiralTactic == AT_SEEK)
 		{
-			MPart part1 = targets[0];
-			MPart part2 = targets[1];
+			MPart part1 = targets[0].Ptr();
+			MPart part2 = targets[1].Ptr();
 
 			if (part1.isValid() == 0 && part2.isValid() == 0 && admiralTactic == AT_SEEK)
 			{
@@ -3122,8 +3122,8 @@ IBaseObject * Flagship::FleetShipTargetDestroyed (IBaseObject * ship)
 		}
 		else if(admiralTactic == AT_HOLD)
 		{
-			MPart part1 = targets[0];
-			MPart part2 = targets[1];
+			MPart part1 = targets[0].Ptr();
+			MPart part2 = targets[1].Ptr();
 
 			if (part1.isValid() == 0 && part2.isValid() == 0)
 			{
@@ -3178,7 +3178,7 @@ IBaseObject * Flagship::FleetShipTargetDestroyed (IBaseObject * ship)
 				int cnt1 = 0;
 				int cnt2 = 0;
 				IBaseObject * targ = NULL;
-				MPart part1 = group->ai.targets[1];
+				MPart part1 = group->ai.targets[1].Ptr();
 
 				// only assign attack commands if the ship is in the same system as the admiral
 				targ = NULL;
@@ -4057,7 +4057,7 @@ BOOL32 Flagship::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) == GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 	{
 		if (fleetSet.numObjects)
 			file->WriteFile(0, fleetSet.objectIDs, fleetSet.numObjects * sizeof(U32), &dwWritten, 0);
@@ -4077,7 +4077,7 @@ BOOL32 Flagship::Load (struct IFileSystem * inFile)
 	COMPTR<IFileSystem> file;
 	DWORD dwRead;
 
-	if (inFile->CreateInstance(&fdesc, file) == GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 	{
 		fleetSet.numObjects = file->GetFileSize() / sizeof(U32);
 		file->ReadFile(0, fleetSet.objectIDs, fleetSet.numObjects * sizeof(U32), &dwRead, 0);
@@ -5041,7 +5041,7 @@ void Flagship::smartFleetTargetSelection (void)
 			int cnt1 = 0;
 			int cnt2 = 0;
 			IBaseObject * targ = NULL;
-			MPart part1 = targets[1];
+			MPart part1 = targets[1].Ptr();
 
 			for (i = 0; i < nAvailableGunboats; i++)
 			{
@@ -5099,7 +5099,7 @@ void Flagship::smartFleetTargetSelection (void)
 			int cnt1 = 0;
 			int cnt2 = 0;
 			IBaseObject * targ = NULL;
-			MPart part1 = targets[1];
+			MPart part1 = targets[1].Ptr();
 
 			for (i = 0; i < nAvailableGunboats; i++)
 			{
@@ -5959,7 +5959,7 @@ void Flagship::attachToDockShip (const MPartNC & part)
 
 	COMPTR<ITerrainMap> map;
 
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	undoFootprintInfo(map);
 }
 //---------------------------------------------------------------------------
@@ -6208,7 +6208,7 @@ FlagshipFactory::~FlagshipFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -6217,7 +6217,7 @@ void FlagshipFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

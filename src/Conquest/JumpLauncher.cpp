@@ -574,7 +574,7 @@ void JumpLauncher::InitLauncher (IBaseObject * _owner, S32 ownerIndex, S32 animA
 	_owner->QueryInterface(ILaunchOwnerID, owner, LAUNCHVOLATILEPTR);
 	CQASSERT(owner!=0);
 
-	VOLPTR(IExtent) extentObj = owner;
+	VOLPTR(IExtent) extentObj = owner.Ptr();
 	CQASSERT(extentObj);
 
 //	mc = &extentObj->GetMeshChain();
@@ -755,7 +755,7 @@ JumpLauncherFactory::~JumpLauncherFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -764,7 +764,7 @@ void JumpLauncherFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -790,7 +790,7 @@ HANDLE JumpLauncherFactory::CreateArchetype (const char *szArchname, OBJCLASS ob
 
 				COMPTR<IFileSystem> file;
 				
-				if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 				{
 					 result->jumpRingAnim = ANIM2D->create_archetype(file);
 				}

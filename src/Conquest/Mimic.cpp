@@ -274,7 +274,7 @@ void Mimic::PhysicalUpdate (SINGLE dt)
 	
 		if (owner.Ptr()->bSpecialRender != bLastState)
 		{
-			VOLPTR(IExtent) extentObj = owner;
+			VOLPTR(IExtent) extentObj = owner.Ptr();
 			CQASSERT(extentObj);
 			if (owner.Ptr()->bSpecialRender)
 			{
@@ -320,7 +320,7 @@ BOOL32 Mimic::Update ()
 			//	enableCloak(bCloakEnabled);
 
 				
-				VOLPTR(IExtent) extentObj = owner;
+				VOLPTR(IExtent) extentObj = owner.Ptr();
 				CQASSERT(extentObj);
 				extentObj->SetAliasData(-1,0);
 				aliasArchetypeID = -1;
@@ -494,7 +494,7 @@ void Mimic::DoSpecialAbility (IBaseObject * obj)
 		enableCloak(bCloakEnabled);
 	}*/
 	
-	VOLPTR(IExtent) extentObj = owner;
+	VOLPTR(IExtent) extentObj = owner.Ptr();
 	CQASSERT(extentObj);
 	extentObj->SetAliasData(aliasArchetypeID,aliasPlayerID);
 }
@@ -577,7 +577,7 @@ BOOL32 Mimic::Save (struct IFileSystem * outFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -604,7 +604,7 @@ BOOL32 Mimic::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -780,7 +780,7 @@ MimicManager::~MimicManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -791,7 +791,7 @@ void MimicManager::init()
 	COMPTR<IDAConnectionPoint> connection;
 
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}

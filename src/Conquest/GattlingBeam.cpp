@@ -140,7 +140,7 @@ struct _NO_VTABLE GattlingBeam : public ObjectTransform<ObjectFrame<IBaseObject,
 
 //----------------------------------------------------------------------------------
 //
-GattlingBeam::GattlingBeam (void) 
+GattlingBeam::GattlingBeam (void)
 {
 }
 
@@ -457,7 +457,7 @@ GattlingBeamManager::~GattlingBeamManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 }
@@ -467,7 +467,7 @@ void GattlingBeamManager::init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(GetBase(), &factoryHandle);
 }
 //--------------------------------------------------------------------------

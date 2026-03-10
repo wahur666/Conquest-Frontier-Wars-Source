@@ -105,7 +105,7 @@ Minefield::Minefield (void) :
 Minefield::~Minefield()
 {
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	unsetTerrainFootprint(map);
 
 	if(mines)
@@ -121,7 +121,7 @@ BOOL32 Minefield::Update (void)
 		{	
 			updateCounter = 0;
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(systemID,map);
+			SECTOR->GetTerrainMap(systemID,map.addr());
 	
 			map->TestSegment(gridPos,gridPos,this);
 		}else
@@ -495,7 +495,7 @@ void Minefield::TestVisible (const USER_DEFAULTS & defaults, const U32 currentSy
 	if(bVisible)
 	{
 		//as long as the cammera never goes on it's side this will work
-		RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+		RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 		RECT rect;
 		S32 xCent,yCent,zXLoc,zYLoc;
 		Vector myPos = gridPos;
@@ -586,7 +586,7 @@ BOOL32 Minefield::Save(IFileSystem *outFile)
 	fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memcpy(&save, static_cast<BASE_MINEFIELD_SAVELOAD *>(this), sizeof(BASE_MINEFIELD_SAVELOAD));
@@ -597,7 +597,7 @@ BOOL32 Minefield::Save(IFileSystem *outFile)
 	
 	fdesc.lpFileName = "Data";
 	
-	if (outFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	for(index = 0; index < archetype->pData->maxMineNumber; ++index)
@@ -644,7 +644,7 @@ BOOL32 Minefield::Load(IFileSystem *inFile)
 
 	fdesc.lpFileName = "MINEFIELD_SAVELOAD";
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
 		goto Done;
 	}
@@ -658,7 +658,7 @@ BOOL32 Minefield::Load(IFileSystem *inFile)
 
 	fdesc.lpFileName = "Data";
 	
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 	
 	if (file->ReadFile(0, &loadableMines, sizeof(loadableMines), &dwRead, 0) == 0)
@@ -698,7 +698,7 @@ BOOL32 Minefield::Load(IFileSystem *inFile)
 
 	{
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(systemID, map);
+		SECTOR->GetTerrainMap(systemID, map.addr());
 		setTerrainFootprint(map);
 	}
 
@@ -1032,7 +1032,7 @@ void Minefield::InitMineField( GRIDVECTOR _gridPos, U32 _systemID)
 {
 	COMPTR<ITerrainMap> map;
 	systemID = _systemID;
-	SECTOR->GetTerrainMap(systemID, map);
+	SECTOR->GetTerrainMap(systemID, map.addr());
 	unsetTerrainFootprint(map);
 	gridPos = _gridPos;
 	setTerrainFootprint(map);
@@ -1117,7 +1117,7 @@ BOOL32 Minefield::Setup()//XYCoord *_squares,U32 _numSquares)
 
 	if(systemID)
 	{
-		SECTOR->GetTerrainMap(systemID, map);
+		SECTOR->GetTerrainMap(systemID, map.addr());
 		if (map)
 			unsetTerrainFootprint(map);
 		gridPos = pos;
@@ -1171,7 +1171,7 @@ HANDLE Minefield::CreateArchetype (PARCHETYPE pArchetype, OBJCLASS objClass, voi
 	DAFILEDESC fdesc;
 	COMPTR<IFileSystem> objFile;
 	fdesc.lpFileName = mArch->pData->regAnimation;
-	if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+	if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 	{
 		mArch->regAnimArchetype = ANIM2D->create_archetype(objFile);
 	}

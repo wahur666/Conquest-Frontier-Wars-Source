@@ -292,7 +292,7 @@ struct Jumper
 	SINGLE aim;
 	Jumper *next;
 
-	Jumper::Jumper()
+	Jumper()
 	{
 	}
 
@@ -410,8 +410,8 @@ enum JUMP_STAGE
 	JS_CLOSING
 };
 
-#define OPENING_TIME 1.0
-#define	OPEN_TIME 3.0
+constexpr float OPENING_TIME = 1.0;
+constexpr float	OPEN_TIME = 3.0;
 
 struct _NO_VTABLE Jumpgate : public ObjectSelection
 										<ObjectMission
@@ -706,7 +706,7 @@ void Jumpgate::enableTerrainFootprint (bool bEnable)
 
 	// get the TerrainMap pointer
 	COMPTR<ITerrainMap> map;
-	SECTOR->GetTerrainMap(GetSystemID(), map);
+	SECTOR->GetTerrainMap(GetSystemID(), map.addr());
 
 	if (bEnable)
 	{
@@ -749,7 +749,7 @@ void Jumpgate::DrawHighlighted (void)
 		}
 		else
 		{
-			if (OBJLIST->GetUnitFont(pFont) == GR_OK)
+			if (OBJLIST->GetUnitFont(pFont.addr()) == GR_OK)
 			{
 				WM->GetCursorPos(x, y);
 				y += IDEAL2REALY(24);
@@ -772,10 +772,10 @@ SINGLE Jumpgate::JumpOut (IBaseObject *obj,SINGLE time)
 {
 	if (jumpStage == JS_OPEN)
 	{
-		timer = max(OPEN_TIME,timer);
+		timer = std::max(OPEN_TIME,timer);
 	}
 	else
-		hangTime = max(OPEN_TIME,hangTime);
+		hangTime = std::max(OPEN_TIME,hangTime);
 
 	Vector dir = transform.translation-obj->GetPosition();
 	Jumper * newJumper = new Jumper;
@@ -856,7 +856,7 @@ SINGLE Jumpgate::JumpIn (IBaseObject *obj,SINGLE arrivalTime,const Vector &dir)
 {
 	SINGLE result;
 		
-	result = max(data->min_hold_time+arrivalTime,time_until_last_jump+data->min_stagger_time);
+	result = std::max(data->min_hold_time+arrivalTime,time_until_last_jump+data->min_stagger_time);
 
 	time_until_last_jump = result;
 	
@@ -865,10 +865,10 @@ SINGLE Jumpgate::JumpIn (IBaseObject *obj,SINGLE arrivalTime,const Vector &dir)
 
 	if (jumpStage == JS_OPEN)
 	{
-		timer = max(OPEN_TIME*0.5+result,timer);
+		timer = std::max(OPEN_TIME*0.5f+result,timer);
 	}
 	else
-		hangTime = max(OPEN_TIME*0.5+result,hangTime);
+		hangTime = std::max(OPEN_TIME*0.5f+result,hangTime);
 
 //	Vector dir = transform.translation-obj->GetPosition();
 	Jumper * newJumper = new Jumper;
@@ -1805,7 +1805,7 @@ SINGLE Jumpgate::TestHighlight (const RECT & rect)	// set bHighlight if possible
 				_rect.top = center_y - radius;
 				_rect.bottom = center_y + radius;
 
-				RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
+				RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
 
 				if ((bVisible = RectIntersects(_rect, screenRect)) != 0)
 				{
@@ -1866,7 +1866,7 @@ BOOL32 Jumpgate::Save (struct IFileSystem * outFile)
 	fdesc.dwDesiredAccess = GENERIC_READ|GENERIC_WRITE;
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
-	if (outFile->CreateInstance(&fdesc,file) != GR_OK)
+	if (outFile->CreateInstance(&fdesc,file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&d, 0, sizeof(d));
@@ -1903,7 +1903,7 @@ BOOL32 Jumpgate::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 	JUMPGATE_SAVELOAD d;
 
-	if (inFile->CreateInstance(&fdesc,file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc,file.void_addr()) != GR_OK)
 		goto Done;
 
 	file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0);
@@ -1949,7 +1949,7 @@ void Jumpgate::ResolveAssociations()
 //
 void Jumpgate::QuickSave (struct IFileSystem * file)
 {
-	DAFILEDESC fdesc = partName;
+	DAFILEDESC fdesc {partName};
 	HANDLE hFile;
 
 	file->CreateDirectory("MT_QJGATELOAD");
@@ -2186,7 +2186,7 @@ JumpgateManager::~JumpgateManager()
 	COMPTR<IDAConnectionPoint> connection;
 	if (OBJLIST)
 	{
-		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+		if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 			connection->Unadvise(factoryHandle);
 	}
 
@@ -2205,7 +2205,7 @@ void JumpgateManager::Init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 	{
 		connection->Advise(GetBase(), &factoryHandle);
 	}
@@ -2369,7 +2369,7 @@ HANDLE JumpgateManager::CreateArchetype(const char *szArchname, OBJCLASS objClas
 				if (strstr(newguy->pData->billboardMesh[i].mesh_name,".3db"))
 				{
 					fdesc = newguy->pData->billboardMesh[i].mesh_name;
-					if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+					if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 						newguy->bb_mesh_archID[i] = ENGINE->create_archetype(fdesc.lpFileName, file);
 					else
 						CQFILENOTFOUND(fdesc.lpFileName);
@@ -2387,7 +2387,7 @@ HANDLE JumpgateManager::CreateArchetype(const char *szArchname, OBJCLASS objClas
 				else if (strstr(newguy->pData->billboardMesh[i].tex_name,".anm"))
 				{
 					fdesc = newguy->pData->billboardMesh[i].tex_name;
-					if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+					if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 						newguy->bb_anim_arch[i] = ANIM2D->create_archetype(file);
 					else
 						CQFILENOTFOUND(fdesc.lpFileName);
@@ -2399,7 +2399,7 @@ HANDLE JumpgateManager::CreateArchetype(const char *szArchname, OBJCLASS objClas
 		// LOAD REMAINING DISORGANIZED CRAP
 
 		fdesc = "Jring.3db";
-		if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 			TEXLIB->load_library(file, 0);
 
 		if ((newguy->arche2 = ENGINE->create_archetype("TheRing", file)) != INVALID_ARCHETYPE_INDEX)
@@ -2413,7 +2413,7 @@ HANDLE JumpgateManager::CreateArchetype(const char *szArchname, OBJCLASS objClas
 
 		//fdesc = newguy->pData->file_3db;
 		fdesc = "Jgate_Sphere.3db";
-		if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 			TEXLIB->load_library(file, 0);
 		if ((newguy->archIndex = ENGINE->create_archetype(fdesc.lpFileName, file)) != INVALID_ARCHETYPE_INDEX)
 		{
@@ -2440,7 +2440,7 @@ HANDLE JumpgateManager::CreateArchetype(const char *szArchname, OBJCLASS objClas
 
 		newguy->mapTex = SYSMAP->RegisterIcon("SysMap\\Jumpgate.bmp");
 		fdesc = "dormant.anm";
-		if (OBJECTDIR->CreateInstance(&fdesc, file) == GR_OK)
+		if (OBJECTDIR->CreateInstance(&fdesc, file.void_addr()) == GR_OK)
 		{
 			newguy->dormantArch = ANIM2D->create_archetype(file);
 		}
@@ -2610,16 +2610,16 @@ void Render3db(Mesh *mesh,ColorRGB *color,const Transform &trans,SINGLE colorDam
 		v2 = mesh->object_vertex_list[ref[2]];
 
 		SINGLE f = fabs(dot_product(a,*(mesh->normal_ABC+mesh->vertex_normal[ref[0]])));
-		f = colorDamp*max(f*1.5-0.5,0);
+		f = colorDamp*std::max(f*1.5f-0.5f,0.f);
 
 		PB.TexCoord2f(mesh->texture_vertex_list[tref[0]].u,mesh->texture_vertex_list[tref[0]].v);
 		PB.Color3ub(f*color[ref[0]].r,f*color[ref[0]].g,f*color[ref[0]].b);   PB.Vertex3f(v0.x,v0.y,v0.z);
 		f = fabs(dot_product(a,*(mesh->normal_ABC+mesh->vertex_normal[ref[1]])));
-		f = colorDamp*max(f*1.5-0.5,0);
+		f = colorDamp*std::max(f*1.5f-0.5f,0.f);
 		PB.TexCoord2f(mesh->texture_vertex_list[tref[1]].u,mesh->texture_vertex_list[tref[1]].v);
 		PB.Color3ub(f*color[ref[1]].r,f*color[ref[1]].g,f*color[ref[1]].b);   PB.Vertex3f(v1.x,v1.y,v1.z);
 		f = fabs(dot_product(a,*(mesh->normal_ABC+mesh->vertex_normal[ref[2]])));
-		f = colorDamp*max(f*1.5-0.5,0);
+		f = colorDamp*std::max(f*1.5f-0.5f,0.f);
 		PB.TexCoord2f(mesh->texture_vertex_list[tref[2]].u,mesh->texture_vertex_list[tref[2]].v);
 		PB.Color3ub(f*color[ref[2]].r,f*color[ref[2]].g,f*color[ref[2]].b);   PB.Vertex3f(v2.x,v2.y,v2.z);
 		

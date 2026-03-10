@@ -713,7 +713,7 @@ void HarvestShip::DrawHighlighted()
 	{
 		COMPTR<IFontDrawAgent> pFont;
 
-		if (OBJLIST->GetUnitFont(pFont) == GR_OK)
+		if (OBJLIST->GetUnitFont(pFont.addr()) == GR_OK)
 		{
 			if (bShowPartName)
 				pFont->SetFontColor(RGB(140,140,180) | 0xFF000000, 0);
@@ -3469,7 +3469,7 @@ HarvestShipFactory::~HarvestShipFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -3478,7 +3478,7 @@ void HarvestShipFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------
@@ -3506,7 +3506,7 @@ HANDLE HarvestShipFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 			{
 				DAFILEDESC fdesc="getnugget.anm";
 				COMPTR<IFileSystem> objFile;
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				{
 					result->harvestAnimArch = ANIM2D->create_archetype(objFile);
 				}
@@ -3523,7 +3523,7 @@ HANDLE HarvestShipFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 				DAFILEDESC fdesc = data->gasTankMesh;
 				COMPTR<IFileSystem> objFile;
 
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 					TEXLIB->load_library(objFile, 0);
 				else
 					goto Error;
@@ -3546,7 +3546,7 @@ HANDLE HarvestShipFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 				DAFILEDESC fdesc = data->metalTankMesh;
 				COMPTR<IFileSystem> objFile;
 
-				if (OBJECTDIR->CreateInstance(&fdesc, objFile) == GR_OK)
+				if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 					TEXLIB->load_library(objFile, 0);
 				else
 					goto Error;

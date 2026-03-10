@@ -124,10 +124,10 @@ struct Cloudzone
 	SINGLE alpha[9];
 };
 
-#define MAX_ZONES 512
-#define BLACKFOG_RES 32
-#define TEXTURE_RES 32
-#define SKIP 1
+constexpr int MAX_ZONES = 512;
+constexpr int BLACKFOG_RES = 32;
+constexpr int TEXTURE_RES = 32;
+constexpr int SKIP = 1;
 
 
 
@@ -297,7 +297,7 @@ Done:
 		memset(buffer,fill,sizeof(U8)*height*width);
 	}
 
-	BlackFog::~BlackFog()
+	~BlackFog()
 	{
 		delete [] buffer;
 	}
@@ -484,7 +484,7 @@ Done:
 		memset(buffer,fill,sizeof(U32)*height*width);
 	}
 
-	CircleBits::~CircleBits()
+	~CircleBits()
 	{
 		delete [] buffer;
 	}
@@ -523,7 +523,7 @@ struct DACOM_NO_VTABLE FogOfWar : IFogOfWar, IEventCallback, DocumentClient
 	BOOL *mapGrid;
 	S32 mapX,mapY;
 
-	U32 mapTexID[MAX_SYSTEMS];
+	LONG_PTR mapTexID[MAX_SYSTEMS];
 	COLORREF bits_array[MAX_SYSTEMS][TEXTURE_RES*TEXTURE_RES];
 	U32 update_step[MAX_SYSTEMS];
 
@@ -726,7 +726,7 @@ FogOfWar::~FogOfWar (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
 		
-		if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
 
@@ -741,7 +741,7 @@ void FogOfWar::Init()
 {
 	COMPTR<IDAConnectionPoint> connection;
 	
-	if (GS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK)
+	if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 	{
 		CQASSERT(eventHandle==0);
 		connection->Advise(GetBase(), &eventHandle);
@@ -1336,10 +1336,10 @@ void FogOfWar::Render()
 		p[3] = worldTrans.rotate_translate(p[3]);
 
 		S32 minX,minY,maxX,maxY;
-		minX = min(p[0].x,min(p[1].x,min(p[2].x,p[3].x)));
-		maxX = max(p[0].x,max(p[1].x,max(p[2].x,p[3].x)));
-		minY = min(p[0].y,min(p[1].y,min(p[2].y,p[3].y)));
-		maxY = max(p[0].y,max(p[1].y,max(p[2].y,p[3].y)));
+		minX = std::min(p[0].x,std::min(p[1].x,std::min(p[2].x,p[3].x)));
+		maxX = std::max(p[0].x,std::max(p[1].x,std::max(p[2].x,p[3].x)));
+		minY = std::min(p[0].y,std::min(p[1].y,std::min(p[2].y,p[3].y)));
+		maxY = std::max(p[0].y,std::max(p[1].y,std::max(p[2].y,p[3].y)));
 
 
 		BATCH->set_state(RPR_BATCH,false);
@@ -1373,10 +1373,10 @@ void FogOfWar::Render()
 		maxX = SKIP*floor((float)(((maxX-sysMapRect.left)*FOG_RES))/sysWidth)+1;
 		maxY = SKIP*floor((float)(((maxY-sysMapRect.bottom)*FOG_RES))/sysHeight)+1;
 
-		minX = min(max(minX,-1),FOG_RES);
-		maxX = min(max(maxX,-1),FOG_RES);
-		minY = min(max(minY,-1),FOG_RES);
-		maxY = min(max(maxY,-1),FOG_RES);
+		minX = std::min(std::max((int)minX,-1),FOG_RES);
+		maxX = std::min(std::max((int)maxX,-1),FOG_RES);
+		minY = std::min(std::max((int)minY,-1),FOG_RES);
+		maxY = std::min(std::max((int)maxY,-1),FOG_RES);
 		for (int cx=minX;cx<maxX;cx+=SKIP)
 		{
 			for (int cy=minY;cy<maxY;cy+=SKIP)
@@ -1478,10 +1478,10 @@ void FogOfWar::Render()
 									alpha = alpha>>16;  //magic shift to take alpha down to 0..256 - higher with average alpha
 
 									//capping on next 3 lines
-									color[w*3+c] |= ((min(alpha*(bbit&0xff),0xff00))>>8)<<16;
-									color[w*3+c] |= ((min(alpha*(bbit&0xff00),0xff0000))>>16)<<8;
+									color[w*3+c] |= ((std::min(alpha*(bbit&0xff),(unsigned long)0xff00))>>8)<<16;
+									color[w*3+c] |= ((std::min(alpha*(bbit&0xff00),(unsigned long)0xff0000))>>16)<<8;
 									//these calculations depend on overflow, so this one must be divided down before being multiplied
-									color[w*3+c] |= ((min(alpha*((bbit&0xff0000)>>16),0xff00))>>8);
+									color[w*3+c] |= ((std::min(alpha*((bbit&0xff0000)>>16),(unsigned long)0xff00))>>8);
 									//different than below cause alpha is not coming out of bbit
 								//	color[w*3+c] = (bbit&0x0000ff00) | ((bbit&0xff)<<16) | ((bbit>>16)&0xff);
 									color[w*3+c] |= drawAlpha<<24;
@@ -2072,7 +2072,7 @@ BOOL32 FogOfWar::CreateViewer (void)
 	minfo.fMask = MIIM_ID | MIIM_TYPE;
 	minfo.fType = MFT_STRING;
 	minfo.wID = IDS_VIEWFOG;
-	minfo.dwTypeData = "Fog of War";
+	minfo.dwTypeData = LPSTR("Fog of War");
 	minfo.cch = strlen(minfo.dwTypeData);
 		
 	if (InsertMenuItem(hMenu, 0x7FFE, 1, &minfo))
@@ -2116,7 +2116,7 @@ BOOL32 FogOfWar::CreateViewer (void)
 	ddesc.memory = &fogData;
 	ddesc.memoryLength = sizeof(fogData);
 
-	if (DACOM->CreateInstance(&ddesc, doc) == GR_OK)
+	if (DACOM->CreateInstance(&ddesc, doc.void_addr()) == GR_OK)
 	{
 		VIEWDESC vdesc;
 		HWND hwnd;
@@ -2125,7 +2125,7 @@ BOOL32 FogOfWar::CreateViewer (void)
 		vdesc.doc = doc;
 		vdesc.hOwnerWindow = hMainWindow;
 		
-		if (PARSER->CreateInstance(&vdesc, viewer) == GR_OK)
+		if (PARSER->CreateInstance(&vdesc, viewer.void_addr()) == GR_OK)
 		{
 			COMPTR<IDAConnectionPoint> connection;
 
@@ -2283,7 +2283,7 @@ BOOL32 __stdcall FogOfWar::Save (struct IFileSystem * outFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 	
-	if (outFile->CreateInstance(&fdesc,file) == GR_OK)
+	if (outFile->CreateInstance(&fdesc,file.void_addr()) == GR_OK)
 	{
 		U32 crazyPacking = MAX_PLAYERS<<24|MAX_SYSTEMS<<16|BLACKFOG_RES;
 		file->WriteFile(0,&crazyPacking,sizeof(crazyPacking),&dwWritten);
@@ -2313,7 +2313,7 @@ BOOL32 __stdcall FogOfWar::Load (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = OPEN_EXISTING;
 
-	if (inFile->CreateInstance(&fdesc,file) == GR_OK)
+	if (inFile->CreateInstance(&fdesc,file.void_addr()) == GR_OK)
 	{
 		U32 crazyPacking;
 		U32 oldPlayers;

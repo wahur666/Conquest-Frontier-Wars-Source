@@ -401,7 +401,7 @@ BOOL32 MassDisruptor::Save (struct IFileSystem * inFile)
 	fdesc.dwShareMode = 0;  // no sharing
 	fdesc.dwCreationDistribution = CREATE_ALWAYS;
 
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	memset(&save, 0, sizeof(save));
@@ -430,7 +430,7 @@ BOOL32 MassDisruptor::Load (struct IFileSystem * inFile)
 	U8 buffer[1024];
 
 	fdesc.lpImplementation = "DOS";
-	if (inFile->CreateInstance(&fdesc, file) != GR_OK)
+	if (inFile->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		goto Done;
 
 	if (file->ReadFile(0, buffer, sizeof(buffer), &dwRead, 0) == 0)
@@ -454,7 +454,7 @@ void MassDisruptor::ResolveAssociations()
 	OBJLIST->FindObject(ownerID,NONSYSVOLATILEPTR,owner,ILaunchOwnerID);
 	if(target && owner)
 	{
-		VOLPTR(IExtent) extentObj = target;
+		VOLPTR(IExtent) extentObj = target.Ptr();
 //		mc = &extentObj->GetMeshChain();
 		float box[6];
 		target.Ptr()->GetObjectBox(box);
@@ -559,7 +559,7 @@ MassDisruptorFactory::~MassDisruptorFactory (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST && OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Unadvise(factoryHandle);
 }
 //--------------------------------------------------------------------------//
@@ -568,7 +568,7 @@ void MassDisruptorFactory::init (void)
 {
 	COMPTR<IDAConnectionPoint> connection;
 
-	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection) == GR_OK)
+	if (OBJLIST->QueryOutgoingInterface("IObjectFactory", connection.addr()) == GR_OK)
 		connection->Advise(getBase(), &factoryHandle);
 }
 //-----------------------------------------------------------------------------

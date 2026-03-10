@@ -812,43 +812,14 @@ delete fg[i];
 	vb_mgr->Delete(this);
 }
 
-BOOL MungeFPCW( WORD *pwOldCW )
-{
-    BOOL ret = FALSE;
-    WORD wTemp, wSave;
- 
-    __asm fstcw wSave
-    if (wSave & 0x300)// ||            // Not single mode
-//        0x3f != (wSave & 0x3f) ||   // Exceptions enabled
-  //      wSave & 0xC00)              // Not round to nearest mode
-    {
-        __asm
-        {
-            mov ax, wSave
-            and ax, not 300h    ;; single mode
-     //       or  ax, 3fh         ;; disable all exceptions
-       //     and ax, not 0xC00   ;; round to nearest mode
-            mov wTemp, ax
-            fldcw   wTemp
-        }
-        ret = TRUE;
-    }
-    *pwOldCW = wSave;
-    return ret;
-}
-
 
 void MeshRender::Render(MeshInfo *mc,const Transform &world_to_view)
 {
-//	WORD wOldCW;
-//	BOOL bChangedFPCW = MungeFPCW( &wOldCW );
-
-
 	unique = 0;//mc->unique;
 
 	Transform world_adjust_tr(false);
 	Transform inv(false);
-	
+	TRANSFORM mv;
 	if (mc->cameraMoveCnt != camMoved)
 	{
 		mc->cameraMoveCnt = camMoved;
@@ -908,7 +879,7 @@ void MeshRender::Render(MeshInfo *mc,const Transform &world_to_view)
 	inv = world_adjust_tr.get_inverse();
 
 	//{
-		TRANSFORM mv = world_to_view*world_adjust_tr;
+		mv = world_to_view*world_adjust_tr;
 		//.rotate_about_j(1);
 	//BATCH->set_modelview(mv);
 	PIPE->set_modelview(mv);
@@ -1289,7 +1260,7 @@ void MeshRender::Init(ARCHETYPE_INDEX idx)
 					char texName[255];
 					Material * mat = &mesh->material_list[material_entry];
 
-					U32 id = 0;
+					LONG_PTR id = 0;
 					TEXLIB->get_texture_ref_texture_id( mat->diffuse_texture_ref, &id);
 					TEXLIB->get_texture_name(id, texName, 255);
 					if (!texName[0])
@@ -1467,7 +1438,8 @@ void MeshRender::BuildTangentSpace(VBVertex * pVertices, int c)
 			Vector vN(0,0,0);
 			for(int j=0; j < pos_cnt; j++ )
 			{
-				FLOAT dist1 = D3DXVec3LengthSq( (D3DXVECTOR3*)&(pVertices[i].pos - pVertices[j].pos) );
+				auto res = pVertices[i].pos - pVertices[j].pos;
+				FLOAT dist1 = D3DXVec3LengthSq( (D3DXVECTOR3*)&res );
 				if( dist1 < 1.0e-8f)
 				{
 					vN += pVertices[j].norm;
@@ -1736,7 +1708,7 @@ void MeshRender::RestoreVertexBuffers()
 
 
 
-void LoadFromTexLib(const char* name, U32 *tex)
+void LoadFromTexLib(const char* name, LONG_PTR *tex)
 {
 	if (TEXLIB->has_texture_id(name) != GR_OK)		// name is not present yet
 		TEXLIB->load_texture(TEXTURESDIR, name);
@@ -1804,7 +1776,7 @@ void MeshRender::SetupMeshInfo(MeshInfo *mc,bool bMakeBuffers, const char* mater
 			//if (mat->texturelib)
 			//{
 				//mat->texturelib->get_texture_name(fgi[fg_idx].texture_id, texName, 512);
-			U32 id = 0;
+			LONG_PTR id = 0;
 			TEXLIB->get_texture_ref_texture_id( mat->diffuse_texture_ref, &id);
 			TEXLIB->get_texture_name(id, texName + 4, 512);
 			//}
@@ -1822,7 +1794,7 @@ void MeshRender::SetupMeshInfo(MeshInfo *mc,bool bMakeBuffers, const char* mater
 				{
 					this->bSolarianRenderstateKludge = true;
 					bSolarian = true;
-					U32 id = 0;
+					LONG_PTR id = 0;
 					texName[6] = 0;
 					TEXLIB->get_texture_ref_texture_id( mat->emissive_texture_ref, &id);
 					TEXLIB->get_texture_name(id, texName +4, 512);
@@ -1864,7 +1836,7 @@ void MeshRender::SetupMeshInfo(MeshInfo *mc,bool bMakeBuffers, const char* mater
 					{
 						if (mat->emissive_texture_id && mat->emissive_texture_ref)
 						{
-							U32 id = 0;
+							LONG_PTR id = 0;
 							texName[6] = 0;
 							TEXLIB->get_texture_ref_texture_id( mat->emissive_texture_ref, &id);
 							TEXLIB->get_texture_name(id, texName +4, 512);
@@ -2827,9 +2799,9 @@ Loop:
 
 		if (r>255 || g>255 || b >255)
 		{
-			r = min(r,255);
-			g = min(g,255);
-			b = min(b,255);
+			r = std::min(r,(U32)255);
+			g = std::min(g,(U32)255);
+			b = std::min(b,(U32)255);
 		}
 
 		vert.r = r;
@@ -3281,9 +3253,9 @@ void MMaterial<VertexStruct,VERTEX_FORMAT>::RenderPortionZAlign(const Transform 
 			PIPE->set_render_state(D3DRS_ZWRITEENABLE,TRUE);
 			PIPE->set_render_state(D3DRS_ZFUNC,D3DCMP_LESSEQUAL);
 			
-			float emissiveColor [] = { fgi[fg_idx].emissive.r/255.0, 
-									   fgi[fg_idx].emissive.g/255.0, 
-									   fgi[fg_idx].emissive.b/255.0,
+			float emissiveColor [] = { fgi[fg_idx].emissive.r/255.0f,
+									   fgi[fg_idx].emissive.g/255.0f,
+									   fgi[fg_idx].emissive.b/255.0f,
 									   0};
 			if ((emissiveColor[0] > .7 && emissiveColor[1] > .7 && emissiveColor[2] > .7)
 				|| (emissiveColor[0] <= .2 && emissiveColor[1]<= .2 && emissiveColor[2]<= .2))
@@ -3510,9 +3482,9 @@ void MMaterial<VertexStruct,VERTEX_FORMAT>::RenderPortion(const Transform &inv,c
 			PIPE->set_render_state(D3DRS_ZWRITEENABLE,TRUE);
 			PIPE->set_render_state(D3DRS_ZFUNC,D3DCMP_LESSEQUAL);
 			
-			float emissiveColor [] = { fgi[fg_idx].emissive.r/255.0, 
-									   fgi[fg_idx].emissive.g/255.0, 
-									   fgi[fg_idx].emissive.b/255.0,
+			float emissiveColor [] = { fgi[fg_idx].emissive.r/255.0f,
+									   fgi[fg_idx].emissive.g/255.0f,
+									   fgi[fg_idx].emissive.b/255.0f,
 									   0};
 			if ((emissiveColor[0] > .7 && emissiveColor[1] > .7 && emissiveColor[2] > .7)
 				|| (emissiveColor[0] <= .2 && emissiveColor[1]<= .2 && emissiveColor[2]<= .2))
@@ -3696,7 +3668,7 @@ void MMaterial<VertexStruct,VERTEX_FORMAT>::RenderPuffy(const Transform &inv,con
 					puff_norm.normalize();
 //					SINGLE dot = dot_product(puff_norm,fake_look);
 					puff_norm.normalize();
-					SINGLE s=max(0.0,min(1.0f,-2.0f+3.0f*dot_product(puff_norm,fake_look)));
+					SINGLE s=std::max(0.0f,std::min(1.0f,-2.0f+3.0f*dot_product(puff_norm,fake_look)));
 					alphas[v_dst] = F2LONG(255.0*s);
 					
 					//SINGLE d=fabs(fmod(dot,400));
@@ -3770,9 +3742,9 @@ Loop:
 
 		if (r>255 || g>255 || b >255)
 		{
-			r = min(r,255);
-			g = min(g,255);
-			b = min(b,255);
+			r = std::min(r,(U32)255);
+			g = std::min(g,(U32)255);
+			b = std::min(b,(U32)255);
 		}
 
 		vert.r = r;
@@ -3905,9 +3877,9 @@ Loop:
 
 		if (r>255 || g>255 || b >255)
 		{
-			r = min(r,255);
-			g = min(g,255);
-			b = min(b,255);
+			r = std::min(r,(U32)255);
+			g = std::min(g,(U32)255);
+			b = std::min(b,(U32)255);
 		}
 
 		vert.r = r;
@@ -4238,9 +4210,9 @@ void PremultiplyTexture (U32 texID,S16 bias,SINGLE contrast)
 					r = (*pixel >> data.pf.rl) << data.pf.rr;
 					g = (*pixel >> data.pf.gl) << data.pf.gr;
 					b = (*pixel >> data.pf.bl) << data.pf.br;
-					r = min(bias+r*contrast,255);
-					g = min(bias+g*contrast,255);
-					b = min(bias+b*contrast,255);
+					r = std::min(bias+r*contrast,255.f);
+					g = std::min(bias+g*contrast,255.f);
+					b = std::min(bias+b*contrast,255.f);
 					*pixel = (r >> data.pf.rr) << data.pf.rl;
 					*pixel |= (g >> data.pf.gr) << data.pf.gl;
 					*pixel |= (b >> data.pf.br) << data.pf.bl;
