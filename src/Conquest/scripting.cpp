@@ -835,7 +835,7 @@ bool Scripting::applyRegionToTerrainMap( Region& _region )
 
 		// the object has to initialize its footprint
 		COMPTR<ITerrainMap> map;
-		SECTOR->GetTerrainMap(_region.m_systemID, map);
+		SECTOR->GetTerrainMap(_region.m_systemID, map.addr());
 		if( map )
 		{
 			map->SetFootprint( grids, _region.m_grid.size(), _region );
@@ -869,7 +869,7 @@ struct _scripting : GlobalComponent
 	virtual void Initialize (void)
 	{
 		COMPTR<IDAConnectionPoint> connection;
-		if( EVENTSYS && EVENTSYS->QueryOutgoingInterface("IEventCallback", connection) == GR_OK )
+		if( EVENTSYS && EVENTSYS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK )
 		{
 			connection->Advise(SCRIPTING, &scripting->eventHandle);
 		}

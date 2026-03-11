@@ -54,7 +54,7 @@
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
-
+#include "renderer.h"
 
 
 
@@ -79,7 +79,7 @@ struct _NO_VTABLE ObjectExtent : public Base, IWeaponTarget, IExplosionOwner, IE
 	//child blasts
 	IBaseObject *childBlastList;
 	
-	ObjectExtent (void) : initNode(this, InitProc(&ObjectExtent::initExtents)),
+	ObjectExtent (void) : initNode(this, Base::InitProc(&ObjectExtent::initExtents)),
 		postRenderNode(this,Base::RenderProc(&ObjectExtent::postRenderExtent))
 	{
 	}

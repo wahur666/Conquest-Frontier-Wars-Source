@@ -153,11 +153,6 @@ static void clean_up (void)
 
 	if (DACOM)
 	{
-		if (CQIMAGE)
-			CQIMAGE->MemoryReport(HEAP);
-		else
-			PrintHeap(HEAP);
-
 		IHeap *batchHeap = GetBatchHeap();
 		if (CQIMAGE)
 			CQIMAGE->MemoryReport(batchHeap);
@@ -656,15 +651,9 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	messages |=	DAHEAPFLAG_NOMSGS;
 #endif
 
-	if (InitializeDAHeap(0x10000, 0x4000, messages)==0)
-	{
-		alloc_failed();
-		goto Done;
-	}
-
 	HEAP_Acquire()->SetErrorHandler(ICQImage::STANDARD_DUMP);
 	// TrimResetHeap(HEAP);
-	MissionResetHeap(HEAP);
+	MissionResetHeap(HEAP_Acquire());
 	GetBatchHeap()->SetErrorHandler(ICQImage::STANDARD_DUMP);
 
 	CQIMAGE->SetMessagesEnabled(false);
@@ -809,13 +798,6 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	
 	ParseVideoINI();
 
-	// add an extra 500000 if GDI is used, because viewers, documents use that much!
-	if (InitializeDAHeap(HEAP_SIZE+((CQFLAGS.bNoGDI)?0:500000), 0x800000, messages)==0)
-	{
-		alloc_failed();
-		goto Done;
-	}
-
 	{
 		// make sure we have enough memory to play the game
 		void * pMem = VirtualAlloc(0, 120*1024*1024 - HEAP_SIZE, MEM_COMMIT, PAGE_NOACCESS);
@@ -828,7 +810,7 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	}
 
 
-	MarkAllocatedBlocks(HEAP);
+	MarkAllocatedBlocks(HEAP_Acquire());
 	MarkAllocatedBlocks(GetBatchHeap());
 
 	CreateGlobalComponents();
