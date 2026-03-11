@@ -111,8 +111,8 @@ template <class Base>
 ObjectGlow< Base >::ObjectGlow (void) :
 				//	updateNode(this, UpdateProc(updateGlow)),
 				//	preRenderNode(this, RenderProc(glowPreRender)),
-					postRenderNode(this, RenderProc(&ObjectGlow::glowPostRender)),
-					initNode(this, InitProc(&ObjectGlow::initGlow))
+					postRenderNode(this, Base::RenderProc(&ObjectGlow::glowPostRender)),
+					initNode(this, Base::InitProc(&ObjectGlow::initGlow))
 {
 	for (int c=0;c<MAX_ENGINE_GLOWS;c++)
 		engine_child_index[c] = INVALID_INSTANCE_INDEX;

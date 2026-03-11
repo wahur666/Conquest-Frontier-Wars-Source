@@ -21,6 +21,7 @@
 #include "Sector.h"
 #include "TSmartPointer.h"
 #include "Search.h"
+#include "renderer.h"
 
 #ifndef _INC_STDLIB
 #include <stdlib.h>
@@ -228,7 +229,7 @@ BOOL32 ObjectWarp< Base >::doWarp (SINGLE dt)
 			this->SetSystemID(sysID | HYPER_SYSTEM_MASK);
 			// update the map with our latest location
 			COMPTR<ITerrainMap> map;
-			SECTOR->GetTerrainMap(this->systemID, map);
+			SECTOR->GetTerrainMap(this->systemID, map.addr());
 			if (map)
 				this->SetTerrainFootprint(map);
 
@@ -267,14 +268,14 @@ BOOL32 ObjectWarp< Base >::doWarp (SINGLE dt)
 	CQASSERT (warpTimer >= 0);
 
 	svec.set(1,1, zStretch);
-	svec2.set(0,0,this->box[this->BBOX_MAX_Z]);
+	svec2.set(0,0,this->box[BBOX_MAX_Z]);
 	
 	warpAccelerate(dt);
 
 	SINGLE stretchRatio;
 	stretchRatio = dp.magnitude()/warpRadius;
 	svec.set(stretchRatio, stretchRatio, zStretch*stretchRatio);
-	svec2.set(0,0,this->box[this->BBOX_MAX_Z]);
+	svec2.set(0,0,this->box[BBOX_MAX_Z]);
 
 	scaleTrans.d[0][0] = svec.x;
 	scaleTrans.d[1][1] = svec.y;

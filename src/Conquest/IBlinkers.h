@@ -11,6 +11,7 @@
 #ifndef IOBJECT_H
 #include "IObject.h"
 #endif
+#include "TSmartPointer.h"
 
 struct IBlinkers : IDAComponent
 {

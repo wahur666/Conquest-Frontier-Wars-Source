@@ -34,6 +34,10 @@
 #define MAX_ENGINE_GLOWS 6
 
 #include "Globals.h"
+#include "IBlinkers.h"
+#include "IAnim.h"
+#include "ObjList.h"
+#include "EffectPlayer.h"
 
 //----------------------------------------------------------------
 //
@@ -178,6 +182,10 @@ struct BASE_SPACESHIP_DATA : BASIC_DATA
 #ifndef _ADB
 struct IEffectHandle;
 
+//global ship texture ID one for all kinds of ships
+inline U32 shipMapTex = -1;
+inline U32 shipMapTexRef = 0;
+
 template <class BT_TYPE> 
 struct SPACESHIP_INIT
 {
@@ -236,7 +244,73 @@ struct SPACESHIP_INIT
 
 	bool loadSpaceshipArchetype (BT_TYPE * _pData, PARCHETYPE _pArchetype);		// load archetype data (return true on success)
 
-	~SPACESHIP_INIT (void);					// free archetype references
+	~SPACESHIP_INIT (void) {
+		// free archetype references
+		if(meshArch)
+		{
+			meshArch->Release();
+			meshArch = NULL;
+		}
+		if (animArchetype != -1)
+			ANIM->release_script_set_arch(animArchetype);
+		if (archIndex != -1)
+			ENGINE->release_archetype(archIndex);
+		if (smoke_archID != -1)
+			ENGINE->release_archetype(smoke_archID);
+
+		if (pExplosionType)
+			ARCHLIST->Release(pExplosionType, OBJREFNAME);
+		//if (pShieldHitType)
+		//		ARCHLIST->Release(pShieldHitType);
+		if (pTrailType)
+			ARCHLIST->Release(pTrailType, OBJREFNAME);
+		if (pDamageBlast)
+			ARCHLIST->Release(pDamageBlast, OBJREFNAME);
+		if (pSparkBlast)
+			ARCHLIST->Release(pSparkBlast, OBJREFNAME);
+
+
+		if (damageAnimArch)
+			delete damageAnimArch;
+		//shield parts
+		if (shieldAnimArch)
+			delete shieldAnimArch;
+		if (shieldFizzAnimArch)
+			delete shieldFizzAnimArch;
+		if (smesh)
+			delete smesh;
+		//	if (m_extent)
+		//		delete m_extent;
+		//
+		if (blink_arch)
+			DestroyBlinkersArchetype(blink_arch);
+
+		TMANAGER->ReleaseTextureRef(engineTex);
+		TMANAGER->ReleaseTextureRef(blinkTex);
+		TMANAGER->ReleaseTextureRef(cloakTex);
+		TMANAGER->ReleaseTextureRef(hiliteTex);
+		TMANAGER->ReleaseTextureRef(billboardTex);
+		TMANAGER->ReleaseTextureRef(cloakTex2);
+		TMANAGER->ReleaseTextureRef(damageTexID);
+
+		if(ambientEffect)
+		{
+			EFFECTPLAYER->ReleaseEffect(ambientEffect);
+			ambientEffect = NULL;
+		}
+
+		//render experiment
+		//	DeleteMeshRenders(mr,numChildren);
+		for (int i=0;i<numChildren;i++)
+		{
+			mr[i]->Release();
+		}
+		delete [] mr;
+
+		--shipMapTexRef;
+		if(!shipMapTexRef)
+			shipMapTex = -1;
+	}
 };
 #endif
 //----------------------------------------------------------------
@@ -396,6 +470,7 @@ struct HARVEST_INIT : SPACESHIP_INIT<BT_HARVESTSHIP_DATA>
 	struct AnimArchetype *harvestAnimArch;
 };
 typedef SPACESHIP_INIT<BT_BUILDERSHIP_DATA> BUILDER_INIT;
+
 #endif
 //----------------------------------------------------------------
 //----------------------------------------------------------------

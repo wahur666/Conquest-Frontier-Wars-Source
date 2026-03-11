@@ -69,7 +69,6 @@ add_executable(Conquest
         MultiCloakLauncher.cpp
         Nugget.cpp
         ObjComm.cpp
-        ObjControl.cpp
         ObjectGenerator.cpp
         ObjGen.cpp
         ObjList.cpp
