@@ -74,7 +74,6 @@ add_executable(Conquest
         ObjList.cpp
         ObjMap.cpp
         ObjMapIterator.cpp
-        ObjMove.cpp
         Overdrive.cpp
         ParticleObj.cpp
         Pch.cpp

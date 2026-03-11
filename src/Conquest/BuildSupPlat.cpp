@@ -239,7 +239,10 @@ struct _NO_VTABLE BuildSupPlat : public TFabricator<
 
 	virtual void OnMasterChange (bool bIsMaster);
 
-	virtual void TakeoverSwitchID (U32 newMissionID);
+	void TakeoverSwitchID (U32 newMissionID) override {
+		TFabricator::TakeoverSwitchID(newMissionID);
+		SECTOR->ComputeSupplyForAllPlayers();
+	}
 
 	// IPlatform method
 
@@ -1173,13 +1176,7 @@ void BuildSupPlat::OnMasterChange (bool bIsMaster)
 		>::OnMasterChange(bIsMaster);
 	//platfroms seem to have no host specific or client specific modes
 }
-//---------------------------------------------------------------------------
-//
-void BuildSupPlat::TakeoverSwitchID (U32 newMissionID)
-{
-	TFabricator<Platform<BUILDSUPPLAT_SAVELOAD, BUILDSUPPLAT_INIT> >::TakeoverSwitchID(newMissionID);
-	SECTOR->ComputeSupplyForAllPlayers();
-}
+
 //---------------------------------------------------------------------------
 //
 void BuildSupPlat::ParkYourself (const TRANSFORM & _transform, U32 planetID, U32 slotID)

@@ -654,7 +654,7 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	HEAP_Acquire()->SetErrorHandler(ICQImage::STANDARD_DUMP);
 	// TrimResetHeap(HEAP);
 	MissionResetHeap(HEAP_Acquire());
-	GetBatchHeap()->SetErrorHandler(ICQImage::STANDARD_DUMP);
+	// GetBatchHeap()->SetErrorHandler(ICQImage::STANDARD_DUMP);
 
 	CQIMAGE->SetMessagesEnabled(false);
 
