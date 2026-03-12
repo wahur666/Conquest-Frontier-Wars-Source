@@ -293,7 +293,7 @@ struct MeshRender : IMeshRender, IVertexBufferOwner
 	bool bSolarianRenderstateKludge;
 	bool vertexBuffersBuilt;
 	U32 vb_handle;
-	U32 vb_handle4[4];
+	LONG_PTR vb_handle4[4];
 	struct RenderMaterial *fgr;
 //	Vector *face_norms[4];
 	U32 ref_cnt;

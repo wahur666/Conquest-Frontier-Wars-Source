@@ -109,7 +109,7 @@ struct DACOM_NO_VTABLE DrawAgent : IDrawAgent
 	//------------------------------
 	// texture data
 	//------------------------------
-	U32			*textureID;
+	LONG_PTR			*textureID;
 	U32			*hintID;
 	BLOCKRECT	*blockRect;
 	S16			numTextures;
@@ -625,7 +625,7 @@ BOOL32 DrawAgent::init (struct IImageReader * reader, BOOL32 bScaleData, BOOL32 
 		goto Done;
 	}
 
-	textureID = new U32[numTextures];
+	textureID = new LONG_PTR[numTextures];
 	hintID = new U32[numTextures];
 	memset(hintID,0xff,sizeof(U32)*numTextures);
 	blockRect = new BLOCKRECT[numTextures];
@@ -848,9 +848,6 @@ void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parent
 	COMPTR<IImageReader> reader;
 	COMPTR<IFileSystem> file;
 	DAFILEDESC fdesc = filename;
-	HANDLE hMapping;
-	U8 * pMemory;
-	U32 fileSize;
 
 	fdesc.lpImplementation = "DOS";
 	if (parentFile == 0)
@@ -865,9 +862,9 @@ void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parent
 		return;
 	}
 
-	hMapping = file->CreateFileMapping();
-	pMemory = (U8*) file->MapViewOfFile(hMapping);
-	fileSize = file->GetFileSize();
+	HANDLE hMapping = file->CreateFileMapping();
+	U8 *pMemory = static_cast<U8 *>(file->MapViewOfFile(hMapping));
+	U32 fileSize = file->GetFileSize();
 
 	if (type == DA::UNKTYPE)
 	{

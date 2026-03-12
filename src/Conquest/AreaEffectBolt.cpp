@@ -77,7 +77,7 @@ struct AEBoltMesh : IVertexBufferOwner
 	Vector upperRing[AEBOLT_SEGMENTS];
 	U32 ringTexID;
 	U32 moveTexID;
-	U32 vb_handle;
+	LONG_PTR vb_handle;
 	
 	virtual void RestoreVertexBuffers();
 

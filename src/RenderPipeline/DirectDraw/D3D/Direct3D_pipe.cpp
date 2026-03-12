@@ -3832,7 +3832,7 @@ GENRESULT COMAPI Direct3D_RenderPipeline::lock_vertex_buffer( IRP_VERTEXBUFFERHA
 		return GR_GENERIC;
 	}
 	D3DVERTEXBUFFER_DESC desc;
-	if( FAILED( ((IDirect3DVertexBuffer9*)vb_handle)->GetDesc(&desc))) 
+	if( FAILED( reinterpret_cast<IDirect3DVertexBuffer9 *>(vb_handle)->GetDesc(&desc)))
 	{
 		return GR_GENERIC;
 	}

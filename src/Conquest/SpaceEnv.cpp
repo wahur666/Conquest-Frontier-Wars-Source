@@ -80,7 +80,7 @@ struct DACOM_NO_VTABLE SpaceEnvironment : public IEventCallback, IBackground, IV
 	unsigned int textureID;
 	U32 	multiStages;
 
-	U32 vb_handle[MAX_BG_CHILD];
+	LONG_PTR vb_handle[MAX_BG_CHILD];
 	S32 vb_triangles[MAX_BG_CHILD];
 	S32 vb_max_triangles[MAX_BG_CHILD];
 	Mesh * vbMesh[MAX_BG_CHILD];

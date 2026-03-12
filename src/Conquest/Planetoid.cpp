@@ -434,7 +434,7 @@ struct HaloMesh : IVertexBufferOwner
 {
 	Vector ringCenter[HALO_SEGMENTS];
 	Vector upperRing[HALO_SEGMENTS];
-	U32 vb_handle;
+	LONG_PTR vb_handle;
 	
 	virtual void RestoreVertexBuffers();
 

@@ -41,7 +41,7 @@ struct VertexBufferNode
 {
 	VertexBufferNode * next;
 	CQ_VertexType vType;
-	U32 vertexBuffer;
+	LONG_PTR vertexBuffer;
 	bool bValid;
 };
 

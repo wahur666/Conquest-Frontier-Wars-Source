@@ -96,7 +96,7 @@ struct StasisBoltMesh : IVertexBufferOwner, RenderArch
 
 	U32 baseTexID;
 	U32 moveTexID;
-	U32 vb_handle;
+	LONG_PTR vb_handle;
 
 	virtual void RestoreVertexBuffers();
 

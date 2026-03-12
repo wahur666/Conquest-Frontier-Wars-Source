@@ -412,7 +412,7 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 GENRESULT BMP_READER::LoadImage (void *fileImage, U32 fileSize, U32 imageNumber)
 {
 	GENRESULT result = GR_OK;
-	BITMAPINFOHEADER *header = (BITMAPINFOHEADER *) fileImage;
+	BITMAPINFOHEADER *header = static_cast<BITMAPINFOHEADER *>(fileImage);
 
 	free();
 
