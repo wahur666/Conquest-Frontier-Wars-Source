@@ -36,8 +36,9 @@
 #include <TSmartPointer.h>
 #include <IAnim.h>
 #include <FileSys.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h>
+#include <span>
 
 #include <stdlib.h>
 
@@ -466,9 +467,17 @@ struct DACOM_NO_VTABLE ReconLaunchFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ReconLaunchFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<ReconLaunchFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	ReconLaunchFactory (void) { }
 
@@ -577,7 +586,7 @@ struct _reconLaunch : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<ReconLaunchFactory>;
+		sfactory = new DAComponentX<ReconLaunchFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

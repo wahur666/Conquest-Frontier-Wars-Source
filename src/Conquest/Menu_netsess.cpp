@@ -44,7 +44,7 @@ U32 __stdcall DoMenu_mshell (Frame * parent, const GT_MENU1 & data, const SAVED_
 #define SESSFLAG_2PLAYER  0x00000010
 //--------------------------------------------------------------------------//
 //
-struct Menu_sess : public DAComponent<Frame>
+struct Menu_sess : public DAComponentX<Frame>
 {
 	//
 	// data items

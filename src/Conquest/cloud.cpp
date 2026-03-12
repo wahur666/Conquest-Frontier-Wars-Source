@@ -3136,12 +3136,32 @@ struct DACOM_NO_VTABLE FieldManager : public IFieldManager, IEventCallback, IObj
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(FieldManager)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IFieldManager)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<FieldManager*>(self));
+	}
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<FieldManager*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<FieldManager*>(self));
+	}
+	static IDAComponent* GetIFieldManager(void* self) {
+	    return static_cast<IFieldManager*>(
+	        static_cast<FieldManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IObjectFactory",  &GetIObjectFactory},
+	        {"IResourceClient", &GetIResourceClient},
+	        {"IFieldManager",   &GetIFieldManager},
+	    };
+	    return map;
+	}
 
 	// structure
 	struct IField *fieldList;
@@ -4255,7 +4275,7 @@ struct _cloud : GlobalComponent
 	struct FieldManager *fieldMgr;
 	virtual void Startup (void)
 	{
-		FIELDMGR = fieldMgr = new DAComponent<FieldManager>;
+		FIELDMGR = fieldMgr = new DAComponentX<FieldManager>;
 		AddToGlobalCleanupList(&FIELDMGR);
 	}
 

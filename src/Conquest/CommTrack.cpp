@@ -23,10 +23,11 @@
 #include <Heapobj.h>
 #include <TSmartPointer.h>
 #include <EventSys2.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h>
 
 #include <commctrl.h>
+#include <span>
 
 #define TRACKING_LISTS  256
 
@@ -144,10 +145,22 @@ struct CommTrack : ICommTrack, IEventCallback, TRACKDATA
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(CommTrack)
-	DACOM_INTERFACE_ENTRY(ICommTrack)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetICommTrack(void* self) {
+	    return static_cast<ICommTrack*>(
+	        static_cast<CommTrack*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<CommTrack*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICommTrack",     &GetICommTrack},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -469,7 +482,7 @@ struct _commtrack : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		COMMTRACK = ct = new DAComponent<CommTrack>;
+		COMMTRACK = ct = new DAComponentX<CommTrack>;
 		AddToGlobalCleanupList(&COMMTRACK);
 	}
 	

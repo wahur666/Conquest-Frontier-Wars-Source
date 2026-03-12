@@ -108,17 +108,38 @@ struct Menu_AdmiralBar : public Frame, IToolbar
 	// interface map
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(Menu_AdmiralBar)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IToolbar)
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<Menu_AdmiralBar*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Menu_AdmiralBar*>(self));
+	}
+	static IDAComponent* GetIToolbar(void* self) {
+	    return static_cast<IToolbar*>(
+	        static_cast<Menu_AdmiralBar*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Menu_AdmiralBar*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Menu_AdmiralBar*>(self));
+	}
 
-	// the following are for BaseHotRect
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDocumentClient",               &GetIDocumentClient},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IToolbar",                      &GetIToolbar},
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	enum CURSOR_MODE
 	{
@@ -2546,7 +2567,7 @@ struct _admiralBar : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		ADMIRALBAR  = menu = new DAComponent<Menu_AdmiralBar>; 
+		ADMIRALBAR  = menu = new DAComponentX<Menu_AdmiralBar>;
 		AddToGlobalCleanupList(&ADMIRALBAR);
 	}
 

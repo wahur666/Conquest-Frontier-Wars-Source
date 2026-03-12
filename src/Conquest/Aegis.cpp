@@ -491,9 +491,17 @@ struct DACOM_NO_VTABLE AegisManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(AegisManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<AegisManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 //	struct AegisNode *explosionList;
 	U32 factoryHandle;
@@ -621,7 +629,7 @@ struct _agaa : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		AegisMgr = new DAComponent<AegisManager>;
+		AegisMgr = new DAComponentX<AegisManager>;
 		AddToGlobalCleanupList((IDAComponent **) &AegisMgr);
 	}
 

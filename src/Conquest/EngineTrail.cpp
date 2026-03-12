@@ -29,6 +29,9 @@
 #include <Engine.h>
 #include <TSmartPointer.h>
 #include <IConnection.h>
+#include <span>
+
+#include "TComponent2.h"
 
 
 #define NUM_BATCH_RENDER_STAGES 2
@@ -982,9 +985,17 @@ struct DACOM_NO_VTABLE EngineTrailManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(EngineTrailManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<EngineTrailManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	U32 factoryHandle;
 
@@ -1110,7 +1121,7 @@ struct _engineTrailGC : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		engineTrailMgr = new DAComponent<EngineTrailManager>;
+		engineTrailMgr = new DAComponentX<EngineTrailManager>;
 		AddToGlobalCleanupList((IDAComponent **) &engineTrailMgr);
 	}
 

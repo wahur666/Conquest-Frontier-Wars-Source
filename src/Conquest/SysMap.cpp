@@ -158,13 +158,32 @@ struct DACOM_NO_VTABLE SysMap : public ISystemMap,
 								  ResourceClient<>,
 								  SYSMAP_DATA
 {
-	BEGIN_DACOM_MAP_INBOUND(SysMap)
-	DACOM_INTERFACE_ENTRY(ISystemMap)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetISystemMap(void* self) {
+	    return static_cast<ISystemMap*>(
+	        static_cast<SysMap*>(self));
+	}
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<SysMap*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<SysMap*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<SysMap*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISystemMap",      &GetISystemMap},
+	        {"IDocumentClient", &GetIDocumentClient},
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IResourceClient", &GetIResourceClient},
+	    };
+	    return map;
+	}
 
 	COMPTR<IViewer> viewer;
 	COMPTR<IDocument> doc;
@@ -3460,7 +3479,7 @@ struct _sysmap : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		SYSMAP = sysmap = new DAComponent<SysMap>;
+		SYSMAP = sysmap = new DAComponentX<SysMap>;
 		AddToGlobalCleanupList((IDAComponent **) &SYSMAP);
 	}
 

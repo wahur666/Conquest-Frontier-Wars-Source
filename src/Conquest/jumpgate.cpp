@@ -2118,9 +2118,17 @@ struct DACOM_NO_VTABLE JumpgateManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(JumpgateManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<JumpgateManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	// structure
 //	struct JumpgateNode *JumpgateList;
@@ -2559,7 +2567,7 @@ struct _jump : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		struct JumpgateManager *JumpgateMgr = new DAComponent<JumpgateManager>;
+		struct JumpgateManager *JumpgateMgr = new DAComponentX<JumpgateManager>;
 		JUMPGATEMGR = JumpgateMgr;
 		AddToGlobalCleanupList((IDAComponent **) &JUMPGATEMGR);
 	}

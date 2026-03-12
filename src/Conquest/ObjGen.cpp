@@ -45,12 +45,15 @@
 #include <EventSys2.h>
 #include <TComponent.h>
 #include <IConnection.h>
+#include <span>
 #include <TConnPoint.h>
 #include <TConnContainer.h>
 #include <WindowManager.h>
 
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "TComponent2.h"
 //--------------------------------------------------------------------------//
 //----------------------------//
 //
@@ -83,10 +86,22 @@ struct DACOM_NO_VTABLE ObjGenerator : public IEventCallback, ResourceClient<>
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ObjGenerator)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ObjGenerator*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<ObjGenerator*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IResourceClient", &GetIResourceClient},
+	    };
+	    return map;
+	}
 
 	ObjGenerator (void);
 
@@ -938,7 +953,7 @@ struct _gen : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		gen = new DAComponent<ObjGenerator>;
+		gen = new DAComponentX<ObjGenerator>;
 		AddToGlobalCleanupList((IDAComponent **) &gen);
 	}
 

@@ -62,7 +62,7 @@ struct LineVar
 
 //--------------------------------------------------------------------------//
 //
-struct Menu_mission : public DAComponent<Frame>
+struct Menu_mission : public DAComponentX<Frame>
 {
 	//
 	// data items

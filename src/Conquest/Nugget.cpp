@@ -14,7 +14,7 @@
 #include "pch.h"
 #include <globals.h>
 
-#include "TComponent.h"
+#include "TComponent2.h"
 #include "TObjFrame.h"
 #include "TObject.h"
 #include "TObjTrans.h"
@@ -52,6 +52,7 @@
 #include <FileSys.h>
 #include <IConnection.h>
 #include <EventSys2.h>
+#include <span>
 #include <stdio.h>
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -941,10 +942,22 @@ struct CreateSync
 
 struct DACOM_NO_VTABLE NuggetManager : public INuggetManager, IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(NuggetManager)
-	DACOM_INTERFACE_ENTRY(INuggetManager)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetINuggetManager(void* self) {
+	    return static_cast<INuggetManager*>(
+	        static_cast<NuggetManager*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<NuggetManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"INuggetManager", &GetINuggetManager},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	void * operator new (size_t size)
 	{
@@ -1641,7 +1654,7 @@ struct _nuggetManager : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		NUGGETMANAGER = nManager = new DAComponent<NuggetManager>;
+		NUGGETMANAGER = nManager = new DAComponentX<NuggetManager>;
 		AddToGlobalCleanupList((IDAComponent **) &nManager);
 	}
 
@@ -1693,9 +1706,17 @@ struct DACOM_NO_VTABLE NuggetFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(NuggetFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<NuggetFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	NuggetFactory (void) { }
 
@@ -1845,7 +1866,7 @@ struct _nugget : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		nugget = new DAComponent<NuggetFactory>;
+		nugget = new DAComponentX<NuggetFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &nugget);
 	}
 

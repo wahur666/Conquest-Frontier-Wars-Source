@@ -48,7 +48,7 @@
 */
 //--------------------------------------------------------------------------//
 //-------------------------------------------
-struct MDreadnoughts : public DAComponent<SPlayerAI>
+struct MDreadnoughts : public DAComponentX<SPlayerAI>
 {
 	/* corvette rush data items */
 	

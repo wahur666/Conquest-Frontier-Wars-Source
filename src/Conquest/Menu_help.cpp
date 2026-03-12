@@ -29,7 +29,7 @@ U32 __stdcall DoMenu_Credits (Frame * parent);
 
 //--------------------------------------------------------------------------//
 //
-struct Menu_help : public DAComponent<Frame>
+struct Menu_help : public DAComponentX<Frame>
 {
 	//
 	// data items

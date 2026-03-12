@@ -82,10 +82,22 @@ typedef struct tagTextEntity
 //
 struct DACOM_NO_VTABLE ScrollingText : public IEventCallback, IScrollingText
 {
-	BEGIN_DACOM_MAP_INBOUND(ScrollingText)
-	DACOM_INTERFACE_ENTRY(IScrollingText)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIScrollingText(void* self) {
+	    return static_cast<IScrollingText*>(
+	        static_cast<ScrollingText*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ScrollingText*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IScrollingText", &GetIScrollingText},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	typedef std::vector<TextEntity> TE_VECTOR;
 
@@ -889,7 +901,7 @@ struct _scrollingText : GlobalComponent
 	
 	virtual void Startup (void)
 	{
-		SCROLLTEXT = STEXT = new DAComponent<ScrollingText>;
+		SCROLLTEXT = STEXT = new DAComponentX<ScrollingText>;
 		AddToGlobalCleanupList((IDAComponent **) &SCROLLTEXT);
 	}
 

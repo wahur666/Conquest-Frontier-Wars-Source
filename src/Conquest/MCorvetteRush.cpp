@@ -35,7 +35,7 @@
 #include <Heapobj.h>
 #include <TSmartPointer.h>
 
-struct MRush : public DAComponent<SPlayerAI>
+struct MRush : public DAComponentX<SPlayerAI>
 {
 	/* corvette rush data items */
 	

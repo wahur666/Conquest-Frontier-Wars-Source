@@ -87,9 +87,17 @@ struct FabQueueStruct
 //
 struct DACOM_NO_VTABLE UnbornMeshList : public IUnbornMeshList,IAgentEnumerator
 {
-	BEGIN_DACOM_MAP_INBOUND(UnbornMeshList)
-	DACOM_INTERFACE_ENTRY(IUnbornMeshList)
-	END_DACOM_MAP()
+	static IDAComponent* GetIUnbornMeshList(void* self) {
+	    return static_cast<IUnbornMeshList*>(
+	        static_cast<UnbornMeshList*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IUnbornMeshList", &GetIUnbornMeshList},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -809,7 +817,7 @@ struct _unbornMang : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		UNBORNMANAGER = unbornMeshList = new DAComponent<UnbornMeshList>;
+		UNBORNMANAGER = unbornMeshList = new DAComponentX<UnbornMeshList>;
 		AddToGlobalCleanupList(&unbornMeshList);
 	}
 

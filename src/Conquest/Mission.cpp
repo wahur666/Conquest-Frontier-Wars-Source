@@ -121,13 +121,37 @@ struct DACOM_NO_VTABLE Mission : public IMission,
 										IResourceClient,
 										IFileTransferCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(Mission)
-	DACOM_INTERFACE_ENTRY(IMission)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(ISystemEventCallback)
-	DACOM_INTERFACE_ENTRY(IFileTransferCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIMission(void* self) {
+	    return static_cast<IMission*>(
+	        static_cast<Mission*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Mission*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Mission*>(self));
+	}
+	static IDAComponent* GetISystemEventCallback(void* self) {
+	    return static_cast<ISystemEventCallback*>(
+	        static_cast<Mission*>(self));
+	}
+	static IDAComponent* GetIFileTransferCallback(void* self) {
+	    return static_cast<IFileTransferCallback*>(
+	        static_cast<Mission*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IMission",              &GetIMission},
+	        {"IEventCallback",        &GetIEventCallback},
+	        {"IResourceClient",       &GetIResourceClient},
+	        {"ISystemEventCallback",  &GetISystemEventCallback},
+	        {"IFileTransferCallback", &GetIFileTransferCallback},
+	    };
+	    return map;
+	}
 
 	//--------------------------------
 	// data items go here
@@ -3487,7 +3511,7 @@ struct _mission : GlobalComponent
 
 		memcpy(COLORTABLE, DEFCOLORTABLE, sizeof(COLORTABLE));		// init the color table
 		
-		MISSION = mission = new DAComponent<Mission>;
+		MISSION = mission = new DAComponentX<Mission>;
 		AddToGlobalCleanupList((IDAComponent **) &MISSION);
 	}
 

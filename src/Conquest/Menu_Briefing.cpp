@@ -32,7 +32,7 @@
 
 //--------------------------------------------------------------------------//
 //
-struct MenuBriefing : public DAComponent<Frame>, IBriefing
+struct MenuBriefing : public DAComponentX<Frame>, IBriefing
 {
 	//
 	// data items
@@ -88,17 +88,17 @@ struct MenuBriefing : public DAComponent<Frame>, IBriefing
 
 	DEFMETHOD(QueryInterface) (const C8 *interface_name, void **instance)
 	{
-		return DAComponent<Frame>::QueryInterface(interface_name, instance);
+		return DAComponentX<Frame>::QueryInterface(interface_name, instance);
 	}
 	
 	DEFMETHOD_(U32,AddRef)           (void)
 	{
-		return DAComponent<Frame>::AddRef();
+		return DAComponentX<Frame>::AddRef();
 	}
 	
 	DEFMETHOD_(U32,Release)          (void)
 	{
-		return DAComponent<Frame>::Release();
+		return DAComponentX<Frame>::Release();
 	}
 
 	/* IDocumentClient methods */

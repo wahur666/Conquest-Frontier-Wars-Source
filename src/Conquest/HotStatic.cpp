@@ -43,13 +43,33 @@ struct DACOM_NO_VTABLE HotStatic : BaseHotRect, IHotStatic
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(HotStatic)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IHotStatic)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<HotStatic*>(self));
+	}
+	static IDAComponent* GetIHotStatic(void* self) {
+	    return static_cast<IHotStatic*>(
+	        static_cast<HotStatic*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<HotStatic*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<HotStatic*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IHotStatic",                    &GetIHotStatic},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -266,9 +286,17 @@ struct DACOM_NO_VTABLE HotStaticFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(HotStaticFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<HotStaticFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	HotStaticFactory (void) { }
 
@@ -350,7 +378,7 @@ BOOL32 HotStaticFactory::DestroyArchetype (HANDLE hArchetype)
 //
 GENRESULT HotStaticFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
-	HotStatic * result = new DAComponent<HotStatic>;
+	HotStatic * result = new DAComponentX<HotStatic>;
 
 	result->init((HotStaticArchetype *)hArchetype);
 	*pInstance = result->GetBase();
@@ -364,7 +392,7 @@ struct _HotStaticfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<HotStaticFactory>;
+		factory = new DAComponentX<HotStaticFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

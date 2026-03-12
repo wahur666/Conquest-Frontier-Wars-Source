@@ -28,7 +28,7 @@
 
 //--------------------------------------------------------------------------//
 //
-struct MenuPause : public DAComponent<Frame>, IPlayerStateCallback
+struct MenuPause : public DAComponentX<Frame>, IPlayerStateCallback
 {
 	//
 	// data items

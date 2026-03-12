@@ -263,9 +263,17 @@ struct DACOM_NO_VTABLE SwapperManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(SwapperManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<SwapperManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	U32 factoryHandle;
 
@@ -404,7 +412,7 @@ struct _swappers : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		struct SwapperManager *swapperMgr = new DAComponent<SwapperManager>;
+		struct SwapperManager *swapperMgr = new DAComponentX<SwapperManager>;
 		SWAPPERMGR = swapperMgr;
 		AddToGlobalCleanupList((IDAComponent **) &SWAPPERMGR);
 	}

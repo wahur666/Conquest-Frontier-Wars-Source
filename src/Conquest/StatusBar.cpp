@@ -57,13 +57,33 @@ struct DACOM_NO_VTABLE StatusBarResource : public Resource<StatusBarResource,ISt
 	HWND hStatusBar;	
 #endif
 
-	BEGIN_DACOM_MAP_INBOUND(StatusBarResource)
-	DACOM_INTERFACE_ENTRY(IResource)
-	DACOM_INTERFACE_ENTRY(IStatusBarResource)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResource(void* self) {
+	    return static_cast<IResource*>(
+	        static_cast<StatusBarResource*>(self));
+	}
+	static IDAComponent* GetIStatusBarResource(void* self) {
+	    return static_cast<IStatusBarResource*>(
+	        static_cast<StatusBarResource*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<StatusBarResource*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<StatusBarResource*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResource",                     &GetIResource},
+	        {"IStatusBarResource",            &GetIStatusBarResource},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	        {"IEventCallback",                &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	U32 handle;		// connection handle
 	U32 dwHeight;		// height of the control, in pixels
@@ -438,7 +458,7 @@ struct _status : GlobalComponent
 
 		RECT rect;
 
-		STATUS = SBAR = new DAComponent<StatusBarResource>);
+		STATUS = SBAR = new DAComponentX<StatusBarResource>);
 		AddToGlobalCleanupList((IDAComponent **) &STATUS);
 
 		SBAR->hStatusBar = hStatus;
@@ -446,7 +466,7 @@ struct _status : GlobalComponent
 		GetWindowRect(hStatus, &rect);
 		SBAR->dwHeight = rect.bottom - rect.top + 1;
 #else
-		STATUS = SBAR = new DAComponent<StatusBarResource>;
+		STATUS = SBAR = new DAComponentX<StatusBarResource>;
 		AddToGlobalCleanupList((IDAComponent **) &STATUS);
 #endif
 	}

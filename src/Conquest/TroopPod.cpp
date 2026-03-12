@@ -32,6 +32,9 @@
 #include <FileSys.h>
 #include <TSmartPointer.h>
 #include <IHardpoint.h>
+#include <span>
+
+#include "TComponent2.h"
 
 #define OPPRINT0(exp) FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), exp)
 #define OPPRINT1(exp,p1) FDUMP(ErrorCode(ERR_GENERAL, SEV_TRACE_1), exp, p1)
@@ -341,9 +344,17 @@ struct DACOM_NO_VTABLE TrooppodFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(TrooppodFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<TrooppodFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	TrooppodFactory (void) { }
 
@@ -565,7 +576,7 @@ struct _trooppod : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<TrooppodFactory>;
+		sfactory = new DAComponentX<TrooppodFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

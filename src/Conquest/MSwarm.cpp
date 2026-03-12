@@ -45,7 +45,7 @@
 */
 //--------------------------------------------------------------------------//
 //-------------------------------------------
-struct MSwarm : public DAComponent<SPlayerAI>
+struct MSwarm : public DAComponentX<SPlayerAI>
 {
 	/* mantis AI data items */
 	

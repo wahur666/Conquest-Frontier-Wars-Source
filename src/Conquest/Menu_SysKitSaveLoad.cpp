@@ -25,7 +25,7 @@
 
 //--------------------------------------------------------------------------//
 //
-struct MenuSystemKitSaveLoad : public DAComponent<Frame>
+struct MenuSystemKitSaveLoad : public DAComponentX<Frame>
 {
 	//
 	// data items

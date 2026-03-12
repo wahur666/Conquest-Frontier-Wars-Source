@@ -502,9 +502,17 @@ struct DACOM_NO_VTABLE MoonResourceLauncherFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(MoonResourceLauncherFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<MoonResourceLauncherFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	MoonResourceLauncherFactory (void) { }
 
@@ -610,7 +618,7 @@ struct _moonResourceLauncher : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<MoonResourceLauncherFactory>;
+		sfactory = new DAComponentX<MoonResourceLauncherFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

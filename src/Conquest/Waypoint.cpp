@@ -38,7 +38,8 @@
 #include <3DMath.h>
 #include <FileSys.h>
 #include <IConnection.h>
-#include <TComponent.h>
+#include <span>
+#include "TComponent2.h"
 
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -380,10 +381,22 @@ struct DACOM_NO_VTABLE WaypointFactory : public IObjectFactory, IEventCallback
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(WaypointFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<WaypointFactory*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<WaypointFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	WaypointFactory (void) { }
 
@@ -565,7 +578,7 @@ struct _waypoint : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<WaypointFactory>;
+		sfactory = new DAComponentX<WaypointFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

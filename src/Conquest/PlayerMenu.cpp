@@ -35,7 +35,7 @@ using namespace CQGAMETYPES;
 #define BOX_LENGTH  50
 //--------------------------------------------------------------------------//
 //
-struct PlayerMenu : public DAComponent<Frame>
+struct PlayerMenu : public DAComponentX<Frame>
 {
 	typedef std::vector<U32> U32VECTOR;
 

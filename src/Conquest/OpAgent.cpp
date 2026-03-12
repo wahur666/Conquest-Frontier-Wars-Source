@@ -956,10 +956,22 @@ private:
 //
 struct DACOM_NO_VTABLE OpAgent : public IOpAgent, IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(OpAgent)
-	DACOM_INTERFACE_ENTRY(IOpAgent)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIOpAgent(void* self) {
+	    return static_cast<IOpAgent*>(
+	        static_cast<OpAgent*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<OpAgent*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IOpAgent",       &GetIOpAgent},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	//--------------------------------
 	// data items go here
@@ -8225,7 +8237,7 @@ struct _opagent : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		THEMATRIX = agent = new DAComponent<OpAgent>;
+		THEMATRIX = agent = new DAComponentX<OpAgent>;
 		AddToGlobalCleanupList(&THEMATRIX);
 	}
 

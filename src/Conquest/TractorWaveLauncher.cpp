@@ -45,11 +45,12 @@
 #include <TSmartPointer.h>
 #include <IAnim.h>
 #include <FileSys.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h> 
 #include <MGlobals.h>
 #include <DMTechNode.h>
 #include <renderer.h>
+#include <span>
 
 #include <stdlib.h>
 
@@ -838,9 +839,17 @@ struct DACOM_NO_VTABLE TractorWaveLauncherFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(TractorWaveLauncherFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<TractorWaveLauncherFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	TractorWaveLauncherFactory (void) { }
 
@@ -955,7 +964,7 @@ struct _tractorWaveLauncher : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<TractorWaveLauncherFactory>;
+		sfactory = new DAComponentX<TractorWaveLauncherFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

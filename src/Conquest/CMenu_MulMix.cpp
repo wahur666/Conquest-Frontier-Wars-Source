@@ -67,10 +67,22 @@ inline MISSION_DATA::M_CAPS & MISSION_DATA::M_CAPS::operator &= (const MISSION_D
 }
 struct DACOM_NO_VTABLE CMenu_MulMix : public IEventCallback, IHotControlEvent
 {
-	BEGIN_DACOM_MAP_INBOUND(CMenu_MulMix)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IHotControlEvent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<CMenu_MulMix*>(self));
+	}
+	static IDAComponent* GetIHotControlEvent(void* self) {
+	    return static_cast<IHotControlEvent*>(
+	        static_cast<CMenu_MulMix*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",   &GetIEventCallback},
+	        {"IHotControlEvent", &GetIHotControlEvent},
+	    };
+	    return map;
+	}
 
 	U32 eventHandle, hotEventHandle;		// connection handle
 	bool bPanelOwned;
@@ -765,7 +777,7 @@ struct _cmenu_mulmix : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		menu = new DAComponent<CMenu_MulMix>;
+		menu = new DAComponentX<CMenu_MulMix>;
 		AddToGlobalCleanupList(&menu);
 	}
 

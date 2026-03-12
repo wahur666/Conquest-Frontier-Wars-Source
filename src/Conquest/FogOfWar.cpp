@@ -37,7 +37,7 @@
 
 //#include <ITextureLibrary.h>
 #include <FileSys.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
 #include <Viewer.h>
@@ -48,6 +48,7 @@
 //#include <RPUL\PrimitiveBuilder.h>
 
 #include <malloc.h>
+#include <span>
 //#include <stdlib.h>
 
 //--------------------------------------------------------------------------//
@@ -498,10 +499,22 @@ struct DACOM_NO_VTABLE FogOfWar : IFogOfWar, IEventCallback, DocumentClient
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(FogOfWar)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<FogOfWar*>(self));
+	}
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<FogOfWar*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IDocumentClient", &GetIDocumentClient},
+	    };
+	    return map;
+	}
 
 	// infrastructure
 	COMPTR<IViewer> viewer;
@@ -2357,7 +2370,7 @@ struct _warfog : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		FOGOFWAR = fog = new DAComponent<FogOfWar>;
+		FOGOFWAR = fog = new DAComponentX<FogOfWar>;
 		AddToGlobalCleanupList((IDAComponent **) &FOGOFWAR);
 	}
 	

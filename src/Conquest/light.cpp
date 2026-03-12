@@ -1049,13 +1049,32 @@ struct DACOM_NO_VTABLE Lights : public IEventCallback, DocumentClient, IObjectFa
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(Lights)
-	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	DACOM_INTERFACE_ENTRY(ILights)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Lights*>(self));
+	}
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<Lights*>(self));
+	}
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<Lights*>(self));
+	}
+	static IDAComponent* GetILights(void* self) {
+	    return static_cast<ILights*>(
+	        static_cast<Lights*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IDocumentClient", &GetIDocumentClient},
+	        {"IObjectFactory",  &GetIObjectFactory},
+	        {"ILights",         &GetILights},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -2012,11 +2031,11 @@ void ILights::ReleaseEngineID(int engineID)
 
 struct _lights : GlobalComponent
 {
-	DAComponent<Lights>	* lights;
+	DAComponentX<Lights>	* lights;
 
 	virtual void Startup (void)
 	{
-		LIGHTS = lights = new DAComponent<Lights>;
+		LIGHTS = lights = new DAComponentX<Lights>;
 		AddToGlobalCleanupList((IDAComponent **) &lights);
 
 		MAINLIGHT = &lights->lights[0];

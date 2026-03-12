@@ -45,17 +45,44 @@
 //
 struct DACOM_NO_VTABLE Frame : public BaseHotRect, DocumentClient, ISystemEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(Frame)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	// the following are for BaseHotRect
-	DACOM_INTERFACE_ENTRY(BaseHotRect)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY(ISystemEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<Frame*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Frame*>(self));
+	}
+	static IDAComponent* GetBaseHotRect(void* self) {
+	    return reinterpret_cast<IDAComponent *> (
+			static_cast<BaseHotRect*>(
+				static_cast<Frame*>(self)));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Frame*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Frame*>(self));
+	}
+	static IDAComponent* GetISystemEventCallback(void* self) {
+	    return static_cast<ISystemEventCallback*>(
+	        static_cast<Frame*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDocumentClient",               &GetIDocumentClient},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"BaseHotRect",                   &GetBaseHotRect},
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	        {"ISystemEventCallback",          &GetISystemEventCallback},
+	    };
+	    return map;
+	}
 
 	//
 	// data for on-line editing of data

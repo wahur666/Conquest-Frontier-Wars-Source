@@ -331,9 +331,17 @@ struct DACOM_NO_VTABLE StreakManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(StreakManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<StreakManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 //	struct StreakNode *explosionList;
 	U32 factoryHandle;
@@ -498,7 +506,7 @@ struct _streak : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		StreakMgr = new DAComponent<StreakManager>;
+		StreakMgr = new DAComponentX<StreakManager>;
 		AddToGlobalCleanupList((IDAComponent **) &StreakMgr);
 	}
 

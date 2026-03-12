@@ -37,7 +37,7 @@
 
 //--------------------------------------------------------------------------//
 //-------------------------------------------
-struct MForwardBuild : public DAComponent<SPlayerAI>
+struct MForwardBuild : public DAComponentX<SPlayerAI>
 {
 	/* corvette rush data items */
 	

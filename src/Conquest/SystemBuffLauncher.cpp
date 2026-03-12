@@ -438,9 +438,17 @@ struct DACOM_NO_VTABLE SystemBuffLauncherFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(SystemBuffLauncherFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<SystemBuffLauncherFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	SystemBuffLauncherFactory (void) { }
 
@@ -546,7 +554,7 @@ struct _systemBuffLauncher : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<SystemBuffLauncherFactory>;
+		sfactory = new DAComponentX<SystemBuffLauncherFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

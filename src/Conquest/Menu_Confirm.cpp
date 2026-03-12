@@ -26,7 +26,7 @@
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 //
-struct Menu_CQMessageBox : public DAComponent<Frame>
+struct Menu_CQMessageBox : public DAComponentX<Frame>
 {
 	//
 	// data items

@@ -795,11 +795,28 @@ struct DACOM_NO_VTABLE SpiderDroneFactory : public IObjectFactory, IBuildShipFac
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(SpiderDroneFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	DACOM_INTERFACE_ENTRY(IBuildShipFactory)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<SpiderDroneFactory*>(self));
+	}
+	static IDAComponent* GetIBuildShipFactory(void* self) {
+	    return reinterpret_cast<IDAComponent *>(
+			static_cast<IBuildShipFactory*>(
+				static_cast<SpiderDroneFactory*>(self)));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<SpiderDroneFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory",    &GetIObjectFactory},
+	        {"IBuildShipFactory", &GetIBuildShipFactory},
+	        {"IEventCallback",    &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	SpiderDroneFactory (void) { }
 
@@ -1082,7 +1099,7 @@ struct _spiderdrone : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<SpiderDroneFactory>;
+		sfactory = new DAComponentX<SpiderDroneFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

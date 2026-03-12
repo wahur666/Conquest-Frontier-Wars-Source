@@ -33,6 +33,9 @@
 #include <IConnection.h>
 //#include <ITextureLibrary.h>
 #include <FileSys.h>
+#include <span>
+
+#include "TComponent2.h"
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
@@ -944,9 +947,17 @@ struct DACOM_NO_VTABLE TerranBuildFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(TerranBuildFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<TerranBuildFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	TerranBuildFactory (void) { }
 
@@ -1065,7 +1076,7 @@ struct _terranbuild : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<TerranBuildFactory>;
+		sfactory = new DAComponentX<TerranBuildFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

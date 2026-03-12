@@ -180,9 +180,17 @@ struct DACOM_NO_VTABLE CloakEffectManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(CloakEffectManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<CloakEffectManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 //	struct CloakEffectNode *explosionList;
 	U32 factoryHandle;
@@ -363,7 +371,7 @@ struct _ag : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		CloakEffectMgr = new DAComponent<CloakEffectManager>;
+		CloakEffectMgr = new DAComponentX<CloakEffectManager>;
 		AddToGlobalCleanupList((IDAComponent **) &CloakEffectMgr);
 	}
 

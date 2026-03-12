@@ -288,9 +288,17 @@ struct DACOM_NO_VTABLE TalorianEffectManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(TalorianEffectManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<TalorianEffectManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 //	struct BlastNode *explosionList;
 	U32 factoryHandle;
@@ -420,7 +428,7 @@ struct _tebing : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		blastMgr = new DAComponent<TalorianEffectManager>;
+		blastMgr = new DAComponentX<TalorianEffectManager>;
 		AddToGlobalCleanupList((IDAComponent **) &blastMgr);
 	}
 

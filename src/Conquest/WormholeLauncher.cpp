@@ -43,10 +43,11 @@
 #include <TSmartPointer.h>
 #include <IAnim.h>
 #include <FileSys.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h> 
 #include <MGlobals.h>
 #include <DMTechNode.h>
+#include <span>
 
 #include <stdlib.h>
 
@@ -697,9 +698,17 @@ struct DACOM_NO_VTABLE WormholeLauncherFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(WormholeLauncherFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<WormholeLauncherFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	WormholeLauncherFactory (void) { }
 
@@ -808,7 +817,7 @@ struct _wormholeLauncher : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<WormholeLauncherFactory>;
+		sfactory = new DAComponentX<WormholeLauncherFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

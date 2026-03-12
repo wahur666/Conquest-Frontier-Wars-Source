@@ -30,7 +30,7 @@ U32 __stdcall DoMenu_SlideShow (const char * vfxName,SINGLE speed, bool bAllowEx
 
 //--------------------------------------------------------------------------//
 //
-struct Menu_SlideShow : public DAComponent<Frame>
+struct Menu_SlideShow : public DAComponentX<Frame>
 {
 	//
 	// data items

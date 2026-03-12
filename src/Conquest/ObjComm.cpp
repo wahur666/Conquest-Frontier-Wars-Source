@@ -62,12 +62,13 @@
 #include <HeapObj.h>
 #include <TSmartPointer.h>
 #include <EventSys2.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h>
 #include <TConnPoint.h>
 #include <TConnContainer.h>
 #include <WindowManager.h>
 #include <HKEvent.h>
+#include <span>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -225,10 +226,22 @@ struct DACOM_NO_VTABLE ObjectComm : public IEventCallback, ResourceClient<>
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ObjectComm)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ObjectComm*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<ObjectComm*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IResourceClient", &GetIResourceClient},
+	    };
+	    return map;
+	}
 
 	//----------------------------------------
 	// struct used for terrainMap callback
@@ -6049,7 +6062,7 @@ struct _objcomm : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		comm = new DAComponent<ObjectComm>;
+		comm = new DAComponentX<ObjectComm>;
 		AddToGlobalCleanupList((IDAComponent **) &comm);
 	}
 

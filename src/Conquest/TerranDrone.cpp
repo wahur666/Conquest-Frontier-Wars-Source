@@ -7,7 +7,7 @@
 //--------------------------------------------------------------------------//
 /*
     $Header: /Conquest/App/Src/TerranDrone.cpp 12    10/04/00 8:35p Jasony $
-*/			    
+*/
 //------------------------------- #INCLUDES --------------------------------//
 //--------------------------------------------------------------------------//
 
@@ -67,14 +67,14 @@ struct TERRANDRONE_INIT : BUILDSHIP_INIT
 	S32 archIndex;
 	S32 animArchetype;
 	IMeshArchetype * meshArch;
-	
+
 	PARCHETYPE pExplosion;
 	AnimArchetype * sparkAnmArch;
-	
+
 	int numChildren;
 	struct IMeshInfoTree *mesh_info;
 	struct IMeshRender **mr;
-	
+
 	~TERRANDRONE_INIT()
 	{
 		for (int i=0;i<numChildren;i++)
@@ -86,7 +86,7 @@ struct TERRANDRONE_INIT : BUILDSHIP_INIT
 };
 
 //false but adequate
-struct ARCHNODE 
+struct ARCHNODE
 {
 	struct ARCHNODE * prev, * next;
 	U32 usage;
@@ -99,7 +99,7 @@ struct TERRANDRONE_SAVELOAD
 };
 
 struct EngineTerranDrone : public ObjectRender<ObjectTransform<ObjectFrame<IBaseObject,TERRANDRONE_SAVELOAD,TERRANDRONE_INIT> > >
-{	
+{
 	BEGIN_MAP_INBOUND(EngineTerranDrone)
 	_INTERFACE_ENTRY(IBaseObject)
 	END_MAP()
@@ -119,7 +119,7 @@ struct EngineTerranDrone : public ObjectRender<ObjectTransform<ObjectFrame<IBase
 	{
 		buildAnimIndex = -1;
 	}
-	
+
 	~EngineTerranDrone()
 	{
 		if(buildAnimIndex != -1)
@@ -134,7 +134,7 @@ struct EngineTerranDrone : public ObjectRender<ObjectTransform<ObjectFrame<IBase
 	}
 
 	bool initTerranDrone (TERRANDRONE_INIT * data);
-	
+
 	BOOL32 updateMove (SINGLE dt);
 
 	virtual void Render();
@@ -180,7 +180,7 @@ struct _NO_VTABLE TerranDrone : public ObjectFControl<ObjectTransform<ObjectFram
 		engineDroneRef = rand()%3;
 		dockIndex = -1;
 	}
-	
+
 	~TerranDrone()
 	{
 	}
@@ -202,7 +202,7 @@ struct _NO_VTABLE TerranDrone : public ObjectFControl<ObjectTransform<ObjectFram
 	// IBuildShip
 
 	virtual void InitBuildShip (IBaseObject * owner);
-	
+
 	virtual void Return ()
 	{
 		/*if(bWorking)
@@ -220,7 +220,7 @@ struct _NO_VTABLE TerranDrone : public ObjectFControl<ObjectTransform<ObjectFram
 
 	virtual void SetTransform (const TRANSFORM & trans)
 	{
-		transform = trans;	
+		transform = trans;
 	}
 
 	virtual void SetPosition (const Vector & pos)
@@ -240,7 +240,7 @@ struct _NO_VTABLE TerranDrone : public ObjectFControl<ObjectTransform<ObjectFram
 	BOOL32 updateMove (SINGLE dt);
 
 	BOOL32 craneMove ();
-	
+
 	void doBuild ();
 
 	bool initTerranDrone (TERRANDRONE_INIT *init);//PARCHETYPE pArchetype);
@@ -274,7 +274,7 @@ void TerranDrone::InitBuildShip (IBaseObject * _owner)
 //---------------------------------------------------------------------------
 //
 void TerranDrone::Render (void)
-{	
+{
 	/*if(!bVisible)
 	{
 		visTimer=0;
@@ -286,7 +286,7 @@ void TerranDrone::Render (void)
 		updateMove(visTimer);
 		visTimer=0;
 	}
-	
+
 	engineTerranDrones[engineDroneRef].Render();
 }
 
@@ -321,7 +321,7 @@ void TerranDrone::GotoPosition (const Vector & pos)
 	action = TD_MOVING;
 //	zCenter = pos.z;
 }
-	
+
 void TerranDrone::PhysicalUpdate (SINGLE dt)
 {
 	visTimer += dt;
@@ -410,7 +410,7 @@ BOOL32 TerranDrone::updateMove (SINGLE dt)
 
 	//	position += velocity*dt;
 	}
-	
+
 	FRAME_physicalUpdate(dt);
 
 	engineTerranDrones[engineDroneRef].updateMove(dt);
@@ -424,7 +424,7 @@ BOOL32 TerranDrone::updateMove (SINGLE dt)
 	transform.set_j(j);
 	transform.set_k(k);*/
 	trans = transform;
-	
+
 	return 1;
 }
 //---------------------------------------------------------------------------
@@ -434,11 +434,11 @@ BOOL32 TerranDrone::craneMove (void)
 	Vector goal = goalPosition-GetPosition();
 
 	setPosition(goal);
-	
+
 	SINGLE yaw   = transform.get_yaw();
 	SINGLE relPitch = -transform.get_pitch();
 	SINGLE relRoll = -transform.get_roll();
-	
+
 	goal = -goalDir;
 	SINGLE pitch = transform.get_pitch();
 	relPitch = get_angle(goal.y,goal.z) -pitch-(PI/2);
@@ -455,16 +455,16 @@ BOOL32 TerranDrone::craneMove (void)
 			relPitch = (PI/4)-pitch;
 		if(relPitch+pitch < -(PI/4))
 			relPitch = -(PI/4)-pitch;
-		
+
 		SINGLE relYaw = get_angle(goal.x, goal.y) - yaw;
-		
+
 	if (relYaw < -PI)
 		relYaw += PI*2;
 	else
 	if (relYaw > PI)
 		relYaw -= PI*2;
 	rotateShip(relYaw, relRoll,relPitch);
-	
+
 	return 1;
 }
 
@@ -542,12 +542,12 @@ struct DACOM_NO_VTABLE TerranDroneFactory : public IObjectFactory, IBuildShipFac
 		{
 			return calloc(size,1);
 		}
-		
+
 		void * operator new [] (size_t size)
 		{
 			return calloc(size,1);
 		}
-		
+
 		void   operator delete (void *ptr)
 		{
 			::free(ptr);
@@ -557,7 +557,7 @@ struct DACOM_NO_VTABLE TerranDroneFactory : public IObjectFactory, IBuildShipFac
 		{
 			::free(ptr);
 		}
-		
+
 		OBJTYPE (void)
 		{
 			animArchetype = archIndex = -1;
@@ -602,11 +602,28 @@ struct DACOM_NO_VTABLE TerranDroneFactory : public IObjectFactory, IBuildShipFac
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(TerranDroneFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	DACOM_INTERFACE_ENTRY(IBuildShipFactory)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<TerranDroneFactory*>(self));
+	}
+	static IDAComponent* GetIBuildShipFactory(void* self) {
+	    return reinterpret_cast<IDAComponent *>(
+			static_cast<IBuildShipFactory*>(
+		        static_cast<TerranDroneFactory*>(self)));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<TerranDroneFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory",    &GetIObjectFactory},
+	        {"IBuildShipFactory", &GetIBuildShipFactory},
+	        {"IEventCallback",    &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	TerranDroneFactory (void) { }
 
@@ -668,7 +685,7 @@ TerranDroneFactory::~TerranDroneFactory (void)
 	if (GS)
 	{
 		COMPTR<IDAConnectionPoint> connection;
-		
+
 		if (GS->QueryOutgoingInterface("IEventCallback", connection.addr()) == GR_OK)
 			connection->Unadvise(eventHandle);
 	}
@@ -698,7 +715,7 @@ HANDLE TerranDroneFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 	{
 		BT_BUILDERSHIP_DATA * data = (BT_BUILDERSHIP_DATA *) _data;
 
-		if (data->type == SSC_TERRANDRONE)	   
+		if (data->type == SSC_TERRANDRONE)
 		{
 			result = new OBJTYPE;
 			result->pData = data;
@@ -712,7 +729,7 @@ HANDLE TerranDroneFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 				result->pExplosion = ARCHLIST->LoadArchetype(data->explosionType);
 				ARCHLIST->AddRef(result->pExplosion, OBJREFNAME);
 			}
- 
+
 			if (OBJECTDIR->CreateInstance(&fdesc, objFile.void_addr()) == GR_OK)
 				TEXLIB->load_library(objFile, 0);
 			else
@@ -732,16 +749,16 @@ HANDLE TerranDroneFactory::CreateArchetype (const char *szArchname, OBJCLASS obj
 				{
 					result->sparkAnmArch = ANIM2D->create_archetype(objFile);
 				}
-				else 
+				else
 				{
 					CQFILENOTFOUND(fdesc.lpFileName);
 					result->sparkAnmArch =0;
 				}
-			}	
-			
+			}
+
 			result->factory = this;
-			
-			
+
+
 			typedef ObjectImpl<EngineTerranDrone> DroneObj;
 			result->engineTerranDrones = new DroneObj[3];
 			for (int i=0;i<3;i++)
@@ -796,7 +813,7 @@ GENRESULT TerranDroneFactory::Notify (U32 message, void *param)
 		{
 			ShipNode * pos = shipNodeList;
 			ShipNode * nextShip;
-		
+
 			while (pos)
 			{
 				nextShip = pos->next;
@@ -817,7 +834,7 @@ void TerranDroneFactory::GetBuilderShips (struct IBuildShip **ships,int numShips
 {
 	ShipNode * pos = shipNodeList;
 	ShipNode * freeNode=0;
-	
+
 	while (pos && freeNode == 0)
 	{
 		if ((!pos->bTaken) && numShips == pos->numDrones && pos->pArchetype == _pArchetype)
@@ -859,7 +876,7 @@ void TerranDroneFactory::ReleaseShips (const IBuildShip * firstShip)
 {
 	ShipNode * pos = shipNodeList;
 	ShipNode * node=0;
-	
+
 	if (pos && firstShip)
 	{
 		while (pos && node == 0)
@@ -870,7 +887,7 @@ void TerranDroneFactory::ReleaseShips (const IBuildShip * firstShip)
 			}
 			pos = pos->next;
 		}
-		
+
 		CQASSERT(node);
 		CQASSERT(node->bTaken);
 		node->bTaken = false;
@@ -886,7 +903,7 @@ struct _terrandrone : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<TerranDroneFactory>;
+		sfactory = new DAComponentX<TerranDroneFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

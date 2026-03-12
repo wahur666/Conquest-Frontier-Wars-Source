@@ -48,7 +48,7 @@
 */
 //--------------------------------------------------------------------------//
 //-------------------------------------------
-struct MDeny : public DAComponent<SPlayerAI>
+struct MDeny : public DAComponentX<SPlayerAI>
 {
 	/* mantis AI data items */
 	

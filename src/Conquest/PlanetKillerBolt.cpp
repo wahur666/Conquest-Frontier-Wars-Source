@@ -688,9 +688,17 @@ struct DACOM_NO_VTABLE PKBoltFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(PKBoltFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<PKBoltFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	PKBoltFactory (void) { }
 
@@ -849,7 +857,7 @@ struct _pkBolt : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<PKBoltFactory>;
+		sfactory = new DAComponentX<PKBoltFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

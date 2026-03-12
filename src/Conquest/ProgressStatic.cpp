@@ -87,13 +87,33 @@ struct DACOM_NO_VTABLE ProgressStatic : BaseHotRect, IProgressStatic
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(ProgressStatic)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IProgressStatic)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<ProgressStatic*>(self));
+	}
+	static IDAComponent* GetIProgressStatic(void* self) {
+	    return static_cast<IProgressStatic*>(
+	        static_cast<ProgressStatic*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ProgressStatic*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<ProgressStatic*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IProgressStatic",               &GetIProgressStatic},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -558,9 +578,17 @@ struct DACOM_NO_VTABLE ProgressStaticFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ProgressStaticFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<ProgressStaticFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	ProgressStaticFactory (void) { }
 
@@ -663,7 +691,7 @@ BOOL32 ProgressStaticFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT ProgressStaticFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	PROGRESS_STATICTYPE * type = (PROGRESS_STATICTYPE *) hArchetype;
-	ProgressStatic * result = new DAComponent<ProgressStatic>;
+	ProgressStatic * result = new DAComponentX<ProgressStatic>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -677,7 +705,7 @@ struct _ProgressStaticFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<ProgressStaticFactory>;
+		factory = new DAComponentX<ProgressStaticFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

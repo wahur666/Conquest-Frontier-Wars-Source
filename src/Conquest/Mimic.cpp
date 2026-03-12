@@ -45,6 +45,9 @@
 #include <Engine.h>
 #include <IRenderPrimitive.h>
 #include <Renderer.h>
+#include <span>
+
+#include "TComponent2.h"
 
 struct MimicArchetype
 {
@@ -726,9 +729,17 @@ struct DACOM_NO_VTABLE MimicManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(MimicManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<MimicManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	U32 factoryHandle;
 
@@ -858,7 +869,7 @@ struct _mmc : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		MimicMgr = new DAComponent<MimicManager>;
+		MimicMgr = new DAComponentX<MimicManager>;
 		AddToGlobalCleanupList((IDAComponent **) &MimicMgr);
 	}
 

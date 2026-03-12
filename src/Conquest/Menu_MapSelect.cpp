@@ -35,7 +35,7 @@
 
 //--------------------------------------------------------------------------//
 //
-struct Menu_MapSelect : public DAComponent<Frame>
+struct Menu_MapSelect : public DAComponentX<Frame>
 {
 	//
 	// data items

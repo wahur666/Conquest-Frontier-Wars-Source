@@ -183,9 +183,17 @@ static void readJoystick (void)
 //
 struct DACOM_NO_VTABLE ModalEventCallback : public IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(ModalEventCallback)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ModalEventCallback*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	U32 eventHandle;
 	IDAConnectionPoint * parentConnection;
@@ -371,7 +379,7 @@ U32 __stdcall CQDoModal (BaseHotRect * pDialog)
 	CQASSERT(bInScene == 0);
 	__int64 time1,time2;
 
-	DAComponent<ModalEventCallback> modalEvent;
+	DAComponentX<ModalEventCallback> modalEvent;
 
 	if (pDialog)
 	{
@@ -456,7 +464,7 @@ U32 __stdcall CQNonRenderingModal (BaseHotRect * pDialog)
 {
 	CQASSERT(bInScene == 0);
 
-	DAComponent<ModalEventCallback> modalEvent;
+	DAComponentX<ModalEventCallback> modalEvent;
 
 	if (pDialog)
 	{

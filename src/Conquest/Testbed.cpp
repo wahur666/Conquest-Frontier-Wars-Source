@@ -43,8 +43,9 @@
 #include <HeapObj.h>
 #include <TSmartPointer.h>
 #include <EventSys2.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h>
+#include <span>
 #include <WindowManager.h>
 
 #include <stdlib.h>
@@ -63,9 +64,17 @@ struct DACOM_NO_VTABLE Testbed : public IEventCallback
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(Testbed)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Testbed*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	U32 currentTexture;
 
@@ -295,7 +304,7 @@ struct _testbed : GlobalComponent
 	Testbed * test;
 	virtual void Startup (void)
 	{
-		test = new DAComponent<Testbed>;
+		test = new DAComponentX<Testbed>;
 		AddToGlobalCleanupList(&test);
 	}
 

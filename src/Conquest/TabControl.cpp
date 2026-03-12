@@ -78,14 +78,38 @@ struct DACOM_NO_VTABLE TabControl : BaseHotRect, ITabControl, IKeyboardFocus
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(TabControl)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(ITabControl)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IKeyboardFocus)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<TabControl*>(self));
+	}
+	static IDAComponent* GetITabControl(void* self) {
+	    return static_cast<ITabControl*>(
+	        static_cast<TabControl*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<TabControl*>(self));
+	}
+	static IDAComponent* GetIKeyboardFocus(void* self) {
+	    return static_cast<IKeyboardFocus*>(
+	        static_cast<TabControl*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<TabControl*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"ITabControl",                   &GetITabControl},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IKeyboardFocus",                &GetIKeyboardFocus},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	TABTYPE * tabType;
 	U32 controlID;					// set by owner
@@ -395,9 +419,17 @@ struct DACOM_NO_VTABLE TabControlFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(TabControlFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<TabControlFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	TabControlFactory (void) { }
 
@@ -484,7 +516,7 @@ BOOL32 TabControlFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT TabControlFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	TABTYPE * type = (TABTYPE *) hArchetype;
-	TabControl * result = new DAComponent<TabControl>;
+	TabControl * result = new DAComponentX<TabControl>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -498,7 +530,7 @@ struct _tabcontrolfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<TabControlFactory>;
+		factory = new DAComponentX<TabControlFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

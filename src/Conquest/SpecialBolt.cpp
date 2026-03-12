@@ -324,9 +324,17 @@ struct DACOM_NO_VTABLE SpecialBoltManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(SpecialBoltManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<SpecialBoltManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	U32 factoryHandle;
 
@@ -494,7 +502,7 @@ struct _specbolt : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		struct SpecialBoltManager *spubMgr = new DAComponent<SpecialBoltManager>;
+		struct SpecialBoltManager *spubMgr = new DAComponentX<SpecialBoltManager>;
 		SPUB = spubMgr;
 		AddToGlobalCleanupList((IDAComponent **) &SPUB);
 	}

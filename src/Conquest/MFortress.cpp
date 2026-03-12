@@ -45,7 +45,7 @@
 */
 //--------------------------------------------------------------------------//
 //-------------------------------------------
-struct MFortress : public DAComponent<SPlayerAI>
+struct MFortress : public DAComponentX<SPlayerAI>
 {
 	/* mantis AI data items */
 	

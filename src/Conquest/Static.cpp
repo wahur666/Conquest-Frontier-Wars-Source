@@ -88,13 +88,33 @@ struct DACOM_NO_VTABLE Static : BaseHotRect, IStatic
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Static)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IStatic)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Static*>(self));
+	}
+	static IDAComponent* GetIStatic(void* self) {
+	    return static_cast<IStatic*>(
+	        static_cast<Static*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Static*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Static*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IStatic",                       &GetIStatic},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -678,9 +698,17 @@ struct DACOM_NO_VTABLE StaticFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(StaticFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<StaticFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	StaticFactory (void) { }
 
@@ -781,7 +809,7 @@ BOOL32 StaticFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT StaticFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	STATICTYPE * type = (STATICTYPE *) hArchetype;
-	Static * result = new DAComponent<Static>;
+	Static * result = new DAComponentX<Static>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -795,7 +823,7 @@ struct _StaticFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<StaticFactory>;
+		factory = new DAComponentX<StaticFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

@@ -34,7 +34,7 @@ U32 __stdcall DoMenu_Briefing (Frame * parent, const char * szFileName);
 
 //--------------------------------------------------------------------------//
 //
-struct Menu_SPGame : public DAComponent<Frame>
+struct Menu_SPGame : public DAComponentX<Frame>
 {
 	//
 	// data items

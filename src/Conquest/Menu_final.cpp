@@ -34,7 +34,7 @@ void  __stdcall DoMenu_map (Frame * parent, const GT_MENU1 & data, ICQGame & cqg
 using namespace CQGAMETYPES;
 //--------------------------------------------------------------------------//
 //
-struct Menu_final : public DAComponent<Frame>
+struct Menu_final : public DAComponentX<Frame>
 {
 	//
 	// data items

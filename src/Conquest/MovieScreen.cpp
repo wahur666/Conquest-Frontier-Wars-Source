@@ -23,7 +23,7 @@
 
 //--------------------------------------------------------------------------//
 //
-struct MenuMovie : public DAComponent<Frame>
+struct MenuMovie : public DAComponentX<Frame>
 {
 	//
 	// data items

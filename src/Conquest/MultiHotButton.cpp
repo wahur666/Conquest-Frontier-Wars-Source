@@ -37,14 +37,38 @@ struct DACOM_NO_VTABLE MultiHotButton : BaseHotRect, IHotButton, IMultiHotButton
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(MultiHotButton)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IHotButton)
-	DACOM_INTERFACE_ENTRY(IMultiHotButton)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<MultiHotButton*>(self));
+	}
+	static IDAComponent* GetIHotButton(void* self) {
+	    return static_cast<IHotButton*>(
+	        static_cast<MultiHotButton*>(self));
+	}
+	static IDAComponent* GetIMultiHotButton(void* self) {
+	    return static_cast<IMultiHotButton*>(
+	        static_cast<MultiHotButton*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<MultiHotButton*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<MultiHotButton*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IHotButton",                    &GetIHotButton},
+	        {"IMultiHotButton",               &GetIMultiHotButton},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -794,9 +818,17 @@ struct DACOM_NO_VTABLE MultiHotButtonFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(MultiHotButtonFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<MultiHotButtonFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	MultiHotButtonFactory (void) { }
 
@@ -884,7 +916,7 @@ BOOL32 MultiHotButtonFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT MultiHotButtonFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	CQASSERT((U32)hArchetype == 1 && pArchetype != 0);
-	MultiHotButton * result = new DAComponent<MultiHotButton>;
+	MultiHotButton * result = new DAComponentX<MultiHotButton>;
 
 	result->init(pArchetype, hSound);
 	*pInstance = result->getBase();
@@ -898,7 +930,7 @@ struct _multihotbuttonfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<MultiHotButtonFactory>;
+		factory = new DAComponentX<MultiHotButtonFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

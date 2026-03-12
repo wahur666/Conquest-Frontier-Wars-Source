@@ -40,6 +40,9 @@
 #include <IConnection.h>
 #include <ITextureLibrary.h>
 #include <FileSys.h>
+#include <span>
+
+#include "TComponent2.h"
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
@@ -1647,9 +1650,17 @@ struct DACOM_NO_VTABLE SolarianBuildFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(SolarianBuildFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<SolarianBuildFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	SolarianBuildFactory (void) { }
 
@@ -1776,7 +1787,7 @@ struct _solarianbuild : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<SolarianBuildFactory>;
+		sfactory = new DAComponentX<SolarianBuildFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

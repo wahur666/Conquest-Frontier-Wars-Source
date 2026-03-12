@@ -42,8 +42,9 @@
 #include <3DMath.h>
 #include <FileSys.h>
 #include <IConnection.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <ITextureLibrary.h>
+#include <span>
 
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -576,9 +577,17 @@ struct DACOM_NO_VTABLE TriggerFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(TriggerFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<TriggerFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	TriggerFactory (void) { }
 
@@ -697,7 +706,7 @@ struct _trigger : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<TriggerFactory>;
+		sfactory = new DAComponentX<TriggerFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

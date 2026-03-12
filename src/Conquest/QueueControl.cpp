@@ -76,13 +76,33 @@ struct DACOM_NO_VTABLE QueueControl : BaseHotRect, IQueueControl
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(QueueControl)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IQueueControl)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<QueueControl*>(self));
+	}
+	static IDAComponent* GetIQueueControl(void* self) {
+	    return static_cast<IQueueControl*>(
+	        static_cast<QueueControl*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<QueueControl*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<QueueControl*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IQueueControl",                 &GetIQueueControl},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -430,9 +450,17 @@ struct DACOM_NO_VTABLE QueueControlFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(QueueControlFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<QueueControlFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	QueueControlFactory (void) { }
 
@@ -513,7 +541,7 @@ BOOL32 QueueControlFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT QueueControlFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	QUEUECONTROLTYPE * type = (QUEUECONTROLTYPE *) hArchetype;
-	QueueControl * result = new DAComponent<QueueControl>;
+	QueueControl * result = new DAComponentX<QueueControl>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -527,7 +555,7 @@ struct _QueueControlFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<QueueControlFactory>;
+		factory = new DAComponentX<QueueControlFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

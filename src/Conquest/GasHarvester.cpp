@@ -644,9 +644,17 @@ struct DACOM_NO_VTABLE GasHarvesterFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(GasHarvesterFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<GasHarvesterFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	GasHarvesterFactory (void) { }
 
@@ -770,7 +778,7 @@ struct _gasharvestfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<GasHarvesterFactory>;
+		sfactory = new DAComponentX<GasHarvesterFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

@@ -28,7 +28,7 @@
 using namespace CQGAMETYPES;
 //--------------------------------------------------------------------------//
 //
-struct Menu_nul : public DAComponent<Frame>
+struct Menu_nul : public DAComponentX<Frame>
 {
 	//
 	// data items

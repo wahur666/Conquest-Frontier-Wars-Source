@@ -25,6 +25,9 @@
 
 
 #include <Heapobj.h>
+#include <span>
+
+#include "TComponent2.h"
 
 //////////////////////////////
 
@@ -69,9 +72,17 @@ struct ObjMap : IObjMap
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(ObjMap)
-	DACOM_INTERFACE_ENTRY(IObjMap)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjMap(void* self) {
+	    return static_cast<IObjMap*>(
+	        static_cast<ObjMap*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjMap", &GetIObjMap},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -364,7 +375,7 @@ struct _objmap : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		OBJMAP = om = new DAComponent<ObjMap>;
+		OBJMAP = om = new DAComponentX<ObjMap>;
 		AddToGlobalCleanupList(&OBJMAP);
 	}
 	

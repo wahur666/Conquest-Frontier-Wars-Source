@@ -116,14 +116,39 @@ struct DACOM_NO_VTABLE ScrollBar : BaseHotRect, IScrollBar
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(ScrollBar)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IScrollBar)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(BaseHotRect)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<ScrollBar*>(self));
+	}
+	static IDAComponent* GetIScrollBar(void* self) {
+	    return static_cast<IScrollBar*>(
+	        static_cast<ScrollBar*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ScrollBar*>(self));
+	}
+	static IDAComponent* GetBaseHotRect(void* self) {
+	    return reinterpret_cast<IDAComponent *>(
+			static_cast<BaseHotRect*>(
+		        static_cast<ScrollBar*>(self)));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<ScrollBar*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IScrollBar",                    &GetIScrollBar},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"BaseHotRect",                   &GetBaseHotRect},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -883,9 +908,17 @@ struct DACOM_NO_VTABLE ScrollBarFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ScrollBarFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<ScrollBarFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	ScrollBarFactory (void) { }
 
@@ -1014,7 +1047,7 @@ BOOL32 ScrollBarFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT ScrollBarFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	SCROLLBARTYPE * type = (SCROLLBARTYPE *) hArchetype;
-	ScrollBar * result = new DAComponent<ScrollBar>;
+	ScrollBar * result = new DAComponentX<ScrollBar>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -1028,7 +1061,7 @@ struct _ScrollBarFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<ScrollBarFactory>;
+		factory = new DAComponentX<ScrollBarFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

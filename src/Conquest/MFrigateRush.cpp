@@ -45,7 +45,7 @@
 */
 //--------------------------------------------------------------------------//
 //-------------------------------------------
-struct MFrigateRush : public DAComponent<SPlayerAI>
+struct MFrigateRush : public DAComponentX<SPlayerAI>
 {
 	/* mantis AI data items */
 	

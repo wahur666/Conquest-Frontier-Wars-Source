@@ -47,12 +47,27 @@ static char szKey[] = "Music";
 
 struct DACOM_NO_VTABLE MManager : IMusicManager, IEventCallback, DocumentClient
 {
-	BEGIN_DACOM_MAP_INBOUND(MManager)
-	DACOM_INTERFACE_ENTRY(IMusicManager)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIMusicManager(void* self) {
+	    return static_cast<IMusicManager*>(
+	        static_cast<MManager*>(self));
+	}
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<MManager*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<MManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IMusicManager",   &GetIMusicManager},
+	        {"IDocumentClient", &GetIDocumentClient},
+	        {"IEventCallback",  &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	COMPTR<IViewer> viewer;
 	COMPTR<IDocument> doc;
@@ -596,7 +611,7 @@ struct _music : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		MUSICMANAGER = manager = new DAComponent<MManager>;
+		MUSICMANAGER = manager = new DAComponentX<MManager>;
 		AddToGlobalCleanupList((IDAComponent **)&MUSICMANAGER);
 	}
 

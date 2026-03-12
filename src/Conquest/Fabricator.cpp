@@ -3759,9 +3759,17 @@ struct DACOM_NO_VTABLE FabricatorFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(FabricatorFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<FabricatorFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	FabricatorFactory (void) { }
 
@@ -3905,7 +3913,7 @@ struct _fabricatorship : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<FabricatorFactory>;
+		sfactory = new DAComponentX<FabricatorFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

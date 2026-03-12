@@ -844,9 +844,17 @@ struct DACOM_NO_VTABLE AEBoltFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(AEBoltFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<AEBoltFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	AEBoltFactory (void) { }
 
@@ -1005,7 +1013,7 @@ struct _aeBolt : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<AEBoltFactory>;
+		sfactory = new DAComponentX<AEBoltFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

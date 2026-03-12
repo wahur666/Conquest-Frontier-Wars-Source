@@ -221,10 +221,22 @@ public:
 //
 struct DACOM_NO_VTABLE LineManager : public IEventCallback, ILineManager
 {
-	BEGIN_DACOM_MAP_INBOUND(LineManager)
-	DACOM_INTERFACE_ENTRY(ILineManager)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetILineManager(void* self) {
+	    return static_cast<ILineManager*>(
+	        static_cast<LineManager*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<LineManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ILineManager",   &GetILineManager},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	typedef std::vector<LineBaseObj*> LINE_VEC;
 
@@ -442,7 +454,7 @@ struct _linemanager : GlobalComponent
 	
 	virtual void Startup (void)
 	{
-		LINEMAN = LMAN = new DAComponent<LineManager>;
+		LINEMAN = LMAN = new DAComponentX<LineManager>;
 		AddToGlobalCleanupList((IDAComponent **) &LINEMAN);
 	}
 

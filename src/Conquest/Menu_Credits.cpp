@@ -117,7 +117,7 @@ void delete_whole_fucker (CreditText *& list)
 }
 //--------------------------------------------------------------------------//
 //
-struct Menu_Credits : public DAComponent<Frame>
+struct Menu_Credits : public DAComponentX<Frame>
 {
 	//
 	// data items

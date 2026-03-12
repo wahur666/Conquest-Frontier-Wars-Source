@@ -37,7 +37,7 @@ Frame * __stdcall CreateMenuChat (bool bChatAll);
 
 //--------------------------------------------------------------------------//
 //
-struct MenuChat : public DAComponent<Frame>
+struct MenuChat : public DAComponentX<Frame>
 {
 	//
 	// data items

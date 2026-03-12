@@ -26,7 +26,7 @@
 
 //--------------------------------------------------------------------------//
 //
-struct MenuLoadSave : public DAComponent<Frame>
+struct MenuLoadSave : public DAComponentX<Frame>
 {
 	//
 	// data items

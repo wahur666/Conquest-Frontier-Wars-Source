@@ -33,7 +33,7 @@ U32 __stdcall DoMenu_mshell (Frame * parent, const GT_MENU1 & data, const struct
 #define IDZONE_PAGE 10
 //--------------------------------------------------------------------------//
 //
-struct Menu_zone : public DAComponent<Frame>
+struct Menu_zone : public DAComponentX<Frame>
 {
 	//
 	// data items

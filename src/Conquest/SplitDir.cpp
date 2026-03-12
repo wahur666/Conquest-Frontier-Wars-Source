@@ -44,7 +44,7 @@ struct _soundman : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		SOUNDMANAGER = soundMan = new DAComponent<SoundMan>;
+		SOUNDMANAGER = soundMan = new DAComponentX<SoundMan>;
 		AddToGlobalCleanupList((IDAComponent **) &SOUNDMANAGER);
 	}
 

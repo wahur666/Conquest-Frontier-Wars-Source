@@ -2383,9 +2383,17 @@ struct DACOM_NO_VTABLE RefinePlatFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(RefinePlatFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<RefinePlatFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	RefinePlatFactory (void) { }
 
@@ -2515,7 +2523,7 @@ struct _refineplatfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<RefinePlatFactory>;
+		sfactory = new DAComponentX<RefinePlatFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

@@ -399,9 +399,17 @@ struct DACOM_NO_VTABLE RecoveryShipFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(RecoveryShipFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<RecoveryShipFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	RecoveryShipFactory (void) { }
 
@@ -520,7 +528,7 @@ struct _recoveryship : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<RecoveryShipFactory>;
+		sfactory = new DAComponentX<RecoveryShipFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

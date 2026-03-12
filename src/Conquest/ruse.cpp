@@ -326,9 +326,17 @@ static LPARAM CALLBACK loadArchDlgProc (HWND hwnd, UINT message, WPARAM wParam, 
 //
 struct DACOM_NO_VTABLE EventCallback : public IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(EventCallback)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<EventCallback*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 
 	DEFMETHOD(Notify) (U32 message, void *param = 0);
@@ -743,7 +751,7 @@ void __stdcall ActivateRUSE (IFileSystem * outFile)
 
 	if (EVENT==0)
 	{
-		EVENT = new DAComponent<EventCallback>;
+		EVENT = new DAComponentX<EventCallback>;
 		AddToGlobalCleanupList(&EVENT);
 		AddToGlobalCleanupList(&RHOTKEY);
 	}

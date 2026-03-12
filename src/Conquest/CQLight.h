@@ -80,11 +80,27 @@ struct DACOM_NO_VTABLE ICQLight : IDAComponent
 
 struct DummyLight : BaseLight, IEventCallback, ICQLight
 {
-	BEGIN_DACOM_MAP_INBOUND(DummyLight)
-	DACOM_INTERFACE_ENTRY(ILight)
-	DACOM_INTERFACE_ENTRY(ICQLight)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetILight(void* self) {
+	    return static_cast<ILight*>(
+	        static_cast<DummyLight*>(self));
+	}
+	static IDAComponent* GetICQLight(void* self) {
+	    return static_cast<ICQLight*>(
+	        static_cast<DummyLight*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<DummyLight*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ILight",         &GetILight},
+	        {"ICQLight",       &GetICQLight},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	DummyLight (void)  : BaseLight(ENGINE,(ISystemContainer *)GS)
 	{}
@@ -92,7 +108,7 @@ struct DummyLight : BaseLight, IEventCallback, ICQLight
 
 #pragma warning (disable : 4505)
 
-struct CQLight : DAComponent<DummyLight>
+struct CQLight : DAComponentX<DummyLight>
 {
 private:
 	bool bLogicalOn;

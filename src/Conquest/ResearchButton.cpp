@@ -39,14 +39,38 @@ struct DACOM_NO_VTABLE ResearchButton : BaseHotRect, IHotButton, IActiveButton
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(ResearchButton)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IHotButton)
-	DACOM_INTERFACE_ENTRY(IActiveButton)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<ResearchButton*>(self));
+	}
+	static IDAComponent* GetIHotButton(void* self) {
+	    return static_cast<IHotButton*>(
+	        static_cast<ResearchButton*>(self));
+	}
+	static IDAComponent* GetIActiveButton(void* self) {
+	    return static_cast<IActiveButton*>(
+	        static_cast<ResearchButton*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ResearchButton*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<ResearchButton*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IHotButton",                    &GetIHotButton},
+	        {"IActiveButton",                 &GetIActiveButton},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -878,9 +902,17 @@ struct DACOM_NO_VTABLE ResearchButtonFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ResearchButtonFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<ResearchButtonFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	ResearchButtonFactory (void) { }
 
@@ -979,7 +1011,7 @@ BOOL32 ResearchButtonFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT ResearchButtonFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	CQASSERT((U32)hArchetype == 1 && pArchetype != 0);
-	ResearchButton * result = new DAComponent<ResearchButton>;
+	ResearchButton * result = new DAComponentX<ResearchButton>;
 
 	result->init(pArchetype, hSound, pFontType,fontColor);
 	*pInstance = result->getBase();
@@ -993,7 +1025,7 @@ struct _researchbuttonfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<ResearchButtonFactory>;
+		factory = new DAComponentX<ResearchButtonFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

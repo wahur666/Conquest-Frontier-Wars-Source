@@ -59,11 +59,27 @@ struct stalledNode
 
 struct DACOM_NO_VTABLE Banker : public IBanker, IEventCallback, IHotControlEvent
 {
-	BEGIN_DACOM_MAP_INBOUND(Banker)
-	DACOM_INTERFACE_ENTRY(IBanker)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IHotControlEvent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIBanker(void* self) {
+	    return static_cast<IBanker*>(
+	        static_cast<Banker*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Banker*>(self));
+	}
+	static IDAComponent* GetIHotControlEvent(void* self) {
+	    return static_cast<IHotControlEvent*>(
+	        static_cast<Banker*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IBanker",          &GetIBanker},
+	        {"IEventCallback",   &GetIEventCallback},
+	        {"IHotControlEvent", &GetIHotControlEvent},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -831,7 +847,7 @@ struct _banker : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		BANKER = banker = new DAComponent<Banker>;
+		BANKER = banker = new DAComponentX<Banker>;
 		AddToGlobalCleanupList(&banker);
 	}
 

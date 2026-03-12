@@ -81,14 +81,38 @@ struct DACOM_NO_VTABLE Slider : BaseHotRect, ISlider, IKeyboardFocus
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Slider)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(ISlider)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IKeyboardFocus)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Slider*>(self));
+	}
+	static IDAComponent* GetISlider(void* self) {
+	    return static_cast<ISlider*>(
+	        static_cast<Slider*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Slider*>(self));
+	}
+	static IDAComponent* GetIKeyboardFocus(void* self) {
+	    return static_cast<IKeyboardFocus*>(
+	        static_cast<Slider*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Slider*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"ISlider",                       &GetISlider},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IKeyboardFocus",                &GetIKeyboardFocus},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -747,9 +771,17 @@ struct DACOM_NO_VTABLE SliderFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(SliderFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<SliderFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	SliderFactory (void) { }
 
@@ -874,7 +906,7 @@ BOOL32 SliderFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT SliderFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	SLIDERTYPE * type = (SLIDERTYPE *) hArchetype;
-	Slider * result = new DAComponent<Slider>;
+	Slider * result = new DAComponentX<Slider>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -888,7 +920,7 @@ struct _sliderfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<SliderFactory>;
+		factory = new DAComponentX<SliderFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

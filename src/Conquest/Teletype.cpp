@@ -542,10 +542,22 @@ struct TeletypeObj
 //
 struct DACOM_NO_VTABLE Teletype : public IEventCallback, ITeletype
 {
-	BEGIN_DACOM_MAP_INBOUND(Teletype)
-	DACOM_INTERFACE_ENTRY(ITeletype)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetITeletype(void* self) {
+	    return static_cast<ITeletype*>(
+	        static_cast<Teletype*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Teletype*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ITeletype",      &GetITeletype},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	typedef std::vector<TeletypeObj*> TTOBJ_VECTOR;
 
@@ -817,7 +829,7 @@ struct _teletype : GlobalComponent
 	
 	virtual void Startup (void)
 	{
-		TELETYPE = TTYPE = new DAComponent<Teletype>;
+		TELETYPE = TTYPE = new DAComponentX<Teletype>;
 		AddToGlobalCleanupList((IDAComponent **) &TELETYPE);
 	}
 

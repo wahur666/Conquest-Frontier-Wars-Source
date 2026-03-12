@@ -433,9 +433,17 @@ struct DACOM_NO_VTABLE SpaceWaveFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(SpaceWaveFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<SpaceWaveFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	SpaceWaveFactory (void) { }
 
@@ -576,7 +584,7 @@ struct _spaceWave : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<SpaceWaveFactory>;
+		sfactory = new DAComponentX<SpaceWaveFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

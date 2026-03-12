@@ -378,13 +378,32 @@ struct DACOM_NO_VTABLE Sector : public ISector,
 								  SECTOR_DATA
 
 {
-	BEGIN_DACOM_MAP_INBOUND(Sector)
-	DACOM_INTERFACE_ENTRY(ISector)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)	
-	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
-	END_DACOM_MAP()
+	static IDAComponent* GetISector(void* self) {
+	    return static_cast<ISector*>(
+	        static_cast<Sector*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Sector*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Sector*>(self));
+	}
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<Sector*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISector",         &GetISector},
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IResourceClient", &GetIResourceClient},
+	        {"IDocumentClient", &GetIDocumentClient},
+	    };
+	    return map;
+	}
 
 	//--------------------------------
 	// data items go here
@@ -4195,7 +4214,7 @@ struct _sector : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		SECTOR = sector = new DAComponent<Sector>;
+		SECTOR = sector = new DAComponentX<Sector>;
 		AddToGlobalCleanupList((IDAComponent **) &SECTOR);
 	}
 

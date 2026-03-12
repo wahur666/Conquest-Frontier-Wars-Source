@@ -419,9 +419,17 @@ struct DACOM_NO_VTABLE ArtifactLauncherFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ArtifactLauncherFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<ArtifactLauncherFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	ArtifactLauncherFactory (void) { }
 
@@ -527,7 +535,7 @@ struct _artifactLauncher : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<ArtifactLauncherFactory>;
+		sfactory = new DAComponentX<ArtifactLauncherFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

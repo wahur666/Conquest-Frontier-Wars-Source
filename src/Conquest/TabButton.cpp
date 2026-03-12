@@ -64,15 +64,44 @@ struct DACOM_NO_VTABLE TabButton :  BaseHotRect, ITabButton, IKeyboardFocus
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(TabButton)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(ITabButton)
-	DACOM_INTERFACE_ENTRY(IKeyboardFocus)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(BaseHotRect)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<TabButton*>(self));
+	}
+	static IDAComponent* GetITabButton(void* self) {
+	    return static_cast<ITabButton*>(
+	        static_cast<TabButton*>(self));
+	}
+	static IDAComponent* GetIKeyboardFocus(void* self) {
+	    return static_cast<IKeyboardFocus*>(
+	        static_cast<TabButton*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<TabButton*>(self));
+	}
+	static IDAComponent* GetBaseHotRect(void* self) {
+	    return reinterpret_cast<IDAComponent *>(
+			static_cast<BaseHotRect*>(
+		        static_cast<TabButton*>(self)));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<TabButton*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"ITabButton",                    &GetITabButton},
+	        {"IKeyboardFocus",                &GetIKeyboardFocus},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"BaseHotRect",                   &GetBaseHotRect},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -857,9 +886,17 @@ struct DACOM_NO_VTABLE TabButtonFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(TabButtonFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<TabButtonFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	TabButtonFactory (void) { }
 
@@ -951,7 +988,7 @@ BOOL32 TabButtonFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT TabButtonFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	TABBUTTONTYPE * type = (TABBUTTONTYPE *) hArchetype;
-	TabButton * result = new DAComponent<TabButton>;
+	TabButton * result = new DAComponentX<TabButton>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -965,7 +1002,7 @@ struct _tabbuttonfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<TabButtonFactory>;
+		factory = new DAComponentX<TabButtonFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

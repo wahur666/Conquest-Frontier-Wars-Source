@@ -91,11 +91,27 @@ struct DACOM_NO_VTABLE MenuResource : public IMenuResource,
 	COMPTR<ISearchPath> searchPath;
 
 
-	BEGIN_DACOM_MAP_INBOUND(MenuResource)
-	DACOM_INTERFACE_ENTRY(IMenuResource)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIMenuResource(void* self) {
+	    return static_cast<IMenuResource*>(
+	        static_cast<MenuResource*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<MenuResource*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<MenuResource*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IMenuResource",   &GetIMenuResource},
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IResourceClient", &GetIResourceClient},
+	    };
+	    return map;
+	}
 
 	MenuResource (void);
 
@@ -1659,7 +1675,7 @@ struct _menu : GlobalComponent
 		HMENU hPopup = ::GetSubMenu(hMenu, MENUPOS_VIEW);
 		::DeleteMenu(hPopup, ID_VIEW_EMPTY, MF_BYCOMMAND);
 		
-		MENU = menu = new DAComponent<MenuResource>;
+		MENU = menu = new DAComponentX<MenuResource>;
 		AddToGlobalCleanupList((IDAComponent **) &MENU);
 
 		menu->hMenu = hMenu;

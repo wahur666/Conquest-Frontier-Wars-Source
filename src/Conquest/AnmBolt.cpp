@@ -396,9 +396,17 @@ struct DACOM_NO_VTABLE AnmBoltManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(AnmBoltManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<AnmBoltManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	U32 factoryHandle;
 
@@ -581,7 +589,7 @@ struct _AnmBoltManager : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<AnmBoltManager>;
+		sfactory = new DAComponentX<AnmBoltManager>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

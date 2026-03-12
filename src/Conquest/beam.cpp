@@ -454,9 +454,17 @@ struct DACOM_NO_VTABLE BeamManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(BeamManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<BeamManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	U32 factoryHandle;
 
@@ -617,7 +625,7 @@ struct _guns : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		struct BeamManager *weaponMgr = new DAComponent<BeamManager>;
+		struct BeamManager *weaponMgr = new DAComponentX<BeamManager>;
 		WEAPONMGR = weaponMgr;
 		AddToGlobalCleanupList((IDAComponent **) &WEAPONMGR);
 	}

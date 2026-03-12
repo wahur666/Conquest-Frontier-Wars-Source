@@ -246,10 +246,22 @@ U32 GetFleetUpgrades(M_RACE race)
 
 struct DACOM_NO_VTABLE CMenu_Ind : public IEventCallback, IHotControlEvent
 {
-	BEGIN_DACOM_MAP_INBOUND(CMenu_Ind)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IHotControlEvent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<CMenu_Ind*>(self));
+	}
+	static IDAComponent* GetIHotControlEvent(void* self) {
+	    return static_cast<IHotControlEvent*>(
+	        static_cast<CMenu_Ind*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",   &GetIEventCallback},
+	        {"IHotControlEvent", &GetIHotControlEvent},
+	    };
+	    return map;
+	}
 
 	U32 eventHandle, hotEventHandle;		// connection handle
 //	bool bEnabled;
@@ -1041,7 +1053,7 @@ struct _cmenu_ind : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		menu = new DAComponent<CMenu_Ind>;
+		menu = new DAComponentX<CMenu_Ind>;
 		AddToGlobalCleanupList(&menu);
 	}
 

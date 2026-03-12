@@ -666,14 +666,38 @@ struct DACOM_NO_VTABLE ObjectList : public IObjectList,
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ObjectList)
-	DACOM_INTERFACE_ENTRY(IObjectList)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IArchetypeList)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectList(void* self) {
+	    return static_cast<IObjectList*>(
+	        static_cast<ObjectList*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ObjectList*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<ObjectList*>(self));
+	}
+	static IDAComponent* GetIArchetypeList(void* self) {
+	    return static_cast<IArchetypeList*>(
+	        static_cast<ObjectList*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<ObjectList*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectList",                   &GetIObjectList},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IArchetypeList",                &GetIArchetypeList},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	static std::span<const DACOMInterfaceEntry2> GetInterfaceMapOut() {
 		static constexpr DACOMInterfaceEntry2 entriesOut[] = {
@@ -5106,7 +5130,7 @@ struct _olist : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		OBJLIST = list = new DAComponent<ObjectList>;
+		OBJLIST = list = new DAComponentX<ObjectList>;
 		AddToGlobalCleanupList((IDAComponent **) &OBJLIST);
 
 		OBJLIST->QueryInterface("IArchetypeList", (void **)&ARCHLIST);

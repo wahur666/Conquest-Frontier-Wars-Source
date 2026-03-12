@@ -52,7 +52,7 @@ U32 __stdcall DoMenu_MapSelect (BaseHotRect * parent, ICQGame & cqgame, wchar_t 
 using namespace CQGAMETYPES;
 //--------------------------------------------------------------------------//
 //
-struct Menu_map : public DAComponent<Frame>
+struct Menu_map : public DAComponentX<Frame>
 {
 	//
 	// data items

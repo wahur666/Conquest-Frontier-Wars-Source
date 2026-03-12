@@ -40,7 +40,7 @@
 //
 //--------------------------------------------------------------------------//
 //
-struct MenuEndGame : public DAComponent<Frame>
+struct MenuEndGame : public DAComponentX<Frame>
 {
 	//
 	// data items

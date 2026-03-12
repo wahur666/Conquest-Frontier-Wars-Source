@@ -54,10 +54,22 @@
 
 struct DACOM_NO_VTABLE CMenu_BuildInd : public IEventCallback, IHotControlEvent
 {
-	BEGIN_DACOM_MAP_INBOUND(CMenu_BuildInd)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IHotControlEvent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<CMenu_BuildInd*>(self));
+	}
+	static IDAComponent* GetIHotControlEvent(void* self) {
+	    return static_cast<IHotControlEvent*>(
+	        static_cast<CMenu_BuildInd*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",   &GetIEventCallback},
+	        {"IHotControlEvent", &GetIHotControlEvent},
+	    };
+	    return map;
+	}
 
 	U32 eventHandle, hotEventHandle;		// connection handle
 	bool bPanelOwned;
@@ -702,7 +714,7 @@ struct _cmenu_buildind: GlobalComponent
 
 	virtual void Startup (void)
 	{
-		menu = new DAComponent<CMenu_BuildInd>;
+		menu = new DAComponentX<CMenu_BuildInd>;
 		AddToGlobalCleanupList(&menu);
 	}
 

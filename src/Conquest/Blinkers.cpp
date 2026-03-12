@@ -27,6 +27,9 @@
 #include <Mesh.h>
 #include <HeapObj.h>
 #include <IHardpoint.h>
+#include <span>
+
+#include "TComponent2.h"
 
 
 struct Blinker
@@ -272,10 +275,22 @@ Done:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 struct Blinkers : IBlinkers
 {
-	BEGIN_DACOM_MAP_INBOUND(Blinkers)
-	DACOM_INTERFACE_ENTRY (IDAComponent)
-	DACOM_INTERFACE_ENTRY (IBlinkers)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDAComponent(void* self) {
+	    return static_cast<IDAComponent*>(
+	        static_cast<Blinkers*>(self));
+	}
+	static IDAComponent* GetIBlinkers(void* self) {
+	    return static_cast<IBlinkers*>(
+	        static_cast<Blinkers*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDAComponent", &GetIDAComponent},
+	        {"IBlinkers",    &GetIBlinkers},
+	    };
+	    return map;
+	}
 	
 	S32 numStages,numBlinkers;
 	SINGLE timer,totalTime;
@@ -361,7 +376,7 @@ GENRESULT CreateBlinkers(COMPTR<IBlinkers> &ibs,struct BlinkersArchetype * arch,
 	if (arch->totalTime <= 0.0)
 		return GR_GENERIC;
 
-	Blinkers *bs = new DAComponent<Blinkers>;
+	Blinkers *bs = new DAComponentX<Blinkers>;
 
 	GENRESULT result = bs->QueryInterface("IBlinkers",ibs.void_addr());
 	bs->blinker = arch->blinker;

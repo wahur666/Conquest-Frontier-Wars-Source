@@ -520,9 +520,17 @@ struct DACOM_NO_VTABLE ReconProbeFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ReconProbeFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<ReconProbeFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	ReconProbeFactory (void) { }
 
@@ -642,7 +650,7 @@ struct _rpfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		rpfactory = new DAComponent<ReconProbeFactory>;
+		rpfactory = new DAComponentX<ReconProbeFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &rpfactory);
 	}
 

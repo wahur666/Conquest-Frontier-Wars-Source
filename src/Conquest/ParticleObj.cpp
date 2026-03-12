@@ -254,9 +254,17 @@ struct DACOM_NO_VTABLE ParticleObjManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(ParticleObjManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<ParticleObjManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 //	struct ParticleObjNode *explosionList;
 	U32 factoryHandle;
@@ -420,7 +428,7 @@ struct _wang : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		ParticleObjMgr = new DAComponent<ParticleObjManager>;
+		ParticleObjMgr = new DAComponentX<ParticleObjManager>;
 		AddToGlobalCleanupList((IDAComponent **) &ParticleObjMgr);
 	}
 

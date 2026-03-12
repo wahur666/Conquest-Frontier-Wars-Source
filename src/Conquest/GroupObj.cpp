@@ -29,7 +29,8 @@
 #include <3DMath.h>
 #include <FileSys.h>
 #include <IConnection.h>
-#include <TComponent.h>
+#include <span>
+#include <TComponent2.h>
 
 #define IDLE_TIMEOUT (60 * RENDER_FRAMERATE * 3)		// 3 minutes, in real time
 #define DEAD_TIMEOUT (60 * RENDER_FRAMERATE * 5)		// 5 minutes, in real time
@@ -316,9 +317,17 @@ struct DACOM_NO_VTABLE GroupObjFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(GroupObjFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<GroupObjFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	GroupObjFactory (void) { }
 
@@ -420,7 +429,7 @@ struct _groupobj : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		gfactory = new DAComponent<GroupObjFactory>;
+		gfactory = new DAComponentX<GroupObjFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &gfactory);
 	}
 

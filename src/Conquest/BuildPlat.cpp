@@ -1986,9 +1986,17 @@ struct DACOM_NO_VTABLE BuildPlatFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(BuildPlatFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<BuildPlatFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	BuildPlatFactory (void) { }
 
@@ -2118,7 +2126,7 @@ struct _buildplatfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<BuildPlatFactory>;
+		sfactory = new DAComponentX<BuildPlatFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

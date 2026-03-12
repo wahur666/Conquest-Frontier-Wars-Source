@@ -1011,9 +1011,17 @@ struct DACOM_NO_VTABLE MinelayerFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(MinelayerFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<MinelayerFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	MinelayerFactory (void) { }
 
@@ -1132,7 +1140,7 @@ struct _Minelayer : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<MinelayerFactory>;
+		sfactory = new DAComponentX<MinelayerFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

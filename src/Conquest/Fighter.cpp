@@ -2275,9 +2275,17 @@ struct DACOM_NO_VTABLE FighterFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(FighterFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<FighterFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	FighterFactory (void) { }
 
@@ -2422,7 +2430,7 @@ struct _fighter : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<FighterFactory>;
+		sfactory = new DAComponentX<FighterFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

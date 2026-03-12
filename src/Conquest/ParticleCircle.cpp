@@ -191,9 +191,17 @@ struct DACOM_NO_VTABLE ParticleCircleManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(ParticleCircleManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<ParticleCircleManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 //	struct BlastNode *explosionList;
 	U32 factoryHandle;
@@ -314,7 +322,7 @@ struct PartCircGlobal : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		blastMgr = new DAComponent<ParticleCircleManager>;
+		blastMgr = new DAComponentX<ParticleCircleManager>;
 		AddToGlobalCleanupList((IDAComponent **) &blastMgr);
 	}
 

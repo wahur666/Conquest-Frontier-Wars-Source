@@ -24,6 +24,9 @@
 #include <Renderer.h>
 #include <Mesh.h>
 #include <HeapObj.h>
+#include <span>
+
+#include "TComponent2.h"
 //
 // Catmull-Rom basis.
 //
@@ -478,10 +481,22 @@ struct AnimQueue
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 struct MorphMesh : IMorphMesh
 {
-	BEGIN_DACOM_MAP_INBOUND(MorphMesh)
-	DACOM_INTERFACE_ENTRY (IDAComponent)
-	DACOM_INTERFACE_ENTRY (IMorphMesh)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDAComponent(void* self) {
+	    return static_cast<IDAComponent*>(
+	        static_cast<MorphMesh*>(self));
+	}
+	static IDAComponent* GetIMorphMesh(void* self) {
+	    return static_cast<IMorphMesh*>(
+	        static_cast<MorphMesh*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDAComponent", &GetIDAComponent},
+	        {"IMorphMesh",   &GetIMorphMesh},
+	    };
+	    return map;
+	}
 	
 	S32 currentAnim;
 	S32 last_cp;
@@ -943,7 +958,7 @@ void *MorphMesh::GetBase()
 ///////////////////////////////////////////////////////////////////////////////////////
 GENRESULT CreateMorphMesh(COMPTR<IMorphMesh> &imm,struct MorphMeshArchetype * arch)
 {
-	MorphMesh *mm = new DAComponent<MorphMesh>;
+	MorphMesh *mm = new DAComponentX<MorphMesh>;
 
 	GENRESULT result = mm->QueryInterface("IMorphMesh",imm.void_addr());
 	mm->anims = arch->anims;

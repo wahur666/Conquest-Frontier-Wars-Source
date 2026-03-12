@@ -45,7 +45,7 @@
 */
 //--------------------------------------------------------------------------//
 //-------------------------------------------
-struct MSolarianAI : public DAComponent<SPlayerAI>
+struct MSolarianAI : public DAComponentX<SPlayerAI>
 {
 	/* mantis AI data items */
 	

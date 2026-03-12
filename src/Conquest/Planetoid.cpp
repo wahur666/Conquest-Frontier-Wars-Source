@@ -2475,10 +2475,22 @@ struct DACOM_NO_VTABLE PlanetFactory : public IObjectFactory, IEventCallback
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(PlanetFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<PlanetFactory*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<PlanetFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	PlanetFactory (void) { }
 
@@ -2814,7 +2826,7 @@ struct _planet : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		planet = new DAComponent<PlanetFactory>;
+		planet = new DAComponentX<PlanetFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &planet);
 	}
 

@@ -1718,9 +1718,17 @@ struct DACOM_NO_VTABLE EffectPlayer : public IEffectPlayer, IInternalEffectPlaye
 	//
 	// Interface mapping
 	//
-	BEGIN_DACOM_MAP_INBOUND(EffectPlayer)
-	DACOM_INTERFACE_ENTRY(IEffectPlayer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEffectPlayer(void* self) {
+	    return static_cast<IEffectPlayer*>(
+	        static_cast<EffectPlayer*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEffectPlayer", &GetIEffectPlayer},
+	    };
+	    return map;
+	}
 
 	EffectInstance * instList;
 
@@ -2619,7 +2627,7 @@ struct EffectPlayerComp : GlobalComponent
 		FileLog::LogLine("EffectPlayer","Effect Player Started\n");
 		FileLog::Flush();
 #endif*/
-		EFFECTPLAYER = eplayer = new DAComponent<EffectPlayer>;
+		EFFECTPLAYER = eplayer = new DAComponentX<EffectPlayer>;
 		internalPlayer = eplayer;
 		GAMEPOSCALLBACK = eplayer;
 		AddToGlobalCleanupList((IDAComponent **) &EFFECTPLAYER);

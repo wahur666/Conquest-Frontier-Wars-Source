@@ -221,14 +221,33 @@ struct Menu_context : public BaseHotRect, IToolbar
 	//
 	// interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Menu_context)
-	DACOM_INTERFACE_ENTRY(IToolbar)
-	// the following are for BaseHotRect
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIToolbar(void* self) {
+	    return static_cast<IToolbar*>(
+	        static_cast<Menu_context*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Menu_context*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Menu_context*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Menu_context*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IToolbar",                      &GetIToolbar},
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -774,7 +793,7 @@ struct Menu_tb : public Frame, IToolbar
 			if (bRecursion==false && varDesc.kind==VARIABLEDESC::RECORD && (varDesc.varName || arrayVarName))
 			{
 				createCallback callback(pButtonType, pBuildButtonType, pResearchButtonType,pMultiButtonType, pHotStaticType, pShipSilButtonType, pTabType, pIconType, pQType, pBaseData, commonMenu+1);
-				Menu_context * pNode = new DAComponent<Menu_context>;
+				Menu_context * pNode = new DAComponentX<Menu_context>;
 
 				if (arrayVarName)
 				{
@@ -816,7 +835,7 @@ struct Menu_tb : public Frame, IToolbar
 			if (pLastTab!=0 && varDesc.kind==VARIABLEDESC::RECORD && (varDesc.varName || arrayVarName))
 			{
 				createCallback callback(pButtonType, pBuildButtonType, pResearchButtonType,pMultiButtonType, pHotStaticType, pShipSilButtonType, pTabType, pIconType, pQType, pBaseData, commonMenu+1);
-				Menu_context * pNode = new DAComponent<Menu_context>;
+				Menu_context * pNode = new DAComponentX<Menu_context>;
 
 				if (varDesc.varName == 0)
 				{
@@ -859,16 +878,38 @@ struct Menu_tb : public Frame, IToolbar
 	// interface map
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(Menu_tb)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IToolbar)
-	// the following are for BaseHotRect
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<Menu_tb*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Menu_tb*>(self));
+	}
+	static IDAComponent* GetIToolbar(void* self) {
+	    return static_cast<IToolbar*>(
+	        static_cast<Menu_tb*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Menu_tb*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Menu_tb*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDocumentClient",               &GetIDocumentClient},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IToolbar",                      &GetIToolbar},
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -1872,7 +1913,7 @@ struct _panels : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		TOOLBAR  = menu = new DAComponent<Menu_tb>; 
+		TOOLBAR  = menu = new DAComponentX<Menu_tb>;
 		AddToGlobalCleanupList(&TOOLBAR);
 
 //		CreateAdmiralToolbar();

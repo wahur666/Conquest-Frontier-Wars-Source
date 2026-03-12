@@ -66,7 +66,7 @@ void __stdcall EnableLogging (const FULLCQGAME & cqgame, U32 seed);
 		parent->CloseHandle(hFile); }
 //--------------------------------------------------------------------------//
 //
-struct Menu_nl : public DAComponent<Frame>
+struct Menu_nl : public DAComponentX<Frame>
 {
 	//
 	// data items

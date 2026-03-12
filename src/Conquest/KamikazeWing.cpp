@@ -35,8 +35,9 @@
 #include <TSmartPointer.h>
 #include <IAnim.h>
 #include <FileSys.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h>
+#include <span>
 
 #include <stdlib.h>
 
@@ -358,9 +359,17 @@ struct DACOM_NO_VTABLE KamikazeWingFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(KamikazeWingFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<KamikazeWingFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	KamikazeWingFactory (void) { }
 
@@ -470,7 +479,7 @@ struct _kamikazeWing : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<KamikazeWingFactory>;
+		sfactory = new DAComponentX<KamikazeWingFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

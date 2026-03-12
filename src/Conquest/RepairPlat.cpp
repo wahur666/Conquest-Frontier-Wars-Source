@@ -1555,9 +1555,17 @@ struct DACOM_NO_VTABLE RepairPlatFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(RepairPlatFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<RepairPlatFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	RepairPlatFactory (void) { }
 
@@ -1677,7 +1685,7 @@ struct _repairplatfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<RepairPlatFactory>;
+		sfactory = new DAComponentX<RepairPlatFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

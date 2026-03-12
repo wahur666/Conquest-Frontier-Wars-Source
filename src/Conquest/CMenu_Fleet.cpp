@@ -85,10 +85,22 @@ MISSION_DATA::M_CAPS getCaps (IBaseObject * selected);
 
 struct DACOM_NO_VTABLE CMenu_Fleet : public IEventCallback, IHotControlEvent, IFleetMenu
 {
-	BEGIN_DACOM_MAP_INBOUND(CMenu_Fleet)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IHotControlEvent)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<CMenu_Fleet*>(self));
+	}
+	static IDAComponent* GetIHotControlEvent(void* self) {
+	    return static_cast<IHotControlEvent*>(
+	        static_cast<CMenu_Fleet*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",   &GetIEventCallback},
+	        {"IHotControlEvent", &GetIHotControlEvent},
+	    };
+	    return map;
+	}
 
 	U32 eventHandle, hotEventHandle;		// connection handle
 	bool bPanelOwned;
@@ -1280,7 +1292,7 @@ struct _cmenu_fleet : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		FLEET_MENU = menu = new DAComponent<CMenu_Fleet>;
+		FLEET_MENU = menu = new DAComponentX<CMenu_Fleet>;
 		AddToGlobalCleanupList(&menu);
 	}
 

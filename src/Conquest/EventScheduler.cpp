@@ -51,9 +51,17 @@ struct DACOM_NO_VTABLE EventScheduler : IEventScheduler
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(EventScheduler)
-	DACOM_INTERFACE_ENTRY(IEventScheduler)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventScheduler(void* self) {
+	    return static_cast<IEventScheduler*>(
+	        static_cast<EventScheduler*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventScheduler", &GetIEventScheduler},
+	    };
+	    return map;
+	}
 
 	EventNode * eventList;
 
@@ -237,7 +245,7 @@ struct EventSchedulerComponent : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		SCHEDULER = ev = new DAComponent<EventScheduler>;
+		SCHEDULER = ev = new DAComponentX<EventScheduler>;
 		AddToGlobalCleanupList((IDAComponent **) &SCHEDULER);
 	}
 	

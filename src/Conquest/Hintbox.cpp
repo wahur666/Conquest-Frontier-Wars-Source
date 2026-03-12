@@ -57,13 +57,33 @@ struct DACOM_NO_VTABLE HintResource : public Resource<HintResource,IHintResource
 								  ConnectionPointContainer<HintResource>,
 								  IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(HintResource)
-	DACOM_INTERFACE_ENTRY(IResource)
-	DACOM_INTERFACE_ENTRY(IHintResource)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResource(void* self) {
+	    return static_cast<IResource*>(
+	        static_cast<HintResource*>(self));
+	}
+	static IDAComponent* GetIHintResource(void* self) {
+	    return static_cast<IHintResource*>(
+	        static_cast<HintResource*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<HintResource*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<HintResource*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResource",                     &GetIResource},
+	        {"IHintResource",                 &GetIHintResource},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	U32 handle;		// connection handle
 	U32 dwHeight;		// height of the control, in pixels
@@ -430,7 +450,7 @@ struct _hintbox : GlobalComponent
 	
 	virtual void Startup (void)
 	{
-		HINTBOX = hint = new DAComponent<HintResource>;
+		HINTBOX = hint = new DAComponentX<HintResource>;
 		AddToGlobalCleanupList((IDAComponent **) &HINTBOX);
 	}
 

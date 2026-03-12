@@ -747,9 +747,17 @@ struct DACOM_NO_VTABLE TractorManager : public IObjectFactory
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(TractorManager)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<TractorManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	U32 factoryHandle;
 
@@ -933,7 +941,7 @@ struct _tractors : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		struct TractorManager *tractorMgr = new DAComponent<TractorManager>;
+		struct TractorManager *tractorMgr = new DAComponentX<TractorManager>;
 		TRACTORMGR = tractorMgr;
 		AddToGlobalCleanupList((IDAComponent **) &TRACTORMGR);
 	}

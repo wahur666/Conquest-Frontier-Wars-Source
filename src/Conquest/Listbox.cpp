@@ -109,16 +109,49 @@ struct DACOM_NO_VTABLE Listbox : BaseHotRect, IListbox, IKeyboardFocus, IScrollB
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Listbox)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IListbox)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IKeyboardFocus)
-	DACOM_INTERFACE_ENTRY(BaseHotRect)
-	DACOM_INTERFACE_ENTRY(IScrollBarOwner)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Listbox*>(self));
+	}
+	static IDAComponent* GetIListbox(void* self) {
+	    return static_cast<IListbox*>(
+	        static_cast<Listbox*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Listbox*>(self));
+	}
+	static IDAComponent* GetIKeyboardFocus(void* self) {
+	    return static_cast<IKeyboardFocus*>(
+	        static_cast<Listbox*>(self));
+	}
+	static IDAComponent* GetBaseHotRect(void* self) {
+	    return reinterpret_cast<IDAComponent *>(
+	    	static_cast<BaseHotRect*>(
+				static_cast<Listbox*>(self)));
+	}
+	static IDAComponent* GetIScrollBarOwner(void* self) {
+	    return static_cast<IScrollBarOwner*>(
+	        static_cast<Listbox*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Listbox*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IListbox",                      &GetIListbox},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IKeyboardFocus",                &GetIKeyboardFocus},
+	        {"BaseHotRect",                   &GetBaseHotRect},
+	        {"IScrollBarOwner",               &GetIScrollBarOwner},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -1585,9 +1618,17 @@ struct DACOM_NO_VTABLE ListboxFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ListboxFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<ListboxFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	ListboxFactory (void) { }
 
@@ -1698,7 +1739,7 @@ BOOL32 ListboxFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT ListboxFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	LISTBOXTYPE * type = (LISTBOXTYPE *) hArchetype;
-	Listbox * result = new DAComponent<Listbox>;
+	Listbox * result = new DAComponentX<Listbox>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -1712,7 +1753,7 @@ struct _ListboxFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<ListboxFactory>;
+		factory = new DAComponentX<ListboxFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

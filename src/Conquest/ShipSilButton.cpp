@@ -40,13 +40,33 @@ struct DACOM_NO_VTABLE ShipSilButton : BaseHotRect, IShipSilButton
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(ShipSilButton)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IShipSilButton)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<ShipSilButton*>(self));
+	}
+	static IDAComponent* GetIShipSilButton(void* self) {
+	    return static_cast<IShipSilButton*>(
+	        static_cast<ShipSilButton*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<ShipSilButton*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<ShipSilButton*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IShipSilButton",                &GetIShipSilButton},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -427,9 +447,17 @@ struct DACOM_NO_VTABLE ShipSilButtonFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ShipSilButtonFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<ShipSilButtonFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	ShipSilButtonFactory (void) { }
 
@@ -511,7 +539,7 @@ BOOL32 ShipSilButtonFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT ShipSilButtonFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	CQASSERT(pArchetype != 0);
-	ShipSilButton * result = new DAComponent<ShipSilButton>;
+	ShipSilButton * result = new DAComponentX<ShipSilButton>;
 
 	result->init(pArchetype,(GT_SHIPSILBUTTON *)hArchetype);
 	*pInstance = result->getBase();
@@ -525,7 +553,7 @@ struct _shipSilbuttonfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<ShipSilButtonFactory>;
+		factory = new DAComponentX<ShipSilButtonFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

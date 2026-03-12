@@ -43,10 +43,22 @@
 //
 struct DACOM_NO_VTABLE Subtitle : public IEventCallback, ISubtitle
 {
-	BEGIN_DACOM_MAP_INBOUND(Subtitle)
-	DACOM_INTERFACE_ENTRY(ISubtitle)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetISubtitle(void* self) {
+	    return static_cast<ISubtitle*>(
+	        static_cast<Subtitle*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Subtitle*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISubtitle",      &GetISubtitle},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	U32 handle;			// connection handle
 	
@@ -262,7 +274,7 @@ struct _subtitle : GlobalComponent
 	
 	virtual void Startup (void)
 	{
-		SUBTITLE = SSubTitle = new DAComponent<Subtitle>;
+		SUBTITLE = SSubTitle = new DAComponentX<Subtitle>;
 		AddToGlobalCleanupList((IDAComponent **) &SUBTITLE);
 	}
 

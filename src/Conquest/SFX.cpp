@@ -157,12 +157,22 @@ struct DACOM_NO_VTABLE Sfx : ISFX, IEventCallback
 struct DACOM_NO_VTABLE Sfx : ISFX
 #endif
 {
-	BEGIN_DACOM_MAP_INBOUND(Sfx)
-	DACOM_INTERFACE_ENTRY(ISFX)
-#if SFXNOTIFY
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-#endif
-	END_DACOM_MAP()
+	static IDAComponent* GetISFX(void* self) {
+	    return static_cast<ISFX*>(
+	        static_cast<Sfx*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Sfx*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISFX",           &GetISFX},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 #if SFXNOTIFY
 	U32 eventHandle;
@@ -1231,7 +1241,7 @@ struct _sfx : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		SFXMANAGER = manager = new DAComponent<Sfx>;
+		SFXMANAGER = manager = new DAComponentX<Sfx>;
 		AddToGlobalCleanupList((IDAComponent **)&SFXMANAGER);
 	}
 

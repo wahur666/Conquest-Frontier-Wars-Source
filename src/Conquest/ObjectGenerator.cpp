@@ -45,8 +45,9 @@
 #include <3DMath.h>
 #include <FileSys.h>
 #include <IConnection.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <ITextureLibrary.h>
+#include <span>
 
 #include "DObjectGenerator.h"
 
@@ -728,9 +729,17 @@ struct DACOM_NO_VTABLE ObjectGeneratorFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ObjectGeneratorFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<ObjectGeneratorFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	ObjectGeneratorFactory (void) { }
 
@@ -849,7 +858,7 @@ struct _objectGenerator : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<ObjectGeneratorFactory>;
+		sfactory = new DAComponentX<ObjectGeneratorFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

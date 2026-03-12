@@ -20,7 +20,8 @@
 
 #include <Physics.h>
 #include <HeapObj.h>
-#include <TComponent.h>
+#include <span>
+#include <TComponent2.h>
 #include <stdlib.h>
 
 
@@ -1224,9 +1225,17 @@ struct DACOM_NO_VTABLE TerrainMap : ITerrainMap
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(TerrainMap)
-	DACOM_INTERFACE_ENTRY(ITerrainMap)
-	END_DACOM_MAP()
+	static IDAComponent* GetITerrainMap(void* self) {
+	    return static_cast<ITerrainMap*>(
+	        static_cast<TerrainMap*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ITerrainMap", &GetITerrainMap},
+	    };
+	    return map;
+	}
 
 	//
 	// member data
@@ -2610,7 +2619,7 @@ void TerrainMap::RenderEdit (void)
 //
 bool __stdcall CreateTerrainMap (ITerrainMap ** map)
 {
-	*map = new DAComponent<TerrainMap>;
+	*map = new DAComponentX<TerrainMap>;
 	return (*map != 0);
 }
 //----------------------------------------------------------------------------------------------
@@ -2620,9 +2629,17 @@ struct DummyTerrainMap : ITerrainMap
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(TerrainMap)
-	DACOM_INTERFACE_ENTRY(ITerrainMap)
-	END_DACOM_MAP()
+	static IDAComponent* GetITerrainMap(void* self) {
+	    return static_cast<ITerrainMap*>(
+	        static_cast<TerrainMap*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ITerrainMap", &GetITerrainMap},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -2690,7 +2707,7 @@ struct DummyTerrainMap : ITerrainMap
 //
 bool __stdcall CreateDummyTerrainMap (ITerrainMap ** map)
 {
-	*map = new DAComponent<DummyTerrainMap>;
+	*map = new DAComponentX<DummyTerrainMap>;
 	return (*map != 0);
 }
 //----------------------------------------------------------------------------------------------

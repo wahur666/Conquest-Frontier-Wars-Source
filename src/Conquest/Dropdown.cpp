@@ -34,15 +34,43 @@ struct DACOM_NO_VTABLE Dropdown : BaseHotRect, IDropdown, IKeyboardFocus
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Dropdown)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IListbox)
-	DACOM_INTERFACE_ENTRY(IDropdown)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IKeyboardFocus)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Dropdown*>(self));
+	}
+	static IDAComponent* GetIListbox(void* self) {
+	    return static_cast<IListbox*>(
+	        static_cast<Dropdown*>(self));
+	}
+	static IDAComponent* GetIDropdown(void* self) {
+	    return static_cast<IDropdown*>(
+	        static_cast<Dropdown*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Dropdown*>(self));
+	}
+	static IDAComponent* GetIKeyboardFocus(void* self) {
+	    return static_cast<IKeyboardFocus*>(
+	        static_cast<Dropdown*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Dropdown*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IListbox",                      &GetIListbox},
+	        {"IDropdown",                     &GetIDropdown},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IKeyboardFocus",                &GetIKeyboardFocus},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -704,9 +732,17 @@ struct DACOM_NO_VTABLE DropdownFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(DropdownFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<DropdownFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	DropdownFactory (void) { }
 
@@ -785,7 +821,7 @@ GENRESULT DropdownFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pI
 {
 	CQASSERT(hArchetype == (HANDLE)1);
 
-	Dropdown * result = new DAComponent<Dropdown>;
+	Dropdown * result = new DAComponentX<Dropdown>;
 
 	result->init(pArchetype);
 	*pInstance = result->getBase();
@@ -799,7 +835,7 @@ struct _dropdownFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<DropdownFactory>;
+		factory = new DAComponentX<DropdownFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

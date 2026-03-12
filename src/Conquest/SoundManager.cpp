@@ -191,10 +191,22 @@ struct PENDING_NODE
 //
 struct DACOM_NO_VTABLE SoundMan : public ISoundManager, IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(SoundMan)
-	DACOM_INTERFACE_ENTRY(ISoundManager)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetISoundManager(void* self) {
+	    return static_cast<ISoundManager*>(
+	        static_cast<SoundMan*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<SoundMan*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISoundManager",  &GetISoundManager},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	//--------------------------------
 	// data items go here
@@ -1490,7 +1502,7 @@ struct _soundman : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		SOUNDMANAGER = soundMan = new DAComponent<SoundMan>;
+		SOUNDMANAGER = soundMan = new DAComponentX<SoundMan>;
 		AddToGlobalCleanupList((IDAComponent **) &SOUNDMANAGER);
 	}
 

@@ -43,7 +43,7 @@ U32 __stdcall DoMenu_mshell (Frame * parent, const GT_MENU1 & data, const SAVED_
 
 //--------------------------------------------------------------------------//
 //
-struct Menu_sess2 : public DAComponent<Frame>
+struct Menu_sess2 : public DAComponentX<Frame>
 {
 	//
 	// data items

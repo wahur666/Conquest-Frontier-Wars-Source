@@ -498,11 +498,27 @@ struct DACOM_NO_VTABLE MovieCameraFactory : public IObjectFactory, IEventCallbac
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(MovieCameraFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<MovieCameraFactory*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<MovieCameraFactory*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<MovieCameraFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory",  &GetIObjectFactory},
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IResourceClient", &GetIResourceClient},
+	    };
+	    return map;
+	}
 
 	MovieCameraFactory (void) 
 	{
@@ -1005,7 +1021,7 @@ struct _movieCam : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<MovieCameraFactory>;
+		sfactory = new DAComponentX<MovieCameraFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 
@@ -1045,10 +1061,22 @@ struct CamSpot
 //
 struct DACOM_NO_VTABLE MovieCameraManager : public IMovieCameraManager, IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(MovieCameraManager)
-	DACOM_INTERFACE_ENTRY(IMovieCameraManager)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIMovieCameraManager(void* self) {
+	    return static_cast<IMovieCameraManager*>(
+	        static_cast<MovieCameraManager*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<MovieCameraManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IMovieCameraManager", &GetIMovieCameraManager},
+	        {"IEventCallback",      &GetIEventCallback},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -1749,7 +1777,7 @@ struct _camMang : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		CAMERAMANAGER = manager = new DAComponent<MovieCameraManager>;
+		CAMERAMANAGER = manager = new DAComponentX<MovieCameraManager>;
 		AddToGlobalCleanupList(&manager);
 	}
 

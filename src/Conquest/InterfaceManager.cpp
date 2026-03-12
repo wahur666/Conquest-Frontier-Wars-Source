@@ -35,10 +35,22 @@ struct FlashingHotkey
 //
 struct DACOM_NO_VTABLE InterfaceManager : public IEventCallback, IInterfaceManager
 {
-	BEGIN_DACOM_MAP_INBOUND(InterfaceManager)
-	DACOM_INTERFACE_ENTRY(IInterfaceManager)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIInterfaceManager(void* self) {
+	    return static_cast<IInterfaceManager*>(
+	        static_cast<InterfaceManager*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<InterfaceManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IInterfaceManager", &GetIInterfaceManager},
+	        {"IEventCallback",    &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	U32 handle;			// connection handle
 
@@ -207,7 +219,7 @@ struct InterfaceManagerComponent : GlobalComponent
 	
 	virtual void Startup (void)
 	{
-		INTERMAN = IMAN = new DAComponent<InterfaceManager>;
+		INTERMAN = IMAN = new DAComponentX<InterfaceManager>;
 		AddToGlobalCleanupList((IDAComponent **) &INTERMAN);
 	}
 

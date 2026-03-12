@@ -27,14 +27,25 @@
 #include <TSmartPointer.h>
 #include <DPlatform.h>
 #include <renderer.h>
+#include <span>
+
+#include "TComponent2.h"
 
 //--------------------------------------------------------------------------------------
 //
 struct DACOM_NO_VTABLE Dust : public IDust
 {
-	BEGIN_DACOM_MAP_INBOUND(Dust)
-	DACOM_INTERFACE_ENTRY(IDust)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDust(void* self) {
+	    return static_cast<IDust*>(
+	        static_cast<Dust*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDust", &GetIDust},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -226,7 +237,7 @@ struct _dustMang : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		DUSTMANAGER = dust = new DAComponent<Dust>;
+		DUSTMANAGER = dust = new DAComponentX<Dust>;
 		AddToGlobalCleanupList(&dust);
 	}
 
