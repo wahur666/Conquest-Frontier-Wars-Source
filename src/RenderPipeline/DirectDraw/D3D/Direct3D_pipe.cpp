@@ -322,8 +322,8 @@ public:	// Interface
 #endif
 
 	// IRenderPrimitive
-	GENRESULT COMAPI set_state( RPRSTATE state, U32 value );
-	GENRESULT COMAPI get_state( RPRSTATE state, U32 *value );
+	GENRESULT COMAPI set_state( RPRSTATE state, LONG_PTR value );
+	GENRESULT COMAPI get_state( RPRSTATE state, LONG_PTR *value );
 	GENRESULT COMAPI flush( U32 flags );
 
 	// IGammaControl
@@ -947,7 +947,7 @@ inline void Direct3D_RenderPipeline::internal_set_default_render_state( void )
 
 	RenderStateArray::iterator tss_beg, tss_end, tss;
 
-	for( U32 stage=0; stage<D3DTSS_NUM_STAGES; stage++ ) {
+	for( LONG_PTR stage=0; stage<D3DTSS_NUM_STAGES; stage++ ) {
 
 		curr_hw_texture[stage].invalidate();
 		curr_hw_texture[stage].set( direct3d_device, stage, 0 );
@@ -2065,7 +2065,7 @@ DA_METHOD(	set_perspective,(float fovy_halfangle, float aspect, float nearval, f
 // State/Scene Management Related Code
 // ------------------------------------------------------------------
 
-DA_METHOD(	set_state,(RPRSTATE state, U32 value ))
+DA_METHOD(	set_state,(RPRSTATE state, LONG_PTR value ))
 {
 	CHECK_STARTUP(set_state);
 
@@ -2076,7 +2076,7 @@ DA_METHOD(	set_state,(RPRSTATE state, U32 value ))
 
 //
 
-DA_METHOD(	get_state,(RPRSTATE state, U32 *value ))
+DA_METHOD(	get_state,(RPRSTATE state, LONG_PTR *value ))
 {
 	CHECK_STARTUP(get_state);
 
@@ -2334,6 +2334,7 @@ DA_METHOD(  set_texture_stage_texture,(U32 stage, LONG_PTR htexture ))
 			return GR_GENERIC;
 		}
 
+		// TODO: Imre, itt működik
 		curr_hw_texture[stage].set( direct3d_device, stage, htexture, disable_hw_caches );
 	
 	}

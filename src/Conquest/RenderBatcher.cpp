@@ -115,8 +115,8 @@ public:		// public interface
 	GENRESULT init(AGGDESC *desc);
 
 	// IRenderPrimitive
-	DA_METHOD(	set_state,					(RPRSTATE state, U32 value ));
-	DA_METHOD(	get_state,					(RPRSTATE state, U32 *value ));
+	DA_METHOD(	set_state,					(RPRSTATE state, LONG_PTR value ));
+	DA_METHOD(	get_state,					(RPRSTATE state, LONG_PTR *value ));
 
 	DA_METHOD(	set_modelview,				(const Transform & modelview ));
 	DA_METHOD(	get_modelview,				(Transform & modelview ));
@@ -1967,7 +1967,7 @@ void BMPOOL::set_name( const char *_name )
 
 //
 
-DA_METHOD(	set_state,(RPRSTATE _state, U32 value ))
+DA_METHOD(	set_state,(RPRSTATE _state, LONG_PTR value ))
 {
 	//if (_state == RPR_BATCH) 	value = 0;	// disable batching for debug
 
@@ -2010,7 +2010,7 @@ DA_METHOD(	set_state,(RPRSTATE _state, U32 value ))
 
 //
 
-DA_METHOD(	get_state,(RPRSTATE _state, U32 *value ))
+DA_METHOD(	get_state,(RPRSTATE _state, LONG_PTR *value ))
 {
 	*value = state[_state];
 	return GR_OK;

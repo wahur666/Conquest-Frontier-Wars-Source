@@ -1146,8 +1146,8 @@ public:		// public interface
 	static void operator delete(void *ptr);
 
 	// IRenderPrimitive
-	GENRESULT COMAPI set_state( RPRSTATE state, U32 value ) ;
-	GENRESULT COMAPI get_state( RPRSTATE state, U32 *value ) ;
+	GENRESULT COMAPI set_state( RPRSTATE state, LONG_PTR value ) ;
+	GENRESULT COMAPI get_state( RPRSTATE state, LONG_PTR *value ) ;
 	GENRESULT COMAPI set_modelview( const Transform & modelview ) ;
 	GENRESULT COMAPI get_modelview( Transform & modelview ) ;
 	GENRESULT COMAPI set_viewport( int x, int y, int w, int h ) ;
@@ -1212,7 +1212,7 @@ DA_HEAP_DEFINE_NEW_OPERATOR(RenderBatcher);
 
 //
 
-DA_METHOD(	set_state,(RPRSTATE _state, U32 value ))
+DA_METHOD(	set_state,(RPRSTATE _state, LONG_PTR value ))
 {
 	if (0 > _state || _state > RPR_MAX_STATE ) {
 		GENERAL_NOTICE(TEMPSTR("Invalid state RPRSTATE: %d\n", _state));
@@ -1250,7 +1250,7 @@ DA_METHOD(	set_state,(RPRSTATE _state, U32 value ))
 
 //
 
-DA_METHOD(	get_state,(RPRSTATE _state, U32 *value ))
+DA_METHOD(	get_state,(RPRSTATE _state, LONG_PTR *value ))
 {
 	*value = state[_state];
 	return GR_OK;

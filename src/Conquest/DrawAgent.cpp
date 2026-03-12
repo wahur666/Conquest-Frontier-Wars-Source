@@ -266,7 +266,7 @@ void DrawAgent::Draw (PANE *pane, S32 x, S32 y)
 		}
 
 		PB.Color3ub(255,255,255);
-		U32 currentTexID = textureID[0];
+		LONG_PTR currentTexID = textureID[0];
 
 		BATCH->set_state(RPR_STATE_ID,textureID[0]);
 	/*	if (CQBATCH)
@@ -384,7 +384,7 @@ void DrawAgent::Draw (PANE *src, PANE *dst)
 		}
 
 		PB.Color3ub(255,255,255);
-		U32 currentTexID = textureID[0];
+		LONG_PTR currentTexID = textureID[0];
 
 		BATCH->set_state(RPR_STATE_ID,textureID[0]);
 		PB.Begin(PB_QUADS);

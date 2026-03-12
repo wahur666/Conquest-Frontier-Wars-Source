@@ -3116,7 +3116,7 @@ void MMaterial<VertexStruct,VERTEX_FORMAT>::RenderPortionZAlign(const Transform 
 	S32 index_count;
 
 	setRenderStates();
-	U32 val;
+	LONG_PTR val;
 	BATCH->get_state(RPR_BATCH,&val);
 	if (val)
 	{
@@ -3348,7 +3348,7 @@ void MMaterial<VertexStruct,VERTEX_FORMAT>::RenderPortion(const Transform &inv,c
 	S32 index_count;
 
 	setRenderStates();
-	U32 val;
+	LONG_PTR val;
 	BATCH->get_state(RPR_BATCH,&val);
 	if (val)
 	{

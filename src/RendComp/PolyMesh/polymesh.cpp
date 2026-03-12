@@ -1410,7 +1410,7 @@ void POLYMESH::render_facegroup_with_material( U32 rwm_flags, MeshInstance *obje
 
 			renderprimitive->set_state( RPR_STATE_ID, mat_uid++ );
 
-			U32 btm;
+			LONG_PTR btm;
 
 			renderprimitive->get_state( RPR_BATCH_TRANSLUCENT_MODE, &btm );
 			renderprimitive->set_state( RPR_BATCH_TRANSLUCENT_MODE, RPR_TRANSLUCENT_UNSORTED );

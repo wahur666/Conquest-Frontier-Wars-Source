@@ -49,8 +49,8 @@ typedef enum
 //
 struct IRenderPrimitive : public IDAComponent
 {
-	virtual GENRESULT COMAPI set_state( RPRSTATE state, U32 value ) = 0;
-	virtual GENRESULT COMAPI get_state( RPRSTATE state, U32 *value ) = 0;
+	virtual GENRESULT COMAPI set_state( RPRSTATE state, LONG_PTR value ) = 0;
+	virtual GENRESULT COMAPI get_state( RPRSTATE state, LONG_PTR *value ) = 0;
 
 	virtual GENRESULT COMAPI set_modelview( const Transform & modelview ) = 0;
 	virtual GENRESULT COMAPI get_modelview( Transform & modelview ) = 0;

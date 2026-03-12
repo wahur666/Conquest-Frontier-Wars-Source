@@ -745,9 +745,7 @@ GENRESULT MemoryFile::init (MEMFILEDESC * lpDesc)
 			dwEndOfFile = bufferSize;
 			break;
 		}
-		auto bff = std::make_unique<char[]>(bufferSize);
 		if (lpDesc->lpBuffer && lpDesc->lpBuffer != buffer) {
-			memcpy(bff.get(), lpDesc->lpBuffer, bufferSize);
 			memcpy(buffer, lpDesc->lpBuffer, bufferSize);
 		}
 	}

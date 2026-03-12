@@ -423,7 +423,7 @@ struct CACHED_TEXTURE
 
 	//
 
-	void set( IDirect3DDevice9 *device, U32 stage_idx, LONG_PTR new_value, bool force_to_hw = false )
+	void set( IDirect3DDevice9 *device, LONG_PTR stage_idx, LONG_PTR new_value, bool force_to_hw = false )
 	{
 		if( valid && !force_to_hw && (value == new_value) ) {
 #if !RP_DISABLE_CACHES

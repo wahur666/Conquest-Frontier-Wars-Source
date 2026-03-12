@@ -31,7 +31,7 @@
 
 struct AnimFrame
 {
-	U32 texture;
+	LONG_PTR texture;
 	SINGLE x0;
 	SINGLE y0;
 	SINGLE x1;

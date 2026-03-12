@@ -868,7 +868,7 @@ U32 __stdcall GetMultiplayerNumberFromString (const char * buffer);
 U32 __stdcall GetMultiplayerStringFromNumber (U32 number, wchar_t * buffer, U32 bufferSize);
 U32 __stdcall GetMultiplayerVersion (void);
 CQEXTERN GENRESULT __stdcall CreateProfileParser (const char * filename, struct IProfileParser2 **ppParser, struct IFileSystem * parent=0);	// reads from "Profiles" dir by default
-CQEXTERN void __stdcall SetupDiffuseBlend( U32 irp_texture_id , bool bClamp);
+CQEXTERN void __stdcall SetupDiffuseBlend( LONG_PTR irp_texture_id , bool bClamp);
 CQEXTERN void __stdcall DisableTextures();
 CQEXTERN BOOL32 __stdcall RecursiveDelete (IFileSystem * pFileSystem);	// deletes *.* from current directory
 CQEXTERN U32 __stdcall CreateZBufferAnalog (const char * filename);

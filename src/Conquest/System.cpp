@@ -2233,7 +2233,7 @@ void __stdcall Enable3DMode (bool bEnable)
 }
 	//---------------------------------------------------------------------
 	//
-	void __stdcall SetupDiffuseBlend( U32 irp_texture_id, bool bClamp )
+	void __stdcall SetupDiffuseBlend( LONG_PTR irp_texture_id, bool bClamp )
 	{
 		BATCH->set_render_state(D3DRS_COLORVERTEX, TRUE);
 		BATCH->set_render_state(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
