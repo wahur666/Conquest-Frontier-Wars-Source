@@ -569,7 +569,7 @@ BOOL32 GenData::loadTypesData (void)
 	fdesc.lpImplementation = "DOS";
 	if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
-		fdesc.lpFileName = "..\\DB\\GenData.db";
+		fdesc.lpFileName = "DB\\GenData.db";
 		if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		{
 			CQBOMB1("Could not access '%s'", fdesc.lpFileName);
@@ -586,7 +586,7 @@ BOOL32 GenData::loadTypesData (void)
 		//
 		// create a memory file
 		//
-		MEMFILEDESC mdesc = fdesc.lpFileName;
+		MEMFILEDESC mdesc {fdesc.lpFileName};
 		mdesc.lpBuffer = pImage;
 		mdesc.dwBufferSize = size;
 		mdesc.dwFlags = 0;
@@ -700,7 +700,7 @@ GENRESULT GenData::copyOpenFile (IFileSystem *file)
 	}
 	else
 	{
-		fdesc.lpFileName = "..\\DB\\GenData.db";
+		fdesc.lpFileName = "DB\\GenData.db";
 		if ((result = DACOM->CreateInstance(&fdesc,outFile.void_addr())) == GR_OK)
 			outFile->WriteFile(0,buffer,dwRead,&dwWritten,0);
 	}

@@ -284,7 +284,7 @@ BOOL32 StringData::loadTypesData (void)
 
 	if (DACOM->CreateInstance(&fdesc, pFile.void_addr()) != GR_OK)
 	{
-		fdesc.lpFileName = "..\\DB\\StringPack.db";
+		fdesc.lpFileName = "DB\\StringPack.db";
 		if (DACOM->CreateInstance(&fdesc, pFile.void_addr()) != GR_OK)
 		{
 			CQBOMB1("Could not access '%s'", fdesc.lpFileName);

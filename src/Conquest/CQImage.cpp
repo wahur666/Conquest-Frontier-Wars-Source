@@ -379,7 +379,7 @@ static void initStatic(HWND hwnd)
 
 //--------------------------------------------------------------------------//
 
-static LONG_PTR CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LONG lParam)
+static LONG_PTR CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     BOOL result = 0;
 
@@ -388,7 +388,7 @@ static LONG_PTR CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LONG lP
     case WM_INITDIALOG:
         {
             HWND hItem;
-            const TEXT_BUFFER<4096> *pText = (const TEXT_BUFFER<4096> *)lParam;
+            const TEXT_BUFFER<4096> *pText = reinterpret_cast<const TEXT_BUFFER<4096> *>(lParam);
 
             hItem = GetDlgItem(hwnd, IDC_STATIC_VERSION);
             initStatic(hItem);

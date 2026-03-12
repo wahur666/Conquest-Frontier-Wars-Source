@@ -350,7 +350,7 @@ GENRESULT DAComponentFactoryX<ClassType,DescType>::CreateInstance (DACOMDESC *de
 {
 	GENRESULT result = GR_OK;
 	ClassType *pNewInstance = 0;
-	DescType *lpDesc = (DescType *) descriptor;
+	DescType *lpDesc = static_cast<DescType *>(descriptor);
 
 	//
 	// If unsupported interface requested, fail call

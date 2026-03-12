@@ -24,6 +24,7 @@
 #include <span>
 
 #include "TComponent2.h"
+#include <memory>
 
 extern ICOManager *DACOM;
 extern LONG __stdcall DOS__SerialCall (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC lpProc, VOID *lpContext);
@@ -42,15 +43,15 @@ struct DACOM_NO_VTABLE MemoryFile : public IFileSystem
 	//--------------------------
 	
 	U8 *	buffer;
-	U32		bufferSize;
-	U32		filePos;
-	BOOL32	bOwnedMemory:1;
-	BOOL32  bNoExtend:1;		// don't extend the memory buffer
-	BOOL32  bVirtualAlloc:1;	// allocated through VirtualAlloc()
-	DWORD   dwMode;
-	DWORD	dwEndOfFile;		
+	U32		bufferSize{};
+	U32		filePos{};
+	BOOL32	bOwnedMemory:1{};
+	BOOL32  bNoExtend:1{};		// don't extend the memory buffer
+	BOOL32  bVirtualAlloc:1{};	// allocated through VirtualAlloc()
+	DWORD   dwMode{};
+	DWORD	dwEndOfFile{};
 		
-	C8   fileName[MAX_PATH+4];
+	C8   fileName[MAX_PATH+4]{};
 
 	//--------------------------
 
@@ -117,7 +118,7 @@ struct DACOM_NO_VTABLE MemoryFile : public IFileSystem
 		DWORD dwDesiredAccess,
 		DWORD dwFileOffsetHigh,
 		DWORD dwFileOffsetLow,
-		DWORD dwNumberOfBytesToMap);
+		SIZE_T dwNumberOfBytesToMap);
 	
 	DEFMETHOD_(BOOL,UnmapViewOfFile)      (LPCVOID lpBaseAddress);
 	
@@ -155,7 +156,7 @@ struct DACOM_NO_VTABLE MemoryFile : public IFileSystem
 	
 	DEFMETHOD_(DWORD,GetFilePosition) (HANDLE hFileHandle = 0, PLONG pPositionHigh=0);
 	
-	DEFMETHOD_(LONG,GetFileName) (LPSTR lpBuffer, LONG lBufferSize);
+	DEFMETHOD_(SIZE_T,GetFileName) (LPSTR lpBuffer, SIZE_T lBufferSize);
 	
 	DEFMETHOD_(DWORD,GetAccessType) (VOID);
 	
@@ -166,12 +167,12 @@ struct DACOM_NO_VTABLE MemoryFile : public IFileSystem
 	DEFMETHOD(GetPreference)  (DWORD dwNumber, PDWORD pdwValue);
 	
 	DEFMETHOD(ReadDirectoryExtension) (HANDLE hFile, LPVOID lpBuffer, 
-		DWORD nNumberOfBytesToRead,
-		LPDWORD lpNumberOfBytesRead=0, DWORD dwStartOffset=0);
+		SIZE_T nNumberOfBytesToRead,
+		LPDWORD lpNumberOfBytesRead=0, SIZE_T dwStartOffset=0);
 	
 	DEFMETHOD(WriteDirectoryExtension) (HANDLE hFile, LPCVOID lpBuffer, 
-		DWORD nNumberOfBytesToWrite,
-		LPDWORD lpNumberOfBytesWritten=0, DWORD dwStartOffset=0);
+		SIZE_T nNumberOfBytesToWrite,
+		LPDWORD lpNumberOfBytesWritten=0, SIZE_T dwStartOffset=0);
 	
 	DEFMETHOD_(LONG,SerialCall) (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC lpProc, VOID *lpContext);
 	
@@ -464,7 +465,7 @@ LPVOID MemoryFile::MapViewOfFile (HANDLE hFileMappingObject,
 		DWORD dwDesiredAccess,
 		DWORD dwFileOffsetHigh,
 		DWORD dwFileOffsetLow,
-		DWORD dwNumberOfBytesToMap)
+		SIZE_T dwNumberOfBytesToMap)
 {
 	return 0;
 }
@@ -575,9 +576,9 @@ DWORD MemoryFile::GetFilePosition (HANDLE hFileHandle, PLONG pPositionHigh)
 }
 //--------------------------------------------------------------------------//
 //
-LONG MemoryFile::GetFileName (LPSTR lpBuffer, LONG lBufferSize)
+SIZE_T MemoryFile::GetFileName (LPSTR lpBuffer, SIZE_T lBufferSize)
 {
-	LONG len = (LONG)strlen(fileName)+1;
+	SIZE_T len = strlen(fileName)+1;
 	lBufferSize = __min(lBufferSize, len);
 
 	if (lBufferSize > 0 && lpBuffer)
@@ -616,16 +617,16 @@ GENRESULT MemoryFile::GetPreference (DWORD dwNumber, PDWORD pdwValue)
 //--------------------------------------------------------------------------//
 //
 GENRESULT MemoryFile::ReadDirectoryExtension (HANDLE hFile, LPVOID lpBuffer, 
-		DWORD nNumberOfBytesToRead,
-		LPDWORD lpNumberOfBytesRead, DWORD dwStartOffset)
+		SIZE_T nNumberOfBytesToRead,
+		LPDWORD lpNumberOfBytesRead, SIZE_T dwStartOffset)
 {
 	return GR_GENERIC;
 }
 //--------------------------------------------------------------------------//
 //
 GENRESULT MemoryFile::WriteDirectoryExtension (HANDLE hFile, LPCVOID lpBuffer, 
-		DWORD nNumberOfBytesToWrite,
-		LPDWORD lpNumberOfBytesWritten, DWORD dwStartOffset)
+		SIZE_T nNumberOfBytesToWrite,
+		LPDWORD lpNumberOfBytesWritten, SIZE_T dwStartOffset)
 {
 	return GR_GENERIC;
 }
@@ -744,9 +745,11 @@ GENRESULT MemoryFile::init (MEMFILEDESC * lpDesc)
 			dwEndOfFile = bufferSize;
 			break;
 		}
-
-		if (lpDesc->lpBuffer && lpDesc->lpBuffer != buffer)
+		auto bff = std::make_unique<char[]>(bufferSize);
+		if (lpDesc->lpBuffer && lpDesc->lpBuffer != buffer) {
+			memcpy(bff.get(), lpDesc->lpBuffer, bufferSize);
 			memcpy(buffer, lpDesc->lpBuffer, bufferSize);
+		}
 	}
 
 	if (lpDesc->lpFileName)

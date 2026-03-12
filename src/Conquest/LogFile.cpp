@@ -190,7 +190,7 @@ struct DACOM_NO_VTABLE LogFile : public IFileSystem
 		DWORD dwDesiredAccess,
 		DWORD dwFileOffsetHigh,
 		DWORD dwFileOffsetLow,
-		DWORD dwNumberOfBytesToMap);
+		SIZE_T dwNumberOfBytesToMap);
 	
 	DEFMETHOD_(BOOL,UnmapViewOfFile)      (LPCVOID lpBaseAddress);
 	
@@ -228,7 +228,7 @@ struct DACOM_NO_VTABLE LogFile : public IFileSystem
 	
 	DEFMETHOD_(DWORD,GetFilePosition) (HANDLE hFileHandle = 0, PLONG pPositionHigh=0);
 	
-	DEFMETHOD_(LONG,GetFileName) (LPSTR lpBuffer, LONG lBufferSize);
+	DEFMETHOD_(SIZE_T,GetFileName) (LPSTR lpBuffer, SIZE_T lBufferSize);
 	
 	DEFMETHOD_(DWORD,GetAccessType) (VOID);
 	
@@ -239,12 +239,12 @@ struct DACOM_NO_VTABLE LogFile : public IFileSystem
 	DEFMETHOD(GetPreference)  (DWORD dwNumber, PDWORD pdwValue);
 	
 	DEFMETHOD(ReadDirectoryExtension) (HANDLE hFile, LPVOID lpBuffer, 
-		DWORD nNumberOfBytesToRead,
-		LPDWORD lpNumberOfBytesRead=0, DWORD dwStartOffset=0);
+		SIZE_T nNumberOfBytesToRead,
+		LPDWORD lpNumberOfBytesRead=0, SIZE_T dwStartOffset=0);
 	
 	DEFMETHOD(WriteDirectoryExtension) (HANDLE hFile, LPCVOID lpBuffer, 
-		DWORD nNumberOfBytesToWrite,
-		LPDWORD lpNumberOfBytesWritten=0, DWORD dwStartOffset=0);
+		SIZE_T nNumberOfBytesToWrite,
+		LPDWORD lpNumberOfBytesWritten=0, SIZE_T dwStartOffset=0);
 	
 	DEFMETHOD_(LONG,SerialCall) (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC lpProc, VOID *lpContext);
 	
@@ -376,7 +376,7 @@ LPVOID LogFile::MapViewOfFile (HANDLE hFileMappingObject,
 		DWORD dwDesiredAccess,
 		DWORD dwFileOffsetHigh,
 		DWORD dwFileOffsetLow,
-		DWORD dwNumberOfBytesToMap)
+		SIZE_T dwNumberOfBytesToMap)
 {
 	return pFile->MapViewOfFile(hFileMappingObject, dwDesiredAccess, dwFileOffsetHigh, dwFileOffsetLow, dwNumberOfBytesToMap);
 }
@@ -484,7 +484,7 @@ DWORD LogFile::GetFilePosition (HANDLE hFileHandle, PLONG pPositionHigh)
 }
 //--------------------------------------------------------------------------//
 //
-LONG LogFile::GetFileName (LPSTR lpBuffer, LONG lBufferSize)
+SIZE_T LogFile::GetFileName (LPSTR lpBuffer, SIZE_T lBufferSize)
 {
 	return pFile->GetFileName(lpBuffer, lBufferSize);
 }
@@ -515,16 +515,16 @@ GENRESULT LogFile::GetPreference (DWORD dwNumber, PDWORD pdwValue)
 //--------------------------------------------------------------------------//
 //
 GENRESULT LogFile::ReadDirectoryExtension (HANDLE hFile, LPVOID lpBuffer, 
-		DWORD nNumberOfBytesToRead,
-		LPDWORD lpNumberOfBytesRead, DWORD dwStartOffset)
+		SIZE_T nNumberOfBytesToRead,
+		LPDWORD lpNumberOfBytesRead, SIZE_T dwStartOffset)
 {
 	return pFile->ReadDirectoryExtension(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, dwStartOffset);
 }
 //--------------------------------------------------------------------------//
 //
 GENRESULT LogFile::WriteDirectoryExtension (HANDLE hFile, LPCVOID lpBuffer, 
-		DWORD nNumberOfBytesToWrite,
-		LPDWORD lpNumberOfBytesWritten, DWORD dwStartOffset)
+		SIZE_T nNumberOfBytesToWrite,
+		LPDWORD lpNumberOfBytesWritten, SIZE_T dwStartOffset)
 {
 	return pFile->WriteDirectoryExtension(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, dwStartOffset);
 }

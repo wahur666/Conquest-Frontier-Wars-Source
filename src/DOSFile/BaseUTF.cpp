@@ -688,7 +688,7 @@ LPVOID BaseUTF::MapViewOfFile (HANDLE hFileMappingObject,
                             DWORD dwDesiredAccess,
                             DWORD dwFileOffsetHigh,
                             DWORD dwFileOffsetLow,
-                            DWORD dwNumberOfBytesToMap)
+                            SIZE_T dwNumberOfBytesToMap)
 {
 	if (pParent)
 	{
@@ -1160,9 +1160,9 @@ HANDLE BaseUTF::OpenChild (DAFILEDESC *lpInfo)
 }
 //--------------------------------------------------------------------------//
 //
-LONG BaseUTF::GetFileName (LPSTR lpBuffer, LONG lBufferSize)
+SIZE_T BaseUTF::GetFileName (LPSTR lpBuffer, SIZE_T lBufferSize)
 {
-   lBufferSize = __min(lBufferSize, (LONG)strlen(szFilename)+1);
+   lBufferSize = __min(lBufferSize, (SIZE_T)strlen(szFilename)+1);
 
    if (lBufferSize > 0 && lpBuffer)
       memcpy(lpBuffer, szFilename, lBufferSize);
@@ -1198,16 +1198,16 @@ GENRESULT BaseUTF::GetPreference (DWORD dwNumber, PDWORD pdwValue)
 //--------------------------------------------------------------------------//
 //
 GENRESULT BaseUTF::ReadDirectoryExtension (HANDLE hFile, LPVOID lpBuffer, 
-										DWORD nNumberOfBytesToRead,
-										LPDWORD lpNumberOfBytesRead, DWORD dwStartOffset)
+										SIZE_T nNumberOfBytesToRead,
+										LPDWORD lpNumberOfBytesRead, SIZE_T dwStartOffset)
 {
 	return GR_GENERIC;
 }
 //--------------------------------------------------------------------------//
 //
 GENRESULT BaseUTF::WriteDirectoryExtension (HANDLE hFile, LPCVOID lpBuffer, 
-										DWORD nNumberOfBytesToWrite,
-										LPDWORD lpNumberOfBytesWritten, DWORD dwStartOffset)
+										SIZE_T nNumberOfBytesToWrite,
+										LPDWORD lpNumberOfBytesWritten, SIZE_T dwStartOffset)
 {
 	return GR_GENERIC;
 }

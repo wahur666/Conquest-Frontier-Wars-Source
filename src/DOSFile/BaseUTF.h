@@ -251,7 +251,7 @@ struct DACOM_NO_VTABLE BaseUTF : public IFileSystem
 								 DWORD dwDesiredAccess,
 								 DWORD dwFileOffsetHigh,
 								 DWORD dwFileOffsetLow,
-								 DWORD dwNumberOfBytesToMap);
+								 SIZE_T dwNumberOfBytesToMap);
 
 	DEFMETHOD_(BOOL,UnmapViewOfFile)      (LPCVOID lpBaseAddress);
 
@@ -289,7 +289,7 @@ struct DACOM_NO_VTABLE BaseUTF : public IFileSystem
 
 	DEFMETHOD_(DWORD,GetFilePosition) (HANDLE hFileHandle = 0, PLONG pPositionHigh=0);
 
-	DEFMETHOD_(LONG,GetFileName) (LPSTR lpBuffer, LONG lBufferSize);
+	DEFMETHOD_(SIZE_T,GetFileName) (LPSTR lpBuffer, SIZE_T lBufferSize);
 
 	DEFMETHOD_(DWORD,GetAccessType) (VOID);
 
@@ -300,12 +300,12 @@ struct DACOM_NO_VTABLE BaseUTF : public IFileSystem
 	DEFMETHOD(GetPreference)  (DWORD dwNumber, PDWORD pdwValue);
 
 	DEFMETHOD(ReadDirectoryExtension) (HANDLE hFile, LPVOID lpBuffer, 
-										DWORD nNumberOfBytesToRead,
-										LPDWORD lpNumberOfBytesRead=0, DWORD dwStartOffset=0);
+										SIZE_T nNumberOfBytesToRead,
+										LPDWORD lpNumberOfBytesRead=0, SIZE_T dwStartOffset=0);
 
 	DEFMETHOD(WriteDirectoryExtension) (HANDLE hFile, LPCVOID lpBuffer, 
-										DWORD nNumberOfBytesToWrite,
-										LPDWORD lpNumberOfBytesWritten=0, DWORD dwStartOffset=0);
+										SIZE_T nNumberOfBytesToWrite,
+										LPDWORD lpNumberOfBytesWritten=0, SIZE_T dwStartOffset=0);
 
 	DEFMETHOD_(LONG,SerialCall) (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC lpProc, VOID *lpContext);
 

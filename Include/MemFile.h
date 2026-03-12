@@ -37,9 +37,9 @@
 //
 struct MEMFILEDESC : public DAFILEDESC
 {
-	PVOID		lpBuffer = nullptr;
-	DWORD		dwBufferSize = 0;
-	DWORD		dwFlags = 0;
+	void*		lpBuffer = nullptr;
+	LONG_PTR		dwBufferSize = 0;
+	LONG_PTR		dwFlags = 0;
 
 	MEMFILEDESC (const C8 *_file_name = NULL, const C8 *_interface_name = "IFileSystem") : DAFILEDESC(_file_name, _interface_name)
 	{

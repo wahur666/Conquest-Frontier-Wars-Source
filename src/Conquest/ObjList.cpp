@@ -3054,7 +3054,7 @@ static BOOL32 GuardedEnableWindow (HWND hwnd, BOOL bEnable)
 }
 //----------------------------------------------------------------------------
 //
-static LONG CALLBACK editControlProcedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
+static LONG CALLBACK editControlProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
  	WNDPROC oldProc = (WNDPROC) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
@@ -4080,7 +4080,7 @@ BOOL32 ObjectList::loadTypesData (void)
 
 	if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 	{
-		fdesc.lpFileName = "..\\DB\\GameTypes.db";
+		fdesc.lpFileName = "DB\\GameTypes.db";
 		if (DACOM->CreateInstance(&fdesc, file.void_addr()) != GR_OK)
 		{
 			CQFILENOTFOUND(fdesc.lpFileName);

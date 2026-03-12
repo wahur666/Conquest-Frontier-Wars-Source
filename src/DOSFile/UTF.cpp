@@ -363,7 +363,7 @@ Error:
 //
 BOOL UTF::init (DAFILEDESC *lpDesc)
 {
-	UTF_HEADER header;
+	UTF_HEADER header{};
 	DWORD dwRead;
 	BOOL result=0;
 

@@ -146,7 +146,7 @@ struct Document : public IDocument,
 								 DWORD dwDesiredAccess,
 								 DWORD dwFileOffsetHigh,
 								 DWORD dwFileOffsetLow,
-								 DWORD dwNumberOfBytesToMap);
+								 SIZE_T dwNumberOfBytesToMap);
 
 	DEFMETHOD_(BOOL,UnmapViewOfFile)      (LPCVOID lpBaseAddress);
 
@@ -184,7 +184,7 @@ struct Document : public IDocument,
 
 	DEFMETHOD_(DWORD,GetFilePosition) (HANDLE hFileHandle = 0, PLONG pPositionHigh=0);
 
-	DEFMETHOD_(LONG,GetFileName) (LPSTR lpBuffer, LONG lBufferSize);
+	DEFMETHOD_(SIZE_T,GetFileName) (LPSTR lpBuffer, SIZE_T lBufferSize);
 
 	DEFMETHOD_(DWORD,GetAccessType) (VOID);
 
@@ -195,12 +195,12 @@ struct Document : public IDocument,
 	DEFMETHOD(GetPreference)  (DWORD dwNumber, PDWORD pdwValue);
 
 	DEFMETHOD(ReadDirectoryExtension) (HANDLE hFile, LPVOID lpBuffer, 
-										DWORD nNumberOfBytesToRead,
-										LPDWORD lpNumberOfBytesRead=0, DWORD dwStartOffset=0);
+										SIZE_T nNumberOfBytesToRead,
+										LPDWORD lpNumberOfBytesRead=0, SIZE_T dwStartOffset=0);
 
 	DEFMETHOD(WriteDirectoryExtension) (HANDLE hFile, LPCVOID lpBuffer, 
-										DWORD nNumberOfBytesToWrite,
-										LPDWORD lpNumberOfBytesWritten=0, DWORD dwStartOffset=0);
+										SIZE_T nNumberOfBytesToWrite,
+										LPDWORD lpNumberOfBytesWritten=0, SIZE_T dwStartOffset=0);
 
 	DEFMETHOD_(LONG,SerialCall) (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC lpProc, VOID *lpContext);
 
@@ -538,7 +538,7 @@ LPVOID Document::MapViewOfFile (HANDLE hFileMappingObject,
 								 DWORD dwDesiredAccess,
 								 DWORD dwFileOffsetHigh,
 								 DWORD dwFileOffsetLow,
-								 DWORD dwNumberOfBytesToMap)
+								 SIZE_T dwNumberOfBytesToMap)
 {
 	return pFile->MapViewOfFile(hFileMappingObject, dwDesiredAccess, dwFileOffsetHigh,
 								 dwFileOffsetLow, dwNumberOfBytesToMap);
@@ -710,7 +710,7 @@ DWORD Document::GetFilePosition (HANDLE hFileHandle, PLONG pPositionHigh)
 }
 //--------------------------------------------------------------------------//
 //
-LONG Document::GetFileName (LPSTR lpBuffer, LONG lBufferSize)
+SIZE_T Document::GetFileName (LPSTR lpBuffer, SIZE_T lBufferSize)
 {
 	const char *src = fileName;
 
@@ -718,7 +718,7 @@ LONG Document::GetFileName (LPSTR lpBuffer, LONG lBufferSize)
 		src++;
 	
 	{
-		LONG localLength = (LONG)strlen(src)+1;
+		SIZE_T localLength = strlen(src)+1;
 		lBufferSize = __min(lBufferSize, localLength);
 	}
 
@@ -759,16 +759,16 @@ GENRESULT Document::GetPreference (DWORD dwNumber, PDWORD pdwValue)
 //--------------------------------------------------------------------------//
 //
 GENRESULT Document::ReadDirectoryExtension (HANDLE hFile, LPVOID lpBuffer, 
-										DWORD nNumberOfBytesToRead,
-										LPDWORD lpNumberOfBytesRead, DWORD dwStartOffset)
+										SIZE_T nNumberOfBytesToRead,
+										LPDWORD lpNumberOfBytesRead, SIZE_T dwStartOffset)
 {
 	return pFile->ReadDirectoryExtension(hFile, lpBuffer, nNumberOfBytesToRead, lpNumberOfBytesRead, dwStartOffset);
 }
 //--------------------------------------------------------------------------//
 //
 GENRESULT Document::WriteDirectoryExtension (HANDLE hFile, LPCVOID lpBuffer, 
-										DWORD nNumberOfBytesToWrite,
-										LPDWORD lpNumberOfBytesWritten, DWORD dwStartOffset)
+										SIZE_T nNumberOfBytesToWrite,
+										LPDWORD lpNumberOfBytesWritten, SIZE_T dwStartOffset)
 {
 	return pFile->WriteDirectoryExtension(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, dwStartOffset);
 }

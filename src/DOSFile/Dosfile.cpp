@@ -238,7 +238,7 @@ struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem
 		DWORD dwDesiredAccess,
 		DWORD dwFileOffsetHigh,
 		DWORD dwFileOffsetLow,
-		DWORD dwNumberOfBytesToMap);
+		SIZE_T dwNumberOfBytesToMap);
 	
 	DEFMETHOD_(BOOL,UnmapViewOfFile)      (LPCVOID lpBaseAddress);
 	
@@ -276,7 +276,7 @@ struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem
 	
 	DEFMETHOD_(DWORD,GetFilePosition) (HANDLE hFileHandle = 0, PLONG pPositionHigh=0);
 	
-	DEFMETHOD_(LONG,GetFileName) (LPSTR lpBuffer, LONG lBufferSize);
+	DEFMETHOD_(SIZE_T,GetFileName) (LPSTR lpBuffer, SIZE_T lBufferSize);
 	
 	DEFMETHOD_(DWORD,GetAccessType) (VOID);
 	
@@ -287,12 +287,12 @@ struct DACOM_NO_VTABLE DOSFileSystem : public IFileSystem
 	DEFMETHOD(GetPreference)  (DWORD dwNumber, PDWORD pdwValue);
 	
 	DEFMETHOD(ReadDirectoryExtension) (HANDLE hFile, LPVOID lpBuffer, 
-		DWORD nNumberOfBytesToRead,
-		LPDWORD lpNumberOfBytesRead=0, DWORD dwStartOffset=0);
+		SIZE_T nNumberOfBytesToRead,
+		LPDWORD lpNumberOfBytesRead=0, SIZE_T dwStartOffset=0);
 	
 	DEFMETHOD(WriteDirectoryExtension) (HANDLE hFile, LPCVOID lpBuffer, 
-		DWORD nNumberOfBytesToWrite,
-		LPDWORD lpNumberOfBytesWritten=0, DWORD dwStartOffset=0);
+		SIZE_T nNumberOfBytesToWrite,
+		LPDWORD lpNumberOfBytesWritten=0, SIZE_T dwStartOffset=0);
 	
 	DEFMETHOD_(LONG,SerialCall) (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC lpProc, VOID *lpContext);
 	
@@ -1167,34 +1167,34 @@ HANDLE DOSFileSystem::CreateFileMapping (HANDLE hFileHandle, LPSECURITY_ATTRIBUT
 //--------------------------------------------------------------------------//
 //
 LPVOID DOSFileSystem::MapViewOfFile (HANDLE hFileMappingObject,
-									 DWORD dwDesiredAccess,
-									 DWORD dwFileOffsetHigh,
-									 DWORD dwFileOffsetLow,
-									 DWORD dwNumberOfBytesToMap)
+							 DWORD dwDesiredAccess,
+							 DWORD dwFileOffsetHigh,
+							 DWORD dwFileOffsetLow,
+							 SIZE_T dwNumberOfBytesToMap)
 {
 	LPVOID result;
-	
+
 	if (pParent)
 		result = pParent->MapViewOfFile(hFileMappingObject,
-		dwDesiredAccess,
-		dwFileOffsetHigh,
-		dwFileOffsetLow,
-		dwNumberOfBytesToMap);
+		   dwDesiredAccess,
+		   dwFileOffsetHigh,
+		   dwFileOffsetLow,
+		   dwNumberOfBytesToMap);
 	else
 	{
 		DWORD dwExtra = dwFileOffsetLow & dwAllocationMask;
 		result = ::MapViewOfFile(hFileMappingObject,
-			dwDesiredAccess,
-			dwFileOffsetHigh,
-			dwFileOffsetLow^dwExtra,
-			dwNumberOfBytesToMap+dwExtra);
+		   dwDesiredAccess,
+		   dwFileOffsetHigh,
+		   dwFileOffsetLow ^ dwExtra,
+		   dwNumberOfBytesToMap + dwExtra);
 		if (result)
-			result = (LPVOID) ((DWORD)result + dwExtra);
+			result = (LPVOID) ((ULONG_PTR)result + dwExtra);  // FIX: ULONG_PTR, not DWORD
 	}
-	
+
 	if (result == 0)
-		dwLastError = (pParent)? (pParent->GetLastError()) : (::GetLastError());
-	
+		dwLastError = (pParent) ? (pParent->GetLastError()) : (::GetLastError());
+
 	return result;
 }
 //--------------------------------------------------------------------------//
@@ -1664,9 +1664,9 @@ DWORD DOSFileSystem::GetFilePosition (HANDLE hFileHandle, PLONG pPositionHigh)
 }
 //--------------------------------------------------------------------------//
 //
-LONG DOSFileSystem::GetFileName (LPSTR lpBuffer, LONG lBufferSize)
+SIZE_T DOSFileSystem::GetFileName (LPSTR lpBuffer, SIZE_T lBufferSize)
 {
-	lBufferSize = __min(lBufferSize, (LONG)strlen(szFilename)+1);
+	lBufferSize = __min(lBufferSize, (SIZE_T)strlen(szFilename)+1);
 	
 	if (lBufferSize > 0 && lpBuffer)
 	{
@@ -1708,16 +1708,16 @@ GENRESULT DOSFileSystem::GetPreference (DWORD dwNumber, PDWORD pdwValue)
 //--------------------------------------------------------------------------//
 //
 GENRESULT DOSFileSystem::ReadDirectoryExtension (HANDLE hFile, LPVOID lpBuffer, 
-												 DWORD nNumberOfBytesToRead,
-												 LPDWORD lpNumberOfBytesRead, DWORD dwStartOffset)
+												 SIZE_T nNumberOfBytesToRead,
+												 LPDWORD lpNumberOfBytesRead, SIZE_T dwStartOffset)
 {
 	return GR_GENERIC;
 }
 //--------------------------------------------------------------------------//
 //
 GENRESULT DOSFileSystem::WriteDirectoryExtension (HANDLE hFile, LPCVOID lpBuffer, 
-												  DWORD nNumberOfBytesToWrite,
-												  LPDWORD lpNumberOfBytesWritten, DWORD dwStartOffset)
+												  SIZE_T nNumberOfBytesToWrite,
+												  LPDWORD lpNumberOfBytesWritten, SIZE_T dwStartOffset)
 {
 	return GR_GENERIC;
 }

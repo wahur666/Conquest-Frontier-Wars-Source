@@ -62,19 +62,19 @@ struct DAFILEDESC : public DACOMDESC
    HANDLE                hTemplateFile = nullptr;
    LPFILESYSTEM          lpParent = {};
    HANDLE                hParent = nullptr;
-   HANDLE				 hFindFirst = nullptr;
+   HANDLE                hFindFirst = nullptr;
 
-	DAFILEDESC(const C8* _file_name = nullptr, const C8* _interface_name = "IFileSystem")
-	 : DACOMDESC(_interface_name),
-	   lpFileName(_file_name),
-	   dwDesiredAccess(GENERIC_READ),
-	   dwShareMode(FILE_SHARE_READ),
-	   dwCreationDistribution(OPEN_EXISTING),
-	   dwFlagsAndAttributes(FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN),
-	   hFindFirst(INVALID_HANDLE_VALUE)
-	 {
-			size = sizeof(*this);
-	 }
+    DAFILEDESC(const C8* _file_name = nullptr, const C8* _interface_name = "IFileSystem")
+     : DACOMDESC(_interface_name),
+       lpFileName(_file_name),
+       dwDesiredAccess(GENERIC_READ),
+       dwShareMode(FILE_SHARE_READ),
+       dwCreationDistribution(OPEN_EXISTING),
+       dwFlagsAndAttributes(FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN),
+       hFindFirst(INVALID_HANDLE_VALUE)
+     {
+          size = sizeof(*this);
+     }
 };
 
 
@@ -101,44 +101,52 @@ struct DACOM_NO_VTABLE IFileSystem : public IComponentFactory
 
    DEFMETHOD_(BOOL,CloseHandle) (HANDLE handle) = 0;
 
-   DEFMETHOD_(BOOL,ReadFile) (HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, 
+   // ReadFile/WriteFile: nNumberOfBytesToRead stays DWORD per Win32 convention
+   // (ReadFile itself is limited to DWORD-sized chunks)
+   DEFMETHOD_(BOOL,ReadFile) (HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
                LPDWORD lpNumberOfBytesRead,
                LPOVERLAPPED lpOverlapped=0) = 0;
 
    DEFMETHOD_(BOOL,WriteFile) (HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
                 LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped=0) = 0;
 
-   DEFMETHOD_(BOOL,GetOverlappedResult)   (HANDLE hFile,  
+   DEFMETHOD_(BOOL,GetOverlappedResult)   (HANDLE hFile,
                                  LPOVERLAPPED lpOverlapped,
-                                 LPDWORD lpNumberOfBytesTransferred,   
-                                 BOOL bWait) = 0;   
+                                 LPDWORD lpNumberOfBytesTransferred,
+                                 BOOL bWait) = 0;
 
-   DEFMETHOD_(DWORD,SetFilePointer) (HANDLE hFile, LONG lDistanceToMove, 
+   // SetFilePointer: use LARGE_INTEGER-compatible approach;
+   // lDistanceToMove stays LONG but lpDistanceToMoveHigh enables 64-bit offsets
+   DEFMETHOD_(DWORD,SetFilePointer) (HANDLE hFile, LONG lDistanceToMove,
                      PLONG lpDistanceToMoveHigh=0, DWORD dwMoveMethod=FILE_BEGIN) = 0;
 
    DEFMETHOD_(BOOL,SetEndOfFile) (HANDLE hFile = 0) = 0;
 
-   DEFMETHOD_(DWORD,GetFileSize) (HANDLE hFile=0, LPDWORD lpFileSizeHigh=0) = 0;   
+   // GetFileSize: returns DWORD (low), lpFileSizeHigh gets high 32 bits — matches Win32
+   // For sizes, combine as: ULONGLONG size = ((ULONGLONG)high << 32) | low
+   DEFMETHOD_(DWORD,GetFileSize) (HANDLE hFile=0, LPDWORD lpFileSizeHigh=0) = 0;
 
-   DEFMETHOD_(BOOL,LockFile) (HANDLE hFile,	
-							  DWORD dwFileOffsetLow,
-							  DWORD dwFileOffsetHigh,
-							  DWORD nNumberOfBytesToLockLow,
-							  DWORD nNumberOfBytesToLockHigh) = 0;
+   // LockFile/UnlockFile: High/Low pairs are correct Win32 convention for 64-bit offsets
+   DEFMETHOD_(BOOL,LockFile) (HANDLE hFile,
+                              DWORD dwFileOffsetLow,
+                              DWORD dwFileOffsetHigh,
+                              DWORD nNumberOfBytesToLockLow,
+                              DWORD nNumberOfBytesToLockHigh) = 0;
 
-   DEFMETHOD_(BOOL,UnlockFile) (HANDLE hFile, 
-								DWORD dwFileOffsetLow,
-								DWORD dwFileOffsetHigh,
-								DWORD nNumberOfBytesToUnlockLow,
-								DWORD nNumberOfBytesToUnlockHigh) = 0;
+   DEFMETHOD_(BOOL,UnlockFile) (HANDLE hFile,
+                                DWORD dwFileOffsetLow,
+                                DWORD dwFileOffsetHigh,
+                                DWORD nNumberOfBytesToUnlockLow,
+                                DWORD nNumberOfBytesToUnlockHigh) = 0;
 
    DEFMETHOD_(BOOL,GetFileTime) (HANDLE hFile,   LPFILETIME lpCreationTime,
                    LPFILETIME lpLastAccessTime, LPFILETIME lpLastWriteTime) = 0;
 
-   DEFMETHOD_(BOOL,SetFileTime) (HANDLE hFile,   CONST FILETIME *lpCreationTime, 
+   DEFMETHOD_(BOOL,SetFileTime) (HANDLE hFile,   CONST FILETIME *lpCreationTime,
                   CONST FILETIME *lpLastAccessTime,
                   CONST FILETIME *lpLastWriteTime) = 0;
 
+   // CreateFileMapping: dwMaximumSizeHigh/Low are correct Win32 convention for 64-bit sizes
    DEFMETHOD_(HANDLE,CreateFileMapping)   (HANDLE hFile=0,
                                  LPSECURITY_ATTRIBUTES lpFileMappingAttributes=0,
                                  DWORD flProtect=PAGE_READONLY,
@@ -146,32 +154,34 @@ struct DACOM_NO_VTABLE IFileSystem : public IComponentFactory
                                  DWORD dwMaximumSizeLow=0,
                                  LPCTSTR lpName=0) = 0;
 
+   // FIX: dwNumberOfBytesToMap must be SIZE_T (64-bit on x64) — was DWORD, causing
+   // pointer truncation and the 0x0000000054d80000 access violation
    DEFMETHOD_(LPVOID,MapViewOfFile)      (HANDLE hFileMappingObject,
-                                 DWORD dwDesiredAccess=FILE_MAP_READ,
-                                 DWORD dwFileOffsetHigh=0,
-                                 DWORD dwFileOffsetLow=0,
-                                 DWORD dwNumberOfBytesToMap=0) = 0;
-   
+                                 DWORD  dwDesiredAccess=FILE_MAP_READ,
+                                 DWORD  dwFileOffsetHigh=0,
+                                 DWORD  dwFileOffsetLow=0,
+                                 SIZE_T dwNumberOfBytesToMap=0) = 0;
+
    DEFMETHOD_(BOOL,UnmapViewOfFile)      (LPCVOID lpBaseAddress) = 0;
 
    DEFMETHOD_(HANDLE,FindFirstFile) (LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFileData) = 0;
-   
-   DEFMETHOD_(BOOL,FindNextFile) (HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData) = 0;   
-   
-   DEFMETHOD_(BOOL,FindClose) (HANDLE hFindFile) = 0;   
+
+   DEFMETHOD_(BOOL,FindNextFile) (HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData) = 0;
+
+   DEFMETHOD_(BOOL,FindClose) (HANDLE hFindFile) = 0;
 
    DEFMETHOD_(BOOL,CreateDirectory) (LPCTSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes=0) = 0;
 
    DEFMETHOD_(BOOL,RemoveDirectory) (LPCTSTR lpPathName) = 0;
-   
+
    DEFMETHOD_(DWORD,GetCurrentDirectory) (DWORD nBufferLength, LPTSTR lpBuffer) = 0;
 
    DEFMETHOD_(BOOL,SetCurrentDirectory) (LPCTSTR lpPathName) = 0;
 
-   DEFMETHOD_(BOOL,DeleteFile)  (LPCTSTR lpFileName) = 0; 
+   DEFMETHOD_(BOOL,DeleteFile)  (LPCTSTR lpFileName) = 0;
 
    DEFMETHOD_(BOOL,CopyFile)    (LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName, BOOL bFailIfExists) = 0;
-   
+
    DEFMETHOD_(BOOL,MoveFile) (LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName) = 0;
 
    DEFMETHOD_(DWORD,GetFileAttributes) (LPCTSTR lpFileName) = 0;
@@ -180,16 +190,19 @@ struct DACOM_NO_VTABLE IFileSystem : public IComponentFactory
 
    DEFMETHOD_(DWORD,GetLastError) (void) = 0;
 
-   //---------------   
+   //---------------
    // IFileSystem extensions to WIN32 system
-   //---------------   
-   
+   //---------------
+
    DEFMETHOD_(HANDLE,OpenChild) (DAFILEDESC *lpDesc) = 0;
-   
+
+   // FIX: GetFilePosition returns DWORD (low 32 bits), pPositionHigh gets upper 32 bits
+   // matches SetFilePointer convention — callers should use both for files > 4GB
    DEFMETHOD_(DWORD,GetFilePosition) (HANDLE hFile = 0, PLONG pPositionHigh=0) = 0;
-   
-   DEFMETHOD_(LONG,GetFileName) (LPSTR lpBuffer, LONG lBufferSize) = 0;
-   
+
+   // FIX: lBufferSize should be SIZE_T to handle large path buffers safely
+   DEFMETHOD_(SIZE_T,GetFileName) (LPSTR lpBuffer, SIZE_T lBufferSize) = 0;
+
    DEFMETHOD_(DWORD,GetAccessType) (void) = 0;
 
    DEFMETHOD(GetParentSystem) (LPFILESYSTEM *lplpFileSystem) = 0;
@@ -198,13 +211,14 @@ struct DACOM_NO_VTABLE IFileSystem : public IComponentFactory
 
    DEFMETHOD(GetPreference)  (DWORD dwNumber, PDWORD pdwValue) = 0;
 
-   DEFMETHOD(ReadDirectoryExtension) (HANDLE hFile, LPVOID lpBuffer, 
-										DWORD nNumberOfBytesToRead,
-										LPDWORD lpNumberOfBytesRead=0, DWORD dwStartOffset=0) = 0;
+   // FIX: nNumberOfBytesToRead and dwStartOffset should be SIZE_T for large directory extensions
+   DEFMETHOD(ReadDirectoryExtension) (HANDLE hFile, LPVOID lpBuffer,
+                                        SIZE_T nNumberOfBytesToRead,
+                                        LPDWORD lpNumberOfBytesRead=0, SIZE_T dwStartOffset=0) = 0;
 
-   DEFMETHOD(WriteDirectoryExtension) (HANDLE hFile, LPCVOID lpBuffer, 
-										DWORD nNumberOfBytesToWrite,
-										LPDWORD lpNumberOfBytesWritten=0, DWORD dwStartOffset=0) = 0;
+   DEFMETHOD(WriteDirectoryExtension) (HANDLE hFile, LPCVOID lpBuffer,
+                                        SIZE_T nNumberOfBytesToWrite,
+                                        LPDWORD lpNumberOfBytesWritten=0, SIZE_T dwStartOffset=0) = 0;
 
    DEFMETHOD_(LONG,SerialCall) (LPFILESYSTEM lpSystem, DAFILE_SERIAL_PROC lpProc, void *lpContext) = 0;
 
