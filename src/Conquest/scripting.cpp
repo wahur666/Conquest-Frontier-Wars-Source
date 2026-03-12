@@ -21,7 +21,7 @@
 #include <TSmartPointer.h>
 #include <EventSys2.h>
 #include <IConnection.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 #include <SaveLoad.h>
@@ -39,6 +39,7 @@
 #include <map>
 #include <string>
 #include <malloc.h>
+#include <span>
 
 //----------------------------------------------------------------------------------------------
 // ScriptParameterList
@@ -275,11 +276,27 @@ MEXTERN ScriptParameterList::~ScriptParameterList()
 
 struct Scripting : public IScripting, public IEventCallback, public ISaverLoader
 {
-	BEGIN_DACOM_MAP_INBOUND(Scripting)
-		DACOM_INTERFACE_ENTRY(IScripting)
-		DACOM_INTERFACE_ENTRY(IEventCallback)
-		DACOM_INTERFACE_ENTRY(ISaverLoader)
-	END_DACOM_MAP()
+	static IDAComponent* GetIScripting(void* self) {
+	    return static_cast<IScripting*>(
+	        static_cast<Scripting*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Scripting*>(self));
+	}
+	static IDAComponent* GetISaverLoader(void* self) {
+	    return static_cast<ISaverLoader*>(
+	        static_cast<Scripting*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IScripting",     &GetIScripting},
+	        {"IEventCallback", &GetIEventCallback},
+	        {"ISaverLoader",   &GetISaverLoader},
+	    };
+	    return map;
+	}
 
 	// IScripting startup/shutdown
 
@@ -862,7 +879,7 @@ struct _scripting : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		SCRIPTING = scripting = new DAComponent<Scripting>;
+		SCRIPTING = scripting = new DAComponentX<Scripting>;
 		AddToGlobalCleanupList((IDAComponent **) &SCRIPTING);
 	}
 

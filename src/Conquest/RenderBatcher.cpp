@@ -6,7 +6,7 @@
 #include <globals.h>
 
 #include "CQTrace.h"
-#include "tcomponent.h"
+#include "TComponent2.h"
 #include "stddat.h"
 #include "FDump.h"
 #include "pixel.h"
@@ -23,6 +23,7 @@
 #include <DEffectOpts.h>
 
 #include <IVertexBufferManager.h>
+#include <span>
 
 #include "TempStr.h"
 
@@ -82,14 +83,30 @@ struct RenderBatcher : 	IRenderPrimitive,
 						ICQBatch
 
 {
-	BEGIN_DACOM_MAP_INBOUND(RenderBatcher)
-	DACOM_INTERFACE_ENTRY(IRenderPrimitive)
-	DACOM_INTERFACE_ENTRY2(IID_IRenderPrimitive,IRenderPrimitive)
-	DACOM_INTERFACE_ENTRY(IAggregateComponent)
-	DACOM_INTERFACE_ENTRY2(IID_IAggregateComponent,IAggregateComponent)
-	DACOM_INTERFACE_ENTRY(ICQBatch)
-	DACOM_INTERFACE_ENTRY2(IID_ICQBatch,ICQBatch)
-	END_DACOM_MAP()
+	static IDAComponent* GetIRenderPrimitive(void* self) {
+	    return static_cast<IRenderPrimitive*>(
+	        static_cast<RenderBatcher*>(self));
+	}
+	static IDAComponent* GetIAggregateComponent(void* self) {
+	    return static_cast<IAggregateComponent*>(
+	        static_cast<RenderBatcher*>(self));
+	}
+	static IDAComponent* GetICQBatch(void* self) {
+	    return static_cast<ICQBatch*>(
+	        static_cast<RenderBatcher*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IRenderPrimitive",      &GetIRenderPrimitive},
+	        {IID_IRenderPrimitive,    &GetIRenderPrimitive},
+	        {"IAggregateComponent",   &GetIAggregateComponent},
+	        {IID_IAggregateComponent, &GetIAggregateComponent},
+	        {"ICQBatch",              &GetICQBatch},
+	        {IID_ICQBatch,            &GetICQBatch},
+	    };
+	    return map;
+	}
 
 public:		// public interface
     
@@ -2937,7 +2954,7 @@ __declspec(dllexport) IHeap * __stdcall GetBatchHeap (void)
 		{
 			ICOManager *DACOM = DACOM_Acquire();
 			IComponentFactory *server1;
-			if( DACOM && (server1 = new DAComponentFactory2<DAComponentAggregate<RenderBatcher>, AGGDESC>("IRenderPrimitive")) != NULL ) {
+			if( DACOM && (server1 = new DAComponentFactoryX2<DAComponentAggregateX<RenderBatcher>, AGGDESC>("IRenderPrimitive")) != NULL ) {
 				DACOM->RegisterComponent( server1, "IRenderPrimitive", DACOM_HIGH_PRIORITY );
 				server1->Release();
 			}

@@ -36,6 +36,8 @@
 #include <MScript.h>
 #endif
 
+#include <span>
+
 #include "IPlanet.h"
 #include "Sector.h"
 #include "DNebula.h"
@@ -461,10 +463,22 @@ struct PLAYERAI_SAVELOAD
 //
 struct DACOM_NO_VTABLE SPlayerAI : public ISPlayerAI, IEventCallback, PLAYERAI_SAVELOAD
 {
-	BEGIN_DACOM_MAP_INBOUND(SPlayerAI)
-	DACOM_INTERFACE_ENTRY(ISPlayerAI)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetISPlayerAI(void* self) {
+	    return static_cast<ISPlayerAI*>(
+	        static_cast<SPlayerAI*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<SPlayerAI*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ISPlayerAI",     &GetISPlayerAI},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	//--------------------------------
 	// member data

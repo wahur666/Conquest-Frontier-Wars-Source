@@ -33,7 +33,10 @@
 #include "IPlanet.h"
 
 #include <IConnection.h>
+#include <span>
 #include <TSmartPointer.h>
+
+#include "TComponent2.h"
 
 using namespace CQGAMETYPES;
 
@@ -229,9 +232,17 @@ struct GenStruct
 
 struct DACOM_NO_VTABLE MapGen : public IMapGen
 {
-	BEGIN_DACOM_MAP_INBOUND(MapGen)
-	DACOM_INTERFACE_ENTRY(IMapGen)
-	END_DACOM_MAP()
+	static IDAComponent* GetIMapGen(void* self) {
+	    return static_cast<IMapGen*>(
+	        static_cast<MapGen*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IMapGen", &GetIMapGen},
+	    };
+	    return map;
+	}
 
 	virtual ~MapGen();
 
@@ -3311,7 +3322,7 @@ struct _mapGen : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		MAPGEN = mapGen = new DAComponent<MapGen>;
+		MAPGEN = mapGen = new DAComponentX<MapGen>;
 		AddToGlobalCleanupList(&mapGen);
 	}
 

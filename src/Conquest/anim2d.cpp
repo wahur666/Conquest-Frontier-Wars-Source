@@ -17,6 +17,9 @@
 #include <Engine.h>
 //#include <RPUL\PrimitiveBuilder.h>
 #include <IRenderPrimitive.h>
+#include <span>
+
+#include "TComponent2.h"
 
 AnimArchetype::AnimArchetype (void) : frames (NULL)
 {
@@ -485,10 +488,22 @@ struct DACOM_NO_VTABLE Anim2D : public IAnim2D
 	// Incoming interface map
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(Anim2D)
-	//DACOM_INTERFACE_ENTRY (IDAComponent)
-	//DACOM_INTERFACE_ENTRY (IAnim2D)
-	END_DACOM_MAP()
+	static IDAComponent* GetIDAComponent(void* self) {
+	    return static_cast<IDAComponent*>(
+	        static_cast<Anim2D*>(self));
+	}
+	static IDAComponent* GetIAnim2D(void* self) {
+	    return static_cast<IAnim2D*>(
+	        static_cast<Anim2D*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDAComponent", &GetIDAComponent},
+	        {"IAnim2D",      &GetIAnim2D},
+	    };
+	    return map;
+	}
 
 	Anim2D (void);
 
@@ -1218,7 +1233,7 @@ struct _anim : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		ANIM2D = anim2d = new DAComponent<Anim2D>;
+		ANIM2D = anim2d = new DAComponentX<Anim2D>;
 		AddToGlobalCleanupList((IDAComponent **) &ANIM2D);
 	}
 

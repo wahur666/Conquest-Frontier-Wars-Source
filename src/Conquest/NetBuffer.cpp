@@ -29,10 +29,11 @@
 #include "CQTrace.h"
 
 #include <IProfileParser.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
 #include <EventSys2.h>
+#include <span>
 
 #include <directx2007aug/dplobby.h>
 
@@ -132,9 +133,17 @@ struct SYNC_PACKET : BASE_PACKET
 //
 struct DACOM_NO_VTABLE NetBuffer : public INetBuffer
 {
-	BEGIN_DACOM_MAP_INBOUND(NetBuffer)
-	DACOM_INTERFACE_ENTRY(INetBuffer)
-	END_DACOM_MAP()
+	static IDAComponent* GetINetBuffer(void* self) {
+	    return static_cast<INetBuffer*>(
+	        static_cast<NetBuffer*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"INetBuffer", &GetINetBuffer},
+	    };
+	    return map;
+	}
 
 	//--------------------
 	// data members
@@ -1224,7 +1233,7 @@ struct _netbuffer : GlobalComponent
 	virtual void Startup (void)
 	{
 		CQASSERT(PT_LAST <= (1 << (PACKETTYPEBITS-1)));
-		NETBUFFER = new DAComponent<NetBuffer>;
+		NETBUFFER = new DAComponentX<NetBuffer>;
 		AddToGlobalCleanupList((IDAComponent **) &NETBUFFER);
 	}
 

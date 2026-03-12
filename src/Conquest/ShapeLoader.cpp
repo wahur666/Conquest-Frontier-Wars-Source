@@ -20,12 +20,13 @@
 #include "CQTrace.h"
 #include "IImageReader.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 #include <HeapObj.h>
 #include <TSmartPointer.h>
 #include <IConnection.h>
+#include <span>
 
 //--------------------------------------------------------------------------//
 //
@@ -101,9 +102,17 @@ struct DACOM_NO_VTABLE ShapeLoader : IShapeLoader
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(ShapeLoader)
-	DACOM_INTERFACE_ENTRY(IShapeLoader)
-	END_DACOM_MAP()
+	static IDAComponent* GetIShapeLoader(void* self) {
+	    return static_cast<IShapeLoader*>(
+	        static_cast<ShapeLoader*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IShapeLoader", &GetIShapeLoader},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -216,9 +225,17 @@ struct DACOM_NO_VTABLE ShapeLoaderFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ShapeLoaderFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<ShapeLoaderFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	ShapeLoaderFactory (void) { }
 
@@ -304,7 +321,7 @@ BOOL32 ShapeLoaderFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT ShapeLoaderFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	SHPTYPE * type = (SHPTYPE *) hArchetype;
-	ShapeLoader * result = new DAComponent<ShapeLoader>;
+	ShapeLoader * result = new DAComponentX<ShapeLoader>;
 
 	result->pShpType = type;
 	*pInstance = result;
@@ -318,7 +335,7 @@ struct _vfxshapefactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<ShapeLoaderFactory>;
+		factory = new DAComponentX<ShapeLoaderFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

@@ -30,7 +30,7 @@
 #include "IVertexBuffer.h"
 
 #include <3DMath.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
@@ -41,6 +41,7 @@
 #include <mesh.h>
 
 #include <malloc.h>
+#include <span>
 #include <stdlib.h>
 
 static U32 BACKGROUNDTEXMEMUSED=0;
@@ -97,10 +98,22 @@ struct DACOM_NO_VTABLE SpaceEnvironment : public IEventCallback, IBackground, IV
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(SpaceEnvironment)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IBackground)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<SpaceEnvironment*>(self));
+	}
+	static IDAComponent* GetIBackground(void* self) {
+	    return static_cast<IBackground*>(
+	        static_cast<SpaceEnvironment*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback", &GetIEventCallback},
+	        {"IBackground",    &GetIBackground},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{
@@ -695,7 +708,7 @@ struct _stars : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		BACKGROUND = spaceEnv = new DAComponent<SpaceEnvironment>;
+		BACKGROUND = spaceEnv = new DAComponentX<SpaceEnvironment>;
 		AddToGlobalCleanupList(&BACKGROUND);
 	}
 

@@ -21,17 +21,26 @@
 #include "Resource.h"
 
 #include <FileSys.h>
+#include <span>
 #include <TSmartPointer.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 //
 struct DACOM_NO_VTABLE LFParser : public ILFParser
 {
-	BEGIN_DACOM_MAP_INBOUND(LFParser)
-	DACOM_INTERFACE_ENTRY(ILFParser)
-	END_DACOM_MAP()
+	static IDAComponent* GetILFParser(void* self) {
+	    return static_cast<ILFParser*>(
+	        static_cast<LFParser*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ILFParser", &GetILFParser},
+	    };
+	    return map;
+	}
 
 	//------------------------
 	U32 * frameArray;
@@ -327,7 +336,7 @@ BaseCase:
 //
 GENRESULT __stdcall CreateLFParser (ILFParser ** result)
 {
-	*result = new DAComponent<LFParser>;
+	*result = new DAComponentX<LFParser>;
 	return GR_OK;
 }
 

@@ -27,11 +27,12 @@
 #include "GRPackets.h"
 
 #include <FileSys.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
 #include <EventSys2.h>
 #include <IConnection.h>
+#include <span>
 
 #if 0
 #include "DBHotkeys.h"
@@ -537,10 +538,22 @@ int NETPLAYER::dispatchPackets (void)
 //
 struct DACOM_NO_VTABLE NetPacket : public INetPacket, IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(NetPacket)
-	DACOM_INTERFACE_ENTRY(INetPacket)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetINetPacket(void* self) {
+	    return static_cast<INetPacket*>(
+	        static_cast<NetPacket*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<NetPacket*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"INetPacket",     &GetINetPacket},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	//--------------------
 	// data members
@@ -2378,7 +2391,7 @@ struct _netpacket : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		NETPACKET = net = new DAComponent<NetPacket>;
+		NETPACKET = net = new DAComponentX<NetPacket>;
 		AddToGlobalCleanupList(&NETPACKET);
 	}
 

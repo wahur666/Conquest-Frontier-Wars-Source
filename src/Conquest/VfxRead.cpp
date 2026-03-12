@@ -14,8 +14,10 @@
 #include <globals.h>
 #include "IImageReader.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <HeapObj.h>
+#include <span>
+
 #include "VFX_shapes.hpp"
 
 //--------------------------------------------------------------------------//
@@ -26,9 +28,17 @@
 
 struct DACOM_NO_VTABLE VFXREADER : IImageReader
 {
-	BEGIN_DACOM_MAP_INBOUND(VFXREADER)
-  	DACOM_INTERFACE_ENTRY(IImageReader)
-  	END_DACOM_MAP()
+	static IDAComponent* GetIImageReader(void* self) {
+	    return static_cast<IImageReader*>(
+	        static_cast<VFXREADER*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IImageReader", &GetIImageReader},
+	    };
+	    return map;
+	}
 		
   	//------------------------------
   	// data members
@@ -364,7 +374,7 @@ void VFXREADER::getIndexFormat (U8 *buffer, const RECT * rect) const
 //
 void __stdcall CreateVFXReader (struct IImageReader ** reader)
 {
-	*reader = new DAComponent<VFXREADER>;
+	*reader = new DAComponentX<VFXREADER>;
 }
 //-------------------------------------------------------------------------//
 //----------------------------END VFXREAD.CPP------------------------------//

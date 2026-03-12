@@ -21,11 +21,12 @@
 #include "Resource.h"
 #include "GenData.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <HeapObj.h>
 #include <TSmartPointer.h>
 
 #include <malloc.h>
+#include <span>
 #include <stdlib.h>
 
 #define NUM_FONT_COLORS 2
@@ -40,9 +41,17 @@ void __stdcall CreateDrawAgentForFonts (struct IImageReader * reader, struct IDr
 //
 struct DACOM_NO_VTABLE MLFont : IFontDrawAgent, IImageReader
 {
-	BEGIN_DACOM_MAP_INBOUND(MLFont)
-  	DACOM_INTERFACE_ENTRY(IFontDrawAgent)
-  	END_DACOM_MAP()
+	static IDAComponent* GetIFontDrawAgent(void* self) {
+	    return static_cast<IFontDrawAgent*>(
+	        static_cast<MLFont*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IFontDrawAgent", &GetIFontDrawAgent},
+	    };
+	    return map;
+	}
 
 	//-------------------------------
 	// data set by createGDIObjects()
@@ -655,7 +664,7 @@ void MLFont::init (PGENTYPE _pArchetype, HFONT _hFont, COLORREF pen, COLORREF ba
 //
 void __stdcall CreateMultilineFontDrawAgent (PGENTYPE pArchetype, HFONT hFont, COLORREF pen, COLORREF background, struct IFontDrawAgent ** _fontDrawAgent)
 {
-	MLFont * fontDrawAgent = new DAComponent<MLFont>;
+	MLFont * fontDrawAgent = new DAComponentX<MLFont>;
 
 	CQASSERT(hFont);
 

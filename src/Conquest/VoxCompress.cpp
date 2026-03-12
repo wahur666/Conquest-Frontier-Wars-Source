@@ -30,7 +30,8 @@
 // this comes from INI file now
 // #define VOXWARE_KEY "35243410-F7340C0668-CD78867B74DAD857-AC71429AD8CAFCB5-E4E1A99E7FFD-371"
 
-#include <TComponent.h>
+#include <span>
+#include <TComponent2.h>
 
 #ifndef WAVE_FORMAT_MSRT24
 #define WAVE_FORMAT_MSRT24 0x0082
@@ -57,9 +58,17 @@ typedef struct tagVOXACM_WAVEFORMATEX
 
 struct DACOM_NO_VTABLE VoxCompression : public IVoxCompression
 {
-	BEGIN_DACOM_MAP_INBOUND(VoxCompression)
-	DACOM_INTERFACE_ENTRY(IVoxCompression)
-	END_DACOM_MAP()
+	static IDAComponent* GetIVoxCompression(void* self) {
+	    return static_cast<IVoxCompression*>(
+	        static_cast<VoxCompression*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IVoxCompression", &GetIVoxCompression},
+	    };
+	    return map;
+	}
 	//
 	// IVoxCompression functions
 	//
@@ -464,7 +473,7 @@ struct _voxCompression : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		VOXCOMP = new DAComponent<VoxCompression>;
+		VOXCOMP = new DAComponentX<VoxCompression>;
 		AddToGlobalCleanupList((IDAComponent **) &VOXCOMP);
 	}
 

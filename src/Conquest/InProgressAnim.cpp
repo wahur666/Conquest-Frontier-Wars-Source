@@ -28,7 +28,7 @@
 
 #include <TSmartPointer.h>
 #include <EventSys2.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IDDBackDoor.h>
 
 void __stdcall SetPipelineCriticalSection (CRITICAL_SECTION * criticalSection);
@@ -58,14 +58,39 @@ inline long __fastcall F2LONG (SINGLE s)
 //
 struct IPAnim : IPANIM, BaseHotRect
 {
-	BEGIN_DACOM_MAP_INBOUND(IPAnim)
-	DACOM_INTERFACE_ENTRY(IPANIM)
-	DACOM_INTERFACE_ENTRY(BaseHotRect)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIPANIM(void* self) {
+	    return static_cast<IPANIM*>(
+	        static_cast<IPAnim*>(self));
+	}
+	static IDAComponent* GetBaseHotRect(void* self) {
+	    return reinterpret_cast<IDAComponent*>(
+			static_cast<BaseHotRect*>(
+				static_cast<IPAnim*>(self)));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<IPAnim*>(self));
+	}
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<IPAnim*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<IPAnim*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IPANIM",                        &GetIPANIM},
+	        {"BaseHotRect",                   &GetBaseHotRect},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	//  data
@@ -494,7 +519,7 @@ void IPAnim::main (void)
 //
 void __stdcall CreateInProgressAnim (IPANIM ** ppAnim)
 {
-	IPAnim * result = new DAComponent<IPAnim>;
+	IPAnim * result = new DAComponentX<IPAnim>;
 	result->init();
 	*ppAnim = result;
 }

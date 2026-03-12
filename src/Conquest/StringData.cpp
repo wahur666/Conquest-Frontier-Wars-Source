@@ -20,7 +20,7 @@
 #include "CQTrace.h"
 
 #include <TSmartPointer.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <IConnection.h>
 #include <FileSys.h>
 #include <TConnPoint.h>
@@ -29,6 +29,7 @@
 #include <MemFile.h>
 #include <Document.h>
 #include <EventSys2.h>
+#include <span>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -64,10 +65,22 @@ struct DACOM_NO_VTABLE StringData : public IStringData, IEventCallback
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(StringData)
-	DACOM_INTERFACE_ENTRY(IStringData)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIStringData(void* self) {
+	    return static_cast<IStringData*>(
+	        static_cast<StringData*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<StringData*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IStringData",    &GetIStringData},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	U32 eventHandle;
 
@@ -366,7 +379,7 @@ struct _stringlist : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		STRINGDATA = list = new DAComponent<StringData>;
+		STRINGDATA = list = new DAComponentX<StringData>;
 		AddToGlobalCleanupList((IDAComponent **) &STRINGDATA);
 	}
 

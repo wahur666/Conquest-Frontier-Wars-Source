@@ -30,13 +30,14 @@
 #include "Camera.h"
 #include "UserDefaults.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <TSmartPointer.h>
 #include <FileSys.h>
 #include <RendPipeline.h>
 //#include <RPUL\PrimitiveBuilder.h>
 #include "VFX_shapes.hpp"
 #include <malloc.h>
+#include <span>
 
 #define AWKWARD_HEIGHT  40
 
@@ -89,9 +90,17 @@ void EnableFastDrawAgent (bool bEnable)
 //
 struct DACOM_NO_VTABLE DrawAgent : IDrawAgent
 {
-	BEGIN_DACOM_MAP_INBOUND(DrawAgent)
-  	DACOM_INTERFACE_ENTRY(IDrawAgent)
-  	END_DACOM_MAP()
+	static IDAComponent* GetIDrawAgent(void* self) {
+	    return static_cast<IDrawAgent*>(
+	        static_cast<DrawAgent*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDrawAgent", &GetIDrawAgent},
+	    };
+	    return map;
+	}
 
 	//------------------------------
 	// 2D shape data
@@ -807,7 +816,7 @@ Done:
 //
 void __stdcall CreateDrawAgent (struct IImageReader * reader, struct IDrawAgent ** _drawAgent,BOOL32 bHiRes ,RECT * pRect)
 {
-	DrawAgent * drawAgent = new DAComponent<DrawAgent>;
+	DrawAgent * drawAgent = new DAComponentX<DrawAgent>;
 	
 	if (drawAgent->init(reader, 1, bHiRes, pRect))
 		*_drawAgent = drawAgent;
@@ -821,7 +830,7 @@ void __stdcall CreateDrawAgent (struct IImageReader * reader, struct IDrawAgent 
 //
 void __stdcall CreateDrawAgentForFonts (struct IImageReader * reader, struct IDrawAgent ** _drawAgent, RECT * pRect)
 {
-	DrawAgent * drawAgent = new DAComponent<DrawAgent>;
+	DrawAgent * drawAgent = new DAComponentX<DrawAgent>;
 	
 	if (drawAgent->init(reader, 0, false, pRect))
 		*_drawAgent = drawAgent;
@@ -926,9 +935,17 @@ struct TEXCOORD
 
 struct DACOM_NO_VTABLE FontDrawAgent : IDebugFontDrawAgent
 {
-	BEGIN_DACOM_MAP_INBOUND(FontDrawAgent)
-  	DACOM_INTERFACE_ENTRY(IDebugFontDrawAgent)
-  	END_DACOM_MAP()
+	static IDAComponent* GetIDebugFontDrawAgent(void* self) {
+	    return static_cast<IDebugFontDrawAgent*>(
+	        static_cast<FontDrawAgent*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IDebugFontDrawAgent", &GetIDebugFontDrawAgent},
+	    };
+	    return map;
+	}
 
 	//-------------------------------
 	// vfx data
@@ -1229,7 +1246,7 @@ Done:
 //
 void __stdcall DEBUGCreateFontDrawAgent (const VFX_FONT * font, U32 fontImageSize, struct IDebugFontDrawAgent ** _fontDrawAgent, const char *txm_name)
 {
-	FontDrawAgent * fontDrawAgent = new DAComponent<FontDrawAgent>;
+	FontDrawAgent * fontDrawAgent = new DAComponentX<FontDrawAgent>;
 	
 	if (fontDrawAgent->init(font, fontImageSize, txm_name))
 		*_fontDrawAgent = fontDrawAgent;

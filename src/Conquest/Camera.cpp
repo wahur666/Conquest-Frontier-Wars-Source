@@ -35,7 +35,7 @@
 #include "CQBatch.h"
 
 #include <BaseCam.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <TSmartPointer.h>
 #include <IConnection.h>
 #include <Engine.h>
@@ -67,12 +67,27 @@ static char szRegKey[] = "Camera";
 struct DACOM_NO_VTABLE Camera : public IBaseCamera, BaseCamera, IEventCallback, DocumentClient
 
 {
-	BEGIN_DACOM_MAP_INBOUND(Camera)
-	DACOM_INTERFACE_ENTRY(ICamera)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	DACOM_INTERFACE_ENTRY_REF("IViewer", viewer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetICamera(void* self) {
+	    return static_cast<ICamera*>(
+	        static_cast<Camera*>(self));
+	}
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<Camera*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Camera*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICamera",         &GetICamera},
+	        {"IDocumentClient", &GetIDocumentClient},
+	        {"IEventCallback",  &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 
 	enum CAMERA_ROTATION
@@ -2086,7 +2101,7 @@ static Camera * CreateCamera (CAMERA_INIT * info)
 	Camera * camera;
 	Vector position (0,0,1000);
 
-	if ((camera = new DAComponent<Camera>) == 0)
+	if ((camera = new DAComponentX<Camera>) == 0)
 		return 0;
 
 	if (info->flags & CIF_PANE)

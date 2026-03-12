@@ -43,7 +43,7 @@
 #include "ObjMapIterator.h"
 
 #include <Renderer.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <Engine.h>
 #include <Vector.h>
 #include <Physics.h>
@@ -56,6 +56,7 @@
 #include <Pixel.h>
 //#include <RPUL\PrimitiveBuilder.h>
 #include <IRenderPrimitive.h>
+#include <span>
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 /*static void Transform_to_4x4 (float m[16], const Transform &t)
@@ -1036,9 +1037,17 @@ struct DACOM_NO_VTABLE ArcCannonFactory : public IObjectFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(ArcCannonFactory)
-	DACOM_INTERFACE_ENTRY(IObjectFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetIObjectFactory(void* self) {
+	    return static_cast<IObjectFactory*>(
+	        static_cast<ArcCannonFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IObjectFactory", &GetIObjectFactory},
+	    };
+	    return map;
+	}
 
 	ArcCannonFactory (void) { }
 
@@ -1180,7 +1189,7 @@ struct _arcCannon : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		sfactory = new DAComponent<ArcCannonFactory>;
+		sfactory = new DAComponentX<ArcCannonFactory>;
 		AddToGlobalCleanupList((IDAComponent **) &sfactory);
 	}
 

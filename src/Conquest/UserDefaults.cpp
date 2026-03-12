@@ -22,7 +22,7 @@
 #include "UserDefaults.h"
 #include "CQTrace.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <HeapObj.h>
 #include <Viewer.h>
 #include <Document.h>
@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <commdlg.h>               // Common dialogs
 #include <shlwapi.h>
+#include <span>
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 
@@ -69,9 +70,17 @@ struct DACOM_NO_VTABLE UserDefaults : public IUserDefaults
 	// interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(UserDefaults)
-	DACOM_INTERFACE_ENTRY(IUserDefaults)
-	END_DACOM_MAP()
+	static IDAComponent* GetIUserDefaults(void* self) {
+	    return static_cast<IUserDefaults*>(
+	        static_cast<UserDefaults*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IUserDefaults", &GetIUserDefaults},
+	    };
+	    return map;
+	}
 
 	UserDefaults (void)
 	{
@@ -1194,7 +1203,7 @@ BOOL32 CreateUserDefaults (void)
 {
 	if (DEFAULTS==0)
 	{
-		DEFAULTS = new DAComponent<UserDefaults>;
+		DEFAULTS = new DAComponentX<UserDefaults>;
 		AddToGlobalCleanupList((IDAComponent **) &DEFAULTS);
 	}
 

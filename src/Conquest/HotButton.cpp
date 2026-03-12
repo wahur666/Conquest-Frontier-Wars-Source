@@ -25,7 +25,7 @@
 #include "IInterfaceManager.h"
 #include <DSounds.h>
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 
@@ -36,14 +36,39 @@ struct DACOM_NO_VTABLE HotButton : BaseHotRect, IHotButton
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(HotButton)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IHotButton)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(BaseHotRect)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<HotButton*>(self));
+	}
+	static IDAComponent* GetIHotButton(void* self) {
+	    return static_cast<IHotButton*>(
+	        static_cast<HotButton*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<HotButton*>(self));
+	}
+	static IDAComponent* GetBaseHotRect(void* self) {
+	    return reinterpret_cast<IDAComponent*>(
+	    	static_cast<BaseHotRect*>(
+				static_cast<HotButton*>(self)));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<HotButton*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IHotButton",                    &GetIHotButton},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"BaseHotRect",                   &GetBaseHotRect},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -563,9 +588,17 @@ struct DACOM_NO_VTABLE HotButtonFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(HotButtonFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<HotButtonFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	HotButtonFactory (void) { }
 
@@ -653,7 +686,7 @@ BOOL32 HotButtonFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT HotButtonFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	CQASSERT((U32)hArchetype == 1 && pArchetype != 0);
-	HotButton * result = new DAComponent<HotButton>;
+	HotButton * result = new DAComponentX<HotButton>;
 
 	result->init(pArchetype, hSound);
 	*pInstance = result->getBase();
@@ -667,7 +700,7 @@ struct _hotbuttonfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<HotButtonFactory>;
+		factory = new DAComponentX<HotButtonFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

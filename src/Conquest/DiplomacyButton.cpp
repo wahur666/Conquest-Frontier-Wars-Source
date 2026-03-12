@@ -22,7 +22,7 @@
 
 #include <DDiplomacyButton.h>
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 
@@ -76,14 +76,38 @@ struct DACOM_NO_VTABLE DiplomacyButton : BaseHotRect, IDiplomacyButton, IKeyboar
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(DiplomacyButton)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IDiplomacyButton)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IKeyboardFocus)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<DiplomacyButton*>(self));
+	}
+	static IDAComponent* GetIDiplomacyButton(void* self) {
+	    return static_cast<IDiplomacyButton*>(
+	        static_cast<DiplomacyButton*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<DiplomacyButton*>(self));
+	}
+	static IDAComponent* GetIKeyboardFocus(void* self) {
+	    return static_cast<IKeyboardFocus*>(
+	        static_cast<DiplomacyButton*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<DiplomacyButton*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IDiplomacyButton",              &GetIDiplomacyButton},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IKeyboardFocus",                &GetIKeyboardFocus},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -447,9 +471,17 @@ struct DACOM_NO_VTABLE DiplomacyButtonFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(DiplomacyButtonFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<DiplomacyButtonFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	DiplomacyButtonFactory (void) { }
 
@@ -547,7 +579,7 @@ BOOL32 DiplomacyButtonFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT DiplomacyButtonFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	DIPBUTTONTYPE * type = (DIPBUTTONTYPE *) hArchetype;
-	DiplomacyButton * result = new DAComponent<DiplomacyButton>;
+	DiplomacyButton * result = new DAComponentX<DiplomacyButton>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -561,7 +593,7 @@ struct _dipbuttonfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<DiplomacyButtonFactory>;
+		factory = new DAComponentX<DiplomacyButtonFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

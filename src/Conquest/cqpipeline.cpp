@@ -15,6 +15,9 @@
 
 #include <rendpipeline.h>
 #include <FVF.h>
+#include <span>
+
+#include "TComponent2.h"
 
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -42,12 +45,20 @@ struct CQPipeline : IRenderPipeline
 	IDAComponent * container;
 	IRenderPipeline * pipe;
 	CRITICAL_SECTION * criticalSection;
-	DAComponentInner<CQPipeline> innerComponent;
+	DAComponentInnerX<CQPipeline> innerComponent;
 
-	BEGIN_DACOM_MAP_INBOUND(CQPipeline)
-	DACOM_INTERFACE_ENTRY(IRenderPipeline)
-	DACOM_INTERFACE_ENTRY2(IID_IRenderPipeline, IRenderPipeline)
-	END_DACOM_MAP()
+	static IDAComponent* GetIRenderPipeline(void* self) {
+	    return static_cast<IRenderPipeline*>(
+	        static_cast<CQPipeline*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IRenderPipeline",   &GetIRenderPipeline},
+	        {IID_IRenderPipeline, &GetIRenderPipeline},
+	    };
+	    return map;
+	}
 
     void * operator new (size_t size)
 	{

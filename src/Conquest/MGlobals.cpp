@@ -48,7 +48,7 @@
 
 #include <IDocClient.h>
 #include <FileSys.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <TSmartPointer.h>
 #include <Heapobj.h>
 #include <Viewer.h>
@@ -59,6 +59,7 @@
 #include <IConnection.h>
 
 #include <malloc.h>
+#include <span>
 
 using namespace CQGAMETYPES;
 
@@ -316,10 +317,22 @@ struct DACOM_NO_VTABLE GlobalViewer : IEventCallback, IDocumentClient
 	// incoming interface map
 	//
   
-	BEGIN_DACOM_MAP_INBOUND(GlobalViewer)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDocumentClient)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<GlobalViewer*>(self));
+	}
+	static IDAComponent* GetIDocumentClient(void* self) {
+	    return static_cast<IDocumentClient*>(
+	        static_cast<GlobalViewer*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventCallback",  &GetIEventCallback},
+	        {"IDocumentClient", &GetIDocumentClient},
+	    };
+	    return map;
+	}
 
 	// infrastructure
 	COMPTR<IViewer> viewer;
@@ -3903,7 +3916,7 @@ struct _globalViewer : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		viewer = new DAComponent<GlobalViewer>;
+		viewer = new DAComponentX<GlobalViewer>;
 		AddToGlobalCleanupList(&viewer);
 	}
 	

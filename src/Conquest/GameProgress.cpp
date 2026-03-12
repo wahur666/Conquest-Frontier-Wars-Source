@@ -19,7 +19,10 @@
 #include "UserDefaults.h"
 
 #include <FileSys.h>
+#include <span>
 #include <TSmartPointer.h>
+
+#include "TComponent2.h"
 
 #define NAME_REG_KEY	"CQPlayerName"
 #define GPF_FILE		"player.gpf"
@@ -42,9 +45,17 @@ struct PROGRESS_DATA
 //
 struct DACOM_NO_VTABLE GameProgress : public IGameProgress
 {
-	BEGIN_DACOM_MAP_INBOUND(GameProgress)
-	DACOM_INTERFACE_ENTRY(IGameProgress)
-	END_DACOM_MAP()
+	static IDAComponent* GetIGameProgress(void* self) {
+	    return static_cast<IGameProgress*>(
+	        static_cast<GameProgress*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IGameProgress", &GetIGameProgress},
+	    };
+	    return map;
+	}
 
 	COMPTR<IFileSystem> fileSystem;
 	PROGRESS_DATA progressData;
@@ -327,7 +338,7 @@ struct _gameProgress : GlobalComponent
 {
 	virtual void Startup (void)
 	{
-		GAMEPROGRESS = new DAComponent<GameProgress>;
+		GAMEPROGRESS = new DAComponentX<GameProgress>;
 		AddToGlobalCleanupList((IDAComponent **) &GAMEPROGRESS);
 	}
 

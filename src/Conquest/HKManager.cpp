@@ -23,20 +23,33 @@
 #include <EventSys2.h>
 #include <IConnection.h>
 #include <HeapObj.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <WindowManager.h>
 #include <HKEvent.h>
 #include <MemFile.h>
+#include <span>
 
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 //
 struct DACOM_NO_VTABLE HKManager : IEventMessageFilter, IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(HKManager)
-	DACOM_INTERFACE_ENTRY(IEventMessageFilter)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIEventMessageFilter(void* self) {
+	    return static_cast<IEventMessageFilter*>(
+	        static_cast<HKManager*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<HKManager*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IEventMessageFilter", &GetIEventMessageFilter},
+	        {"IEventCallback",      &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 
 
@@ -248,7 +261,7 @@ struct _hkmanager : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		manager = new DAComponent<HKManager>;
+		manager = new DAComponentX<HKManager>;
 		AddToGlobalCleanupList(&manager);
 	}
 

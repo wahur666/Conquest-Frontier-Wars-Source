@@ -25,12 +25,13 @@
 #include <DFonts.h>
 
 #include <IConnection.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <HeapObj.h>
 #include <TSmartPointer.h>
 #include <FileSys.h>
 
 #include <malloc.h>
+#include <span>
 #include <stdlib.h>
 
 #define BITMAP_HEIGHT 64
@@ -47,9 +48,17 @@ void __stdcall CreateMultilineFontDrawAgent (PGENTYPE pArchetype, HFONT hFont, C
 //
 struct DACOM_NO_VTABLE FontDrawAgent16 : IFontDrawAgent, IImageReader
 {
-	BEGIN_DACOM_MAP_INBOUND(FontDrawAgent16)
-  	DACOM_INTERFACE_ENTRY(IFontDrawAgent)
-  	END_DACOM_MAP()
+	static IDAComponent* GetIFontDrawAgent(void* self) {
+	    return static_cast<IFontDrawAgent*>(
+	        static_cast<FontDrawAgent16*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IFontDrawAgent", &GetIFontDrawAgent},
+	    };
+	    return map;
+	}
 
 	//-------------------------------
 	// static data
@@ -272,10 +281,10 @@ void FontDrawAgent16::StringDraw (PANE *pane, S32 x, S32 y, U32 dwID)
 GENRESULT FontDrawAgent16::CreateDuplicate (IFontDrawAgent ** _agent)
 {
 	GENRESULT result = GR_OK;
-	COMPTR<DAComponent<FontDrawAgent16> >agent;
+	COMPTR<DAComponentX<FontDrawAgent16> >agent;
 	CreateFontDrawAgent(hFont, 0, palette[0], palette[1], _agent);
 	
-	if ((agent = (DAComponent<FontDrawAgent16> *) (*_agent)) != 0)
+	if ((agent = (DAComponentX<FontDrawAgent16> *) (*_agent)) != 0)
 	{
 		if ((agent->pArchetype = pArchetype) != 0)
 			GENDATA->AddRef(pArchetype);
@@ -573,7 +582,7 @@ void FontDrawAgent16::init (HFONT _hFont, BOOL32 _bOwnFont, COLORREF pen, COLORR
 //
 void __stdcall CreateFontDrawAgent (HFONT hFont, BOOL32 bOwnFont, COLORREF pen, COLORREF background, struct IFontDrawAgent ** _fontDrawAgent)
 {
-	FontDrawAgent16 * fontDrawAgent = new DAComponent<FontDrawAgent16>;
+	FontDrawAgent16 * fontDrawAgent = new DAComponentX<FontDrawAgent16>;
 
 	CQASSERT(hFont);
 
@@ -585,7 +594,7 @@ void __stdcall CreateFontDrawAgent (HFONT hFont, BOOL32 bOwnFont, COLORREF pen, 
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 // need multi-res code in here before we can begin
-struct NumberFont : DAComponent<FontDrawAgent16>
+struct NumberFont : DAComponentX<FontDrawAgent16>
 {
 	//-------------------------------
 	// instance data
@@ -772,9 +781,17 @@ struct DACOM_NO_VTABLE FontFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(FontFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<FontFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	FontFactory (void) { }
 
@@ -881,7 +898,7 @@ GENRESULT FontFactory::CreateInstance (HANDLE hArchetype, IDAComponent **pInstan
 	}
 	else
 	{
-		FontDrawAgent16 * result = new DAComponent<FontDrawAgent16>;
+		FontDrawAgent16 * result = new DAComponentX<FontDrawAgent16>;
 
 		result->init(type->hFont, 0, RGB(255,255,255)|0xFF000000, 0);
 		result->pArchetype = type->pArchetype;
@@ -899,7 +916,7 @@ struct _fontfactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<FontFactory>;
+		factory = new DAComponentX<FontFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 

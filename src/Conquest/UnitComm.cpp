@@ -36,13 +36,14 @@
 #include <TSmartPointer.h>
 #include <EventSys2.h>
 #include <IConnection.h>
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <HeapObj.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 
 #include <commctrl.h>
 #include <malloc.h>
+#include <span>
 
 #define cqoffsetofmember(base, member) (size_t)((&(((base *)0)->member))+0)
 
@@ -92,10 +93,22 @@ struct CommNode
 //
 struct DACOM_NO_VTABLE UnitComm : public IUnitComm, IEventCallback
 {
-	BEGIN_DACOM_MAP_INBOUND(UnitComm)
-	DACOM_INTERFACE_ENTRY(IUnitComm)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	END_DACOM_MAP()
+	static IDAComponent* GetIUnitComm(void* self) {
+	    return static_cast<IUnitComm*>(
+	        static_cast<UnitComm*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<UnitComm*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IUnitComm",      &GetIUnitComm},
+	        {"IEventCallback", &GetIEventCallback},
+	    };
+	    return map;
+	}
 
 	//--------------------------------
 	// data items go here
@@ -977,7 +990,7 @@ struct _unitcomm : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		UNITCOMM = comm = new DAComponent<UnitComm>;
+		UNITCOMM = comm = new DAComponentX<UnitComm>;
 		AddToGlobalCleanupList((IDAComponent **) &UNITCOMM);
 	}
 

@@ -24,7 +24,7 @@
 #include "IShapeLoader.h"
 #include "TManager.h"
 
-#include <TComponent.h>
+#include <TComponent2.h>
 #include <FileSys.h>
 #include <HKEvent.h>
 
@@ -66,13 +66,33 @@ struct DACOM_NO_VTABLE Animate : BaseHotRect, IAnimate
 	//
 	// incoming interface map
 	//
-	BEGIN_DACOM_MAP_INBOUND(Animate)
-	DACOM_INTERFACE_ENTRY(IResourceClient)
-	DACOM_INTERFACE_ENTRY(IAnimate)
-	DACOM_INTERFACE_ENTRY(IEventCallback)
-	DACOM_INTERFACE_ENTRY(IDAConnectionPointContainer)
-	DACOM_INTERFACE_ENTRY2(IID_IDAConnectionPointContainer, IDAConnectionPointContainer)
-	END_DACOM_MAP()
+	static IDAComponent* GetIResourceClient(void* self) {
+	    return static_cast<IResourceClient*>(
+	        static_cast<Animate*>(self));
+	}
+	static IDAComponent* GetIAnimate(void* self) {
+	    return static_cast<IAnimate*>(
+	        static_cast<Animate*>(self));
+	}
+	static IDAComponent* GetIEventCallback(void* self) {
+	    return static_cast<IEventCallback*>(
+	        static_cast<Animate*>(self));
+	}
+	static IDAComponent* GetIDAConnectionPointContainer(void* self) {
+	    return static_cast<IDAConnectionPointContainer*>(
+	        static_cast<Animate*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"IResourceClient",               &GetIResourceClient},
+	        {"IAnimate",                      &GetIAnimate},
+	        {"IEventCallback",                &GetIEventCallback},
+	        {"IDAConnectionPointContainer",   &GetIDAConnectionPointContainer},
+	        {IID_IDAConnectionPointContainer, &GetIDAConnectionPointContainer},
+	    };
+	    return map;
+	}
 
 	//
 	// data items
@@ -436,9 +456,17 @@ struct DACOM_NO_VTABLE AnimateFactory : public ICQFactory
 	// Interface mapping
 	//
 
-	BEGIN_DACOM_MAP_INBOUND(AnimateFactory)
-	DACOM_INTERFACE_ENTRY(ICQFactory)
-	END_DACOM_MAP()
+	static IDAComponent* GetICQFactory(void* self) {
+	    return static_cast<ICQFactory*>(
+	        static_cast<AnimateFactory*>(self));
+	}
+
+	static std::span<const DACOMInterfaceEntry2> GetInterfaceMap() {
+	    static const DACOMInterfaceEntry2 map[] = {
+	        {"ICQFactory", &GetICQFactory},
+	    };
+	    return map;
+	}
 
 	AnimateFactory (void) { }
 
@@ -545,7 +573,7 @@ BOOL32 AnimateFactory::DestroyArchetype (HANDLE hArchetype)
 GENRESULT AnimateFactory::CreateInstance (HANDLE hArchetype, IDAComponent ** pInstance)
 {
 	ANIMATETYPE * type = (ANIMATETYPE *) hArchetype;
-	Animate * result = new DAComponent<Animate>;
+	Animate * result = new DAComponentX<Animate>;
 
 	result->init(type);
 	*pInstance = result->getBase();
@@ -559,7 +587,7 @@ struct _AnimateFactory : GlobalComponent
 
 	virtual void Startup (void)
 	{
-		factory = new DAComponent<AnimateFactory>;
+		factory = new DAComponentX<AnimateFactory>;
 		AddToGlobalCleanupList(&factory);
 	}
 
