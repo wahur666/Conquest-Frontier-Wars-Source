@@ -40,7 +40,61 @@
 	FT_ASTEROID,
 	FT_MINEFIELD
 };*/
-struct IField;
+struct IField : IBaseObject
+{
+	char name[32];
+	struct IFieldManager *factory;
+	FIELDCLASS fieldType;
+	U32 infoHelpID;
+	IField * nextField;
+	BOOL32 flag:1;
+	struct FIELD_ATTRIBUTES attributes;
+
+	//--- IBaseObject ---//
+
+	virtual ~IField (void);	// find this in cloud.cpp
+
+	virtual void TestVisible (const USER_DEFAULTS & defaults, const U32 currentSystem, const U32 currentPlayer)	// set bVisible if possible for any part of object to appear
+	{
+		bVisible = (GetSystemID() == currentSystem);
+	}
+
+
+	virtual SINGLE TestHighlight (const RECT & rect)	// set bHighlight if possible for any part of object to appear within rect
+	{
+		bHighlight = FALSE;
+		return 0.0f;
+	}
+
+	//--- Field ---//
+
+	virtual BOOL32 Setup () = 0;//struct XYCoord *_squares=0,U32 _numSquares=0) = 0;
+
+	virtual BOOL32 Init (HANDLE hArchetype) = 0;
+
+	virtual BOOL32 ObjInField (U32 systemID,const Vector &pos)
+	{
+		return FALSE;
+	}
+
+	virtual void SetSystemID (U32 _systemID) = 0;
+
+	virtual void RenderBackground (void) = 0;
+
+	virtual Vector GetCenterPos (void) = 0;
+
+	virtual void SetFieldFlags (FIELDFLAGS &flags)
+	{}
+
+	virtual void PlaceBaseNuggets ()
+	{};
+
+	virtual void SetAmbientLight (const Vector &pos,const U8_RGB & old_amb)
+	{}
+
+	//	virtual BOOL32 Init (struct BASIC_DATA *data,struct FieldArchetype *fieldArch) = 0;//AnimArchetype *animArch) = 0;
+	//virtual void GetRegions(RECT **zone,U32 *numZones) {};
+};
 
 template <class Type> 
 struct FieldArchetype
@@ -366,61 +420,7 @@ struct DefaultArchetype : FieldArchetype<Type>
 	}
 };
 
-struct IField : IBaseObject
-{
-	char name[32];
-	struct IFieldManager *factory;
-	FIELDCLASS fieldType;
-	U32 infoHelpID;
-	IField * nextField;
-	BOOL32 flag:1;
-	struct FIELD_ATTRIBUTES attributes;
 
-	//--- IBaseObject ---//
-	
-	virtual ~IField (void);	// find this in cloud.cpp
-
-	virtual void TestVisible (const USER_DEFAULTS & defaults, const U32 currentSystem, const U32 currentPlayer)	// set bVisible if possible for any part of object to appear
-	{
-		bVisible = (GetSystemID() == currentSystem);
-	}
-
-
-	virtual SINGLE TestHighlight (const RECT & rect)	// set bHighlight if possible for any part of object to appear within rect
-	{
-		bHighlight = FALSE;
-		return 0.0f;
-	}
-
-	//--- Field ---//
-
-	virtual BOOL32 Setup () = 0;//struct XYCoord *_squares=0,U32 _numSquares=0) = 0;
-
-	virtual BOOL32 Init (HANDLE hArchetype) = 0;
-
-	virtual BOOL32 ObjInField (U32 systemID,const Vector &pos)
-	{
-		return FALSE;
-	}
-
-	virtual void SetSystemID (U32 _systemID) = 0;
-
-	virtual void RenderBackground (void) = 0;
-
-	virtual Vector GetCenterPos (void) = 0;
-
-	virtual void SetFieldFlags (FIELDFLAGS &flags)
-	{}
-
-	virtual void PlaceBaseNuggets ()
-	{};
-
-	virtual void SetAmbientLight (const Vector &pos,const U8_RGB & old_amb)
-	{}
-
-//	virtual BOOL32 Init (struct BASIC_DATA *data,struct FieldArchetype *fieldArch) = 0;//AnimArchetype *animArch) = 0;
-	//virtual void GetRegions(RECT **zone,U32 *numZones) {};
-};
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
