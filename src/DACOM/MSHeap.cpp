@@ -76,9 +76,9 @@ struct MSHeap : public IHeap
 
 	DEFMETHOD_(DA_ERROR_HANDLER,GetErrorHandler) (void);
 
-	DEFMETHOD_(BOOL32,SetBlockOwner) (void *allocatedBlock, U32 caller);
+	DEFMETHOD_(BOOL32,SetBlockOwner) (void *allocatedBlock, ULONG_PTR caller);
 
-	DEFMETHOD_(U32,GetBlockOwner) (void *allocatedBlock);
+	DEFMETHOD_(ULONG_PTR,GetBlockOwner) (void *allocatedBlock);
 
 	DEFMETHOD_(BOOL32,SetBlockMessage) (void *allocatedBlock, const C8 *msg);
 
@@ -207,13 +207,13 @@ DA_ERROR_HANDLER MSHeap::GetErrorHandler (void)
 }
 //--------------------------------------------------------------------------//
 //
-BOOL32 MSHeap::SetBlockOwner (void *allocatedBlock, U32 owner)
+BOOL32 MSHeap::SetBlockOwner (void *allocatedBlock, ULONG_PTR owner)
 {
 	return 0;
 }
 //--------------------------------------------------------------------------//
 //
-U32 MSHeap::GetBlockOwner (void *allocatedBlock)
+ULONG_PTR MSHeap::GetBlockOwner (void *allocatedBlock)
 {
 	return 0;
 }

@@ -34,7 +34,7 @@ struct BASE_BLOCK
 
 	union 
 	{
-		U32				pOwner;		// user defined, defaults to addr of code that allocated the block
+		ULONG_PTR				pOwner;		// user defined, defaults to addr of code that allocated the block
 		struct FREE_BLOCK *	pNext;	// next block in free list
 	};
 
@@ -152,9 +152,9 @@ struct BaseHeap : public IHeap
 
 	DEFMETHOD_(DA_ERROR_HANDLER,GetErrorHandler) (void);
 
-	DEFMETHOD_(BOOL32,SetBlockOwner) (void *allocatedBlock, U32 caller);
+	DEFMETHOD_(BOOL32,SetBlockOwner) (void *allocatedBlock, ULONG_PTR caller);
 
-	DEFMETHOD_(U32,GetBlockOwner) (void *allocatedBlock);
+	DEFMETHOD_(ULONG_PTR,GetBlockOwner) (void *allocatedBlock);
 
 	DEFMETHOD_(BOOL32,SetBlockMessage) (void *allocatedBlock, const C8 *msg);
 
@@ -229,15 +229,15 @@ struct HeapInstance : public BaseHeap
 
 	DEFMETHOD_(DA_ERROR_HANDLER,GetErrorHandler) (void);
 
-	DEFMETHOD_(BOOL32,SetBlockOwner) (void *allocatedBlock, U32 caller);
+	DEFMETHOD_(BOOL32,SetBlockOwner) (void *allocatedBlock, ULONG_PTR caller);
 
-	DEFMETHOD_(U32,GetBlockOwner) (void *allocatedBlock);
+	DEFMETHOD_(ULONG_PTR,GetBlockOwner) (void *allocatedBlock);
 
 	DEFMETHOD_(BOOL32,SetBlockMessage) (void *allocatedBlock, const C8 *msg);
 
 	// *** HeapInstance methods ***
 
-	GENRESULT initHeap (DAHEAPDESC *lpDesc);
+	GENRESULT initHeap (const DAHEAPDESC *lpDesc);
 
 	void __fastcall sort (FREE_BLOCK *pBlock);
 
@@ -468,10 +468,10 @@ struct MTHeapInstance : public HeapInstance
 		return result;
 	}
 
-	DEFMETHOD_(U32,GetBlockOwner) (void *allocatedBlock)
+	DEFMETHOD_(ULONG_PTR,GetBlockOwner) (void *allocatedBlock)
 	{
 		EnterCriticalSection(&criticalSection);
-		U32 result = HeapInstance::GetBlockOwner(allocatedBlock);
+		ULONG_PTR result = HeapInstance::GetBlockOwner(allocatedBlock);
 		LeaveCriticalSection(&criticalSection);
 		return result;
 	}

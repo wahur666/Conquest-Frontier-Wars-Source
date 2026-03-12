@@ -289,24 +289,20 @@ DA_ERROR_HANDLER HeapInstance::GetErrorHandler (void)
 }
 //--------------------------------------------------------------------------//
 //
-GENRESULT HeapInstance::initHeap (DAHEAPDESC *lpDesc)
+GENRESULT HeapInstance::initHeap (const DAHEAPDESC *lpDesc)
 {
-	BASE_BLOCK *pEnding;
-	FREE_BLOCK *pStart;
-	DWORD dwSize;
-
 	ASSERT(lpDesc);
 
-	dwSize = __max((sizeof(FREE_BLOCK)*4 + sizeof(HeapInstance)), lpDesc->heapSize);
+	auto dwSize = std::max((sizeof(FREE_BLOCK)*4 + sizeof(HeapInstance)), (unsigned long long)lpDesc->heapSize);
 	dwSize = (dwSize+0xFFF)&~0xFFF;
 
-	if ((long)lpDesc->growSize <= 0)
+	if (lpDesc->growSize <= 0)
 	{
 		if (lpDesc->flags & DAHEAPFLAG_GROWHEAP)
 			return GR_INVALID_PARMS;
 	}
 	
-	if ((pHeapBase = VirtualAlloc(0, dwSize, MEM_COMMIT, PAGE_READWRITE)) == 0)
+	if ((pHeapBase = VirtualAlloc(0, dwSize, MEM_COMMIT, PAGE_READWRITE)) == nullptr)
 	{
 		doError(DAHEAP_VALLOC_FAILED, dwSize);
 		return GR_OUT_OF_MEMORY;
@@ -314,20 +310,20 @@ GENRESULT HeapInstance::initHeap (DAHEAPDESC *lpDesc)
 
 	dwHeapSize = dwSize;
 	dwFlags = lpDesc->flags;
-	dwBaseBlockSize = (dwFlags & DAHEAPFLAG_NOMSGS) ? 8 : 16;
+	dwBaseBlockSize = sizeof(BASE_BLOCK);
 	dwGrowSize = lpDesc->growSize;
 
 	if (dwFlags & DAHEAPFLAG_MULTITHREADED)
 		InitializeCriticalSection(&criticalSection);	
 
-	pStart = (FREE_BLOCK *) pHeapBase;
-	pEnding = (BASE_BLOCK *) (((char *)pHeapBase) + dwHeapSize - dwBaseBlockSize);
+	FREE_BLOCK *pStart = static_cast<FREE_BLOCK *>(pHeapBase);
+	BASE_BLOCK *pEnding = reinterpret_cast<BASE_BLOCK *>(((char *) pHeapBase) + dwHeapSize - dwBaseBlockSize);
 
 	//----------------------------------------
 	// Initialize heap
 	//----------------------------------------
 
-	pStart->dwSize = (DWORD)pEnding - (DWORD)pStart;
+	pStart->dwSize = (uintptr_t)pEnding - (uintptr_t)pStart;
 	pStart->pUpper = 0;		// first block in list
 	pStart->pPrev = 
 	pStart->pNext = pStart;
@@ -553,7 +549,7 @@ BOOL HeapInstance::free (FREE_BLOCK *pBlock)
 }
 //--------------------------------------------------------------------------//
 //
-BOOL32 HeapInstance::SetBlockOwner (void *allocatedBlock, U32 owner)
+BOOL32 HeapInstance::SetBlockOwner (void *allocatedBlock, ULONG_PTR owner)
 {
 	BOOL32 result;
 	BASE_BLOCK *pBlock;
@@ -574,7 +570,7 @@ Done:
 }
 //--------------------------------------------------------------------------//
 //
-U32 HeapInstance::GetBlockOwner (void *allocatedBlock)
+ULONG_PTR HeapInstance::GetBlockOwner (void *allocatedBlock)
 {
 	U32 result=0;
 	BASE_BLOCK *pBlock;

@@ -524,7 +524,7 @@ BOOL32 BaseHeap::doError (uintptr_t dwErrorNum, uintptr_t dwNum1, uintptr_t dwNu
 }
 //--------------------------------------------------------------------------//
 //
-BOOL32 BaseHeap::SetBlockOwner (void *allocatedBlock, U32 owner)
+BOOL32 BaseHeap::SetBlockOwner (void *allocatedBlock, ULONG_PTR owner)
 {
 	BOOL32 result;
 	BaseHeap *pHeap = FindTheHeap(allocatedBlock);
@@ -538,9 +538,9 @@ BOOL32 BaseHeap::SetBlockOwner (void *allocatedBlock, U32 owner)
 }
 //--------------------------------------------------------------------------//
 //
-U32 BaseHeap::GetBlockOwner (void *allocatedBlock)
+ULONG_PTR BaseHeap::GetBlockOwner (void *allocatedBlock)
 {
-	U32 result;
+	ULONG_PTR result;
 	BaseHeap *pHeap = FindTheHeap(allocatedBlock);
 
 	if (pHeap)

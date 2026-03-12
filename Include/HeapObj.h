@@ -136,9 +136,9 @@ struct DACOM_NO_VTABLE IHeap : public IComponentFactory
 
 	virtual DA_ERROR_HANDLER __stdcall GetErrorHandler (void) = 0;
 
-	virtual BOOL32 __stdcall SetBlockOwner (void *allocatedBlock, U32 owner) = 0;
+	virtual BOOL32 __stdcall SetBlockOwner (void *allocatedBlock, ULONG_PTR owner) = 0;
 
-	virtual U32 __stdcall GetBlockOwner (void *allocatedBlock) = 0;
+	virtual ULONG_PTR __stdcall GetBlockOwner (void *allocatedBlock) = 0;
 
 	virtual BOOL32 __stdcall SetBlockMessage (void *allocatedBlock, const C8 *msg) = 0;
 
