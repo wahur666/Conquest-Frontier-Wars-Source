@@ -811,7 +811,6 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 
 	MarkAllocatedBlocks(HEAP_Acquire());
-	MarkAllocatedBlocks(GetBatchHeap());
 
 	CreateGlobalComponents();
 
