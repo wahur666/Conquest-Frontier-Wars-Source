@@ -334652,7 +334652,7 @@ U32 __stdcall GetMultiplayerNumberFromString (const char * buffer);
 U32 __stdcall GetMultiplayerStringFromNumber (U32 number, wchar_t * buffer, U32 bufferSize);
 U32 __stdcall GetMultiplayerVersion (void);
 __declspec(dllimport) GENRESULT __stdcall CreateProfileParser (const char * filename, struct IProfileParser2 **ppParser, struct IFileSystem * parent=0);	
-__declspec(dllimport) void __stdcall SetupDiffuseBlend( U32 irp_texture_id , bool bClamp);
+__declspec(dllimport) void __stdcall SetupDiffuseBlend( LONG_PTR irp_texture_id , bool bClamp);
 __declspec(dllimport) void __stdcall DisableTextures();
 __declspec(dllimport) BOOL32 __stdcall RecursiveDelete (IFileSystem * pFileSystem);	
 __declspec(dllimport) U32 __stdcall CreateZBufferAnalog (const char * filename);
@@ -336246,8 +336246,7 @@ public:
 
 	SINGLE	x, y, z;
 
-	Vector(void)
-	{
+	Vector(void) : x(0), y(0), z(0) {
 	}
 
 	Vector(const SINGLE xx, const SINGLE yy, const SINGLE zz)

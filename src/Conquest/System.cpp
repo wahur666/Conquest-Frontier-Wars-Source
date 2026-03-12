@@ -157,7 +157,7 @@ void PrimitiveBuilder2::VerifyBuffer( void )
 		FVFVERTEXTYPE *v;
 		U8 *v_real;
 		if( (v_real = (U8 *)malloc(sizeof(FVFVERTEXTYPE)*(num_vertex+block_size)+31)) != NULL ) {
-			v = (FVFVERTEXTYPE *)((U32(v_real)+31) & ~31);
+			v = (FVFVERTEXTYPE *)(((uintptr_t)(v_real)+31) & ~31);
 			if (vertex_buffer != NULL) {
 				memcpy( v, vertex_buffer, sizeof(FVFVERTEXTYPE)*num_vertex );			
 			}

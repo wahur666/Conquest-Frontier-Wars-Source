@@ -128,9 +128,10 @@ inline void PrimitiveBuilder2::Vertex3f( float _x, float _y, float _z )
 		quad_vert_count++;
 	}
 
-	current_vertex_ptr->pos.set(_x,_y,_z);
-	//unsafe casting going on to do the minimum memory movement into the vertex buffer
-	*(PartVertex *)((U8 *)(current_vertex_ptr)+sizeof(Vector)) = *this;
+	current_vertex_ptr->color = color;
+	current_vertex_ptr->u = u;
+	current_vertex_ptr->v = v;
+	current_vertex_ptr->pos = Vector(_x,_y,_z);
 
 	current_vertex++;
 	current_vertex_ptr++;
@@ -191,6 +192,7 @@ inline PrimitiveBuilder2::PrimitiveBuilder2(UINT blocksize)
 	vertex_buffer = NULL;
 	vertex_buffer_real = NULL;
 	num_vertex = 0;
+	current_vertex_ptr = NULL;
 	block_size = blocksize;
 	type = D3DPT_POINTLIST;
 //	last_r = last_g = last_b = last_a = 255;

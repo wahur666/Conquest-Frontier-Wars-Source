@@ -39,6 +39,9 @@
 #include <malloc.h>
 #include <span>
 
+#include "IRenderPrimitive.h"
+#include "MyVertex.h"
+
 #define AWKWARD_HEIGHT  40
 
 //--------------------------------------------------------------------------//
@@ -297,10 +300,17 @@ void DrawAgent::Draw (PANE *pane, S32 x, S32 y)
 			rect.bottom += y;// + 1;
 			
 
-	  		PB.TexCoord2f(rect.toffsetx,rect.toffsety);		PB.Vertex3f(rect.left,rect.top,0);
-	  		PB.TexCoord2f(rect.twidth,rect.toffsety);		PB.Vertex3f(rect.right,rect.top,0);
-	  		PB.TexCoord2f(rect.twidth,rect.theight);		PB.Vertex3f(rect.right,rect.bottom,0);
-	  		PB.TexCoord2f(rect.toffsetx, rect.theight);		PB.Vertex3f(rect.left,rect.bottom,0);
+	  		PB.TexCoord2f(rect.toffsetx,rect.toffsety);
+			PB.Vertex3f(rect.left,rect.top,0);
+
+	  		PB.TexCoord2f(rect.twidth,rect.toffsety);
+			PB.Vertex3f(rect.right,rect.top,0);
+
+			PB.TexCoord2f(rect.twidth,rect.theight);
+			PB.Vertex3f(rect.right,rect.bottom,0);
+
+			PB.TexCoord2f(rect.toffsetx, rect.theight);
+			PB.Vertex3f(rect.left,rect.bottom,0);
 
 		}
 		PB.End();

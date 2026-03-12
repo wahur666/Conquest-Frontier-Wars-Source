@@ -41,8 +41,7 @@ public:
 
 	SINGLE	x, y, z;
 
-	Vector(void)
-	{
+	Vector(void) : x(0), y(0), z(0) {
 	}
 
 	Vector(const SINGLE xx, const SINGLE yy, const SINGLE zz)
