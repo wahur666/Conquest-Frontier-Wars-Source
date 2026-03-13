@@ -1,0 +1,81 @@
+﻿project(ShapeEdit VERSION 1.0 LANGUAGES CXX RC)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Output as executable
+add_executable(ShapeEdit
+        test.cpp
+        Tgaread.cpp
+        Test.rc
+)
+
+# Headers
+target_sources(ShapeEdit PRIVATE
+        resource.h
+)
+
+# Include directories
+target_include_directories(ShapeEdit PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
+)
+
+# Common preprocessor definitions
+target_compile_definitions(ShapeEdit PRIVATE
+        WIN32
+        _CONSOLE
+)
+
+# Per-configuration definitions
+target_compile_definitions(ShapeEdit PRIVATE
+        $<$<CONFIG:Debug>:_DEBUG>
+        $<$<CONFIG:Release>:NDEBUG>
+)
+
+# Compiler options
+target_compile_options(ShapeEdit PRIVATE
+        /W3
+        /nologo
+        # No optimization in either config (both set Optimization=0)
+        /Od
+        $<$<CONFIG:Debug>:/ZI>      # Edit-and-continue debug info (DebugInformationFormat=4)
+        $<$<CONFIG:Release>:/Zi>    # Full PDB debug info (DebugInformationFormat=3)
+)
+
+# Runtime library:
+#   Debug   -> RuntimeLibrary=5 -> /MDd (MultiThreadedDebugDLL)
+#   Release -> RuntimeLibrary=0 -> /MT  (MultiThreadedStatic)
+target_compile_options(ShapeEdit PRIVATE
+        $<$<CONFIG:Debug>:/MDd>
+        $<$<CONFIG:Release>:/MT>
+)
+
+# Linker dependencies
+target_link_libraries(ShapeEdit PRIVATE
+        odbc32
+        odbccp32
+        DACOM
+)
+
+# Linker options
+target_link_options(ShapeEdit PRIVATE
+        /SUBSYSTEM:WINDOWS           # SubSystem=2
+        /ENTRY:mainCRTStartup
+        $<$<CONFIG:Debug>:/INCREMENTAL>      # LinkIncremental=2
+        $<$<CONFIG:Release>:/INCREMENTAL:NO> # LinkIncremental=1
+        /DEBUG                       # GenerateDebugInformation=TRUE (both configs)
+)
+
+# Output name
+set_target_properties(ShapeEdit PROPERTIES
+        OUTPUT_NAME "ShapeEdit"
+)
+
+# Data files — not compiled, listed for IDE visibility only
+target_sources(ShapeEdit PRIVATE
+        imagemissing.data
+        imagemissingpalette
+)
+set_source_files_properties(
+        imagemissing.data
+        imagemissingpalette
+        PROPERTIES HEADER_FILE_ONLY TRUE
+)
