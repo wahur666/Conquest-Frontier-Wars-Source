@@ -495,7 +495,7 @@ void Minefield::TestVisible (const USER_DEFAULTS & defaults, const U32 currentSy
 	if(bVisible)
 	{
 		//as long as the cammera never goes on it's side this will work
-		RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
+		RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
 		RECT rect;
 		S32 xCent,yCent,zXLoc,zYLoc;
 		Vector myPos = gridPos;

@@ -159,7 +159,7 @@ struct _NO_VTABLE Bolt : public ObjectRender<ObjectTransform<ObjectFrame<IBaseOb
 			_rect.top = screenY - 15;
 			_rect.bottom = screenY + 15;
 			
-			RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
+			RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
 			
 			bVisible = RectIntersects(_rect, screenRect);
 		}
@@ -593,7 +593,7 @@ struct _NO_VTABLE Missile : public ObjectRender<ObjectPhysics<ObjectTransform<Ob
 			_rect.top = screenY - 15;
 			_rect.bottom = screenY + 15;
 			
-			RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
+			RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
 			
 			bVisible = RectIntersects(_rect, screenRect);
 		}

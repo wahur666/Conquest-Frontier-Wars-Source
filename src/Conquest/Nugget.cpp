@@ -283,7 +283,7 @@ void AnimNugget::TestVisible (const USER_DEFAULTS & defaults, const U32 currentS
 		_rect.top = screenY - 15;
 		_rect.bottom = screenY + 15;
 		
-		RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
+		RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
 		
 		bVisible = RectIntersects(_rect, screenRect);
 	}

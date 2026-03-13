@@ -458,7 +458,7 @@ SINGLE GameLight::TestHighlight (const RECT & rect)
 			_rect.top = F2LONG(center_y - radius);
 			_rect.bottom = F2LONG(center_y + radius);
 
-			RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
+			RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
 
 			if (RectIntersects(_rect, screenRect) != 0)
 			{

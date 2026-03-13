@@ -185,7 +185,7 @@ BOOL32 EngineTrail::Update (void)
 	//assuming parent is visible;
 	if (stop != -1)
 	{
-		RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
+		RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
 		RECT rect;
 		CAMERA->PointToScreen(trailPoints[start],&(rect.left),&(rect.top));
 		CAMERA->PointToScreen(trailPoints[stop],&(rect.right),&(rect.bottom));

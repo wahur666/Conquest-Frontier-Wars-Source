@@ -197,7 +197,7 @@ SINGLE ObjectSelection< Base >::TestHighlight (const RECT & rect)
 				_rect.top = center_y - radius;
 				_rect.bottom = center_y + radius;
 
-				RECT screenRect = { 0, 0, (LONG)SCREENRESX, (LONG)SCREENRESY };
+				RECT screenRect = { 0, 0, SCREENRESX, SCREENRESY };
 
 				if ((this->bVisible = RectIntersects(_rect, screenRect)) != 0)
 				{
