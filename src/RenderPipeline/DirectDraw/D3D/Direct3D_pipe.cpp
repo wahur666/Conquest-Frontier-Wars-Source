@@ -3106,7 +3106,7 @@ DA_METHOD(create_cube_texture_from_file,(const char* filename, IComponentFactory
 DA_METHOD(	destroy_texture,(LONG_PTR htexture ) )
 {
 	if (!htexture) return GR_OK;
-	((LPDIRECT3DTEXTURE9)htexture)->Release();
+	reinterpret_cast<LPDIRECT3DTEXTURE9>(htexture)->Release();
 	return GR_OK;
 }
 

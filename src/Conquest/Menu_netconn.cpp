@@ -345,7 +345,7 @@ void Menu_nc::setStateInfo (void)
 //
 void Menu_nc::initNet (void)
 {
-	S32 lobbied;
+	S32 lobbied {};
 	
 	CURSOR->SetBusy(1);
 

@@ -107,7 +107,7 @@ struct DACOM_NO_VTABLE Animate : BaseHotRect, IAnimate
 	const U32 * pIndexArray;
 	U32   nElements;
 	U32   currentIndex;
-	U32   textureID;
+	LONG_PTR   textureID;
 	COMPTR<IDrawAgent> frameAgent;
 	U32	  fuzzIndex;
 

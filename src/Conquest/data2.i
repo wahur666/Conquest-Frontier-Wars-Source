@@ -334024,8 +334024,8 @@ __declspec(dllimport) HDC hMainDC;
 __declspec(dllimport) DWORD PLAYERID;
 __declspec(dllimport) DWORD HOSTID;
 __declspec(dllimport) DWORD TRACELEVEL;
-__declspec(dllimport) DWORD SCREENRESX;			
-__declspec(dllimport) DWORD SCREENRESY;			
+__declspec(dllimport) LONG SCREENRESX;			
+__declspec(dllimport) LONG SCREENRESY;			
 __declspec(dllimport) S32 SCREEN_WIDTH;		
 __declspec(dllimport) S32 SCREEN_HEIGHT;		
 
