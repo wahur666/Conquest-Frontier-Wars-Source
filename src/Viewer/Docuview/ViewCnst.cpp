@@ -158,63 +158,47 @@ GENRESULT ViewConstructor::Initialize (void)
 }
 //--------------------------------------------------------------------------//
 //
-GENRESULT ViewConstructor::CreateInstance (DACOMDESC *lpDesc, void **instance)
+GENRESULT ViewConstructor::CreateInstance(DACOMDESC *lpDesc, void **instance)
 {
-	// TODO: THIS CREATE INSTANCE IS RUNNING
-	GENRESULT		result        = GR_OK;
-	ViewConstructor *pNewInstance = NULL;
-	AGGDESC * aggDesc = (AGGDESC *) lpDesc;
+	*instance = NULL;
 
-	if (lpDesc==NULL || (lpDesc->interface_name==NULL))
-	{
-		result = GR_INTERFACE_UNSUPPORTED;
-		goto Done;
-	}
+	// Validate base descriptor
+	if (lpDesc == NULL || lpDesc->interface_name == NULL)
+		return GR_INTERFACE_UNSUPPORTED;
 
-   //
-   // If unsupported interface requested, fail call
-   //
-
+	// Handle IDataParser creation
 	if (strcmp(lpDesc->interface_name, "IDataParser") == 0)
 	{
 		if (lpDesc->size != sizeof(DPARSERDESC))
-		{
-			result = GR_INVALID_PARMS;
-			goto Done;
-		}
+			return GR_INVALID_PARMS;
 
-		CreateDataParser(((DPARSERDESC *)lpDesc)->symbol, (IDataParser **) instance);
-		if (*instance==0)
-			return GR_GENERIC;
-		return GR_OK;
-	}
-	else
-	if (strcmp(lpDesc->interface_name, interface_name))
-	{
-		return CreateViewer((VIEWDESC *) lpDesc, instance);
+		CreateDataParser(((DPARSERDESC *)lpDesc)->symbol, (IDataParser **)instance);
+		return (*instance != NULL) ? GR_OK : GR_GENERIC;
 	}
 
+	// Handle Viewer creation
+	if (strcmp(lpDesc->interface_name, interface_name) != 0)
+		return CreateViewer((VIEWDESC *)lpDesc, instance);
+
+	// Handle aggregation descriptor
 	if (lpDesc->size == sizeof(AGGDESC))
 	{
+		AGGDESC *aggDesc = (AGGDESC *)lpDesc;
 		outer = aggDesc->outer;
 		*aggDesc->inner = getBase();
 	}
-	else
-	if (lpDesc->size != sizeof(DACOMDESC))
+	else if (lpDesc->size != sizeof(DACOMDESC))
 	{
-		result = GR_INTERFACE_UNSUPPORTED;
-		goto Done;
+		return GR_INTERFACE_UNSUPPORTED;
 	}
 
-	if (table == 0 && (table = SymbolTable.set_reserved()) != 0)
+	// Ensure symbol table is initialized
+	if (table == NULL && (table = SymbolTable.set_reserved()) != NULL)
 		table->AddRef();
 
 	AddRef();
-	pNewInstance = this;
-
-Done:
-	*instance = pNewInstance;
-	return result;
+	*instance = this;
+	return GR_OK;
 }
 //--------------------------------------------------------------------------//
 //
@@ -459,100 +443,82 @@ BOOL32 ViewConstructor::HasVariableSize (SYMBOL symbol)
 }
 //--------------------------------------------------------------------------//
 //
-GENRESULT ViewConstructor::CreateViewer (VIEWDESC *lpDesc, void **instance)
+GENRESULT ViewConstructor::CreateViewer(VIEWDESC *lpDesc, void **instance)
 {
-	GENRESULT result = GR_GENERIC;
-	DAComponentX<DataViewer> *pNewInstance = NULL;
-	SYMBOL list = 0;
-	COMPTR<IDAConnectionPoint> connection = nullptr;
-	HWND hOwnerWindow=0;
-	GENRESULT inter = GR_DATA_NOT_FOUND;
-	//
-	// If unsupported interface requested, fail call
-	//
+    *instance = NULL;
 
-	if (strcmp(lpDesc->interface_name, "IViewer"))
-	{
-		result = GR_INTERFACE_UNSUPPORTED;
-		goto Done;
-	}
+    // Interface name check (strcmp returns 0 on match, nonzero = mismatch)
+    if (strcmp(lpDesc->interface_name, "IViewer") != 0)
+        return GR_INTERFACE_UNSUPPORTED;
 
-	if (lpDesc->size != sizeof(*lpDesc))
-	{
-		// create viewer from SYMBOL directly
-		if (lpDesc->size == sizeof(*lpDesc) + 4 && strcmp(lpDesc->className, "SYMBOL")==0)
-		{
-			list = ((SYMBOL *)(lpDesc+1))[0];
-			hOwnerWindow = (HWND) lpDesc->hOwnerWindow;
-		}
-		else
-		if (lpDesc->size != sizeof(*lpDesc) - 8)		// old style
-		{
-			result = GR_INTERFACE_UNSUPPORTED;
-			goto Done;
-		}
-	}
-	else
-	{
-		hOwnerWindow = (HWND) lpDesc->hOwnerWindow;
-	}
-	// TODO: This is fucked here
-	inter = lpDesc->doc->QueryOutgoingInterface("IDocumentClient", connection.addr());
-	if (inter != GR_OK)
-	{
-		result = GR_GENERIC;
-		goto Done;
-	}
+    // Resolve hOwnerWindow and optional direct SYMBOL from extended descriptor
+    SYMBOL list = 0;
+    HWND hOwnerWindow = 0;
 
-	if (list==0)
-	{
-		list = table;
-		while (list)
-		{
-			if (strcmp(list->name, lpDesc->className) == 0)
-				break;
-			list = list->link;
-		}
-	}
-	
-	if (list)
-	{
-		if (lpDesc->doc->GetFileSize() == (DWORD) list->size || DataViewer::HasVariableSize(list))
-		{
-			if ((pNewInstance = new DAComponentX<DataViewer>) == 0)
-			{
-				result = GR_OUT_OF_MEMORY;
-				goto Done;
-			}
+    if (lpDesc->size == sizeof(*lpDesc))
+    {
+        hOwnerWindow = (HWND)lpDesc->hOwnerWindow;
+    }
+    else if (lpDesc->size == sizeof(*lpDesc) + 4 && strcmp(lpDesc->className, "SYMBOL") == 0)
+    {
+        list = ((SYMBOL *)(lpDesc + 1))[0];
+        hOwnerWindow = (HWND)lpDesc->hOwnerWindow;
+    }
+    else if (lpDesc->size != sizeof(*lpDesc) - 8)   // old style has no hOwnerWindow
+    {
+        return GR_INTERFACE_UNSUPPORTED;
+    }
 
-			pNewInstance->doc = lpDesc->doc;
-			pNewInstance->symbol = list;
-			pNewInstance->hParentWindow = hOwnerWindow;
-			pNewInstance->set_spelling_list(lpDesc->spellingSet);
-			list->AddRef();
+    // Acquire connection point — required before we can construct a viewer
+    COMPTR<IDAConnectionPoint> connection = nullptr;
+    if (lpDesc->doc->QueryOutgoingInterface("IDocumentClient", connection.addr()) != GR_OK)
+        return GR_GENERIC;
 
-			strncpy(pNewInstance->szClassName, list->name, sizeof(pNewInstance->szClassName)-1);
-			strcpy_s(pNewInstance->szInstanceName, "\1(Instance name goes here)\1");
-			if (connection->Advise((IDocumentClient *)pNewInstance, &pNewInstance->connHandle) != GR_OK ||
-				pNewInstance->init() == 0)
-			{
-				connection->Unadvise(pNewInstance->connHandle);
-				list->Release();
-				delete pNewInstance;
-				pNewInstance = 0;
-			}
-			else
-			{
-				pNewInstance->OnUpdate(lpDesc->doc);
-				pNewInstance->CreateView();
-				result = GR_OK;
-			}
-		}
-	}
-	
-Done:
-	*instance = pNewInstance;
-	return result;
+    // Walk the symbol table if a SYMBOL wasn't supplied directly
+    if (list == 0)
+    {
+        for (SYMBOL s = table; s != 0; s = s->link)
+        {
+            if (strcmp(s->name, lpDesc->className) == 0)
+            {
+                list = s;
+                break;
+            }
+        }
+    }
+
+    if (list == 0)
+        return GR_DATA_NOT_FOUND;
+
+    if (lpDesc->doc->GetFileSize() != (DWORD)list->size && !DataViewer::HasVariableSize(list))
+        return GR_DATA_NOT_FOUND;
+
+    // Construct and wire up the viewer
+    auto *viewer = new DAComponentX<DataViewer>;
+    viewer->doc           = lpDesc->doc;
+    viewer->symbol        = list;
+    viewer->hParentWindow = hOwnerWindow;
+    viewer->set_spelling_list(lpDesc->spellingSet);
+    list->AddRef();
+
+    strncpy(viewer->szClassName,    list->name,                    sizeof(viewer->szClassName) - 1);
+    strcpy_s(viewer->szInstanceName, "\1(Instance name goes here)\1");
+
+    const bool wired = (connection->Advise((IDocumentClient *)viewer, &viewer->connHandle) == GR_OK)
+                    && (viewer->init() != 0);
+
+    if (!wired)
+    {
+        connection->Unadvise(viewer->connHandle);
+        list->Release();
+        delete viewer;
+        return GR_GENERIC;
+    }
+
+    viewer->OnUpdate(lpDesc->doc);
+    viewer->CreateView();
+    *instance = viewer;
+    return GR_OK;
 }
 //--------------------------------------------------------------------------//
 //

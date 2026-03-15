@@ -396,8 +396,8 @@ SYMBOL declaration_member (SYMBOL dataType, SYMKIND kind, int modifier)
 	{
 		tmp = new Symbol;
 		tmp->kind = POINTERSYM;
-		tmp->size = 4;
-		tmp->alignment = 4;
+		tmp->size = sizeof(void*);
+		tmp->alignment = sizeof(void*);
 		if (result == 0)
 		{
 			result = tmp;
