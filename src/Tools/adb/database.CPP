@@ -952,7 +952,7 @@ BOOL CALLBACK AutoBin_DlgProc(HWND hwnd, UINT message, UINT wParam, LPARAM lPara
 		{
 			PARSER->EnumerateTypes(AutoBin_FillBinClassDlgProc,GetDlgItem(hwnd,IDC_COMBO_AUTOBIN));
 			SetDlgItemText(hwnd,IDC_EDIT_BTNAME,(const char*)lParam);
-			SetWindowLong(hwnd, DWL_USER, lParam);
+			SetWindowLongPtr(hwnd, DWL_USER, lParam);
 			ShowWindow( hwnd, SW_NORMAL );
 			break;
 		}
@@ -1078,12 +1078,12 @@ BOOL CALLBACK OpenDatabaseUsingDirectory_DlgProc(HWND hwnd, UINT message, UINT w
 			SendMessage( GetDlgItem(hwnd,IDC_PROGRESS1), PBM_SETSTEP, 1, 0 );
 
 			//HANDLE h = ::CreateThread( NULL, NULL, OpenDatabaseUsingDirectory_ThreadProc, hwnd, 0,NULL );
-			//SetWindowLong(hwnd, DWL_USER, (DWORD)h);
+			//SetWindowLongPtr(hwnd, DWL_USER, (DWORD)h);
 			break;
 		}
 		case WM_DESTROY:
 		{
-			//HANDLE h = (HANDLE)::GetWindowLong(hwnd, DWL_USER);
+			//HANDLE h = (HANDLE)::GetWindowLongPtr(hwnd, DWL_USER);
 			//::CloseHandle( h );
 			break;
 		}

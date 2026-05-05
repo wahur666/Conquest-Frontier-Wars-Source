@@ -298,9 +298,9 @@ long WindowManager::WndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM l
 				
 				if (showWindowFlags & WMF_FULL_SCREEN)
 				{
-					SetWindowLong(hWnd, 
+					SetWindowLongPtr(hWnd,
 						GWL_STYLE, 
-						GetWindowLong(hWnd, 
+						GetWindowLongPtr(hWnd,
 						GWL_STYLE) & ~WS_SYSMENU);
 				}
 			}
@@ -316,9 +316,9 @@ long WindowManager::WndProc (HWND hWindow, UINT message, WPARAM wParam, LPARAM l
 				
 				if (showWindowFlags & WMF_FULL_SCREEN)
 				{
-					SetWindowLong(hWnd, 
+					SetWindowLongPtr(hWnd,
 						GWL_STYLE, 
-						GetWindowLong(hWnd, 
+						GetWindowLongPtr(hWnd,
 						GWL_STYLE) | WS_SYSMENU);
 				}
 			}
@@ -570,13 +570,13 @@ BOOL32 WindowManager::SetWindowPos (U32 width, U32 height, U32 flags)
 		// Disable caption menu
 		//
 		
-		SetWindowLong(hWnd, 
+		SetWindowLongPtr(hWnd,
 			GWL_STYLE, 
-			GetWindowLong(hWnd, GWL_STYLE) | WS_POPUP);
+			GetWindowLongPtr(hWnd, GWL_STYLE) | WS_POPUP);
 		
-		SetWindowLong(hWnd, 
+		SetWindowLongPtr(hWnd,
 			GWL_STYLE, 
-			GetWindowLong(hWnd, GWL_STYLE) & ~(WS_OVERLAPPED  | 
+			GetWindowLongPtr(hWnd, GWL_STYLE) & ~(WS_OVERLAPPED  |
 			WS_CAPTION     | 
 			WS_SYSMENU     | 
 			WS_MINIMIZEBOX | 
@@ -786,36 +786,36 @@ BOOL32 WindowManager::resizeTheWindow (S32 display_size_X, S32 display_size_Y, U
 	// Enable caption menu and user preferences
 	//
 	
-	SetWindowLong(hWnd, 
+	SetWindowLongPtr(hWnd,
 		GWL_STYLE, 
-		GetWindowLong(hWnd, GWL_STYLE) & ~WS_POPUP);
+		GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_POPUP);
 	
-	SetWindowLong(hWnd, 
+	SetWindowLongPtr(hWnd,
 		GWL_STYLE, 
-		GetWindowLong(hWnd, GWL_STYLE) | (WS_OVERLAPPED  | 
+		GetWindowLongPtr(hWnd, GWL_STYLE) | (WS_OVERLAPPED  |
 		WS_CAPTION     | 
 		WS_SYSMENU     | 
 		WS_MINIMIZEBOX));
 	
 	if (flags & WMF_ALLOW_WINDOW_RESIZE)
 	{
-		SetWindowLong(hWnd, 
+		SetWindowLongPtr(hWnd,
 			GWL_STYLE, 
-			GetWindowLong(hWnd, GWL_STYLE) | WS_THICKFRAME |
+			GetWindowLongPtr(hWnd, GWL_STYLE) | WS_THICKFRAME |
 			WS_MAXIMIZEBOX);
 	}
 	
 	if (flags & WMF_ALWAYS_ON_TOP)
 	{
-		SetWindowLong(hWnd, 
+		SetWindowLongPtr(hWnd,
 			GWL_EXSTYLE, 
-			GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_TOPMOST);
+			GetWindowLongPtr(hWnd, GWL_EXSTYLE) | WS_EX_TOPMOST);
 	}
 	else
 	{
-		SetWindowLong(hWnd, 
+		SetWindowLongPtr(hWnd,
 			GWL_EXSTYLE, 
-			GetWindowLong(hWnd, GWL_EXSTYLE) & ~WS_EX_TOPMOST);
+			GetWindowLongPtr(hWnd, GWL_EXSTYLE) & ~WS_EX_TOPMOST);
 	}
 
 	//
@@ -858,9 +858,9 @@ BOOL32 WindowManager::resizeTheWindow (S32 display_size_X, S32 display_size_Y, U
 		windowRect.bottom = area.y + area.h - 1;
 		
 		AdjustWindowRectEx(&windowRect,
-			GetWindowLong(hWnd, GWL_STYLE),
+			GetWindowLongPtr(hWnd, GWL_STYLE),
 			(GetMenu(hWnd) != NULL),
-			GetWindowLong(hWnd, GWL_EXSTYLE));
+			GetWindowLongPtr(hWnd, GWL_EXSTYLE));
 		
 		if ((windowRect.right - windowRect.left + 1) > desktop_w)
 		{

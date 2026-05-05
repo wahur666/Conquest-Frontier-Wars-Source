@@ -2819,9 +2819,9 @@ BOOL32 DataViewer::InitCombo (void)
 	// remove the border style
 	if (pParentViewer)
 	{
-		LONG oldStyle = GetWindowLong(hMainWindow, GWL_STYLE);
+		LONG_PTR oldStyle = GetWindowLongPtr(hMainWindow, GWL_STYLE);
 
-		SetWindowLong(hMainWindow, GWL_STYLE, oldStyle & ~WS_BORDER);
+		SetWindowLongPtr(hMainWindow, GWL_STYLE, oldStyle & ~WS_BORDER);
 	}
 	
 	

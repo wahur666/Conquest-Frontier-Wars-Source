@@ -75,20 +75,20 @@ void SetStyleInWindow (int display_size_X, int display_size_Y)
 	// Enable caption menu and user preferences
 	//
 	
-	SetWindowLong(hWnd, 
+	SetWindowLongPtr(hWnd,
 		GWL_STYLE, 
-		GetWindowLong(hWnd, GWL_STYLE) & ~WS_POPUP);
+		GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_POPUP);
 	
-	SetWindowLong(hWnd, 
+	SetWindowLongPtr(hWnd,
 		GWL_STYLE, 
-		GetWindowLong(hWnd, GWL_STYLE) | (WS_OVERLAPPED  | 
+		GetWindowLongPtr(hWnd, GWL_STYLE) | (WS_OVERLAPPED  |
 		WS_CAPTION     | 
 		WS_SYSMENU     | 
 		WS_MINIMIZEBOX));
 
-	SetWindowLong(hWnd, 
+	SetWindowLongPtr(hWnd,
 		GWL_EXSTYLE, 
-		GetWindowLong(hWnd, GWL_EXSTYLE) & ~WS_EX_TOPMOST);
+		GetWindowLongPtr(hWnd, GWL_EXSTYLE) & ~WS_EX_TOPMOST);
 
 	//
 	// If area not already established, center window's client area on
@@ -112,9 +112,9 @@ void SetStyleInWindow (int display_size_X, int display_size_Y)
 	rect.bottom = rect.top + display_size_Y - 1;
 
 	AdjustWindowRectEx (&rect,
-		GetWindowLong (hWnd, GWL_STYLE),
+		GetWindowLongPtr (hWnd, GWL_STYLE),
 		(GetMenu (hWnd) != NULL),
-		GetWindowLong (hWnd, GWL_EXSTYLE));
+		GetWindowLongPtr (hWnd, GWL_EXSTYLE));
 
 	//
 	// Set window size and position
@@ -135,13 +135,13 @@ void SetStyleFullScreen (void)
 	// Disable caption menu
 	//
 
-	SetWindowLong(hWnd, 
+	SetWindowLongPtr(hWnd,
 		GWL_STYLE, 
-		GetWindowLong(hWnd, GWL_STYLE) | WS_POPUP);
+		GetWindowLongPtr(hWnd, GWL_STYLE) | WS_POPUP);
 
-	SetWindowLong(hWnd, 
+	SetWindowLongPtr(hWnd,
 		GWL_STYLE, 
-		GetWindowLong(hWnd, GWL_STYLE) & ~(WS_OVERLAPPED  | 
+		GetWindowLongPtr(hWnd, GWL_STYLE) & ~(WS_OVERLAPPED  |
 		WS_CAPTION     | 
 		WS_SYSMENU     | 
 		WS_MINIMIZEBOX | 

@@ -1917,7 +1917,7 @@ bool ParticleEditor::setup_render_buffers( void )
 
 	if( camera_initialized ) {
 		T = Camera::getTransform();
-		Camera::uninit();
+		// Camera::uninit();
 	}
 
     Camera::init( renderpipeline, engine, &p );

@@ -3682,7 +3682,7 @@ LRESULT FieldManager::NameDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARA
 LPARAM FieldManager::FieldListDlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	BOOL result=0;
-	//FieldNode * fieldList = (FieldNode *)GetWindowLong(hwnd, DWL_USER);
+	//FieldNode * fieldList = (FieldNode *)GetWindowLongPtr(hwnd, DWL_USER);
 	FieldManager *fieldmgr = (FieldManager *)GetWindowLongPtr(hwnd, DWLP_USER);
 //	char newName[32];
 

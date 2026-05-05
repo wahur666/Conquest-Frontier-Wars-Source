@@ -93,7 +93,7 @@ BOOL CALLBACK eulaDialogCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 			wcsncpy(acceptButton, _localLoadStringW(IDS_EULA_ACCEPT), sizeof(acceptButton)/sizeof(wchar_t));
 			SetWindowText(acceptHandle," ");
 			SetFocus(acceptHandle);
-			buttonProc = (WNDPROC)(GetWindowLong(acceptHandle,GWLP_WNDPROC));
+			buttonProc = (WNDPROC)(GetWindowLongPtr(acceptHandle,GWLP_WNDPROC));
 			SetWindowLongPtr(acceptHandle,GWLP_WNDPROC,reinterpret_cast<LONG_PTR>(&buttonCallback));
 			
 			declineHandle = GetDlgItem(hwndDlg,IDCANCEL);
