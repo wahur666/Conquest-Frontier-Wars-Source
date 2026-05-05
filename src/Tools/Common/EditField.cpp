@@ -11,6 +11,8 @@
 
 #include "EditField.h"
 
+#include <algorithm>
+
 //
 
 struct ControlSubclass
@@ -51,7 +53,7 @@ inline long CALLBACK NumberEditField_WndProc( HWND hWnd, UINT message, WPARAM wP
 	long this_x, this_y, delta_y, min_y;
 	HWND hDlg;
 
-	if( (csc = (ControlSubclass*)GetWindowLong( hWnd, GWL_USERDATA )) == NULL ) {
+	if( (csc = (ControlSubclass*)GetWindowLongPtr( hWnd, GWLP_USERDATA )) == NULL ) {
 //		__debugbreak();
 		return DefWindowProc( hWnd, message, wParam, lParam );
 	}
@@ -136,7 +138,7 @@ inline long CALLBACK NumberEditField_WndProc( HWND hWnd, UINT message, WPARAM wP
 
 			delta_y = this_y - last_y;
 
-			min_y = min( abs(this_x-last_x), 10 );
+			min_y = std::min( abs(this_x-last_x), 10l );
 
 			if( abs(delta_y) < min_y ) {
 				return CallWindowProc( csc->prev_wndproc, hWnd, message, wParam, lParam );
@@ -456,10 +458,10 @@ bool EditField_Attach( HWND hDlg, EditField *field, float field_scale )
 
 	csc->field = field;
 	csc->field_scale = field_scale;
-	csc->prev_wndproc = (WNDPROC)GetWindowLong( hChild, GWL_WNDPROC ) ;
+	csc->prev_wndproc = (WNDPROC)GetWindowLongPtr( hChild, GWLP_WNDPROC ) ;
 
-	SetWindowLong( hChild, GWL_USERDATA, (LONG)csc );
-	SetWindowLong( hChild, GWL_WNDPROC, (LONG)NumberEditField_WndProc );
+	SetWindowLongPtr( hChild, GWLP_USERDATA, (LONG_PTR)csc );
+	SetWindowLongPtr( hChild, GWLP_WNDPROC, (LONG_PTR)NumberEditField_WndProc );
 
 	return true;
 }
@@ -481,11 +483,11 @@ bool EditField_Detach( HWND hDlg, EditField *field )
 		return false;
 	} 
 
-	if( (csc = (ControlSubclass*)GetWindowLong( hChild, GWL_USERDATA )) == NULL ) {
+	if( (csc = (ControlSubclass*)GetWindowLongPtr( hChild, GWLP_USERDATA )) == NULL ) {
 		return false;
 	}
 
-	SetWindowLong( hChild, GWL_WNDPROC, (LONG)csc->prev_wndproc );
+	SetWindowLongPtr( hChild, GWLP_WNDPROC, (LONG_PTR)csc->prev_wndproc );
 
 	return true;	
 }

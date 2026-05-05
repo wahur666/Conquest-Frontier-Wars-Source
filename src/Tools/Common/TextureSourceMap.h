@@ -77,7 +77,7 @@ GENRESULT TextureSourceMap::register_texture_source( IFileSystem *IFS )
 
 	COMPTR<IFileSystem> Parent;
 
-	if( SUCCEEDED( IFS->GetParentSystem( Parent ) ) ) {
+	if( SUCCEEDED( IFS->GetParentSystem( Parent.addr() ) ) ) {
 		Parent->GetAbsolutePath( ifs_buffer, "", MAX_PATH );
 	}
 	else {

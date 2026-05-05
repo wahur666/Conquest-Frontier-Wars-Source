@@ -63,7 +63,7 @@ bool GetTextureSelection( HWND hParent, LPCTSTR DlgTemplate, const char *Title, 
 	params.out_texture = out_texture;
 	params.title = Title;
 
-	int ret = DialogBoxParam( GetModuleHandle(NULL), DlgTemplate, hParent, gts_window_proc, (LPARAM)&params );
+	int ret = DialogBoxParam( GetModuleHandle(NULL), DlgTemplate, hParent, DLGPROC(gts_window_proc), (LPARAM)&params );
 
 	texturelibrary->Release();
 	renderpipe->Release();

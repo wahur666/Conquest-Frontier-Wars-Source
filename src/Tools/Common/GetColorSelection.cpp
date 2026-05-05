@@ -48,7 +48,7 @@ bool GetColorSelection( HWND hParent, LPCTSTR DlgTemplate, const char *Title, fl
 
 	params.out_color = out_color;
 	params.title = Title;
-	return DialogBoxParam( GetModuleHandle(NULL), DlgTemplate, hParent, gcs_window_proc, (LPARAM)&params );
+	return DialogBoxParam( GetModuleHandle(NULL), DlgTemplate, hParent, DLGPROC(gcs_window_proc), (LPARAM)&params );
 }
 #pragma warning( pop )
 
