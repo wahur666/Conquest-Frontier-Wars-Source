@@ -25,6 +25,8 @@
 #include <directx2007aug/dplobby.h>
 #include <shellapi.h>
 
+#include "da_heap_utility.h"
+
 #define ZONE_QUIT 10 //also defined in menu1.cpp
 
 U32 __stdcall DoMenu_mshell (Frame * parent, const GT_MENU1 & data, const struct SAVED_CONNECTION * conn, const wchar_t * szPlayerName, const wchar_t * szSessionName, bool bLAN, bool bZone);
@@ -408,7 +410,7 @@ void Menu_zone::getSessionNames (wchar_t szPlayerName[64], wchar_t szSessionName
 	szSessionName[0] = szPlayerName[0] = 0;
 
 	DPLAY->GetSessionDesc(NULL, &size);
-	pDesc = (DPSESSIONDESC2 *) malloc(size);
+	pDesc = (DPSESSIONDESC2 *) xmalloc(size);
 	hr = DPLAY->GetSessionDesc(pDesc, &size);
 	CQASSERT(hr == DP_OK);
 
@@ -425,7 +427,7 @@ void Menu_zone::getSessionNames (wchar_t szPlayerName[64], wchar_t szSessionName
 
 	if (size)
 	{
-		DPNAME * pName = (DPNAME *) malloc(size);
+		DPNAME * pName = (DPNAME *) xmalloc(size);
 		if (DPLAY->GetPlayerName(PLAYERID, pName, &size) == DP_OK)
 			wcsncpy(szPlayerName, pName->lpszShortName, 64 / sizeof(wchar_t));
 		::free(pName);

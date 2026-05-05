@@ -359,7 +359,7 @@ regcomp(const char *exp)
 		FAIL("regexp too big");
 
 	/* Allocate space. */
-	r = (regexp *)malloc(sizeof(regexp) + (unsigned)regsize);
+	r = (regexp *)xmalloc(sizeof(regexp) + (unsigned)regsize);
 	if (r == NULL)
 		FAIL("out of space");
 

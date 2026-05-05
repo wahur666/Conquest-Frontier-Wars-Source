@@ -40,6 +40,7 @@
 #include <span>
 #include <vector>
 
+#include "da_heap_utility.h"
 #include "dbtreeview.h"
 extern DbTreeView g_DbTreeView;
 
@@ -603,7 +604,7 @@ void * PreprocessToMemory (const C8 *filename)
 	if ((dwFileSize = GetFileSize(hTemp, 0)) == 0)
 		goto Done;
 
-	if ((pMemory = malloc(dwFileSize+1)) == 0)
+	if ((pMemory = xmalloc(dwFileSize+1)) == 0)
 		goto Done;
 	memset(pMemory, 0, dwFileSize+1);
 	ReadFile(hTemp, pMemory, dwFileSize, &dwBytesRead, 0);
@@ -2063,7 +2064,7 @@ struct ConvertEnumerator : FileEnumerator
 		
 		if (bVariableLength==0)
 			size = PARSER->GetTypeSize(newSymbol);
-		newstruct = size ? malloc(size) : 0;
+		newstruct = size ? xmalloc(size) : 0;
 
 		if (oldstruct)
 		{
@@ -2400,7 +2401,7 @@ GENRESULT CopyOpenFile(IFileSystem *file,char *fileName)
 	DAFILEDESC fdesc = fileName;
 	U32 dwSize = file->GetFileSize();
 	U32 dwRead,dwWritten;
-	void *buffer = malloc(dwSize);
+	void *buffer = xmalloc(dwSize);
 	MEMFILEDESC mdesc = fileName;
 
 	mdesc.lpBuffer = buffer;
@@ -2455,7 +2456,7 @@ BOOL32 OpenDatabase(char *oldDB,char *oldH)
 	// do file copy
 	{
 		DWORD dwSize = temp2->GetFileSize();
-		char * buffer = (char *) malloc(dwSize);
+		char * buffer = (char *) xmalloc(dwSize);
 
 		temp2->ReadFile(0, buffer, dwSize, LPDWORD(&dwRead), 0);
 		temp->WriteFile(0, buffer, dwRead, LPDWORD(&dwWritten), 0);
@@ -2510,7 +2511,7 @@ BOOL32 OpenDatabase(char *oldDB,char *oldH)
 			MessageBox(hMainWindow,"Couldn't get file size","Import Failed",MB_OK);
 			goto Done;
 		}
-		pPreprocessBlock = (char *)malloc(dwWritten+1);
+		pPreprocessBlock = (char *)xmalloc(dwWritten+1);
 		if (temp->ReadFile(0,pPreprocessBlock,dwWritten, LPDWORD(&dwRead), 0) == 0)
 		{
 			MessageBox(hMainWindow,"Failed to read parse data","Import Failed",MB_OK);

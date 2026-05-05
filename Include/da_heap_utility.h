@@ -20,6 +20,11 @@
 
 #define DA_HEAP_DEFINE_HEAP_MESSAGE(hinstance) 
 
-#define DA_HEAP_MALLOC( heap, size, tag )	malloc( (size) )
+#define DA_HEAP_MALLOC( heap, size, tag )	xmalloc( (size) )
+
+inline void* xmalloc (size_t size) {
+	return calloc( size, 1 );
+}
+
 
 #endif // EOF

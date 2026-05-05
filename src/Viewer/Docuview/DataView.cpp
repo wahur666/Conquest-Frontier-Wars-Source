@@ -47,6 +47,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#include "da_heap_utility.h"
 #include "Resource.h"
 
 #if !defined(_XBOX)
@@ -404,7 +405,7 @@ GENRESULT DataViewer::update (IDocument * doc)
 		pLastData = 0;
 		if ((dwLastDataSize = dwNewSize) != 0)		// guard againat zero size array
 		{
-			if ((pLastData = (char *) malloc(dwNewSize)) == 0)
+			if ((pLastData = (char *) xmalloc(dwNewSize)) == 0)
 			{
 				dwLastDataSize = 0;
 				return GR_OUT_OF_MEMORY;

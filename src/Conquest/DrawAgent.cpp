@@ -39,6 +39,7 @@
 #include <malloc.h>
 #include <span>
 
+#include "da_heap_utility.h"
 #include "IRenderPrimitive.h"
 #include "MyVertex.h"
 
@@ -702,7 +703,7 @@ Done:
 BOOL32 DrawAgent::constructShape (struct IImageReader * reader, COLORREF palette[256], const RECT * pRect)
 {
 	const U32 size = imageHeight * imageWidth;
-	U8 * buffer = (U8 *) malloc(size * sizeof(*buffer));
+	U8 * buffer = (U8 *) xmalloc(size * sizeof(*buffer));
 	U32 transparent = (U32)-1;
 	U32 i;
 	PANE pane;
@@ -759,7 +760,7 @@ BOOL32 DrawAgent::constructShape (struct IImageReader * reader, COLORREF palette
 
 		if (i < 256)	// we have an unused index
 		{
-			COLORREF * colors = (COLORREF *) malloc(size * sizeof(*colors));
+			COLORREF * colors = (COLORREF *) xmalloc(size * sizeof(*colors));
 
 			transparent = i;
 			result = 1;
@@ -794,7 +795,7 @@ BOOL32 DrawAgent::constructShape (struct IImageReader * reader, COLORREF palette
 	//
 
 	shapeSize = (VFX_shape_scan8(&pane, transparent, 0, 0, 0) + 3) & ~3;
-	vfxShape = (VFX_SHAPETABLE_EX *) malloc(shapeSize + sizeof(vfx_palette) + sizeof(U32));
+	vfxShape = (VFX_SHAPETABLE_EX *) xmalloc(shapeSize + sizeof(vfx_palette) + sizeof(U32));
 	VFX_shape_scan8(&pane, transparent, 0, 0, vfxShape);
 	vfxShape->palette_offset = shapeSize;
 
@@ -1119,7 +1120,7 @@ BOOL32 FontDrawAgent::init (const VFX_FONT * font, U32 fontImageSize, const char
 	PixelFormat desiredFormat(16, 5, 5, 5, 1);		// GL_RGB5_A1
 
 
-	vfxFont = (VFX_FONT *) malloc(fontImageSize);
+	vfxFont = (VFX_FONT *) xmalloc(fontImageSize);
 	memcpy(vfxFont, font, fontImageSize);
 
 /*	for (i = 0; i < 256; i++)	  
@@ -1181,8 +1182,8 @@ BOOL32 FontDrawAgent::init (const VFX_FONT * font, U32 fontImageSize, const char
 				CQBOMB0("create_texture() failed on debug font.");
 		}
 
-		texCoord = (TEXCOORD *) malloc(numChars * sizeof(*texCoord));
-		buffer = (U8 *) malloc(twidth * theight);
+		texCoord = (TEXCOORD *) xmalloc(numChars * sizeof(*texCoord));
+		buffer = (U8 *) xmalloc(twidth * theight);
 		memset(buffer, font->font_background, twidth * theight);
 
 		window.buffer = buffer;
@@ -1229,7 +1230,7 @@ BOOL32 FontDrawAgent::init (const VFX_FONT * font, U32 fontImageSize, const char
 			palette[255].r = 255;		// pen color is white by default
 			palette[255].g = 255;
 			palette[255].b = 255;
-			U8 *alpha = (U8 *) malloc(twidth * theight);
+			U8 *alpha = (U8 *) xmalloc(twidth * theight);
 			memset(alpha, -1, twidth * theight);
 			U32 i;
 			for (i = 0; i < twidth * theight; i++)

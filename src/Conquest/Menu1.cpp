@@ -21,6 +21,8 @@
 #include "IAnimate.h"
 #include <DMenu1.h>
 #include <DStatic.h>
+
+#include "da_heap_utility.h"
 #include "UserDefaults.h"
 #include "Mission.h"
 #include "SoundManager.h"
@@ -460,7 +462,7 @@ const bool Menu1::checkForName (void)
 
 			if (size)
 			{
-				DPNAME * pName = (DPNAME *) malloc(size);
+				DPNAME * pName = (DPNAME *) xmalloc(size);
 				if (DPLAY->GetPlayerName(PLAYERID, pName, &size) == DP_OK)
 				{
 					createFolder(pName->lpszShortName);
@@ -824,7 +826,7 @@ void Menu1::getSessionNames (wchar_t szPlayerName[64], wchar_t szSessionName[128
 	szSessionName[0] = szPlayerName[0] = 0;
 
 	DPLAY->GetSessionDesc(NULL, &size);
-	pDesc = (DPSESSIONDESC2 *) malloc(size);
+	pDesc = (DPSESSIONDESC2 *) xmalloc(size);
 	hr = DPLAY->GetSessionDesc(pDesc, &size);
 	CQASSERT(hr == DP_OK);
 
@@ -841,7 +843,7 @@ void Menu1::getSessionNames (wchar_t szPlayerName[64], wchar_t szSessionName[128
 
 	if (size)
 	{
-		DPNAME * pName = (DPNAME *) malloc(size);
+		DPNAME * pName = (DPNAME *) xmalloc(size);
 		if (DPLAY->GetPlayerName(PLAYERID, pName, &size) == DP_OK)
 			wcsncpy(szPlayerName, pName->lpszShortName, 64 / sizeof(wchar_t));
 		::free(pName);

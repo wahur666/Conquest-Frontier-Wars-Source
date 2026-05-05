@@ -35,6 +35,8 @@
 #include <span>
 #include <directx2007aug/dplobby.h>
 
+#include "da_heap_utility.h"
+
 #pragma warning (disable : 4200)
 
 
@@ -641,7 +643,7 @@ bool FileTransfer::handleTimeout (FTCHANNEL * ftchannel)
 			if ((dataToSend = ftchannel->fileSize - dataSent) > PACKET_SIZE)
 				dataToSend = PACKET_SIZE;
 
-			packet = (DSEND_PACKET *) malloc(sizeof(DSEND_PACKET) + dataToSend);
+			packet = (DSEND_PACKET *) xmalloc(sizeof(DSEND_PACKET) + dataToSend);
 			packet->dwSize = sizeof(DSEND_PACKET) + dataToSend;
 			packet->type = PT_FILE_TRANSFER;
 			packet->code = FTCODE_DSEND;
@@ -831,7 +833,7 @@ void FileTransfer::receiveCREPLY (CREPLY_PACKET * packet)
 			if (ftchannel->status == FTS_SUCCESS)
 			{
 				ftchannel->status = FTS_INPROGRESS;		// start the data flow
-				ftchannel->buffer = (U8 *) malloc(ftchannel->fileSize);
+				ftchannel->buffer = (U8 *) xmalloc(ftchannel->fileSize);
 				handleTimeout(ftchannel);
 			}
 		}
@@ -920,7 +922,7 @@ void FileTransfer::fillBuffer (FTCHANNEL * ftchannel)
 	{
 		if ((ftchannel->fileSize = file->GetFileSize()) != 0)
 		{
-			ftchannel->buffer = (U8 *) malloc(ftchannel->fileSize);
+			ftchannel->buffer = (U8 *) xmalloc(ftchannel->fileSize);
 			file->SetFilePointer(0, 0);
 			file->ReadFile(0, ftchannel->buffer, ftchannel->fileSize, &dwRead, 0);
 		}

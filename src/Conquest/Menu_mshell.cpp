@@ -30,6 +30,8 @@
 #include "MusicManager.h"
 
 #include <stdio.h>
+
+#include "da_heap_utility.h"
 #include "directx2007aug/dplay.h"
 #include "directx2007aug/dplobby.h"
 #include "zonelobby.h"
@@ -532,7 +534,7 @@ struct Menu_mshell : public DAComponentX<Frame>, ICQGame
 			DPLAY->GetPlayerName(id, NULL, &size);
 		if (size)
 		{
-			DPNAME * pName = (DPNAME *) malloc(size);
+			DPNAME * pName = (DPNAME *) xmalloc(size);
 			if (DPLAY->GetPlayerName(id, pName, &size) == DP_OK)
 				wcsncpy(szName, pName->lpszShortName, PLAYERNAMESIZE-1);
 			::free(pName);
@@ -551,7 +553,7 @@ struct Menu_mshell : public DAComponentX<Frame>, ICQGame
 			CQASSERT(HOSTID==PLAYERID);
 
 			DPLAY->GetSessionDesc(NULL, &size);
-			pDesc = (DPSESSIONDESC2 *) malloc(size);
+			pDesc = (DPSESSIONDESC2 *) xmalloc(size);
 			hr = DPLAY->GetSessionDesc(pDesc, &size);
 			CQASSERT(hr == DP_OK);
 			if (bEnable)
@@ -575,7 +577,7 @@ struct Menu_mshell : public DAComponentX<Frame>, ICQGame
 			CQASSERT(HOSTID==PLAYERID);
 
 			DPLAY->GetSessionDesc(NULL, &size);
-			pDesc = (DPSESSIONDESC2 *) malloc(size);
+			pDesc = (DPSESSIONDESC2 *) xmalloc(size);
 			hr = DPLAY->GetSessionDesc(pDesc, &size);
 			CQASSERT(hr == DP_OK);
 			

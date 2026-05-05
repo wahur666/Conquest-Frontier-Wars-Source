@@ -33,6 +33,8 @@
 
 #include <string.h>
 
+#include "da_heap_utility.h"
+
 // Type definitions
 
 struct SHAPEHEADER
@@ -225,7 +227,7 @@ void WINAPI VFX_shape_draw_unclipped8(PANE *pane, VFX_SHAPETABLE *shape_table,
     }
 
     // Allocate temporary buffer for decompressed data
-    U8 *decomp_buffer = (U8 *)malloc(width * height);
+    U8 *decomp_buffer = (U8 *)xmalloc(width * height);
     if (!decomp_buffer)
         return;
 
@@ -353,7 +355,7 @@ void WINAPI VFX_shape_draw8(PANE *pane, VFX_SHAPETABLE *shape_table,
     }
 
     // Allocate temporary buffer for decompressed data
-    U8 *decomp_buffer = (U8 *)malloc(width * height);
+    U8 *decomp_buffer = (U8 *)xmalloc(width * height);
     if (!decomp_buffer)
         return;
 

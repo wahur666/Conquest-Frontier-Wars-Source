@@ -241,7 +241,7 @@ struct HeapInstance : public BaseHeap
 
 	void __fastcall sort (FREE_BLOCK *pBlock);
 
-	BASE_BLOCK * __fastcall malloc (uintptr_t dwNumBytes);
+	BASE_BLOCK * __fastcall xmalloc(uintptr_t dwNumBytes);
 
 	BOOL __fastcall mergeWithLower (BASE_BLOCK *pBlock);
 

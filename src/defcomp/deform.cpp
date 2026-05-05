@@ -10,6 +10,8 @@
 #include "eng.h"
 #include "IDeformable.h"
 #include "deform.h"
+
+#include "da_heap_utility.h"
 #include "ICamera.h"
 #include "system.h"
 
@@ -826,7 +828,7 @@ bool LoadChild(void ** buffer, IFileSystem * parent, const char * child_name)
 		if (h != INVALID_HANDLE_VALUE)
 		{
 			DWORD size = parent->GetFileSize(h, NULL);
-			*buffer = malloc(size);
+			*buffer = xmalloc(size);
 			DWORD bytes_read;
 			parent->ReadFile(h, *buffer, size, &bytes_read);
 			if (bytes_read == size)

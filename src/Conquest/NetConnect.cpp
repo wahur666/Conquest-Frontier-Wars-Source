@@ -34,6 +34,7 @@
 #define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
         EXTERN_C const IID name \
                 = { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
+#include "da_heap_utility.h"
 #include "ZoneLobby.h"
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -269,7 +270,7 @@ U32 __stdcall GetHostIPAddress (wchar_t * ipaddress, wchar_t * ipaddress2, U32 b
 	if (DPLAY->GetPlayerAddress(HOSTID, NULL, &dwSize) != DPERR_BUFFERTOOSMALL || dwSize==0)
 		goto Done;
 
-	buffer = malloc(dwSize);
+	buffer = xmalloc(dwSize);
 	if (DPLAY->GetPlayerAddress(HOSTID, buffer, &dwSize) != DP_OK)
 		goto Done;
 

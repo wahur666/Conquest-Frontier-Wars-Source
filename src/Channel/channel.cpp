@@ -167,7 +167,7 @@ GENRESULT ChannelArch::load (IFileSystem* fs)
 			return GR_GENERIC;
 		}
 
-		data = malloc (malloc_size);
+		data = xmalloc (malloc_size);
 
 		if (!data)
 			return GR_OUT_OF_MEMORY;

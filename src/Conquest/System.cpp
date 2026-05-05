@@ -56,6 +56,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "da_heap_utility.h"
+
 #define WIDTH_REG_KEY  "CQWindowWidth"
 #define HEIGHT_REG_KEY "CQWindowHeight"
 #define DEPTH_REG_KEY  "CQPixelDepth"
@@ -156,7 +158,7 @@ void PrimitiveBuilder2::VerifyBuffer( void )
 	if( current_vertex >= num_vertex ) {
 		FVFVERTEXTYPE *v;
 		U8 *v_real;
-		if( (v_real = (U8 *)malloc(sizeof(FVFVERTEXTYPE)*(num_vertex+block_size)+31)) != NULL ) {
+		if( (v_real = (U8 *)xmalloc(sizeof(FVFVERTEXTYPE)*(num_vertex+block_size)+31)) != NULL ) {
 			v = (FVFVERTEXTYPE *)(((uintptr_t)(v_real)+31) & ~31);
 			if (vertex_buffer != NULL) {
 				memcpy( v, vertex_buffer, sizeof(FVFVERTEXTYPE)*num_vertex );			
@@ -279,7 +281,7 @@ void PrimitiveBuilder2::Begin( PBenum _type, U32 _vert_cnt)
 		//FVFVERTEXTYPE *v;
 		U8 * v_real;
 	//	if( (v= new FVFVERTEXTYPE[_vert_cnt]) != NULL ) {
-		if( (v_real = (U8 *)malloc(sizeof(FVFVERTEXTYPE)*_vert_cnt+31)) != NULL ) {
+		if( (v_real = (U8 *)xmalloc(sizeof(FVFVERTEXTYPE)*_vert_cnt+31)) != NULL ) {
 			CQASSERT(current_vertex == 0);
 			free(vertex_buffer_real);
 			current_vertex_ptr = vertex_buffer = (FVFVERTEXTYPE *)((U32(v_real)+31) & ~31);
@@ -987,7 +989,7 @@ U32 __stdcall GetBuildVersion (char * buffer, U32 bufferSize)
 	if ((dwSize = GetFileVersionInfoSize(tmp, &dwHandle)) == 0)
 		goto Done;
 
-	versionBuffer = malloc(dwSize);
+	versionBuffer = xmalloc(dwSize);
 
 	if (GetFileVersionInfo(tmp, dwHandle, dwSize, versionBuffer) == 0)
 		goto Done;
@@ -1040,7 +1042,7 @@ U32 __stdcall GetProductVersion (char * buffer, U32 bufferSize)
 	if ((dwSize = GetFileVersionInfoSize(tmp, &dwHandle)) == 0)
 		goto Done;
 
-	versionBuffer = malloc(dwSize);
+	versionBuffer = xmalloc(dwSize);
 
 	if (GetFileVersionInfo(tmp, dwHandle, dwSize, versionBuffer) == 0)
 		goto Done;

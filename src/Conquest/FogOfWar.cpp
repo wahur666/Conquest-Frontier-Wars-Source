@@ -49,6 +49,8 @@
 
 #include <malloc.h>
 #include <span>
+
+#include "da_heap_utility.h"
 //#include <stdlib.h>
 
 //--------------------------------------------------------------------------//
@@ -181,11 +183,11 @@ struct BlackFog
 			byte_buff = (U8 *)buffer;
 		}
 		else
-			byte_buff = (U8 *)malloc(_width*_height*sizeof(U8));
+			byte_buff = (U8 *)xmalloc(_width*_height*sizeof(U8));
 
 		if (file->ReadFile(0,&pack_buff_size,sizeof(pack_buff_size),&dwRead) ==0)
 			goto Done;
-		pack_buff = (U8 *)malloc(pack_buff_size);
+		pack_buff = (U8 *)xmalloc(pack_buff_size);
 		if (file->ReadFile(0,pack_buff,pack_buff_size,&dwRead,0) ==0)
 			goto Done;
 
@@ -248,7 +250,7 @@ struct BlackFog
 		U8 *byte_buff = (U8 *)buffer;
 
 		DWORD dwWritten;
-		U8 *pack_buff = (U8 *)malloc(2*buff_size);
+		U8 *pack_buff = (U8 *)xmalloc(2*buff_size);
 
 		//make sure first byte is new
 		U8 currentByte=*byte_buff;

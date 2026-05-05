@@ -18,6 +18,7 @@
 #include <HeapObj.h>
 #include <span>
 
+#include "da_heap_utility.h"
 #include "VFX_shapes.hpp"
 
 //--------------------------------------------------------------------------//
@@ -148,7 +149,7 @@ GENRESULT VFXREADER::LoadImage (void *fileImage, U32 fileSize, U32 imageNumber)
 		}
 
 	::free(indexMap);
-	indexMap = (U8 *) malloc(width * height);
+	indexMap = (U8 *) xmalloc(width * height);
 	memset(indexMap, transparent, width * height);
 
 	//

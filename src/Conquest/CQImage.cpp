@@ -35,6 +35,8 @@
 #include <commctrl.h>
 #include <span>
 
+#include "da_heap_utility.h"
+
 #define ERROR_SND "AppGPFault"
 #define INFO_SND  "SystemExclamation"
 
@@ -334,7 +336,7 @@ static void getVersion(char *buffer, U32 bufferSize)
     if ((dwSize = GetFileVersionInfoSize(tmp, &dwHandle)) == 0)
         goto Done;
 
-    versionBuffer = malloc(dwSize);
+    versionBuffer = xmalloc(dwSize);
 
     if (GetFileVersionInfo(tmp, dwHandle, dwSize, versionBuffer) == 0)
         goto Done;

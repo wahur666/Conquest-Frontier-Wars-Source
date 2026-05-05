@@ -1826,7 +1826,7 @@ GENRESULT Mission::RemoteFileRequest (const C8 *fileName, IFileSystem ** file)
 			mdesc.dwCreationDistribution = OPEN_EXISTING;
 
 			mdesc.dwBufferSize = inFile->GetFileSize();
-			mdesc.lpBuffer = malloc(mdesc.dwBufferSize);
+			mdesc.lpBuffer = xmalloc(mdesc.dwBufferSize);
 			mdesc.dwFlags = CMF_DONT_COPY_MEMORY | CMF_OWN_MEMORY;
 			inFile->SetFilePointer(0,0);
 			inFile->ReadFile(0, mdesc.lpBuffer, mdesc.dwBufferSize, &dwRead, 0);
@@ -2286,7 +2286,7 @@ BOOL32 Mission::SaveParseData (void)
 		if ((pPreprocessBlock = ::GetPreprocessData(length)) == 0)
 			goto Done;
 
-		ptr2 = (char *) malloc(length + 1);
+		ptr2 = (char *) xmalloc(length + 1);
 		memcpy(ptr2, pPreprocessBlock, length);
 		ptr2[length] = 0;
 		len = length;
@@ -2316,7 +2316,7 @@ BOOL32 Mission::LoadParseData (IFileSystem * inFile)
 	if ((hFile = inFile->OpenChild(&fdesc)) == INVALID_HANDLE_VALUE)
 		goto Done;
 	len = inFile->GetFileSize(hFile);
-	if ((pTemp = (C8 *) malloc (len+1)) == 0)
+	if ((pTemp = (C8 *) xmalloc(len+1)) == 0)
 		goto Done;
 	if (inFile->ReadFile(hFile, (void *)pTemp, len, &dwRead, 0) == 0)
 		goto Done;
@@ -3483,7 +3483,7 @@ static BOOL32 ParseDefFile (void)
 		if ((pPreprocessBlock = ::GetPreprocessData(len)) == 0)
 			goto Done;
 
-		ptr2 = (char *) malloc(len + 1);
+		ptr2 = (char *) xmalloc(len + 1);
 		memcpy(ptr2, pPreprocessBlock, len);
 		ptr2[len] = 0;
 

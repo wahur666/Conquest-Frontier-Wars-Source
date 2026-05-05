@@ -16,6 +16,8 @@
 
 #include "Shapes.h"
 
+#include "da_heap_utility.h"
+
 //
 
 #ifndef M_PI
@@ -196,7 +198,7 @@ void CreateCylinder( SHAPE_TYPE type, U32 color, float radius, float length, int
 	out_shape->vbd.vertex_format = D3DFVF_XYZ | D3DFVF_DIFFUSE ;
 	out_shape->vbd.num_vertices = radius_segments * 2 * (1 + length_segments);
 
-	Vector *v = (Vector*)malloc( sizeof(Vector) * (out_shape->vbd.num_vertices) );
+	Vector *v = (Vector*)xmalloc( sizeof(Vector) * (out_shape->vbd.num_vertices) );
 	ASSERT(v);
 
 	out_shape->vbd.Ps.data = v;
@@ -204,7 +206,7 @@ void CreateCylinder( SHAPE_TYPE type, U32 color, float radius, float length, int
 	out_shape->vbd.Ps.size = sizeof(Vector);
 	out_shape->vbd.Ps.stride = sizeof(Vector);
 
-	U32 *c = (U32*)malloc( sizeof(U32) * 1 );
+	U32 *c = (U32*)xmalloc( sizeof(U32) * 1 );
 	ASSERT(c);
 
 	c[0] = 0;

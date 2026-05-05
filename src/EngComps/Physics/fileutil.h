@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include "filesys.h"
+#include "da_heap_utility.h"
 
 //
 // Creates a file system. App must ->Release() it when finished.
@@ -55,7 +56,7 @@ inline void * LoadFile(const char * name, void * buffer, int len, IFileSystem * 
 		// Determine file size, allocate buffer.
 		//
 			bytes	= parent->GetFileSize(h, NULL);
-			result	= malloc(bytes);
+			result	= xmalloc(bytes);
 		}
 
 		DWORD bytes_read;

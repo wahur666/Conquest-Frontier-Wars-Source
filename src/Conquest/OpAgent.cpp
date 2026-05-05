@@ -59,6 +59,8 @@
 #include <HeapObj.h>
 #include <FileSys.h>
 
+#include "da_heap_utility.h"
+
 #define NUM_BINS			  16
 #define SYNC_PERIOD	  (1000	/ NUM_BINS)	// time between throughput measurements
 #define DEFAULT_RAND_MASK  0x00000001
@@ -2640,7 +2642,7 @@ BOOL32 OpAgent::Load (struct IFileSystem * inFile)
 	if ((hFile = inFile->OpenChild(&fdesc)) != INVALID_HANDLE_VALUE)
 	{
 		dwBufferSize = inFile->GetFileSize(hFile);
-		buffer = (U8 *) malloc(dwBufferSize);
+		buffer = (U8 *) xmalloc(dwBufferSize);
 		inFile->ReadFile(hFile, buffer, dwBufferSize, &dwRead, 0);
 		CQASSERT(dwRead==dwBufferSize);
 		TERMINATION_NODE * prev = 0;
@@ -2671,7 +2673,7 @@ BOOL32 OpAgent::Load (struct IFileSystem * inFile)
 	if ((hFile = inFile->OpenChild(&fdesc)) != INVALID_HANDLE_VALUE)
 	{
 		dwBufferSize = inFile->GetFileSize(hFile);
-		buffer = (U8 *) malloc(dwBufferSize);
+		buffer = (U8 *) xmalloc(dwBufferSize);
 		inFile->ReadFile(hFile, buffer, dwBufferSize, &dwRead, 0);
 		CQASSERT(dwRead==dwBufferSize);
 		OPCOMPLETE_NODE * prev = 0;
@@ -2703,7 +2705,7 @@ BOOL32 OpAgent::Load (struct IFileSystem * inFile)
 	if ((hFile = inFile->OpenChild(&fdesc)) != INVALID_HANDLE_VALUE)
 	{
 		dwBufferSize = inFile->GetFileSize(hFile);
-		buffer = (U8 *) malloc(dwBufferSize);
+		buffer = (U8 *) xmalloc(dwBufferSize);
 		inFile->ReadFile(hFile, buffer, dwBufferSize, &dwRead, 0);
 		CQASSERT(dwRead==dwBufferSize);
 		RECALCPARENT_NODE * prev = 0;
@@ -2738,7 +2740,7 @@ BOOL32 OpAgent::Load (struct IFileSystem * inFile)
 	dwBufferSize = inFile->GetFileSize(hFile);
 	if (dwBufferSize!=0)
 	{
-		buffer = (U8 *) malloc(dwBufferSize);
+		buffer = (U8 *) xmalloc(dwBufferSize);
 		inFile->ReadFile(hFile, buffer, dwBufferSize, &dwRead, 0);
 		CQASSERT(dwRead==dwBufferSize);
 
@@ -2994,7 +2996,7 @@ SUPERBASE_PACKET * OpAgent::duplicatePacket (SUPERBASE_PACKET *packet)
 	SUPERBASE_PACKET * result;
 	U32 size = ((U8 *) ((&packet->getSet())+1)) - ((U8 *)packet);
 		
-	result = (SUPERBASE_PACKET *) malloc(size);
+	result = (SUPERBASE_PACKET *) xmalloc(size);
 
 	memcpy(result, packet, size);
 	result->pNext = 0;

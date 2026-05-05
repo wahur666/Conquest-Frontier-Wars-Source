@@ -385,7 +385,7 @@ BOOL UTF::init (DAFILEDESC *lpDesc)
 	if (pParent->SetFilePointer(hParentFile, header.dwDirectoryOffset) == 0xFFFFFFFF)
 		goto Done;
 
-	if ((pDirectory = (UTF_DIR_ENTRY *) malloc(header.dwDirectorySize)) == 0)
+	if ((pDirectory = (UTF_DIR_ENTRY *) xmalloc(header.dwDirectorySize)) == 0)
 		goto Done;
 
 	if (pParent->ReadFile(hParentFile, pDirectory, header.dwDirectorySize, &dwRead, 0) == 0 ||
@@ -406,7 +406,7 @@ BOOL UTF::init (DAFILEDESC *lpDesc)
 	if (pParent->SetFilePointer(hParentFile, header.dwNamesOffset) == 0xFFFFFFFF)
 		goto Done;
 
-	if ((pNames = (LPCTSTR) malloc(header.dwNameSpaceSize)) == 0)
+	if ((pNames = (LPCTSTR) xmalloc(header.dwNameSpaceSize)) == 0)
 		goto Done;
 
 	if (pParent->ReadFile(hParentFile, (void *)pNames, header.dwNameSpaceSize, &dwRead, 0) == 0 ||

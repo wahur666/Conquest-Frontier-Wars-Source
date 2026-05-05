@@ -80,6 +80,8 @@
 
 #include <malloc.h>
 
+#include "da_heap_utility.h"
+
 #define MISSION_OVER_TELETYPE_MIN_X_POS 80
 #define MISSION_OVER_TELETYPE_MAX_X_POS 560
 #define MISSION_OVER_TELETYPE_MIN_Y_POS 300
@@ -293,7 +295,7 @@ void MScript::SetScriptData (const CQSCRIPTDATADESC & desc)
 
 	if (PARSER->QueryInterface("IViewConstructor2", parser.void_addr()) == GR_OK)
 	{
-		char * ptr2 = (char *) malloc(desc.preprocessSize + 1);
+		char * ptr2 = (char *) xmalloc(desc.preprocessSize + 1);
 		memcpy(ptr2, desc.preprocessData, desc.preprocessSize);
 		ptr2[desc.preprocessSize] = 0;		// null terminated string
 
@@ -413,7 +415,7 @@ static void loadParseData (IFileSystem * inFile, IViewConstructor2 * parser)
 	if ((hFile = inFile->OpenChild(&fdesc)) == INVALID_HANDLE_VALUE)
 		goto Done;
 	len = inFile->GetFileSize(hFile);
-	if ((pTemp = (C8 *) malloc (len+1)) == 0)
+	if ((pTemp = (C8 *) xmalloc(len+1)) == 0)
 		goto Done;
 	if (inFile->ReadFile(hFile, (void *)pTemp, len, &dwRead, 0) == 0)
 		goto Done;
@@ -500,7 +502,7 @@ static void loadProgramData (IFileSystem * inFile, IViewConstructor2 * parser)
 				else
 				{
 					len = pDir->GetFileSize(hFile);
-					pTemp = (C8 *) malloc (len);
+					pTemp = (C8 *) xmalloc(len);
 					pDir->ReadFile(hFile, pTemp, len, &dwRead, 0);
 					//
 					// transmorgriphy data
@@ -545,7 +547,7 @@ static void loadGlobalData (IFileSystem * inFile, IViewConstructor2 * parser)
 		goto Done;
 	}
 	len = inFile->GetFileSize(hFile);
-	if (len == 0 || (pTemp = (C8 *) malloc (len)) == 0)
+	if (len == 0 || (pTemp = (C8 *) xmalloc(len)) == 0)
 		goto Done;
 	if (inFile->ReadFile(hFile, (void *)pTemp, len, &dwRead, 0) == 0)
 		goto Done;

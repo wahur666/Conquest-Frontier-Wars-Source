@@ -5,6 +5,8 @@
 //#include "stdlib.h"
 #include "hashtable.h"
 
+#include "da_heap_utility.h"
+
 /////////////////////////////////////////////////////////////
 // HashTable 
 /////////////////////////////////////////////////////////////
@@ -230,7 +232,7 @@ void HashTable::set( const char *key, const char *value, int len ) {
 		// and rebuild the whole hash table
 		int _numRecords = 0;
 		int _hashTableSize = hashTableSize * 2;
-		char **_hashTable = (char **)malloc( sizeof(char*) * _hashTableSize );
+		char **_hashTable = (char **)xmalloc( sizeof(char*) * _hashTableSize );
 		memset( _hashTable, 0, sizeof(char*) * _hashTableSize );
 		for( int i=0; i<hashTableSize; i++ ) {
 			if( hashTable[i] && !(hashTable[i][0] & aaDELETED) ) {
@@ -248,7 +250,7 @@ void HashTable::set( const char *key, const char *value, int len ) {
 	if( value ) {
 		int keyLen = strlen( key ) + 1;
 		int valLen = (len == -1) ? strlen(value)+1 : len;
-		char *recPtr = (char *)malloc( 1 + keyLen + valLen );
+		char *recPtr = (char *)xmalloc( 1 + keyLen + valLen );
 		*recPtr = 0;
 		memcpy( recPtr+1, key, keyLen );
 		memcpy( recPtr+1+keyLen, value, valLen );
@@ -266,7 +268,7 @@ void HashTable::clear() {
 	}
 	hashTableSize = 16;
 	numRecords = 0;
-	hashTable = (char **)malloc( sizeof(char*) * hashTableSize );
+	hashTable = (char **)xmalloc( sizeof(char*) * hashTableSize );
 	memset( hashTable, 0, sizeof(char*) * hashTableSize );
 }
 

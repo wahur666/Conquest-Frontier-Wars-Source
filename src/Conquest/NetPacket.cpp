@@ -34,6 +34,8 @@
 #include <IConnection.h>
 #include <span>
 
+#include "da_heap_utility.h"
+
 #if 0
 #include "DBHotkeys.h"
 #endif
@@ -312,7 +314,7 @@ struct NETPLAYER
 				DPLAY->GetPlayerName(playerID, NULL, &size);
 				if (size)
 				{
-					DPNAME * pName = (DPNAME *) malloc(size);
+					DPNAME * pName = (DPNAME *) xmalloc(size);
 					if (DPLAY->GetPlayerName(playerID, pName, &size) == DP_OK)
 						wcsncpy(name, pName->lpszShortName, PLAYERNAMESIZE-1);
 					::free(pName);
@@ -1471,7 +1473,7 @@ void NetPacket::getPlayerName (DPID dpid, wchar_t * buffer, U32 bufferSize)
 	buffer[0] = 0;
 	if (size)
 	{
-		DPNAME * pName = (DPNAME *) malloc(size);
+		DPNAME * pName = (DPNAME *) xmalloc(size);
 		if (DPLAY->GetPlayerName(dpid, pName, &size) == DP_OK)
 			wcsncpy(buffer, pName->lpszShortName, bufferSize / sizeof(wchar_t));
 		::free(pName);

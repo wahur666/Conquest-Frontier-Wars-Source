@@ -2192,7 +2192,7 @@ void FaceGroupRender::Init(Mesh *mesh,int _fg_idx,MeshRender *_mr)//MeshInfo *mc
 	//faces = new ArchetypeFaceInfo[new_face_cnt];
 
 	//pad for cache read-ahead
-	faces_ptr = (U8 *)malloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
+	faces_ptr = (U8 *)xmalloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
 	faces = (ArchetypeFaceInfo *)((U32(faces_ptr)+31) & ~31);
 	memcpy(faces,afi,new_face_cnt*sizeof(ArchetypeFaceInfo));
 	//	result->sortVertsOnZ();
@@ -2235,7 +2235,7 @@ void FaceGroupRender::Clone(RenderMaterial **rm,bool bCopyBuffers)
 	
 
 		//pad for cache read-ahead
-		fgr->faces_ptr = (U8 *)malloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
+		fgr->faces_ptr = (U8 *)xmalloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
 		fgr->faces = (ArchetypeFaceInfo *)((U32(faces_ptr)+31) & ~31);
 		memcpy(fgr->faces,faces,new_face_cnt*sizeof(ArchetypeFaceInfo));
 	}
@@ -2579,7 +2579,7 @@ void FaceGroupRender2::Init(Mesh *mesh,int _fg_idx,MeshRender *_mr)//MeshInfo *m
 	memcpy(index_list,id_list,ref_cnt*sizeof(U16));
 //	faces = new ArchetypeFaceInfo[new_face_cnt];
 	//pad for cache read-ahead
-	faces_ptr = (U8 *)malloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
+	faces_ptr = (U8 *)xmalloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
 	faces = (ArchetypeFaceInfo *)((U32(faces_ptr)+31) & ~31);
 	memcpy(faces,afi,new_face_cnt*sizeof(ArchetypeFaceInfo));
 
@@ -2617,7 +2617,7 @@ void FaceGroupRender2::Clone(RenderMaterial **rm,bool bCopyBuffers)
 		memcpy(fgr->index_list,index_list,new_face_cnt*3*sizeof(U16));
 		
 		//pad for cache read-ahead
-		fgr->faces_ptr = (U8 *)malloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
+		fgr->faces_ptr = (U8 *)xmalloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
 		fgr->faces = (ArchetypeFaceInfo *)((U32(faces_ptr)+31) & ~31);
 		memcpy(fgr->faces,faces,new_face_cnt*sizeof(ArchetypeFaceInfo));
 	}
@@ -4142,7 +4142,7 @@ void MMaterial<VertexStruct,VERTEX_FORMAT>::SplitFaceGroup (const MeshInfo &src,
 		memcpy(fg_out0->index_list,id_list0,index_count0*sizeof(U16));
 		
 		//pad for cache read-ahead
-		fg_out0->faces_ptr = (U8 *)malloc(sizeof(ArchetypeFaceInfo)*(fg_out0->new_face_cnt+1)+31);
+		fg_out0->faces_ptr = (U8 *)xmalloc(sizeof(ArchetypeFaceInfo)*(fg_out0->new_face_cnt+1)+31);
 		fg_out0->faces = (ArchetypeFaceInfo *)((U32(fg_out0->faces_ptr)+31) & ~31);
 		memcpy(fg_out0->faces,afi0,fg_out0->new_face_cnt*sizeof(ArchetypeFaceInfo));
 		fg_out0->face_offset = meshSplit.out_face_cnt0;
@@ -4163,7 +4163,7 @@ void MMaterial<VertexStruct,VERTEX_FORMAT>::SplitFaceGroup (const MeshInfo &src,
 		memcpy(fg_out1->index_list,id_list1,index_count1*sizeof(U16));
 		
 		//pad for cache read-ahead
-		fg_out1->faces_ptr = (U8 *)malloc(sizeof(ArchetypeFaceInfo)*(fg_out1->new_face_cnt+1)+31);
+		fg_out1->faces_ptr = (U8 *)xmalloc(sizeof(ArchetypeFaceInfo)*(fg_out1->new_face_cnt+1)+31);
 		fg_out1->faces = (ArchetypeFaceInfo *)((U32(fg_out1->faces_ptr)+31) & ~31);
 		memcpy(fg_out1->faces,afi1,fg_out1->new_face_cnt*sizeof(ArchetypeFaceInfo));
 		fg_out1->face_offset = meshSplit.out_face_cnt1;
@@ -4459,7 +4459,7 @@ void SoftwareFGRender::Clone(RenderMaterial **rm,bool bCopyBuffers)
 	
 
 		//pad for cache read-ahead
-		fgr->faces_ptr = (U8 *)malloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
+		fgr->faces_ptr = (U8 *)xmalloc(sizeof(ArchetypeFaceInfo)*(new_face_cnt+1)+31);
 		fgr->faces = (ArchetypeFaceInfo *)((U32(faces_ptr)+31) & ~31);
 		memcpy(fgr->faces,faces,new_face_cnt*sizeof(ArchetypeFaceInfo));
 	}

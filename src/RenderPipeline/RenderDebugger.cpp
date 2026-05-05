@@ -31,6 +31,8 @@
 
 #include <string>
 
+#include "da_heap_utility.h"
+
 //
 
 #if RP_RD_DEBUG
@@ -332,7 +334,7 @@ void rp_rd_save_surface_bmp( const char *filename, LPDIRECTDRAWSURFACE7 surface 
 
 		PixelFormat pf( ddsd.ddpfPixelFormat );
 
-		if( (rgb_data = (unsigned char*)malloc( size )) != NULL ) {
+		if( (rgb_data = (unsigned char*)xmalloc( size )) != NULL ) {
 
 			out_data = rgb_data;
 	

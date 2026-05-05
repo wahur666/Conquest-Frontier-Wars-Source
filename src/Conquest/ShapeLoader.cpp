@@ -28,6 +28,8 @@
 #include <IConnection.h>
 #include <span>
 
+#include "da_heap_utility.h"
+
 //--------------------------------------------------------------------------//
 //
 struct SHPTYPE
@@ -72,7 +74,7 @@ struct SHPTYPE
 			return false;
 		}
 		U32 size = parent->GetFileSize(hFile);
-		pImage = (const void *) malloc(size);
+		pImage = (const void *) xmalloc(size);
 		DWORD dwRead;
 		parent->ReadFile(hFile, (void *)pImage, size, &dwRead, 0);
 		parent->CloseHandle(hFile);

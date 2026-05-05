@@ -67,7 +67,7 @@ void * HeapInstance::AllocateMemory (U32 numBytes, const char *msg)
 {
 	BASE_BLOCK *result;
 
-	if ((result = malloc(numBytes)) == 0)
+	if ((result = xmalloc(numBytes)) == 0)
 		return result;
 
 	if ((dwFlags & DAHEAPFLAG_NOMSGS) == 0)
@@ -413,7 +413,7 @@ void HeapInstance::sort (FREE_BLOCK *pBlock)
 }
 //--------------------------------------------------------------------------//
 //
-BASE_BLOCK * HeapInstance::malloc (uintptr_t dwNumBytes)
+BASE_BLOCK * HeapInstance::xmalloc (uintptr_t dwNumBytes)
 {
 	FREE_BLOCK *pBlock, *pStart;
 	DWORD dwRemainder;

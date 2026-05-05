@@ -149,7 +149,7 @@ GENRESULT VFXREADER::LoadImage (void *fileImage, U32 fileSize, U32 imageNumber)
 		}
 
 	::free(indexMap);
-	indexMap = (U8 *) malloc(width * height);
+	indexMap = (U8 *) xmalloc(width * height);
 	memset(indexMap, transparent, width * height);
 
 	//

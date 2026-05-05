@@ -31,6 +31,8 @@
 #pragma warning( disable : 4786 )
 #include <string>
 #include <list>
+
+#include "da_heap_utility.h"
 using namespace std;
 
 //------------------------------------------------------------------------------
@@ -481,8 +483,8 @@ void MicrosoftDatabaseExport::UpdateFiles( void )
 
 		FILE* xfile = fopen( xfn.c_str(), "rt" );
 
-		char* labels = (char*)malloc(1024*4);
-		char* values = (char*)malloc(1024*4);
+		char* labels = (char*)xmalloc(1024*4);
+		char* values = (char*)xmalloc(1024*4);
 
 		fgets( labels, 1024*4, xfile );
 		fgets( values, 1024*4, xfile );

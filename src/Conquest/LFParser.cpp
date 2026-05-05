@@ -25,6 +25,8 @@
 #include <TSmartPointer.h>
 #include <TComponent2.h>
 
+#include "da_heap_utility.h"
+
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 //
@@ -146,7 +148,7 @@ bool LFParser::Initialize (const char * fileName)
 	else
 	{
 		bufferSize = MSPEECHDIR->GetFileSize(hFile);
-		pMemory = (const char *) malloc(bufferSize);
+		pMemory = (const char *) xmalloc(bufferSize);
 
 		memset(&overlapped, 0, sizeof(overlapped));
 		bytesRead = 0;

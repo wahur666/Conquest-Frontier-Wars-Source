@@ -29,6 +29,8 @@
 #include "MusicManager.h"
 
 #include <directx2007aug/dplobby.h>
+
+#include "da_heap_utility.h"
 #include "ZoneLobby.h"
 
 #define MAX_PLAYER_CHAR 32
@@ -548,7 +550,7 @@ void * Menu_sess::createTCPAddress (const wchar_t * szAddress)
 		goto Done;
 	}
 
-	result = malloc(dwAddressSize);
+	result = xmalloc(dwAddressSize);
 
 	if (DPLOBBY->CreateCompoundAddress(element, 2, result, &dwAddressSize) != DP_OK)
 	{

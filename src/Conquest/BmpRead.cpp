@@ -19,6 +19,8 @@
 
 #include <malloc.h>
 #include <span>
+
+#include "da_heap_utility.h"
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
@@ -140,7 +142,7 @@ void BMP_READER::loadIndexBits (BITMAPINFOHEADER * header)
 		palette[i] = RGB(_palette[i].rgbRed, _palette[i].rgbGreen, _palette[i].rgbBlue) | 0xFF000000;
 
     ::free(indexMap);
-	indexMap = (U8 *) malloc(header->biWidth * trueHeight * sizeof(U8));
+	indexMap = (U8 *) xmalloc(header->biWidth * trueHeight * sizeof(U8));
 
 	// write it upside down for proper GL behavior
 	if (header->biBitCount == 8)
@@ -242,7 +244,7 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 	}
 
     ::free(colorMap);
-	colorMap = (COLORREF *) malloc(header->biWidth * trueHeight * sizeof(COLORREF));
+	colorMap = (COLORREF *) xmalloc(header->biWidth * trueHeight * sizeof(COLORREF));
 
 	// write it upside down for proper GL behavior
 	if (header->biBitCount == 8)

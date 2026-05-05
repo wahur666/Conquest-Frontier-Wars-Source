@@ -41,6 +41,8 @@
 //#include <string.h>
 #include <malloc.h>
 
+#include "da_heap_utility.h"
+
 
 extern ICOManager * DACOM;
 
@@ -72,7 +74,7 @@ int FileStream::open(const char *filename, char fatal)
 		if (bOwnMemory)
 			free((void *)buffer);
 		buffer_index = 0;
-		tmp = (BYTE *) malloc(pFile->GetFileSize()+1);
+		tmp = (BYTE *) xmalloc(pFile->GetFileSize()+1);
 		buffer = tmp;
 		bOwnMemory = true;
 		pFile->ReadFile(0, tmp, pFile->GetFileSize(), &dwRead, 0);

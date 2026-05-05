@@ -33,6 +33,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "da_heap_utility.h"
+
 #pragma warning (disable : 4200)	// zero sized array
 
 //-----------------------------------------------------------------------------------
@@ -671,7 +673,7 @@ GENRESULT GenData::copyOpenFile (IFileSystem *file)
 	DAFILEDESC fdesc = "GenData.db";
 	U32 dwSize = file->GetFileSize();
 	U32 dwRead,dwWritten;
-	void *buffer = malloc(dwSize);
+	void *buffer = xmalloc(dwSize);
 	MEMFILEDESC mdesc = fdesc.lpFileName;
 
 	mdesc.lpBuffer = buffer;

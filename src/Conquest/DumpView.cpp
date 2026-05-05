@@ -32,6 +32,8 @@
 #include <richedit.h>
 #include <stdio.h>
 
+#include "da_heap_utility.h"
+
 //--------------------------------------------------------------------------//
 
 struct DumpView : GlobalComponent, IDAComponent
@@ -159,7 +161,7 @@ void DumpView::getVersion(char *buffer, U32 bufferSize)
     if ((dwSize = GetFileVersionInfoSize(tmp, &dwHandle)) == 0)
         goto Done;
 
-    versionBuffer = malloc(dwSize);
+    versionBuffer = xmalloc(dwSize);
 
     if (GetFileVersionInfo(tmp, dwHandle, dwSize, versionBuffer) == 0)
         goto Done;

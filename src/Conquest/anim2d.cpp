@@ -19,6 +19,7 @@
 #include <IRenderPrimitive.h>
 #include <span>
 
+#include "da_heap_utility.h"
 #include "TComponent2.h"
 
 AnimArchetype::AnimArchetype (void) : frames (NULL)
@@ -61,7 +62,7 @@ void AnimArchetype::load (IFileSystem* fs)
 
 	int len_names = fs->GetFileSize (hndl);
 
-	char* libName = (char*)malloc (len_names);
+	char* libName = (char*)xmalloc(len_names);
 	fs->ReadFile (hndl, libName, len_names, &read);
 	fs->CloseHandle (hndl);*/
 
@@ -72,7 +73,7 @@ void AnimArchetype::load (IFileSystem* fs)
 
 	S32 len_names = fs->GetFileSize (hndl);
 
-	char* buf = (char*)malloc (len_names);
+	char* buf = (char*)xmalloc(len_names);
 	fs->ReadFile (hndl, buf, fs->GetFileSize (hndl), &read);
 
 	#define MAX_TXMS 64

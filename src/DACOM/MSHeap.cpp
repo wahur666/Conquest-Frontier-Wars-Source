@@ -16,6 +16,7 @@
 #include <windows.h>
 
 #include "BaseHeap.h"
+#include "da_heap_utility.h"
 #include "FDump.h"
 #include "Malloc.h"
 #include "TComponent2.h"
@@ -117,13 +118,13 @@ GENRESULT MSHeap::CreateInstance (DACOMDESC *descriptor, void **instance)
 //
 void * MSHeap::AllocateMemory (U32 numBytes, const char *msg)
 {
-	return malloc(numBytes);
+	return xmalloc(numBytes);
 }
 //--------------------------------------------------------------------------//
 //
 void * MSHeap::ClearAllocateMemory (U32 numBytes, const char *msg, U8 initChar)
 {
-	void * result = malloc(numBytes);
+	void * result = xmalloc(numBytes);
 	if (result)
 		memset(result, initChar, numBytes);
 	return result;
@@ -234,7 +235,7 @@ U32 MSHeap::GetHeapFlags (void)
 //
 void * MSHeap::malloc_pass_through (const C8 * msg)
 {
-	return malloc(12);
+	return xmalloc(12);
 }
 //--------------------------------------------------------------------------//
 //

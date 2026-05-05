@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "da_heap_utility.h"
+
 #define HASHSIZE 256
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
@@ -573,7 +575,7 @@ void LogFile::shutdown (void)
 	if (DACOM->CreateInstance(&fdesc, pLog.void_addr()) == GR_OK)
 	{
 		U32 fileSize = pLog->GetFileSize();
-		char * buffer = (char *) malloc(fileSize + 1);
+		char * buffer = (char *) xmalloc(fileSize + 1);
 		DWORD dwRead;
 		S32 i;
 

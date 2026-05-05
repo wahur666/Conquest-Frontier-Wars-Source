@@ -26,6 +26,8 @@
 
 #include <stdio.h>
 
+#include "da_heap_utility.h"
+
 //--------------------------------------------------------------------------//
 //
 struct MenuPause : public DAComponentX<Frame>, IPlayerStateCallback
@@ -92,7 +94,7 @@ struct MenuPause : public DAComponentX<Frame>, IPlayerStateCallback
 			DPLAY->GetPlayerName(id, NULL, &size);
 		if (size)
 		{
-			DPNAME * pName = (DPNAME *) malloc(size);
+			DPNAME * pName = (DPNAME *) xmalloc(size);
 			if (DPLAY->GetPlayerName(id, pName, &size) == DP_OK)
 				wcsncpy(szName, pName->lpszShortName, 64-1);
 			::free(pName);
