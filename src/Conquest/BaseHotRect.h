@@ -194,11 +194,23 @@ private:
 	
 	GENRESULT ReverseNotifyClients(U32 message, void* param)
 	{
-		// notify in reverse order for end-of-frame
-		for (auto it = point.clients.rbegin(); it != point.clients.rend(); ++it)
+		const int count = static_cast<int>(point.clients.size());
+
+		for (int i = count - 1; i >= 0; --i)
 		{
-			it->client->Notify(message, param);
+			auto* client = point.clients[i].client;
+
+			__try
+			{
+				if (client->Notify(message, param) != GR_OK)
+					return GR_GENERIC;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER)
+			{
+				// log it, optionally remove bad client, continue
+			}
 		}
+
 		return GR_OK;
 	}
 
@@ -211,23 +223,33 @@ private:
 
 		for (auto& node : point.clients)
 		{
-			if (node.client->Notify(message, param) != GR_OK)
-				return GR_GENERIC;
+			__try {
+				if (node.client->Notify(message, param) != GR_OK)
+					return GR_GENERIC;			}
+			__except(EXCEPTION_EXECUTE_HANDLER) {
+				// log it, remove node, continue
+			}
+
 		}
 		return GR_OK;
 	}
 
-	void removeClient (BaseHotRect *client)
+	void removeClient(BaseHotRect *client)
 	{
-#ifdef _DEBUG
 		auto it = std::find_if(point.clients.begin(), point.clients.end(),
 			[client](const CONNECTION_NODE2<IEventCallback>& node) {
 				return node.client == client;
 			});
 
-		CQASSERT(it != point.clients.end() && "BaseHotrect::Cannot remove unknown client");
+#ifdef _DEBUG
+		CQASSERT(it != point.clients.end() && "BaseHotRect::Cannot remove unknown client");
 #endif
-		client->Release();
+
+		if (it != point.clients.end())
+		{
+			it->client->Release();
+			point.clients.erase(it);
+		}
 	}
 	
 	void initializeBaseHotRect (void)

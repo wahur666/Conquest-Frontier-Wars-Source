@@ -1402,7 +1402,7 @@ BOOL32 Music::CloseHandle (HSTREAM hMusic)
 	tmp->bStopRequested = true;
 	tmp->bKillRequested = true;
 
-	while (1)
+	while (0)
 	{
 		EnterCriticalSection(&criticalSection);
 		if (tmp->bInPlayList==0)

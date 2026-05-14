@@ -355,6 +355,7 @@ void MManager::InitPlaylist (enum M_RACE race)
 //
 void MManager::PlayMusic (const char * fileName, bool bSmoothTransition)
 {
+	return;
 #ifdef _DEMO_
 	if (fileName)
 		fileName = "demomusic.wav";		// override filename for demo
