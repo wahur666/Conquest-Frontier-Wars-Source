@@ -961,7 +961,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI update_state_block( U32 sbhandle ) = 0;
+	virtual GENRESULT COMAPI update_state_block( LONG_PTR sbhandle ) = 0;
 
 	//
 	// begin recording a new state block
@@ -996,7 +996,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI end_state_block( U32*out_sbhandle ) = 0;
+	virtual GENRESULT COMAPI end_state_block( LONG_PTR * out_sbhandle ) = 0;
 
 	//
 	// apply a previously recorded or created stateblock
@@ -1004,7 +1004,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI apply_state_block( U32 sbhandle ) = 0;
+	virtual GENRESULT COMAPI apply_state_block( LONG_PTR sbhandle ) = 0;
 
 	//
 	// delete a state block
@@ -1012,7 +1012,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI delete_state_block( U32 sbhandle ) = 0;
+	virtual GENRESULT COMAPI delete_state_block( LONG_PTR sbhandle ) = 0;
 
 	// draw_primitive
 	//
@@ -1221,7 +1221,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI blit_texture( U32 hDest, U32 destLevel, RECT destRect, U32 hSrc, U32 srcLevel, RECT srcRect  ) = 0;
+	virtual GENRESULT COMAPI blit_texture( LONG_PTR hDest, LONG_PTR destLevel, RECT destRect, U32 hSrc, U32 srcLevel, RECT srcRect  ) = 0;
 
 	// get_num_textures
 	//

@@ -440,7 +440,7 @@ struct CQPipeline : IRenderPipeline
 		PIPETHROUGH ( create_state_block(type, out_sbhandle) )
 	}
 
-	virtual GENRESULT COMAPI update_state_block( U32 sbhandle )
+	virtual GENRESULT COMAPI update_state_block( LONG_PTR sbhandle )
 	{
 		PIPETHROUGH ( update_state_block(sbhandle) )
 	}
@@ -450,17 +450,17 @@ struct CQPipeline : IRenderPipeline
 		PIPETHROUGH ( begin_state_block() )
 	}
 
-	virtual GENRESULT COMAPI end_state_block( U32 *out_sbhandle )
+	virtual GENRESULT COMAPI end_state_block( LONG_PTR *out_sbhandle )
 	{
 		PIPETHROUGH ( end_state_block(out_sbhandle) )
 	}
 
-	virtual GENRESULT COMAPI apply_state_block( U32 sbhandle )
+	virtual GENRESULT COMAPI apply_state_block( LONG_PTR sbhandle )
 	{
 		PIPETHROUGH ( apply_state_block(sbhandle) )
 	}
 
-	virtual GENRESULT COMAPI delete_state_block( U32 sbhandle )
+	virtual GENRESULT COMAPI delete_state_block( LONG_PTR sbhandle )
 	{
 		PIPETHROUGH ( delete_state_block(sbhandle) )
 	}
@@ -569,7 +569,7 @@ struct CQPipeline : IRenderPipeline
 		PIPETHROUGH ( set_texture_level_data(htexture, level, src_width, src_height, src_stride, src_format, src_pixel, src_alpha, src_palette) )
 	}
 
-	virtual GENRESULT COMAPI blit_texture( U32 hDest, U32 destLevel, RECT destRect, U32 hSrc, U32 srcLevel, RECT srcRect  )
+	virtual GENRESULT COMAPI blit_texture( LONG_PTR hDest, LONG_PTR destLevel, RECT destRect, U32 hSrc, U32 srcLevel, RECT srcRect  )
 	{
 		PIPETHROUGH ( blit_texture(hDest, destLevel, destRect, hSrc, srcLevel, srcRect ) )
 	}

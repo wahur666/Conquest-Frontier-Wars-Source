@@ -25,7 +25,7 @@
 
 
 #define WIN32_LEAN_AND_MEAN
-#include <stdio.h>
+#include <cstdio>
 //#define INITGUID
 //#include <ddraw.h>
 //#include <d3d9types.h>
@@ -128,7 +128,7 @@ const char *BladeDllName			= "blade.dll";
 
 const U32 D3DRP_MAX_STRING_LEN = 128;
 
-LPDIRECT3DINDEXBUFFER9 scratchIB = 0;
+LPDIRECT3DINDEXBUFFER9 scratchIB = nullptr;
 
 //
 
@@ -142,7 +142,7 @@ struct D3DRPDEVICETYPE
 	GUID		  type_guid;
 	U32			  d3drp_dtf_flags;
 
-	D3DRPDEVICETYPE( const char *_nickname=NULL, const char *_fullname=NULL, const GUID *_type_guid=NULL, U32 _flags = 0, const char *_dll_name = NULL )
+	D3DRPDEVICETYPE( const char *_nickname= nullptr, const char *_fullname=NULL, const GUID *_type_guid=NULL, U32 _flags = 0, const char *_dll_name = NULL )
 	{
 		nickname = _nickname;
 		fullname = _fullname;
@@ -174,7 +174,7 @@ typedef handlemap<HWND,RPDDCLIPPERDATA>		ClipperMap;
 
 static int PixelShaderVersion = 0;
 
-static LPDIRECT3DDEVICE9			direct3d_device = 0;
+static LPDIRECT3DDEVICE9			direct3d_device = nullptr;
 
 struct Direct3D_RenderPipeline: IRenderPipeline, 
 								IRenderPrimitive,
@@ -208,7 +208,7 @@ public:	// Interface
 
 
 
-	GENRESULT COMAPI startup( const char *device_id_persist=NULL ) ;
+	GENRESULT COMAPI startup( const char *device_id_persist= nullptr) ;
 	GENRESULT COMAPI shutdown( void  ) ;
 	GENRESULT COMAPI get_device_info( RPDEVICEINFO *info  ) ;
 	GENRESULT COMAPI get_device_stats( RPDEVICESTATS *stat  ) ;
@@ -265,11 +265,11 @@ public:	// Interface
 	GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *htexture  ) ;
 	GENRESULT COMAPI verify_state( void ) ;
 	GENRESULT COMAPI create_state_block( D3DSTATEBLOCKTYPE type, U32*out_sbhandle ) ;
-	GENRESULT COMAPI update_state_block( U32 sbhandle ) ;
+	GENRESULT COMAPI update_state_block( LONG_PTR sbhandle ) ;
 	GENRESULT COMAPI begin_state_block( void ) ;
-	GENRESULT COMAPI end_state_block( U32*out_sbhandle ) ;
-	GENRESULT COMAPI apply_state_block( U32 sbhandle ) ;
-	GENRESULT COMAPI delete_state_block( U32 sbhandle ) ;
+	GENRESULT COMAPI end_state_block( LONG_PTR * out_sbhandle ) ;
+	GENRESULT COMAPI apply_state_block( LONG_PTR sbhandle ) ;
+	GENRESULT COMAPI delete_state_block( LONG_PTR sbhandle ) ;
 	GENRESULT COMAPI draw_primitive( D3DPRIMITIVETYPE type, U32 vertex_format, const void *verts, int num_verts, U32 flags  ) ;
 	GENRESULT COMAPI draw_indexed_primitive( D3DPRIMITIVETYPE type, U32 vertex_format, const void *verts, int num_verts, const U16 * indices, int num_indices, U32 flags  ) ;
 	GENRESULT COMAPI draw_primitive_vb( D3DPRIMITIVETYPE type, IRP_VERTEXBUFFERHANDLE vbhandle, int start_vert, int num_verts, U32 flags  ) ;
@@ -291,7 +291,7 @@ public:	// Interface
 	GENRESULT COMAPI set_texture_palette( LONG_PTR htexture, int start, int length, const RGB *colors  ) ;
 	GENRESULT COMAPI get_texture_palette( LONG_PTR htexture, int start, int length, RGB *colors  ) ;
 	GENRESULT COMAPI set_texture_level_data( LONG_PTR htexture, int subsurface, int src_width, int src_height, int src_stride, const PixelFormat &src_format, const void *src_pixel, const void *src_alpha, const RGB *src_palette ) ;
-	GENRESULT COMAPI blit_texture( U32 hDest, U32 dst_subsurface, RECT destRect, U32 hSrc, U32 src_subsurface, RECT srcRect  ) ;
+	GENRESULT COMAPI blit_texture( LONG_PTR hDest, LONG_PTR dst_subsurface, RECT destRect, U32 hSrc, U32 src_subsurface, RECT srcRect  ) ;
 	GENRESULT COMAPI get_num_textures( U32 *out_num_textures  ) ;
 	GENRESULT COMAPI get_texture( U32 texture_num, LONG_PTR *out_htexture  ) ;
 	GENRESULT COMAPI create_vertex_buffer( U32 vertex_format, int num_verts, U32 irp_vbf_flags, IRP_VERTEXBUFFERHANDLE *out_vb_handle ) ;
@@ -495,7 +495,7 @@ ID3DXEffect * loadEffectHelper(const char* filename,IComponentFactory * DIR)
 {
 		//ICOManager *DACOM = DACOM_Acquire();
 		bool tripAssertion = false;
-		LPD3DXEFFECT effect = 0;
+		LPD3DXEFFECT effect = nullptr;
 		while (effect == NULL)
 		{
 			if (tripAssertion) assert(false);
@@ -513,32 +513,32 @@ ID3DXEffect * loadEffectHelper(const char* filename,IComponentFactory * DIR)
 			U32 fileSize = file->GetFileSize();
 			char * data = new char[fileSize+1];
 			U32 dwRead = 0;
-			file->ReadFile(0, data, fileSize,LPDWORD(&dwRead),0);
+			file->ReadFile(nullptr, data, fileSize,LPDWORD(&dwRead),0);
 
 			data[fileSize] = 0;
 			
-			LPD3DXBUFFER pBufferErrors = NULL;
+			LPD3DXBUFFER pBufferErrors = nullptr;
 			if (FAILED(D3DXCreateEffect( direct3d_device, 
 				data, 
 				fileSize, 
+				nullptr,
+				nullptr,
 				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
+				nullptr,
 				&effect, 
 				&pBufferErrors )))
 				{
 				GENERAL_TRACE_1("Failed to create effect: ");
 				GENERAL_TRACE_1("\n");
 			}
-			if( pBufferErrors != NULL )
+			if( pBufferErrors != nullptr)
 			{
 				GENERAL_TRACE_1("\n");
 				GENERAL_TRACE_1((CHAR*)pBufferErrors->GetBufferPointer());
 				GENERAL_TRACE_1("\n");
 			}
-			if (effect == NULL)	continue;
-			D3DXHANDLE hTech = NULL;
+			if (effect == nullptr)	continue;
+			D3DXHANDLE hTech = nullptr;
 			switch (PixelShaderVersion)
 			{
 			case 0:
@@ -575,7 +575,7 @@ struct effectList
 	}
 };
 
-effectList * effectsForRestoration = 0;
+effectList * effectsForRestoration = nullptr;
 
 
 ID3DXEffect** Direct3D_RenderPipeline::load_effect(const char * filename, IComponentFactory * DIR)
@@ -594,7 +594,7 @@ ID3DXEffect** Direct3D_RenderPipeline::load_effect(const char * filename, ICompo
 	}
 
 	tmp = new effectList();
-	strcpy(tmp->fileName, filename);
+	strcpy_s(tmp->fileName, filename);
 	tmp->fileDir = DIR;
 	tmp->loadEffect();
 	tmp->next = effectsForRestoration;
@@ -788,7 +788,7 @@ Direct3D_RenderPipeline::Direct3D_RenderPipeline(void)
 	//	directdraw = NULL;
 	//	directdraw_color_buffers[0] = NULL;
 	//	directdraw_color_buffers[1] = NULL;
-	direct3d_device = NULL;
+	direct3d_device = nullptr;
 	//	direct3d_depth_buffer = NULL;
 
 	rprd_device_flags = 0;
@@ -824,7 +824,7 @@ Direct3D_RenderPipeline::Direct3D_RenderPipeline(void)
 
 Direct3D_RenderPipeline::~Direct3D_RenderPipeline(void)
 {
-	shutdown();
+	Direct3D_RenderPipeline::shutdown();
 
 	rp_rd_cleanup();
 
@@ -837,11 +837,11 @@ Direct3D_RenderPipeline::~Direct3D_RenderPipeline(void)
 //
 GENRESULT Direct3D_RenderPipeline::init( AGGDESC *desc )
 {
-	if( desc->description!=NULL && strlen( desc->description ) > 0 ) {
-		strcpy( ini_device_profile, desc->description );
+	if( desc->description!= nullptr && strlen( desc->description ) > 0 ) {
+		strcpy_s( ini_device_profile, desc->description );
 	}
 	else {
-		strcpy( ini_device_profile, DeviceProfile_Default );
+		strcpy_s( ini_device_profile, DeviceProfile_Default );
 	}
 
 	GENERAL_NOTICE( _MS(( "Direct3D_RenderPipeline: init(AGG): using profile '%s'\n", ini_device_profile )) );
@@ -857,11 +857,11 @@ GENRESULT Direct3D_RenderPipeline::init( RPUL_DACOMDESC *desc)
 { 
 	profile_parser = desc->profile_parser;
 
-	if( desc->device_id != NULL && strlen( desc->device_id ) > 0 ) {
-		strcpy( ini_device_profile, desc->device_id );
+	if( desc->device_id != nullptr && strlen( desc->device_id ) > 0 ) {
+		strcpy_s( ini_device_profile, desc->device_id );
 	}
 	else {
-		strcpy( ini_device_profile, DeviceProfile_Default );
+		strcpy_s( ini_device_profile, DeviceProfile_Default );
 	}
 
 	GENERAL_NOTICE( _MS(( "Direct3D_RenderPipeline: init(RP): using profile '%s'\n", ini_device_profile )) );
@@ -911,11 +911,10 @@ inline void Direct3D_RenderPipeline::internal_set_default_pipeline_state( void )
 
 	U32 ps_enum, default_value;
 
-	PipelineStateArray::iterator beg = pipeline_state_info.begin();
-	PipelineStateArray::iterator end = pipeline_state_info.end();
-	PipelineStateArray::iterator ps;
+	auto beg = pipeline_state_info.begin();
+	auto end = pipeline_state_info.end();
 
-	for( ps=beg; ps!=end; ps++ ) {
+	for( auto ps = beg; ps!=end; ++ps ) {
 
 		if( ps->second.get_enum_and_default( &ps_enum, &default_value ) ) {
 
@@ -927,7 +926,6 @@ inline void Direct3D_RenderPipeline::internal_set_default_pipeline_state( void )
 		}
 	}
 
-	return;
 }
 
 //
@@ -936,16 +934,12 @@ inline void Direct3D_RenderPipeline::internal_set_default_render_state( void )
 {
 	ASSERT( direct3d_device );
 
-	D3DMATRIX I;
-
-	memset( &I, 0, sizeof(I) );
+	D3DMATRIX I = {};
 
 	I.m[0][0] = I.m[1][1] = I.m[2][2] = I.m[3][3] = 1.0f;
 
 
 	U32 _enum, _value;
-
-	RenderStateArray::iterator tss_beg, tss_end, tss;
 
 	for( LONG_PTR stage=0; stage<D3DTSS_NUM_STAGES; stage++ ) {
 
@@ -955,10 +949,10 @@ inline void Direct3D_RenderPipeline::internal_set_default_render_state( void )
 		curr_hw_texture_transform[stage].invalidate();
 		curr_hw_texture_transform[stage].set( direct3d_device, D3DTS_TEXTURE0 + stage, &I );
 
-		tss_beg = texture_stage_state_info[stage].begin();
-		tss_end = texture_stage_state_info[stage].end();
+		auto tss_beg = texture_stage_state_info[stage].begin();
+		auto tss_end = texture_stage_state_info[stage].end();
 
-		for( tss=tss_beg; tss!=tss_end; tss++ ) {
+		for( auto tss = tss_beg; tss!=tss_end; ++tss ) {
 
 			if( tss->second.get_enum_and_default( &_enum, &_value ) ) {
 			
@@ -970,11 +964,10 @@ inline void Direct3D_RenderPipeline::internal_set_default_render_state( void )
 		}
 	}
 
-	RenderStateArray::iterator beg = render_state_info.begin();
-	RenderStateArray::iterator end = render_state_info.end();
-	RenderStateArray::iterator rs;
+	auto beg = render_state_info.begin();
+	auto end = render_state_info.end();
 
-	for( rs=beg; rs!=end; rs++ ) {
+	for( auto rs = beg; rs!=end; ++rs ) {
 
 		if( rs->second.get_enum_and_default( &_enum, &_value ) ) {
 		
@@ -985,7 +978,6 @@ inline void Direct3D_RenderPipeline::internal_set_default_render_state( void )
 		}
 	}
 
-	return;
 }
 
 //
@@ -994,11 +986,7 @@ inline void Direct3D_RenderPipeline::internal_set_default_transform_state( void 
 {
 	ASSERT( direct3d_device );
 
-	D3DMATRIX M,V,P;
-	
-	memset( &V, 0, sizeof(V) );
-	memset( &M, 0, sizeof(M) );
-	memset( &P, 0, sizeof(P) );
+	D3DMATRIX M = {},V = {},P = {};
 
 	M.m[0][0] = V.m[0][0] = P.m[0][0] = 1.0;
 	M.m[1][1] = V.m[1][1] = P.m[1][1] = 1.0;
@@ -1031,12 +1019,12 @@ void Direct3D_RenderPipeline::internal_reset_all_caches( void )
 	curr_hw_viewport.invalidate();
 
 
-	for( int ps=0; ps<RP_MAX_PIPELINE_STATE; ps++ ) {
-		curr_pipeline_state[ps].invalidate();
+	for(auto & ps : curr_pipeline_state) {
+		ps.invalidate();
 	}
 
-	for( int rs=0; rs<D3DRS_MAX_STATE; rs++ ) {
-		curr_hw_render_state[rs].invalidate();
+	for(auto & rs : curr_hw_render_state) {
+		rs.invalidate();
 	}
 
 	for( int s=0; s<D3DTSS_NUM_STAGES; s++ ) {
@@ -1154,11 +1142,10 @@ HRESULT	Direct3D_RenderPipeline::internal_find_depth_buffer_format( U32 color_bp
 
 RPTEXTUREFORMATCLASS *Direct3D_RenderPipeline::internal_find_texture_format_class( U32 fourcc )
 {
-	TextureFormatClassArray::iterator beg = texture_format_classes.begin();
-	TextureFormatClassArray::iterator end = texture_format_classes.end();
-	TextureFormatClassArray::iterator tfc;
+	auto beg = texture_format_classes.begin();
+	auto end = texture_format_classes.end();
 
-	for( tfc = beg; tfc != end; tfc++ ) 
+	for( auto tfc = beg; tfc != end; ++tfc )
 	{
 		if( fourcc == tfc->fourcc ) 
 		{
@@ -1167,7 +1154,7 @@ RPTEXTUREFORMATCLASS *Direct3D_RenderPipeline::internal_find_texture_format_clas
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //
@@ -1182,7 +1169,7 @@ RPTEXTUREFORMATCLASS *Direct3D_RenderPipeline::internal_add_texture_format_class
 		return tfc;
 	}
 
-	texture_format_classes.push_back( RPTEXTUREFORMATCLASS( fourcc ) );
+	texture_format_classes.emplace_back( fourcc );
 
 	return &texture_format_classes[ texture_format_classes.size()-1 ];
 }
@@ -1191,7 +1178,7 @@ RPTEXTUREFORMATCLASS *Direct3D_RenderPipeline::internal_add_texture_format_class
 
 void Direct3D_RenderPipeline::internal_initialize_texture_format_classes( void )
 {
-	RPTEXTUREFORMATCLASS *tfc = NULL;
+	RPTEXTUREFORMATCLASS *tfc = nullptr;
 
 	texture_format_classes.clear();
 
@@ -1280,13 +1267,15 @@ void Direct3D_RenderPipeline::internal_initialize_texture_format_classes( void )
 	ICOManager *DACOM = DACOM_Acquire();
 	COMPTR<IProfileParser> IPP;
 	
-	char *p, szBuffer[1024+1], *fourcc, *pf;
-	int line = 0;
-	HANDLE hTFC;
+	char szBuffer[1024+1];
 
-	if( SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, (void**) &IPP ) ) ) {
-		if( (hTFC = IPP->CreateSection( "TextureFormatClasses" )) != 0 ) {
-			
+	if( SUCCEEDED( DACOM->QueryInterface( IID_IProfileParser, IPP.void_addr() ) ) ) {
+		if(HANDLE hTFC; (hTFC = IPP->CreateSection( "TextureFormatClasses" )) != 0 ) {
+			char *p;
+			int line = 0;
+			char *pf;
+			char *fourcc;
+
 			while( IPP->ReadProfileLine( hTFC, line, szBuffer, 1024 ) ) {
 				
 				line++;
@@ -1301,7 +1290,7 @@ void Direct3D_RenderPipeline::internal_initialize_texture_format_classes( void )
 
 				fourcc = p;
 
-				if( strnicmp( fourcc, "clear", 3 ) == 0 ) {
+				if( _strnicmp( fourcc, "clear", 3 ) == 0 ) {
 					texture_format_classes.clear();
 					continue; // continue with next profile line
 				}
@@ -1326,7 +1315,7 @@ void Direct3D_RenderPipeline::internal_initialize_texture_format_classes( void )
 
 						if( pf != p ) {
 							U32 bpp=0, r=0,g=0,b=0,a=0;
-							sscanf( pf, "%d:%d:%d:%d:%d", &bpp, &r, &g, &b, &a );
+							sscanf_s( pf, "%d:%d:%d:%d:%d", &bpp, &r, &g, &b, &a );
 							auto pffz = PixelFormat( bpp, r, g, b, a );
 							tfc->add_format( pffz );
 						}
@@ -1345,11 +1334,10 @@ void Direct3D_RenderPipeline::internal_initialize_texture_format_classes( void )
 
 DA_METHOD(	startup,(const char *profile_name))
 {
-	ICOManager *DACOM;
 	HRESULT hr;
 	GUID guid_buffer, *device_guid_ptr;
 	char *s, *c;
-	DACOM = DACOM_Acquire();
+	DACOM_Acquire();
 	d3drp_f_flags &= ~(D3DRP_F_CHECK_STARTUP);
 	shutdown();
 //	internal_set_abilities();	// 
@@ -1404,9 +1392,7 @@ DA_METHOD(	startup,(const char *profile_name))
 
 DA_METHOD(	shutdown,(void ))
 {
-	U32 local_flags;
-
-	local_flags = d3drp_f_flags & D3DRP_F_CHECK_STARTUP;
+	U32 local_flags = d3drp_f_flags & D3DRP_F_CHECK_STARTUP;
 	d3drp_f_flags &= ~(D3DRP_F_CHECK_STARTUP);
 
 	//destroy_buffers();
@@ -2262,7 +2248,7 @@ DA_METHOD(get_sampler_state,( U32 stage, D3DSAMPLERSTATETYPE state, U32 *value )
 {
 	DWORD dword_value = 0;
 	direct3d_device->GetSamplerState(stage, state, &dword_value);
-	*value = static_cast<U32>(dword_value);
+	*value = dword_value;
 	return GR_OK;
 }
 
@@ -2417,12 +2403,12 @@ GENRESULT Direct3D_RenderPipeline::create_state_block( D3DSTATEBLOCKTYPE type, U
 
 //
 
-GENRESULT Direct3D_RenderPipeline::update_state_block( U32 sbhandle ) 
+GENRESULT Direct3D_RenderPipeline::update_state_block( LONG_PTR sbhandle )
 {
 	CHECK_CREATE_BUFFERS(update_state_block);
 	ASSERT( direct3d_device );	
 
-	if( FAILED( ((IDirect3DStateBlock9*)sbhandle)->Capture() )) {
+	if( FAILED( reinterpret_cast<IDirect3DStateBlock9 *>(sbhandle)->Capture() )) {
 		return GR_GENERIC;
 	}
 	
@@ -2447,7 +2433,7 @@ GENRESULT Direct3D_RenderPipeline::begin_state_block( void )
 
 //
 
-GENRESULT Direct3D_RenderPipeline::end_state_block( U32*out_sbhandle ) 
+GENRESULT Direct3D_RenderPipeline::end_state_block( LONG_PTR * out_sbhandle )
 {
 	
 	CHECK_CREATE_BUFFERS(end_state_block);
@@ -2463,12 +2449,12 @@ GENRESULT Direct3D_RenderPipeline::end_state_block( U32*out_sbhandle )
 
 //
 
-GENRESULT Direct3D_RenderPipeline::apply_state_block( U32 sbhandle ) 
+GENRESULT Direct3D_RenderPipeline::apply_state_block( LONG_PTR sbhandle )
 {
 	CHECK_CREATE_BUFFERS(apply_state_block);
 	ASSERT( direct3d_device );	
 
-	if( FAILED( ((IDirect3DStateBlock9*)sbhandle)->Apply() )) {
+	if( FAILED( reinterpret_cast<IDirect3DStateBlock9 *>(sbhandle)->Apply() )) {
 		return GR_GENERIC;
 	}
 	return GR_OK;	
@@ -2476,11 +2462,11 @@ GENRESULT Direct3D_RenderPipeline::apply_state_block( U32 sbhandle )
 
 //
 
-GENRESULT Direct3D_RenderPipeline::delete_state_block( U32 sbhandle ) 
+GENRESULT Direct3D_RenderPipeline::delete_state_block( LONG_PTR sbhandle )
 {
 	CHECK_CREATE_BUFFERS(delete_state_block);
 	ASSERT( direct3d_device );	
-	((IDirect3DStateBlock9*)sbhandle)->Release();
+	reinterpret_cast<IDirect3DStateBlock9 *>(sbhandle)->Release();
 	return GR_OK;	
 }
 
@@ -3283,7 +3269,7 @@ DA_METHOD(	get_texture_palette,(LONG_PTR htexture, int start, int length, RGB *c
 
 //
 
-DA_METHOD(	blit_texture,(U32 hDest, U32 dst_subsurface, RECT destRect, U32 hSrc, U32 src_subsurface, RECT srcRect ))
+DA_METHOD(	blit_texture,(LONG_PTR hDest, LONG_PTR dst_subsurface, RECT destRect, U32 hSrc, U32 src_subsurface, RECT srcRect ))
 {
 	static bool bSkip = 0;
 	if (bSkip) return GR_OK;
@@ -3319,9 +3305,9 @@ DA_METHOD(	blit_texture,(U32 hDest, U32 dst_subsurface, RECT destRect, U32 hSrc,
 		return GR_OK;
 	}
 	// slow-but-safe method:
-	
-	IDirect3DTexture9 * destTex = (IDirect3DTexture9*) hDest;
-	IDirect3DTexture9 * srcTex = (IDirect3DTexture9*) hSrc;
+
+	auto destTex = reinterpret_cast<IDirect3DTexture9 *>(hDest);
+	auto srcTex = reinterpret_cast<IDirect3DTexture9 *>(hSrc);
 
 	D3DLOCKED_RECT rectSrc, rectDest;
 	destTex->LockRect(dst_subsurface, &rectDest,NULL,0);
@@ -4474,7 +4460,7 @@ void Direct3D_RenderPipeline::internal_set_abilities( void )
 
 //
 
-void main( void ){} // linker bug
+int main( void ){} // linker bug
 
 //
 
