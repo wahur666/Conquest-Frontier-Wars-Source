@@ -8,6 +8,7 @@ target_include_directories(CFW_Rebuild PRIVATE
 
 target_link_libraries(CFW_Rebuild PRIVATE
         DACOM
+        dbghelp
         kernel32
 )
 
