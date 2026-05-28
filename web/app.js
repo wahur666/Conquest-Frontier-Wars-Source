@@ -23,6 +23,9 @@ const resetButton = document.querySelector('#reset-view');
 const animStartButton = document.querySelector('#anim-start');
 const animStopButton = document.querySelector('#anim-stop');
 const animRestartButton = document.querySelector('#anim-restart');
+const animResetButton = document.querySelector('#anim-reset');
+const animLoopToggle = document.querySelector('#anim-loop');
+const animPingPongToggle = document.querySelector('#anim-pingpong');
 const wireframeToggle = document.querySelector('#wireframe');
 const statusLine = document.querySelector('#status');
 const statsLine = document.querySelector('#stats');
@@ -85,6 +88,22 @@ animRestartButton.addEventListener('click', () => {
   if (activeAnimationController) {
     activeAnimationController.restart();
     updateAnimationButtons();
+  }
+});
+animResetButton.addEventListener('click', () => {
+  if (activeAnimationController) {
+    activeAnimationController.reset();
+    updateAnimationButtons();
+  }
+});
+animLoopToggle.addEventListener('change', () => {
+  if (activeAnimationController) {
+    activeAnimationController.loop = animLoopToggle.checked;
+  }
+});
+animPingPongToggle.addEventListener('change', () => {
+  if (activeAnimationController) {
+    activeAnimationController.pingPong = animPingPongToggle.checked;
   }
 });
 wireframeToggle.addEventListener('change', () => setWireframe(wireframeToggle.checked));
@@ -779,27 +798,43 @@ function readJointAnimationClips(animationNode, joints) {
     const tracks = [];
     let duration = 0;
 
-    for (const jointMapNode of Object.values(scriptNode.children)) {
-      if (!jointMapNode?.children || !jointMapNode.name?.startsWith('Joint map')) {
+    for (const mapNode of Object.values(scriptNode.children)) {
+      if (!mapNode?.children) {
         continue;
       }
 
-      const parent = getString(jointMapNode.children['Parent name']);
-      const child = getString(jointMapNode.children['Child name']);
-      if (!parent || !child) {
+      const isJointMap = mapNode.name?.startsWith('Joint map');
+      const isObjectMap = mapNode.name?.startsWith('Object map');
+      if (!isJointMap && !isObjectMap) {
         continue;
       }
 
-      const channelName = getString(jointMapNode.children['Channel name']);
+      const parent = getString(mapNode.children['Parent name']);
+      const child = getString(mapNode.children['Child name']);
+      const targetName = isJointMap ? child : parent;
+      if (!parent || !targetName) {
+        continue;
+      }
+
+      const channelName = getString(mapNode.children['Channel name']);
       const channel = channelName
         ? namedChannels.get(channelName)
-        : readAnimationChannel(jointMapNode.children.Channel);
-      const joint = jointByPair.get(jointKey(parent, child));
-      if (!channel || !joint) {
+        : readAnimationChannel(mapNode.children.Channel);
+      if (!channel) {
         continue;
       }
 
-      tracks.push({ parent, child, joint, channel });
+      if (isJointMap) {
+        const joint = jointByPair.get(jointKey(parent, child));
+        if (!joint) {
+          continue;
+        }
+
+        tracks.push({ targetType: 'joint', parent, child, targetName, joint, channel });
+      } else {
+        tracks.push({ targetType: 'object', parent, child: '', targetName, channel });
+      }
+
       duration = Math.max(duration, channel.duration);
     }
 
@@ -843,6 +878,10 @@ function readAnimationChannel(channelNode) {
 
   if ((header.type & CHANNEL_DT_QUATERNION) !== 0) {
     return readQuaternionChannel(channelNode, header);
+  }
+
+  if ((header.type & CHANNEL_DT_VECTOR) !== 0) {
+    return readVectorChannel(channelNode, header);
   }
 
   if ((header.type & CHANNEL_DT_FLOAT) !== 0) {
@@ -996,15 +1035,60 @@ function readQuaternionChannel(channelNode, header = readAnimationChannelHeader(
   };
 }
 
+function readVectorChannel(channelNode, header = readAnimationChannelHeader(channelNode)) {
+  if (!header) {
+    return null;
+  }
+
+  const { frameBytes, frameCount, captureRate, type } = header;
+  if (frameCount < 1) {
+    return null;
+  }
+
+  const frameSize = (captureRate < 0 ? 4 : 0) + 12;
+  if (frameBytes.byteLength < frameSize * frameCount) {
+    return null;
+  }
+
+  const frameView = new DataView(frameBytes.buffer, frameBytes.byteOffset, frameBytes.byteLength);
+  const frames = [];
+
+  for (let i = 0; i < frameCount; i += 1) {
+    const offset = i * frameSize;
+    const dataOffset = captureRate < 0 ? offset + 4 : offset;
+    frames.push({
+      time: captureRate < 0 ? frameView.getFloat32(offset, true) : i * captureRate,
+      position: new THREE.Vector3(
+        frameView.getFloat32(dataOffset, true),
+        frameView.getFloat32(dataOffset + 4, true),
+        frameView.getFloat32(dataOffset + 8, true),
+      ),
+    });
+  }
+
+  return {
+    kind: 'vector',
+    frameCount,
+    captureRate,
+    type,
+    duration: Math.max(0, frames[frames.length - 1].time),
+    frames,
+  };
+}
+
 class CompoundAnimationController {
   constructor(clips, byPartName) {
     this.clips = clips;
     this.byPartName = byPartName;
+    this.bindTransforms = readBindTransforms(byPartName);
     this.activeClip = clips.reduce((best, clip) => (clip.duration > best.duration ? clip : best), clips[0]);
     this.clipCount = clips.length;
     this.time = 0;
+    this.direction = 1;
     this.playing = false;
     this.loop = true;
+    this.pingPong = false;
+    this.apply();
   }
 
   play() {
@@ -1017,7 +1101,15 @@ class CompoundAnimationController {
 
   restart() {
     this.time = 0;
+    this.direction = 1;
     this.playing = true;
+    this.apply();
+  }
+
+  reset() {
+    this.time = 0;
+    this.direction = 1;
+    this.playing = false;
     this.apply();
   }
 
@@ -1026,16 +1118,47 @@ class CompoundAnimationController {
       return;
     }
 
-    this.time += dt;
-    if (this.activeClip.duration > 0) {
-      if (this.loop) {
-        this.time %= this.activeClip.duration;
-      } else {
-        this.time = Math.min(this.time, this.activeClip.duration);
-      }
-    }
+    this.time += dt * this.direction;
+    this.constrainTime();
 
     this.apply();
+  }
+
+  constrainTime() {
+    const duration = this.activeClip?.duration || 0;
+    if (duration <= 0) {
+      this.time = 0;
+      this.playing = false;
+      return;
+    }
+
+    if (this.pingPong) {
+      while (this.time > duration || this.time < 0) {
+        if (this.time > duration) {
+          this.time = duration - (this.time - duration);
+          this.direction = -1;
+        } else if (this.time < 0) {
+          this.time = -this.time;
+          this.direction = 1;
+          if (!this.loop) {
+            this.time = 0;
+            this.playing = false;
+            break;
+          }
+        }
+      }
+      return;
+    }
+
+    if (this.loop) {
+      this.time %= duration;
+      if (this.time < 0) {
+        this.time += duration;
+      }
+    } else if (this.time >= duration) {
+      this.time = duration;
+      this.playing = false;
+    }
   }
 
   apply() {
@@ -1044,23 +1167,44 @@ class CompoundAnimationController {
     }
 
     for (const track of this.activeClip.tracks) {
-      const object = this.byPartName.get(track.child);
+      const object = this.byPartName.get(track.targetName);
       if (!object) {
         continue;
       }
 
-      if (track.channel.kind === 'full') {
+      if (track.targetType === 'object' && track.channel.kind === 'full') {
         const sample = sampleTransformChannel(track.channel, this.time);
-        applyAnimatedJointLocalTransform(object, track.joint, sample);
+        applyObjectFullTransform(object, sample, this.bindTransforms.get(track.targetName));
+      } else if (track.channel.kind === 'full') {
+        const sample = sampleTransformChannel(track.channel, this.time);
+        applyFullJointLocalTransform(object, track.joint, sample);
       } else if (track.channel.kind === 'float') {
         const sample = sampleFloatChannel(track.channel, this.time, track.joint);
         applyFloatJointLocalTransform(object, track.joint, sample.value);
       } else if (track.channel.kind === 'quat') {
         const sample = sampleQuaternionChannel(track.channel, this.time);
         applyQuaternionJointLocalTransform(object, track.joint, sample.rotation);
+      } else if (track.channel.kind === 'vector') {
+        const sample = sampleVectorChannel(track.channel, this.time);
+        applyVectorJointLocalTransform(object, track.joint, sample.position);
       }
     }
   }
+}
+
+function readBindTransforms(byPartName) {
+  const binds = new Map();
+
+  for (const [name, object] of byPartName) {
+    object.updateMatrix();
+    const position = new THREE.Vector3();
+    const rotation = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+    object.matrix.decompose(position, rotation, scale);
+    binds.set(name, { position, rotation, scale });
+  }
+
+  return binds;
 }
 
 function sampleTransformChannel(channel, time) {
@@ -1145,7 +1289,46 @@ function sampleQuaternionChannel(channel, time) {
   };
 }
 
-function applyAnimatedJointLocalTransform(object, joint, sample) {
+function sampleVectorChannel(channel, time) {
+  const frames = channel.frames;
+  if (frames.length === 1 || time <= frames[0].time) {
+    return frames[0];
+  }
+
+  const last = frames[frames.length - 1];
+  if (time >= last.time) {
+    return last;
+  }
+
+  let nextIndex = 1;
+  while (nextIndex < frames.length && frames[nextIndex].time < time) {
+    nextIndex += 1;
+  }
+
+  const previous = frames[nextIndex - 1];
+  const next = frames[nextIndex];
+  const span = Math.max(next.time - previous.time, 0.000001);
+  const ratio = (time - previous.time) / span;
+
+  return {
+    time,
+    position: previous.position.clone().lerp(next.position, ratio),
+  };
+}
+
+function applyObjectFullTransform(object, sample, bind) {
+  if (!bind) {
+    return;
+  }
+
+  const position = bind.position.clone().add(sample.position.clone().applyQuaternion(bind.rotation));
+  const rotation = bind.rotation.clone().multiply(sample.rotation);
+  object.matrix.compose(position, rotation, bind.scale);
+  object.matrixAutoUpdate = false;
+  object.matrixWorldNeedsUpdate = true;
+}
+
+function applyFullJointLocalTransform(object, joint, sample) {
   const relOrientation = matrix4FromMatrix3(joint.relOrientation);
   const rotation = new THREE.Matrix4().makeRotationFromQuaternion(sample.rotation).multiply(relOrientation);
 
@@ -1172,6 +1355,18 @@ function applyQuaternionJointLocalTransform(object, joint, rotationValue) {
   const childPoint = joint.childPoint.clone().applyMatrix4(rotation);
   const translation = joint.parentPoint.clone().sub(childPoint);
   object.matrix.copy(matrix4FromRotationMatrixTranslation(rotation, translation));
+  object.matrixAutoUpdate = false;
+  object.matrixWorldNeedsUpdate = true;
+}
+
+function applyVectorJointLocalTransform(object, joint, position) {
+  if (joint.type !== 'translational') {
+    return;
+  }
+
+  const relOrientation = matrix4FromMatrix3(joint.relOrientation);
+  const translation = joint.relPosition.clone().add(position);
+  object.matrix.copy(matrix4FromRotationMatrixTranslation(relOrientation, translation));
   object.matrixAutoUpdate = false;
   object.matrixWorldNeedsUpdate = true;
 }
@@ -1592,12 +1787,23 @@ function createTextureResolver(textureCanvases) {
   };
 }
 
+const COMPOUND_PARTICLE_SIZE_MULTIPLIER = 10;
+
 function createParticleObject(parameters, textureCanvases, name) {
-  const textureCanvas = findTextureCanvas(textureCanvases, parameters.textureName);
-  const preview = new ParticlePreview(parameters, textureCanvas);
+  const previewParameters = scaleParticlePreviewSizes(parameters, COMPOUND_PARTICLE_SIZE_MULTIPLIER);
+  const textureCanvas = findTextureCanvas(textureCanvases, previewParameters.textureName);
+  const preview = new ParticlePreview(previewParameters, textureCanvas);
   preview.points.name = name;
   preview.points.userData.particlePreview = preview;
   return preview.points;
+}
+
+function scaleParticlePreviewSizes(parameters, multiplier) {
+  return {
+    ...parameters,
+    particleSize: parameters.particleSize * multiplier,
+    particleSizeVelocity: parameters.particleSizeVelocity * multiplier,
+  };
 }
 
 class ParticlePreview {
@@ -2014,6 +2220,7 @@ function animate() {
 
   if (activeAnimationController) {
     activeAnimationController.update(dt);
+    updateAnimationButtons();
   }
 
   renderer.render(scene, camera);
@@ -2042,6 +2249,14 @@ function updateAnimationButtons() {
   animStartButton.disabled = !hasAnimation || activeAnimationController.playing;
   animStopButton.disabled = !hasAnimation || !activeAnimationController.playing;
   animRestartButton.disabled = !hasAnimation;
+  animResetButton.disabled = !hasAnimation;
+  animLoopToggle.disabled = !hasAnimation;
+  animPingPongToggle.disabled = !hasAnimation;
+
+  if (hasAnimation) {
+    animLoopToggle.checked = activeAnimationController.loop;
+    animPingPongToggle.checked = activeAnimationController.pingPong;
+  }
 }
 
 function setStatus(message, isError = false) {
