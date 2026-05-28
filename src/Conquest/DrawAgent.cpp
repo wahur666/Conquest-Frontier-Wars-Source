@@ -128,9 +128,23 @@ static nlohmann::json DrawAgentRectJson(const BLOCKRECT& rect)
 	};
 }
 
-static bool IsHijackedMainBackground(U16 width, U16 height)
+static bool IsMainscreenShapeFilename(const char* filename)
 {
-	return width == 801 && height == 601;
+	if (!filename)
+	{
+		return false;
+	}
+
+	const char* basename = filename;
+	for (const char* scan = filename; *scan; ++scan)
+	{
+		if (*scan == '\\' || *scan == '/')
+		{
+			basename = scan + 1;
+		}
+	}
+
+	return _stricmp(basename, "mainscreen.shp") == 0;
 }
 
 static bool DecodeBase64(const std::string& input, std::vector<U8>& output)
@@ -183,24 +197,33 @@ static bool DecodeBase64(const std::string& input, std::vector<U8>& output)
 	return !output.empty();
 }
 
-static bool LoadMainscreenPng(std::vector<U8>& pngBytes)
+static bool LoadFramePngFromJson(const char* jsonPath, U32 frameIndex, std::vector<U8>* pngBytes, U32* outWidth, U32* outHeight)
 {
-	const char* paths[] = {
-		"mainscreen_frames.json",
-		"cmake-build-debug/bin/mainscreen_frames.json"
-	};
+	if (outWidth)
+	{
+		*outWidth = 0;
+	}
+	if (outHeight)
+	{
+		*outHeight = 0;
+	}
+	if (pngBytes)
+	{
+		pngBytes->clear();
+	}
+	if (!jsonPath || !jsonPath[0])
+	{
+		return false;
+	}
+
+	std::ifstream in(jsonPath, std::ios::binary);
+	if (!in)
+	{
+		return false;
+	}
 
 	std::string jsonText;
-	for (const char* path : paths)
-	{
-		std::ifstream in(path, std::ios::binary);
-		if (!in)
-		{
-			continue;
-		}
-		jsonText.assign(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
-		break;
-	}
+	jsonText.assign(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
 	if (jsonText.empty())
 	{
 		return false;
@@ -212,32 +235,84 @@ static bool LoadMainscreenPng(std::vector<U8>& pngBytes)
 		return false;
 	}
 
-	const nlohmann::json* dataNode = nullptr;
+	char frameName[32];
+	sprintf(frameName, "frame_%04u", frameIndex);
+
+	const nlohmann::json* frameNode = nullptr;
 	const auto framesIt = root.find("frames");
 	if (framesIt != root.end() && framesIt->is_object())
 	{
-		const auto frameIt = framesIt->find("frame_0000");
+		const auto frameIt = framesIt->find(frameName);
 		if (frameIt != framesIt->end() && frameIt->is_object())
 		{
-			const auto dataIt = frameIt->find("data");
-			if (dataIt != frameIt->end() && dataIt->is_string())
-			{
-				dataNode = &(*dataIt);
-			}
+			frameNode = &(*frameIt);
 		}
 	}
-	if (!dataNode)
+	if (!frameNode)
 	{
 		return false;
 	}
 
-	std::string data = dataNode->get<std::string>();
+	const auto widthIt = frameNode->find("width");
+	const auto heightIt = frameNode->find("height");
+	if (widthIt == frameNode->end() || heightIt == frameNode->end() || !widthIt->is_number() || !heightIt->is_number())
+	{
+		return false;
+	}
+	const U32 width = widthIt->get<U32>();
+	const U32 height = heightIt->get<U32>();
+	if (width == 0 || height == 0)
+	{
+		return false;
+	}
+
+	if (outWidth)
+	{
+		*outWidth = width;
+	}
+	if (outHeight)
+	{
+		*outHeight = height;
+	}
+
+	if (!pngBytes)
+	{
+		return true;
+	}
+
+	const auto dataIt = frameNode->find("data");
+	if (dataIt == frameNode->end() || !dataIt->is_string())
+	{
+		return false;
+	}
+
+	std::string data = dataIt->get<std::string>();
 	const std::string prefix = "data:image/png;base64,";
 	if (data.compare(0, prefix.size(), prefix) == 0)
 	{
 		data.erase(0, prefix.size());
 	}
-	return DecodeBase64(data, pngBytes);
+	return DecodeBase64(data, *pngBytes);
+}
+
+static bool FindMainscreenFrameJson(std::string& result)
+{
+	const char* paths[] = {
+		"mainscreen_frames.json",
+		"cmake-build-debug/bin/mainscreen_frames.json"
+	};
+
+	for (const char* path : paths)
+	{
+		std::ifstream in(path, std::ios::binary);
+		if (!in)
+		{
+			continue;
+		}
+		result = path;
+		return true;
+	}
+	return false;
 }
 
 //--------------------------------------------------------------------------//
@@ -271,10 +346,17 @@ struct DACOM_NO_VTABLE DrawAgent : IDrawAgent
 	// general data
 	//------------------------------
 	U16			imageWidth, imageHeight;
+	char		jsonReplacementPath[260];
+	U32			jsonReplacementFrame;
+	LONG_PTR	jsonReplacementTexture;
+	U32			jsonReplacementTextureWidth;
+	U32			jsonReplacementTextureHeight;
+	bool		jsonReplacementTextureAttempted;
 
 	bool bHiRes;//hack for high resolution images
 
 	bool b3DEnabled:1;		// 3D mode when initialized, can only draw in this mode
+	bool bJsonReplacement:1;
 #if 0
 	bool bDebugMsg:1;			// true when we have given a debug msg
 #endif
@@ -313,7 +395,9 @@ struct DACOM_NO_VTABLE DrawAgent : IDrawAgent
 
 	void loadTexture (U32 block, const BLOCKRECT & rect, struct IImageReader * reader, BOOL32 bTransparentMode, RGB rgbData[256], BOOL32 bScaleData, BOOL32 bHiRes, const RECT * pRect);
 
-	BOOL32 drawHijackedBackground(PANE *pane, S32 x, S32 y);
+	BOOL32 initJsonReplacement(const char* sourceFilename, const char* jsonPath, U32 frameIndex, BOOL32 bHiRes);
+
+	BOOL32 drawJsonReplacement(PANE *pane, S32 x, S32 y);
 
 	static U32 __fastcall nearestPower (S32 number);
 
@@ -342,6 +426,12 @@ DrawAgent::DrawAgent (void)
 //
 DrawAgent::~DrawAgent (void)
 {
+	if (bJsonReplacement && jsonReplacementTexture && PIPE)
+	{
+		PIPE->destroy_texture(jsonReplacementTexture);
+		jsonReplacementTexture = 0;
+	}
+
 	ITManager * const TMANAGER = ::TMANAGER;
 	if (TMANAGER)
 	{
@@ -356,51 +446,83 @@ DrawAgent::~DrawAgent (void)
 }
 //--------------------------------------------------------------------------//
 //
-BOOL32 DrawAgent::drawHijackedBackground(PANE *pane, S32 x, S32 y)
+BOOL32 DrawAgent::initJsonReplacement(const char* sourceFilename, const char* jsonPath, U32 frameIndex, BOOL32 _bHiRes)
 {
-	if (!IsHijackedMainBackground(imageWidth, imageHeight))
+	U32 width = 0;
+	U32 height = 0;
+	if (!LoadFramePngFromJson(jsonPath, frameIndex, nullptr, &width, &height))
 	{
 		return 0;
 	}
 
-	static LONG_PTR replacementTexture = 0;
-	static U32 replacementWidth = 0;
-	static U32 replacementHeight = 0;
-	static bool attemptedLoad = false;
-	static bool logged = false;
+	bJsonReplacement = true;
+	bHiRes = _bHiRes != 0;
+	b3DEnabled = (CQFLAGS.b3DEnabled != 0);
+	imageWidth = (U16)width;
+	imageHeight = (U16)height;
+	jsonReplacementFrame = frameIndex;
+	jsonReplacementTexture = 0;
+	jsonReplacementTextureWidth = 0;
+	jsonReplacementTextureHeight = 0;
+	jsonReplacementTextureAttempted = false;
+	strncpy(jsonReplacementPath, jsonPath, sizeof(jsonReplacementPath) - 1);
+	jsonReplacementPath[sizeof(jsonReplacementPath) - 1] = 0;
+	numTextures = 0;
 
-	if (!attemptedLoad)
+	nlohmann::json dump = {
+		{"event", "DrawAgent::jsonReplacementInit"},
+		{"this", reinterpret_cast<std::uintptr_t>(this)},
+		{"source", sourceFilename ? sourceFilename : ""},
+		{"jsonPath", jsonReplacementPath},
+		{"frame", jsonReplacementFrame},
+		{"width", imageWidth},
+		{"height", imageHeight}
+	};
+	VTDUMP_LOG(dump);
+
+	return 1;
+}
+//--------------------------------------------------------------------------
+//
+BOOL32 DrawAgent::drawJsonReplacement(PANE *pane, S32 x, S32 y)
+{
+	if (!bJsonReplacement)
 	{
-		attemptedLoad = true;
-		std::vector<U8> pngBytes;
-		if (LoadMainscreenPng(pngBytes))
-		{
-			if (PIPE->create_texture_from_file_in_memory(pngBytes.data(), (U32)pngBytes.size(), replacementTexture, &replacementWidth, &replacementHeight) != GR_OK)
-			{
-				replacementTexture = 0;
-				replacementWidth = 0;
-				replacementHeight = 0;
-			}
-		}
+		return 0;
 	}
 
-	if (!logged)
+	if (!jsonReplacementTexture && !jsonReplacementTextureAttempted)
 	{
-		logged = true;
+		jsonReplacementTextureAttempted = true;
+		std::vector<U8> pngBytes;
+		U32 width = 0;
+		U32 height = 0;
+		if (LoadFramePngFromJson(jsonReplacementPath, jsonReplacementFrame, &pngBytes, &width, &height))
+		{
+			if (PIPE->create_texture_from_file_in_memory(pngBytes.data(), (U32)pngBytes.size(), jsonReplacementTexture, &jsonReplacementTextureWidth, &jsonReplacementTextureHeight) != GR_OK)
+			{
+				jsonReplacementTexture = 0;
+				jsonReplacementTextureWidth = 0;
+				jsonReplacementTextureHeight = 0;
+			}
+		}
+
 		nlohmann::json dump = {
-			{"event", "DrawAgent::hijackMainBackground"},
+			{"event", "DrawAgent::jsonReplacementTexture"},
 			{"this", reinterpret_cast<std::uintptr_t>(this)},
-			{"loaded", replacementTexture != 0},
-			{"texture", static_cast<long long>(replacementTexture)},
-			{"textureWidth", replacementWidth},
-			{"textureHeight", replacementHeight},
+			{"jsonPath", jsonReplacementPath},
+			{"frame", jsonReplacementFrame},
+			{"loaded", jsonReplacementTexture != 0},
+			{"texture", static_cast<long long>(jsonReplacementTexture)},
+			{"textureWidth", jsonReplacementTextureWidth},
+			{"textureHeight", jsonReplacementTextureHeight},
 			{"imageWidth", imageWidth},
 			{"imageHeight", imageHeight}
 		};
 		VTDUMP_LOG(dump);
 	}
 
-	if (!replacementTexture)
+	if (!jsonReplacementTexture)
 	{
 		return 0;
 	}
@@ -410,8 +532,8 @@ BOOL32 DrawAgent::drawHijackedBackground(PANE *pane, S32 x, S32 y)
 	BATCH->set_render_state(D3DRS_ZWRITEENABLE,FALSE);
 	BATCH->set_render_state(D3DRS_ALPHABLENDENABLE,FALSE);
 	BATCH->set_render_state(D3DRS_CULLMODE,D3DCULL_NONE);
-	SetupDiffuseBlend(replacementTexture, FALSE);
-	BATCH->set_state(RPR_STATE_ID, replacementTexture);
+	SetupDiffuseBlend(jsonReplacementTexture, FALSE);
+	BATCH->set_state(RPR_STATE_ID, jsonReplacementTexture);
 
 	if (pane)
 	{
@@ -420,17 +542,10 @@ BOOL32 DrawAgent::drawHijackedBackground(PANE *pane, S32 x, S32 y)
 	}
 
 	BLOCKRECT rect {};
-	if (blockRect)
-	{
-		rect = blockRect[0];
-	}
-	else
-	{
-		rect.left = 0;
-		rect.top = 0;
-		rect.right = IDEAL2REALX(800);
-		rect.bottom = IDEAL2REALY(600);
-	}
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = IDEAL2REALX(imageWidth);
+	rect.bottom = IDEAL2REALY(imageHeight);
 
 	rect.left += x;
 	rect.right += x;
@@ -469,6 +584,13 @@ void DrawAgent::Draw (PANE *pane, S32 x, S32 y)
 	if (b3DEnabled==false && CQFLAGS.bFrameLockEnabled==false)
 		return;		// cannot draw, frame lock failed
 
+	if (bJsonReplacement)
+	{
+		drawJsonReplacement(pane, x, y);
+		BATCH->set_state(RPR_STATE_ID,0);
+		return;
+	}
+
 	// guard against the awkward system map issue
 	if (pane && pane == CAMERA->GetPane())
 	{
@@ -495,12 +617,6 @@ void DrawAgent::Draw (PANE *pane, S32 x, S32 y)
 		int i;
 		BLOCKRECT rect;
 		static int drawDumpCount = 0;
-
-		if (drawHijackedBackground(pane, x, y))
-		{
-			BATCH->set_state(RPR_STATE_ID,0);
-			return;
-		}
 
 		OrthoView(pane);
 
@@ -606,6 +722,13 @@ void DrawAgent::Draw (PANE *src, PANE *dst)
 
 	if (b3DEnabled==false && CQFLAGS.bFrameLockEnabled==false)
 		return;		// cannot draw, frame lock failed
+
+	if (bJsonReplacement)
+	{
+		drawJsonReplacement(src, dst ? dst->x0 : 0, dst ? dst->y0 : 0);
+		BATCH->set_state(RPR_STATE_ID,0);
+		return;
+	}
 
 	// guard against the awkward system map issue
 	if (src && src == CAMERA->GetPane())
@@ -1182,6 +1305,29 @@ void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parent
 	COMPTR<IImageReader> reader;
 	COMPTR<IFileSystem> file;
 	DAFILEDESC fdesc = filename;
+	*drawAgent = 0;
+
+	if (IsMainscreenShapeFilename(filename))
+	{
+		std::string jsonPath;
+		if (FindMainscreenFrameJson(jsonPath))
+		{
+			DrawAgent * replacement = new DAComponentX<DrawAgent>;
+			if (replacement->initJsonReplacement(filename, jsonPath.c_str(), subImage, bHiRes))
+			{
+				*drawAgent = replacement;
+				return;
+			}
+			delete replacement;
+		}
+
+		nlohmann::json dump = {
+			{"event", "DrawAgent::jsonReplacementMiss"},
+			{"source", filename ? filename : ""},
+			{"frame", subImage}
+		};
+		VTDUMP_LOG(dump);
+	}
 
 	fdesc.lpImplementation = "DOS";
 	if (parentFile == 0)
