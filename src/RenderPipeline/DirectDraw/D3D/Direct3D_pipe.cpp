@@ -49,6 +49,7 @@
 #include "IVideoStreamControl.h"
 #include "IRenderDebugger.h"
 #include "RPUL.h"
+#include "vtdump.h"
 
 #include "../../../include/handlemap.h"
 #include "../../../include/Tfuncs.h"
@@ -129,6 +130,113 @@ const char *BladeDllName			= "blade.dll";
 const U32 D3DRP_MAX_STRING_LEN = 128;
 
 LPDIRECT3DINDEXBUFFER9 scratchIB = nullptr;
+
+static bool D3DShouldDump(int& count, const int maxCount = 96)
+{
+	count++;
+	return false;
+}
+
+static bool D3DShouldDumpTexture(int& count, int width, int height, const int maxCount = 128)
+{
+	D3DShouldDump(count, maxCount);
+	width;
+	height;
+	return false;
+}
+
+static bool D3DShouldDumpPrimitive(int& count, const void* verts, int numVerts, const int maxCount = 96)
+{
+	D3DShouldDump(count, maxCount);
+	verts;
+	numVerts;
+	return false;
+}
+
+static nlohmann::json RectJson(const RECT& rect)
+{
+	return {
+		{"left", rect.left},
+		{"top", rect.top},
+		{"right", rect.right},
+		{"bottom", rect.bottom},
+		{"width", rect.right - rect.left},
+		{"height", rect.bottom - rect.top}
+	};
+}
+
+static nlohmann::json Sample32Json(const void* bits, int width, int height, int pitch)
+{
+	nlohmann::json samples = nlohmann::json::array();
+	if (!bits || width <= 0 || height <= 0 || pitch <= 0)
+	{
+		return samples;
+	}
+
+	const int coords[][2] = {
+		{0, 0},
+		{width / 2, height / 2},
+		{width - 1, height - 1}
+	};
+
+	const auto* base = static_cast<const U8*>(bits);
+	for (const auto& coord : coords)
+	{
+		const int x = coord[0];
+		const int y = coord[1];
+		const U32 raw = *reinterpret_cast<const U32*>(base + y * pitch + x * 4);
+		samples.push_back({
+			{"x", x},
+			{"y", y},
+			{"raw", raw},
+			{"a", (raw >> 24) & 0xff},
+			{"r", raw & 0xff},
+			{"g", (raw >> 8) & 0xff},
+			{"b", (raw >> 16) & 0xff}
+		});
+	}
+	return samples;
+}
+
+static nlohmann::json AlphaStats32Json(const void* bits, int width, int height, int pitch)
+{
+	nlohmann::json stats = {
+		{"sampled", 0},
+		{"alphaZero", 0},
+		{"alphaMid", 0},
+		{"alphaFull", 0}
+	};
+	if (!bits || width <= 0 || height <= 0 || pitch <= 0)
+	{
+		return stats;
+	}
+
+	const int stepY = __max(1, height / 16);
+	const int stepX = __max(1, width / 16);
+	const auto* base = static_cast<const U8*>(bits);
+	for (int y = 0; y < height; y += stepY)
+	{
+		for (int x = 0; x < width; x += stepX)
+		{
+			const U32 raw = *reinterpret_cast<const U32*>(base + y * pitch + x * 4);
+			const U32 alpha = (raw >> 24) & 0xff;
+			stats["sampled"] = stats["sampled"].get<int>() + 1;
+			if (alpha == 0)
+			{
+				stats["alphaZero"] = stats["alphaZero"].get<int>() + 1;
+			}
+			else if (alpha == 255)
+			{
+				stats["alphaFull"] = stats["alphaFull"].get<int>() + 1;
+			}
+			else
+			{
+				stats["alphaMid"] = stats["alphaMid"].get<int>() + 1;
+			}
+		}
+	}
+	return stats;
+}
 
 //
 
@@ -264,7 +372,7 @@ public:	// Interface
 	GENRESULT COMAPI set_texture_stage_texture( U32 stage, LONG_PTR htexture  ) ;
 	GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *htexture  ) ;
 	GENRESULT COMAPI verify_state( void ) ;
-	GENRESULT COMAPI create_state_block( D3DSTATEBLOCKTYPE type, U32*out_sbhandle ) ;
+	GENRESULT COMAPI create_state_block( D3DSTATEBLOCKTYPE type, LONG_PTR *out_sbhandle ) ;
 	GENRESULT COMAPI update_state_block( LONG_PTR sbhandle ) ;
 	GENRESULT COMAPI begin_state_block( void ) ;
 	GENRESULT COMAPI end_state_block( LONG_PTR * out_sbhandle ) ;
@@ -279,6 +387,7 @@ public:	// Interface
 	GENRESULT COMAPI create_index_buffer(UINT Length, IDirect3DIndexBuffer9** ppIndexBuffer);
  		
 	GENRESULT COMAPI create_texture(int width, int height, const PixelFormat &desiredformat, int numTextureLevels, U32 irp_cf_flags, LONG_PTR &out_htexture) ;
+	GENRESULT COMAPI create_texture_from_file_in_memory( const void *data, U32 data_size, LONG_PTR &out_htexture, U32 *out_width, U32 *out_height ) ;
 	GENRESULT COMAPI destroy_texture(LONG_PTR htexture) ;
 	GENRESULT COMAPI is_texture( LONG_PTR htexture  ) ;
 	GENRESULT COMAPI lock_texture( LONG_PTR htexture, int subsurface, RPLOCKDATA *lockData  ) ;
@@ -291,7 +400,7 @@ public:	// Interface
 	GENRESULT COMAPI set_texture_palette( LONG_PTR htexture, int start, int length, const RGB *colors  ) ;
 	GENRESULT COMAPI get_texture_palette( LONG_PTR htexture, int start, int length, RGB *colors  ) ;
 	GENRESULT COMAPI set_texture_level_data( LONG_PTR htexture, int subsurface, int src_width, int src_height, int src_stride, const PixelFormat &src_format, const void *src_pixel, const void *src_alpha, const RGB *src_palette ) ;
-	GENRESULT COMAPI blit_texture( LONG_PTR hDest, LONG_PTR dst_subsurface, RECT destRect, U32 hSrc, U32 src_subsurface, RECT srcRect  ) ;
+	GENRESULT COMAPI blit_texture( LONG_PTR hDest, LONG_PTR dst_subsurface, RECT destRect, LONG_PTR hSrc, U32 src_subsurface, RECT srcRect  ) ;
 	GENRESULT COMAPI get_num_textures( U32 *out_num_textures  ) ;
 	GENRESULT COMAPI get_texture( U32 texture_num, LONG_PTR *out_htexture  ) ;
 	GENRESULT COMAPI create_vertex_buffer( U32 vertex_format, int num_verts, U32 irp_vbf_flags, IRP_VERTEXBUFFERHANDLE *out_vb_handle ) ;
@@ -2312,6 +2421,17 @@ DA_METHOD(  set_texture_stage_texture,(U32 stage, LONG_PTR htexture ))
 {
 	CHECK_CREATE_BUFFERS(set_texture_stage_texture);
 	ASSERT( direct3d_device );
+	static int setTextureDumpCount = 0;
+
+	if (D3DShouldDump(setTextureDumpCount))
+	{
+		nlohmann::json dump = {
+			{"event", "Direct3D::set_texture_stage_texture"},
+			{"stage", stage},
+			{"htexture", static_cast<long long>(htexture)}
+		};
+		VTDUMP_LOG(dump);
+	}
 
 	//if( curr_pipeline_state[RP_TEXTURE].is_enabled() ) 
 	{
@@ -2389,12 +2509,12 @@ DA_METHOD(	verify_state,( void ))
 
 //
 
-GENRESULT Direct3D_RenderPipeline::create_state_block( D3DSTATEBLOCKTYPE type, U32*out_sbhandle ) 
+GENRESULT Direct3D_RenderPipeline::create_state_block( D3DSTATEBLOCKTYPE type, LONG_PTR *out_sbhandle ) 
 {
 	CHECK_CREATE_BUFFERS(create_state_block);
 	ASSERT( direct3d_device );	
 
-	if( FAILED( direct3d_device->CreateStateBlock( type, (IDirect3DStateBlock9**)out_sbhandle ) ) ) {
+	if( FAILED( direct3d_device->CreateStateBlock( type, reinterpret_cast<IDirect3DStateBlock9**>(out_sbhandle) ) ) ) {
 		return GR_GENERIC;
 	}
 
@@ -2441,7 +2561,7 @@ GENRESULT Direct3D_RenderPipeline::end_state_block( LONG_PTR * out_sbhandle )
 
 	disable_hw_caches = false;
 
-	if( FAILED( direct3d_device->EndStateBlock( (IDirect3DStateBlock9**)out_sbhandle ) ) ) {
+	if( FAILED( direct3d_device->EndStateBlock( reinterpret_cast<IDirect3DStateBlock9**>(out_sbhandle) ) ) ) {
 		return GR_GENERIC;
 	}
 	return GR_OK;	
@@ -2737,6 +2857,41 @@ DA_METHOD(	draw_primitive,(D3DPRIMITIVETYPE type, U32 vertex_format, const void 
 	
 	U32 vpx, vpy, vpw, vph;
 	curr_hw_viewport.get_viewport( direct3d_device, &vpx, &vpy, &vpw, &vph );
+
+	static int drawPrimitiveDumpCount = 0;
+	if (D3DShouldDumpPrimitive(drawPrimitiveDumpCount, _verts, num_verts))
+	{
+		const RPVertex* verts = static_cast<const RPVertex*>(_verts);
+		nlohmann::json dump = {
+			{"event", "Direct3D::draw_primitive"},
+			{"type", type},
+			{"vertexFormat", vertex_format},
+			{"numVerts", num_verts},
+			{"stride", stride},
+			{"primCount", primCount},
+			{"viewport", {{"x", vpx}, {"y", vpy}, {"w", vpw}, {"h", vph}}},
+			{"verts", reinterpret_cast<std::uintptr_t>(_verts)}
+		};
+		if (verts)
+		{
+			nlohmann::json vertexDump = nlohmann::json::array();
+			const int vertexCount = __min(num_verts, 6);
+			for (int i = 0; i < vertexCount; ++i)
+			{
+				vertexDump.push_back({
+					{"i", i},
+					{"x", verts[i].pos.x},
+					{"y", verts[i].pos.y},
+					{"z", verts[i].pos.z},
+					{"u", verts[i].u},
+					{"v", verts[i].v},
+					{"color", verts[i].color}
+				});
+			}
+			dump["sampleVertices"] = vertexDump;
+		}
+		VTDUMP_LOG(dump);
+	}
 		
 	if( FAILED( direct3d_device->DrawPrimitiveUP( type,primCount,(void*)_verts,  stride) ) ) 
 	{
@@ -3035,6 +3190,7 @@ DA_METHOD(	create_texture,(int width, int height, const PixelFormat &desiredform
 	CHECK_CREATE_BUFFERS(create_texture);
 	ASSERT( width!=0 );
 	ASSERT( height!=0 );
+	static int createTextureDumpCount = 0;
 	
 	// we always want a specified number of mip levels
 	if (numTextureLevels == 0) numTextureLevels = 1;
@@ -3052,13 +3208,84 @@ DA_METHOD(	create_texture,(int width, int height, const PixelFormat &desiredform
 	{
 		texFmt = D3DFMT_A8R8G8B8;
 	}
-	
+	out_htexture = 0;
+	HRESULT hr = D3DXCreateTexture(direct3d_device, width, height, numTextureLevels, 0, texFmt, D3DPOOL_MANAGED, reinterpret_cast<LPDIRECT3DTEXTURE9*>(&out_htexture));
 
-	
-	D3DXCreateTexture(direct3d_device,width, height, numTextureLevels, 0,texFmt, D3DPOOL_MANAGED,(LPDIRECT3DTEXTURE9 *) (&out_htexture));
+	if (D3DShouldDump(createTextureDumpCount))
+	{
+		nlohmann::json dump = {
+			{"event", "Direct3D::create_texture"},
+			{"width", width},
+			{"height", height},
+			{"levels", numTextureLevels},
+			{"flags", irp_cf_flags},
+			{"format", static_cast<unsigned int>(texFmt)},
+			{"hr", static_cast<long>(hr)},
+			{"htexture", static_cast<long long>(out_htexture)}
+		};
+		if (SUCCEEDED(hr) && out_htexture)
+		{
+			D3DSURFACE_DESC desc {};
+			if (SUCCEEDED(reinterpret_cast<IDirect3DTexture9*>(out_htexture)->GetLevelDesc(0, &desc)))
+			{
+				dump["created"] = {
+					{"width", desc.Width},
+					{"height", desc.Height},
+					{"format", static_cast<unsigned int>(desc.Format)}
+				};
+			}
+		}
+		VTDUMP_LOG(dump);
+	}
+
+	if (FAILED(hr))
+	{
+		return GR_GENERIC;
+	}
 
 	//D3DXCreateTextureFromFile(direct3d_device, "Z:\\CQ2\\test\\test.bmp", 	(LPDIRECT3DTEXTURE9 *) (&out_htexture));
 
+	return GR_OK;
+}
+
+DA_METHOD(	create_texture_from_file_in_memory,( const void *data, U32 data_size, LONG_PTR &out_htexture, U32 *out_width, U32 *out_height ))
+{
+	CHECK_CREATE_BUFFERS(create_texture_from_file_in_memory);
+	out_htexture = 0;
+	if (out_width)
+	{
+		*out_width = 0;
+	}
+	if (out_height)
+	{
+		*out_height = 0;
+	}
+	if (!data || data_size == 0)
+	{
+		return GR_INVALID_PARMS;
+	}
+
+	IDirect3DTexture9 *texture = nullptr;
+	HRESULT hr = D3DXCreateTextureFromFileInMemory(direct3d_device, data, data_size, &texture);
+	if (FAILED(hr) || !texture)
+	{
+		return GR_GENERIC;
+	}
+
+	D3DSURFACE_DESC desc {};
+	if (SUCCEEDED(texture->GetLevelDesc(0, &desc)))
+	{
+		if (out_width)
+		{
+			*out_width = desc.Width;
+		}
+		if (out_height)
+		{
+			*out_height = desc.Height;
+		}
+	}
+
+	out_htexture = reinterpret_cast<LONG_PTR>(texture);
 	return GR_OK;
 }
 
@@ -3202,7 +3429,7 @@ DA_METHOD(	lock_texture,(LONG_PTR htexture, int subsurface, RPLOCKDATA *lockData
 	lockData->pitch = rect.Pitch;
 	lockData->pixels = rect.pBits;
 
-	return GR_GENERIC;
+	return GR_OK;
 }
 
 //
@@ -3211,7 +3438,7 @@ DA_METHOD(	unlock_texture,(LONG_PTR htexture, int subsurface ))
 	if (!htexture) return GR_GENERIC;
 	IDirect3DTexture9 * tex = (IDirect3DTexture9*) htexture;
 	tex->UnlockRect(subsurface);
-	return GR_GENERIC;
+	return GR_OK;
 }
 
 //
@@ -3269,10 +3496,25 @@ DA_METHOD(	get_texture_palette,(LONG_PTR htexture, int start, int length, RGB *c
 
 //
 
-DA_METHOD(	blit_texture,(LONG_PTR hDest, LONG_PTR dst_subsurface, RECT destRect, U32 hSrc, U32 src_subsurface, RECT srcRect ))
+DA_METHOD(	blit_texture,(LONG_PTR hDest, LONG_PTR dst_subsurface, RECT destRect, LONG_PTR hSrc, U32 src_subsurface, RECT srcRect ))
 {
 	static bool bSkip = 0;
 	if (bSkip) return GR_OK;
+	static int blitTextureDumpCount = 0;
+
+	if (D3DShouldDump(blitTextureDumpCount))
+	{
+		nlohmann::json dump = {
+			{"event", "Direct3D::blit_texture"},
+			{"hDest", static_cast<long long>(hDest)},
+			{"dstSubsurface", static_cast<long long>(dst_subsurface)},
+			{"destRect", RectJson(destRect)},
+			{"hSrc", static_cast<long long>(hSrc)},
+			{"srcSubsurface", src_subsurface},
+			{"srcRect", RectJson(srcRect)}
+		};
+		VTDUMP_LOG(dump);
+	}
 
 	CHECK_CREATE_BUFFERS(blit_texture);
 	ASSERT( hDest != RP_CURRENT );
@@ -3344,10 +3586,39 @@ DA_METHOD(	set_texture_level_data,(LONG_PTR htexture, int subsurface, int srcWid
 	IDirect3DTexture9 * tex = reinterpret_cast<IDirect3DTexture9 *>(htexture);
 	if (!tex) return GR_GENERIC;
 	D3DLOCKED_RECT rect {};
-	tex->LockRect(subsurface, &rect,NULL,0);
+	HRESULT hr = tex->LockRect(subsurface, &rect,NULL,0);
+	if (FAILED(hr))
+	{
+		return GR_GENERIC;
+	}
 	U8* pTextureBuffer = static_cast<byte *>(rect.pBits);
 	LONG lTexturePitch = rect.Pitch;
 	U8 * pSourceBuffer = (byte*) srcPixels;
+
+	static int setTextureDataDumpCount = 0;
+	if (D3DShouldDumpTexture(setTextureDataDumpCount, srcWidth, srcHeight, 128))
+	{
+		nlohmann::json dump = {
+			{"event", "Direct3D::set_texture_level_data"},
+			{"htexture", static_cast<long long>(htexture)},
+			{"subsurface", subsurface},
+			{"srcWidth", srcWidth},
+			{"srcHeight", srcHeight},
+			{"srcStride", srcStride},
+			{"srcBits", srcFormat.ddpf.dwRGBBitCount},
+			{"srcFourCC", srcFormat.ddpf.dwFourCC},
+			{"hasAlphaMap", srcAlphaMap != nullptr},
+			{"hasPalette", srcPalette != nullptr},
+			{"lockedPitch", lTexturePitch},
+			{"lockedBits", reinterpret_cast<std::uintptr_t>(rect.pBits)}
+		};
+		if (srcFormat.ddpf.dwRGBBitCount == 32 && !srcPalette)
+		{
+			dump["sourceSamples"] = Sample32Json(srcPixels, srcWidth, srcHeight, srcStride);
+			dump["sourceAlphaStats"] = AlphaStats32Json(srcPixels, srcWidth, srcHeight, srcStride);
+		}
+		VTDUMP_LOG(dump);
+	}
 
 
 	U8			*dst_bits = pTextureBuffer;
@@ -3359,6 +3630,22 @@ DA_METHOD(	set_texture_level_data,(LONG_PTR htexture, int subsurface, int srcWid
     mem_bitblt( dst_bits, dst_width, dst_height, dst_stride, dst_format,
 				srcPixels, srcWidth, srcHeight, srcStride, srcFormat,
 				srcPalette, (const U8*)srcAlphaMap);
+
+	static int setTextureAfterDumpCount = 0;
+	if (D3DShouldDumpTexture(setTextureAfterDumpCount, dst_width, dst_height, 128))
+	{
+		nlohmann::json dump = {
+			{"event", "Direct3D::set_texture_level_data_after"},
+			{"htexture", static_cast<long long>(htexture)},
+			{"subsurface", subsurface},
+			{"dstWidth", dst_width},
+			{"dstHeight", dst_height},
+			{"dstStride", dst_stride},
+			{"destSamples", Sample32Json(dst_bits, dst_width, dst_height, dst_stride)},
+			{"destAlphaStats", AlphaStats32Json(dst_bits, dst_width, dst_height, dst_stride)}
+		};
+		VTDUMP_LOG(dump);
+	}
 
 /*
 	if (!srcPalette || srcStride == srcWidth * 3)
@@ -3538,16 +3825,56 @@ DA_METHOD(	clear_buffers,(U32 flag, RECT *rect ))
 		cflags |= D3DCLEAR_STENCIL;
 	}
 
+	D3DVIEWPORT9 oldViewport {};
+	direct3d_device->GetViewport(&oldViewport);
+
+	D3DVIEWPORT9 clearViewport = oldViewport;
+	clearViewport.X = 0;
+	clearViewport.Y = 0;
+	clearViewport.Width = curr_pipeline_state[RP_BUFFERS_WIDTH].get();
+	clearViewport.Height = curr_pipeline_state[RP_BUFFERS_HEIGHT].get();
+	clearViewport.MinZ = 0.0f;
+	clearViewport.MaxZ = 1.0f;
+
+	if (clearViewport.Width == 0 || clearViewport.Height == 0)
+	{
+		COMPTR<IDirect3DSurface9> renderTarget;
+		if (SUCCEEDED(direct3d_device->GetRenderTarget(0, renderTarget.addr())))
+		{
+			D3DSURFACE_DESC desc {};
+			if (SUCCEEDED(renderTarget->GetDesc(&desc)))
+			{
+				clearViewport.Width = desc.Width;
+				clearViewport.Height = desc.Height;
+			}
+		}
+	}
+
+	const D3DRECT clearRect = {
+		scissor.left,
+		scissor.top,
+		scissor.right,
+		scissor.bottom
+	};
+
 	HRESULT hr;
 
-	hr = direct3d_device->Clear( 0, 
-								NULL,
-								// (D3DRECT*)&scissor, 
+	if (clearViewport.Width != 0 && clearViewport.Height != 0)
+	{
+		direct3d_device->SetViewport(&clearViewport);
+	}
+
+	hr = direct3d_device->Clear( rect ? 1 : 0,
+								 rect ? &clearRect : NULL,
 								 cflags, 
 								 curr_pipeline_state[RP_CLEAR_COLOR].get(),
-								 // D3DCOLOR_XRGB(0,0,0),
-								 1.0, 
+								 zclear,
 								 curr_pipeline_state[RP_CLEAR_STENCIL].get() );
+
+	if (clearViewport.Width != 0 && clearViewport.Height != 0)
+	{
+		direct3d_device->SetViewport(&oldViewport);
+	}
 
 	if( FAILED( hr ) ) {
 		return GR_GENERIC;

@@ -24,6 +24,16 @@
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
+static U32 BmpSourceStride(U32 width, U16 bitsPerPixel)
+{
+	return (((width * bitsPerPixel) + 31) / 32) * 4;
+}
+
+static U32 BmpMaskStride(U32 width)
+{
+	return ((width + 31) / 32) * 4;
+}
+
 //--------------------------------------------------------------------------//
 //--------------------------------------------------------------------------//
 
@@ -149,6 +159,7 @@ void BMP_READER::loadIndexBits (BITMAPINFOHEADER * header)
 	{
 		U8 * buffer;
 		U32 rowSize = header->biWidth;
+		U32 sourceStride = BmpSourceStride(header->biWidth, header->biBitCount);
 		U32 numRows = trueHeight;
 		U32 j;
 
@@ -159,7 +170,7 @@ void BMP_READER::loadIndexBits (BITMAPINFOHEADER * header)
 			for (j = 0; j < rowSize; j++)
 				buffer[j] = indexTable[j];
 			buffer -= rowSize;
-			indexTable += rowSize;
+			indexTable += sourceStride;
 			numRows--;
 		}
 	}
@@ -168,6 +179,7 @@ void BMP_READER::loadIndexBits (BITMAPINFOHEADER * header)
 	{
 		U8 * buffer;
 		U32 rowSize = header->biWidth;
+		U32 sourceStride = BmpSourceStride(header->biWidth, header->biBitCount);
 		U32 numRows = trueHeight;
 		U32 j;
 
@@ -181,7 +193,7 @@ void BMP_READER::loadIndexBits (BITMAPINFOHEADER * header)
 				buffer[(j*2)+1] = indexTable[j] & 0xF;
 			}
 			buffer -= rowSize;
-			indexTable += (rowSize+1)/2;
+			indexTable += sourceStride;
 			numRows--;
 		}
 	}
@@ -190,6 +202,7 @@ void BMP_READER::loadIndexBits (BITMAPINFOHEADER * header)
 	{
 		U8 * buffer;
 		U32 rowSize = header->biWidth;
+		U32 sourceStride = BmpSourceStride(header->biWidth, header->biBitCount);
 		U32 numRows = trueHeight;
 		U32 j;
 
@@ -209,7 +222,7 @@ void BMP_READER::loadIndexBits (BITMAPINFOHEADER * header)
 				buffer[(j*8)+7] = (indexTable[j] >> 0) & 1;
 			}
 			buffer -= rowSize;
-			indexTable += (rowSize+1)/8;
+			indexTable += sourceStride;
 			numRows--;
 		}
 	}
@@ -233,7 +246,7 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 
 		indexTable = (U8 *) (_palette+paletteSize);
 		if (header->biHeight == trueHeight * 2)
-			maskTable = indexTable + (((header->biWidth*trueHeight)*header->biBitCount) / 8);
+			maskTable = indexTable + (BmpSourceStride(header->biWidth, header->biBitCount) * trueHeight);
 
 		for (i = 0; i < paletteSize; i++)
 			rgb[i] = RGB(_palette[i].rgbRed, _palette[i].rgbGreen, _palette[i].rgbBlue);
@@ -251,6 +264,8 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 	{
 		COLORREF * buffer;
 		U32 rowSize = header->biWidth;
+		U32 sourceStride = BmpSourceStride(header->biWidth, header->biBitCount);
+		U32 maskStride = BmpMaskStride(header->biWidth);
 		U32 numRows = trueHeight;
 		U32 j;
 
@@ -265,9 +280,9 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 					buffer[j] |= 0xFF000000;	// set the alpha bits
 			}
 			buffer -= rowSize;
-			indexTable += rowSize;
+			indexTable += sourceStride;
 			if (maskTable)
-				maskTable += (rowSize + 7) / 8;
+				maskTable += maskStride;
 			numRows--;
 		}
 	}
@@ -276,6 +291,8 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 	{
 		COLORREF * buffer;
 		U32 rowSize = header->biWidth;
+		U32 sourceStride = BmpSourceStride(header->biWidth, header->biBitCount);
+		U32 maskStride = BmpMaskStride(header->biWidth);
 		U32 numRows = trueHeight;
 		U32 j;
 
@@ -301,9 +318,9 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 				}
 			}
 			buffer -= rowSize;
-			indexTable += (rowSize+1)/2;
+			indexTable += sourceStride;
 			if (maskTable)
-				maskTable += (rowSize + 7) / 8;
+				maskTable += maskStride;
 			numRows--;
 		}
 	}
@@ -312,6 +329,8 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 	{
 		COLORREF * buffer;
 		U32 rowSize = header->biWidth;
+		U32 sourceStride = BmpSourceStride(header->biWidth, header->biBitCount);
+		U32 maskStride = BmpMaskStride(header->biWidth);
 		U32 numRows = trueHeight;
 		U32 j;
 
@@ -362,9 +381,9 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 				}
 			}
 			buffer -= rowSize;
-			indexTable += (rowSize+7)/8;
+			indexTable += sourceStride;
 			if (maskTable)
-				maskTable += (rowSize + 7) / 8;
+				maskTable += maskStride;
 			numRows--;
 		}
 	}
@@ -373,18 +392,20 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 	{
 		COLORREF * buffer;
 		U32 rowSize = header->biWidth;
+		U32 sourceStride = BmpSourceStride(header->biWidth, header->biBitCount);
 		U32 numRows = trueHeight;
 		U32 j;
-		VFX_CRGB * cIndexTable = (VFX_CRGB *) indexTable;
+		const U8 * cIndexTable = indexTable;
 
 		buffer = colorMap + (rowSize * (numRows-1));
 
 		while (numRows)
 		{
+			const VFX_CRGB * row = (const VFX_CRGB *)cIndexTable;
 			for (j = 0; j < rowSize; j++)
-				buffer[j] = RGB(cIndexTable[j].rgb.b, cIndexTable[j].rgb.g, cIndexTable[j].rgb.r) | (((U32)cIndexTable[j].color) << 24);
+				buffer[j] = RGB(row[j].rgb.b, row[j].rgb.g, row[j].rgb.r) | (((U32)row[j].color) << 24);
 			buffer -= rowSize;
-			cIndexTable += rowSize;
+			cIndexTable += sourceStride;
 			numRows--;
 		}
 	}
@@ -393,18 +414,20 @@ void BMP_READER::depalettize (BITMAPINFOHEADER * header)
 	{
 		COLORREF * buffer;
 		U32 rowSize = header->biWidth;
+		U32 sourceStride = BmpSourceStride(header->biWidth, header->biBitCount);
 		U32 numRows = trueHeight;
 		U32 j;
-		VFX_RGB * cIndexTable = (VFX_RGB *) indexTable;
+		const U8 * cIndexTable = indexTable;
 
 		buffer = colorMap + (rowSize * (numRows-1));
 
 		while (numRows)
 		{
+			const VFX_RGB * row = (const VFX_RGB *)cIndexTable;
 			for (j = 0; j < rowSize; j++)
-				buffer[j] = RGB(cIndexTable[j].b, cIndexTable[j].g, cIndexTable[j].r) | 0xFF000000;
+				buffer[j] = RGB(row[j].b, row[j].g, row[j].r) | 0xFF000000;
 			buffer -= rowSize;
-			cIndexTable += rowSize;
+			cIndexTable += sourceStride;
 			numRows--;
 		}
 	}

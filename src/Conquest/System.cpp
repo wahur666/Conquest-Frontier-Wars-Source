@@ -284,7 +284,7 @@ void PrimitiveBuilder2::Begin( PBenum _type, U32 _vert_cnt)
 		if( (v_real = (U8 *)xmalloc(sizeof(FVFVERTEXTYPE)*_vert_cnt+31)) != NULL ) {
 			CQASSERT(current_vertex == 0);
 			free(vertex_buffer_real);
-			current_vertex_ptr = vertex_buffer = (FVFVERTEXTYPE *)((U32(v_real)+31) & ~31);
+			current_vertex_ptr = vertex_buffer = (FVFVERTEXTYPE *)(((uintptr_t)(v_real)+31) & ~31);
 			vertex_buffer_real = v_real;
 			num_vertex = _vert_cnt;
 		}

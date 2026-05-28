@@ -49,8 +49,8 @@ public:		// public interface
 	GENRESULT COMAPI get_render_state( D3DRENDERSTATETYPE state, U32 *out_value ) ;
 	GENRESULT COMAPI set_texture_stage_state( U32 stage, D3DTEXTURESTAGESTATETYPE state, U32 value ) ;
 	GENRESULT COMAPI get_texture_stage_state( U32 stage, D3DTEXTURESTAGESTATETYPE state, U32 *out_value ) ;
-	GENRESULT COMAPI set_texture_stage_texture( U32 stage, U32 irp_texture_id ) ;
-	GENRESULT COMAPI get_texture_stage_texture( U32 stage, U32 *out_irp_texture_id ) ;
+	GENRESULT COMAPI set_texture_stage_texture( U32 stage, LONG_PTR irp_texture_id ) ;
+	GENRESULT COMAPI get_texture_stage_texture( U32 stage, LONG_PTR *out_irp_texture_id ) ;
 
 
 	//
@@ -76,7 +76,7 @@ protected:	// protected data
 	U32						*texture_stage_states;		// [3*i + 0] == stage, [3*i + 1] == state, [3*i + 2] == value
 	U32						num_texture_stage_states;
 
-	U32						*texture_stage_textures;	// [2*i + 0] == stage, [2*i + 1] == texture
+	LONG_PTR				*texture_stage_textures;	// [2*i + 0] == stage, [2*i + 1] == texture
 	U32						num_texture_stage_textures;
 };
 
@@ -133,15 +133,15 @@ GENRESULT StateMaterial::cleanup( void )
 
 	material_name[0] = 0;
 
-	delete[] render_states;
+	free(render_states);
 	render_states = NULL;
 	num_render_states = 0;
 
-	delete[] texture_stage_states;
+	free(texture_stage_states);
 	texture_stage_states = NULL;
 	num_texture_stage_states = 0;
 
-	delete[] texture_stage_textures;
+	free(texture_stage_textures);
 	texture_stage_textures = NULL;
 	num_texture_stage_textures = 0;
 
@@ -406,20 +406,20 @@ GENRESULT StateMaterial::get_texture_stage_state( U32 stage, D3DTEXTURESTAGESTAT
 
 //
 
-GENRESULT StateMaterial::set_texture_stage_texture( U32 stage, U32 irp_texture_id ) 
+GENRESULT StateMaterial::set_texture_stage_texture( U32 stage, LONG_PTR irp_texture_id ) 
 {
 	for( U32 s=0; s<num_texture_stage_textures; s++ ) {
-		if( texture_stage_textures[s*2+0] == (U32)stage ) {
+		if( texture_stage_textures[s*2+0] == (LONG_PTR)stage ) {
 			texture_stage_textures[s*2+1] = irp_texture_id;
 			return GR_OK;
 		}
 	}
 
-	texture_stage_textures = (U32*)realloc( texture_stage_textures, (num_texture_stage_textures+1)*2*sizeof(U32) );
+	texture_stage_textures = (LONG_PTR*)realloc( texture_stage_textures, (num_texture_stage_textures+1)*2*sizeof(LONG_PTR) );
 	ASSERT( texture_stage_textures );
 
-	texture_stage_textures[num_texture_stage_textures*2 + 0] = (U32)stage;
-	texture_stage_textures[num_texture_stage_textures*2 + 1] = (U32)irp_texture_id;
+	texture_stage_textures[num_texture_stage_textures*2 + 0] = (LONG_PTR)stage;
+	texture_stage_textures[num_texture_stage_textures*2 + 1] = irp_texture_id;
 
 	num_texture_stage_textures++;
 
@@ -428,10 +428,10 @@ GENRESULT StateMaterial::set_texture_stage_texture( U32 stage, U32 irp_texture_i
 
 //
 
-GENRESULT StateMaterial::get_texture_stage_texture( U32 stage, U32 *out_irp_texture_id ) 
+GENRESULT StateMaterial::get_texture_stage_texture( U32 stage, LONG_PTR *out_irp_texture_id ) 
 {
 	for( U32 s=0; s<num_texture_stage_textures; s++ ) {
-		if( texture_stage_textures[s*2+0] == (U32)stage ) {
+		if( texture_stage_textures[s*2+0] == (LONG_PTR)stage ) {
 			*out_irp_texture_id = texture_stage_textures[s*2+1];
 			return GR_OK;
 		}

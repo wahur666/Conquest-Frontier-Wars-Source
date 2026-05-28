@@ -38,10 +38,16 @@
 #include "VFX_shapes.hpp"
 #include <malloc.h>
 #include <span>
+#include <cctype>
+#include <fstream>
+#include <iterator>
+#include <string>
+#include <vector>
 
 #include "da_heap_utility.h"
 #include "IRenderPrimitive.h"
 #include "MyVertex.h"
+#include "vtdump.h"
 
 #define AWKWARD_HEIGHT  40
 
@@ -88,6 +94,150 @@ bool bFastDraw=false;
 void EnableFastDrawAgent (bool bEnable)
 {
 	bFastDraw = 0;//bEnable;
+}
+
+static bool DrawAgentShouldDump(int& count, const int maxCount = 64)
+{
+	count++;
+	return false;
+}
+
+static bool DrawAgentIsLarge(U16 width, U16 height)
+{
+	return width >= 700 || height >= 500;
+}
+
+static bool DrawAgentShouldDumpImage(int& count, U16 width, U16 height, const int maxCount = 64)
+{
+	DrawAgentShouldDump(count, maxCount);
+	DrawAgentIsLarge(width, height);
+	return false;
+}
+
+static nlohmann::json DrawAgentRectJson(const BLOCKRECT& rect)
+{
+	return {
+		{"left", rect.left},
+		{"top", rect.top},
+		{"right", rect.right},
+		{"bottom", rect.bottom},
+		{"twidth", rect.twidth},
+		{"theight", rect.theight},
+		{"toffsetx", rect.toffsetx},
+		{"toffsety", rect.toffsety}
+	};
+}
+
+static bool IsHijackedMainBackground(U16 width, U16 height)
+{
+	return width == 801 && height == 601;
+}
+
+static bool DecodeBase64(const std::string& input, std::vector<U8>& output)
+{
+	static const signed char decodeTable[256] = {
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,
+		52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-2,-1,-1,
+		-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,
+		15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,
+		-1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+		41,42,43,44,45,46,47,48,49,50,51,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
+	};
+
+	output.clear();
+	int value = 0;
+	int bits = -8;
+	for (unsigned char c : input)
+	{
+		if (std::isspace(c))
+		{
+			continue;
+		}
+		const signed char decoded = decodeTable[c];
+		if (decoded == -2)
+		{
+			break;
+		}
+		if (decoded < 0)
+		{
+			return false;
+		}
+		value = (value << 6) + decoded;
+		bits += 6;
+		if (bits >= 0)
+		{
+			output.push_back((U8)((value >> bits) & 0xff));
+			bits -= 8;
+		}
+	}
+	return !output.empty();
+}
+
+static bool LoadMainscreenPng(std::vector<U8>& pngBytes)
+{
+	const char* paths[] = {
+		"mainscreen_frames.json",
+		"cmake-build-debug/bin/mainscreen_frames.json"
+	};
+
+	std::string jsonText;
+	for (const char* path : paths)
+	{
+		std::ifstream in(path, std::ios::binary);
+		if (!in)
+		{
+			continue;
+		}
+		jsonText.assign(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+		break;
+	}
+	if (jsonText.empty())
+	{
+		return false;
+	}
+
+	nlohmann::json root = nlohmann::json::parse(jsonText, nullptr, false);
+	if (root.is_discarded())
+	{
+		return false;
+	}
+
+	const nlohmann::json* dataNode = nullptr;
+	const auto framesIt = root.find("frames");
+	if (framesIt != root.end() && framesIt->is_object())
+	{
+		const auto frameIt = framesIt->find("frame_0000");
+		if (frameIt != framesIt->end() && frameIt->is_object())
+		{
+			const auto dataIt = frameIt->find("data");
+			if (dataIt != frameIt->end() && dataIt->is_string())
+			{
+				dataNode = &(*dataIt);
+			}
+		}
+	}
+	if (!dataNode)
+	{
+		return false;
+	}
+
+	std::string data = dataNode->get<std::string>();
+	const std::string prefix = "data:image/png;base64,";
+	if (data.compare(0, prefix.size(), prefix) == 0)
+	{
+		data.erase(0, prefix.size());
+	}
+	return DecodeBase64(data, pngBytes);
 }
 
 //--------------------------------------------------------------------------//
@@ -163,6 +313,8 @@ struct DACOM_NO_VTABLE DrawAgent : IDrawAgent
 
 	void loadTexture (U32 block, const BLOCKRECT & rect, struct IImageReader * reader, BOOL32 bTransparentMode, RGB rgbData[256], BOOL32 bScaleData, BOOL32 bHiRes, const RECT * pRect);
 
+	BOOL32 drawHijackedBackground(PANE *pane, S32 x, S32 y);
+
 	static U32 __fastcall nearestPower (S32 number);
 
 	static inline void makeSquare (U32 & width, U32 & height)
@@ -204,6 +356,104 @@ DrawAgent::~DrawAgent (void)
 }
 //--------------------------------------------------------------------------//
 //
+BOOL32 DrawAgent::drawHijackedBackground(PANE *pane, S32 x, S32 y)
+{
+	if (!IsHijackedMainBackground(imageWidth, imageHeight))
+	{
+		return 0;
+	}
+
+	static LONG_PTR replacementTexture = 0;
+	static U32 replacementWidth = 0;
+	static U32 replacementHeight = 0;
+	static bool attemptedLoad = false;
+	static bool logged = false;
+
+	if (!attemptedLoad)
+	{
+		attemptedLoad = true;
+		std::vector<U8> pngBytes;
+		if (LoadMainscreenPng(pngBytes))
+		{
+			if (PIPE->create_texture_from_file_in_memory(pngBytes.data(), (U32)pngBytes.size(), replacementTexture, &replacementWidth, &replacementHeight) != GR_OK)
+			{
+				replacementTexture = 0;
+				replacementWidth = 0;
+				replacementHeight = 0;
+			}
+		}
+	}
+
+	if (!logged)
+	{
+		logged = true;
+		nlohmann::json dump = {
+			{"event", "DrawAgent::hijackMainBackground"},
+			{"this", reinterpret_cast<std::uintptr_t>(this)},
+			{"loaded", replacementTexture != 0},
+			{"texture", static_cast<long long>(replacementTexture)},
+			{"textureWidth", replacementWidth},
+			{"textureHeight", replacementHeight},
+			{"imageWidth", imageWidth},
+			{"imageHeight", imageHeight}
+		};
+		VTDUMP_LOG(dump);
+	}
+
+	if (!replacementTexture)
+	{
+		return 0;
+	}
+
+	OrthoView(pane);
+	BATCH->set_render_state(D3DRS_ZENABLE,FALSE);
+	BATCH->set_render_state(D3DRS_ZWRITEENABLE,FALSE);
+	BATCH->set_render_state(D3DRS_ALPHABLENDENABLE,FALSE);
+	BATCH->set_render_state(D3DRS_CULLMODE,D3DCULL_NONE);
+	SetupDiffuseBlend(replacementTexture, FALSE);
+	BATCH->set_state(RPR_STATE_ID, replacementTexture);
+
+	if (pane)
+	{
+		x += pane->x0;
+		y += pane->y0;
+	}
+
+	BLOCKRECT rect {};
+	if (blockRect)
+	{
+		rect = blockRect[0];
+	}
+	else
+	{
+		rect.left = 0;
+		rect.top = 0;
+		rect.right = IDEAL2REALX(800);
+		rect.bottom = IDEAL2REALY(600);
+	}
+
+	rect.left += x;
+	rect.right += x;
+	rect.top += y;
+	rect.bottom += y;
+
+	PB.Color4ub(255,255,255,255);
+	PB.Begin(PB_QUADS);
+	PB.TexCoord2f(0.0f, 0.0f);
+	PB.Vertex3f(rect.left, rect.top, 0);
+	PB.TexCoord2f(1.0f, 0.0f);
+	PB.Vertex3f(rect.right, rect.top, 0);
+	PB.TexCoord2f(1.0f, 1.0f);
+	PB.Vertex3f(rect.right, rect.bottom, 0);
+	PB.TexCoord2f(0.0f, 1.0f);
+	PB.Vertex3f(rect.left, rect.bottom, 0);
+	PB.End();
+
+	BATCH->set_state(RPR_STATE_ID,0);
+	return 1;
+}
+//--------------------------------------------------------------------------
+//
 void DrawAgent::Draw (PANE *pane, S32 x, S32 y)
 {
 	if (b3DEnabled != (CQFLAGS.b3DEnabled!=0))
@@ -244,6 +494,13 @@ void DrawAgent::Draw (PANE *pane, S32 x, S32 y)
 	{
 		int i;
 		BLOCKRECT rect;
+		static int drawDumpCount = 0;
+
+		if (drawHijackedBackground(pane, x, y))
+		{
+			BATCH->set_state(RPR_STATE_ID,0);
+			return;
+		}
 
 		OrthoView(pane);
 
@@ -271,6 +528,26 @@ void DrawAgent::Draw (PANE *pane, S32 x, S32 y)
 
 		PB.Color3ub(255,255,255);
 		LONG_PTR currentTexID = textureID[0];
+
+		if (DrawAgentShouldDumpImage(drawDumpCount, imageWidth, imageHeight))
+		{
+			nlohmann::json dump = {
+				{"event", "DrawAgent::DrawXY"},
+				{"this", reinterpret_cast<std::uintptr_t>(this)},
+				{"x", x},
+				{"y", y},
+				{"imageWidth", imageWidth},
+				{"imageHeight", imageHeight},
+				{"numTextures", numTextures},
+				{"firstTexture", static_cast<long long>(textureID ? textureID[0] : 0)},
+				{"firstBlock", textureID && blockRect ? DrawAgentRectJson(blockRect[0]) : nlohmann::json()}
+			};
+			if (pane)
+			{
+				dump["pane"] = {{"x0", pane->x0}, {"y0", pane->y0}, {"x1", pane->x1}, {"y1", pane->y1}};
+			}
+			VTDUMP_LOG(dump);
+		}
 
 		BATCH->set_state(RPR_STATE_ID,textureID[0]);
 	/*	if (CQBATCH)
@@ -355,6 +632,7 @@ void DrawAgent::Draw (PANE *src, PANE *dst)
 	{
 		int i;
 		BLOCKRECT rect;
+		static int drawPaneDumpCount = 0;
 
 		Transform trans;
 		trans.translation.x = -0.5f;
@@ -396,6 +674,28 @@ void DrawAgent::Draw (PANE *src, PANE *dst)
 
 		PB.Color3ub(255,255,255);
 		LONG_PTR currentTexID = textureID[0];
+
+		if (DrawAgentShouldDumpImage(drawPaneDumpCount, imageWidth, imageHeight))
+		{
+			nlohmann::json dump = {
+				{"event", "DrawAgent::DrawPane"},
+				{"this", reinterpret_cast<std::uintptr_t>(this)},
+				{"imageWidth", imageWidth},
+				{"imageHeight", imageHeight},
+				{"numTextures", numTextures},
+				{"firstTexture", static_cast<long long>(textureID ? textureID[0] : 0)},
+				{"firstBlock", textureID && blockRect ? DrawAgentRectJson(blockRect[0]) : nlohmann::json()}
+			};
+			if (src)
+			{
+				dump["src"] = {{"x0", src->x0}, {"y0", src->y0}, {"x1", src->x1}, {"y1", src->y1}};
+			}
+			if (dst)
+			{
+				dump["dst"] = {{"x0", dst->x0}, {"y0", dst->y0}, {"x1", dst->x1}, {"y1", dst->y1}};
+			}
+			VTDUMP_LOG(dump);
+		}
 
 		BATCH->set_state(RPR_STATE_ID,textureID[0]);
 		PB.Begin(PB_QUADS);
@@ -557,6 +857,27 @@ void DrawAgent::loadTexture (U32 block, const BLOCKRECT & rect, struct IImageRea
 		blockRect[block].top = blockRect[block].top;
 		blockRect[block].bottom = blockRect[block].bottom+1;
 	}
+
+	static int loadTextureDumpCount = 0;
+	if (DrawAgentShouldDumpImage(loadTextureDumpCount, imageWidth, imageHeight, 128))
+	{
+		nlohmann::json dump = {
+			{"event", "DrawAgent::loadTexture"},
+			{"this", reinterpret_cast<std::uintptr_t>(this)},
+			{"block", block},
+			{"texture", static_cast<long long>(textureID[block])},
+			{"imageWidth", imageWidth},
+			{"imageHeight", imageHeight},
+			{"textureWidth", width},
+			{"textureHeight", height},
+			{"transparent", bTransparentMode != 0},
+			{"scaleData", bScaleData != 0},
+			{"hiRes", bHiRes != 0},
+			{"inputRect", DrawAgentRectJson(rect)},
+			{"blockRect", DrawAgentRectJson(blockRect[block])}
+		};
+		VTDUMP_LOG(dump);
+	}
 }
 //--------------------------------------------------------------------------//
 //
@@ -604,6 +925,11 @@ BOOL32 DrawAgent::init (struct IImageReader * reader, BOOL32 bScaleData, BOOL32 
 		CQBOMB0("Non-palettized image.");	
 
 	bTransparentMode = constructShape(reader, palette, pRect);
+	const BOOL32 bForcedOpaqueLargeImage = bTransparentMode && width >= 700 && height >= 500;
+	if (bForcedOpaqueLargeImage)
+	{
+		bTransparentMode = 0;
+	}
 	reader->GetColorTable(PF_RGB, rgbData);
 
 	b3DEnabled = (CQFLAGS.b3DEnabled!=0);
@@ -642,54 +968,51 @@ BOOL32 DrawAgent::init (struct IImageReader * reader, BOOL32 bScaleData, BOOL32 
 	blockRect = new BLOCKRECT[numTextures];
 
 	t = 0;
-	rect.twidth = rect.theight = 1.0;		// use full texture width & height
-
-	for (j = 0; j + 1 < jmax; j++)
+	for (j = 0; j < jmax; j++)
 	{
-		for (i = 0; i + 1 < imax; i++)
+		for (i = 0; i < imax; i++)
 		{
 			rect.left = i * TMAX;
-			rect.right = rect.left + (TMAX-1);
 			rect.top = j * TMAX;
-			rect.bottom = rect.top + (TMAX-1);
+
+			const U32 sourceTileWidth = __min(TMAX, width - rect.left);
+			const U32 sourceTileHeight = __min(TMAX, height - rect.top);
+			const U32 textureTileWidth = nearestPower(sourceTileWidth);
+			const U32 textureTileHeight = nearestPower(sourceTileHeight);
+
+			rect.right = rect.left + textureTileWidth - 1;
+			rect.bottom = rect.top + textureTileHeight - 1;
+			rect.twidth = (float)sourceTileWidth / (float)textureTileWidth;
+			rect.theight = (float)sourceTileHeight / (float)textureTileHeight;
+
 			loadTexture(t++, rect, reader, bTransparentMode, rgbData, bScaleData, bHiRes, pRect);
 		}
 	}
 
-	//
-	// now do the bottom row except bottom right corner
-	// 
-
-	rect.top = (jmax - 1) * TMAX;
-	rect.bottom = rect.top + nearestPower(height - rect.top) - 1;
-	rect.theight = (float)(height-rect.top) / (float)nearestPower(height - rect.top);
-
-	for (i = 0; i + 1 < imax; i++)
+	static int initDumpCount = 0;
+	if (DrawAgentShouldDumpImage(initDumpCount, imageWidth, imageHeight, 64))
 	{
-		rect.left = i * TMAX;
-		rect.right = rect.left + (TMAX-1);
-		loadTexture(t++, rect, reader, bTransparentMode, rgbData, bScaleData, bHiRes, pRect);
-	}
-
-	//
-	// now do the bottom right corner
-	//
-
-	rect.left = (imax - 1) * TMAX;
-	rect.right = rect.left + nearestPower(width - rect.left) - 1;
-	rect.twidth = (float)(width-rect.left) / (float)nearestPower(width - rect.left);
-	loadTexture(t++, rect, reader, bTransparentMode, rgbData, bScaleData, bHiRes, pRect);
-	
-	//
-	// now do the last collumn
-	// 
-	rect.theight = 1.0;		// use full texture height
-
-	for (j = 0; j + 1 < jmax; j++)
-	{
-		rect.top = j * TMAX;
-		rect.bottom = rect.top + (TMAX-1);
-		loadTexture(t++, rect, reader, bTransparentMode, rgbData, bScaleData, bHiRes, pRect);
+		nlohmann::json dump = {
+			{"event", "DrawAgent::init"},
+			{"this", reinterpret_cast<std::uintptr_t>(this)},
+			{"imageWidth", imageWidth},
+			{"imageHeight", imageHeight},
+			{"sourceWidth", width},
+			{"sourceHeight", height},
+			{"maxWidth", maxWidth},
+			{"maxHeight", maxHeight},
+			{"maxSize", maxSize},
+			{"tmax", TMAX},
+			{"imax", imax},
+			{"jmax", jmax},
+			{"numTextures", numTextures},
+			{"loadedTextures", t},
+			{"transparent", bTransparentMode != 0},
+			{"forcedOpaqueLargeImage", bForcedOpaqueLargeImage != 0},
+			{"scaleData", bScaleData != 0},
+			{"hiRes", bHiRes != 0}
+		};
+		VTDUMP_LOG(dump);
 	}
 
 	result = 1;

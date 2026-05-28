@@ -952,7 +952,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI create_state_block( D3DSTATEBLOCKTYPE type, U32*out_sbhandle ) = 0;
+	virtual GENRESULT COMAPI create_state_block( D3DSTATEBLOCKTYPE type, LONG_PTR *out_sbhandle ) = 0;
 
 	//
 	// update the given state block with the current values of the recorded states
@@ -1084,6 +1084,8 @@ struct IRenderPipeline : public IDAComponent
 	virtual GENRESULT COMAPI create_cube_texture_from_file(const char* filename, IComponentFactory * DIR,LONG_PTR &out_htexture) = 0;
 
 	virtual GENRESULT COMAPI create_texture( int width, int height, const PixelFormat &desiredformat, int num_lod, U32 irp_ctf_flags, LONG_PTR &out_htexture  ) = 0;
+
+	virtual GENRESULT COMAPI create_texture_from_file_in_memory( const void *data, U32 data_size, LONG_PTR &out_htexture, U32 *out_width, U32 *out_height ) = 0;
 
 	// destroy_texture
 	//
@@ -1221,7 +1223,7 @@ struct IRenderPipeline : public IDAComponent
 	// This method will always return failure 'outside' of successful create_buffers
 	// and destroy_buffers calls.
 	//
-	virtual GENRESULT COMAPI blit_texture( LONG_PTR hDest, LONG_PTR destLevel, RECT destRect, U32 hSrc, U32 srcLevel, RECT srcRect  ) = 0;
+	virtual GENRESULT COMAPI blit_texture( LONG_PTR hDest, LONG_PTR destLevel, RECT destRect, LONG_PTR hSrc, U32 srcLevel, RECT srcRect  ) = 0;
 
 	// get_num_textures
 	//

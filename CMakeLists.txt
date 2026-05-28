@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.31)
 
 project(Conquest LANGUAGES CXX)
 
+option(CFW_MSVC_PARALLEL_COMPILE "Enable MSVC /MP multi-process compilation." ON)
+
 # ---- Global toolchain policy ----
 if (MSVC)
     set(CMAKE_MFC_FLAG 0)
@@ -10,6 +12,9 @@ if (MSVC)
             /Zc:__cplusplus
             /Zc:preprocessor
     )
+    if (CFW_MSVC_PARALLEL_COMPILE)
+        add_compile_options(/MP /FS)
+    endif()
 endif()
 
 # ---- Language ----
