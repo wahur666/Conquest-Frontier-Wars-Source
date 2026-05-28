@@ -899,6 +899,7 @@ CQEXTERN void __stdcall CreateBMPReader (struct IImageReader ** reader);
 CQEXTERN void __stdcall CreateDrawAgent (const VFX_SHAPETABLE * vfxShape, U32 subImage, struct IDrawAgent ** drawAgent, BOOL32 bHiRes = false, RECT * pRect=0);
 CQEXTERN void __stdcall CreateDrawAgent (struct IImageReader * reader, struct IDrawAgent ** _drawAgent,BOOL32 bHiRes = false, RECT * pRect=0);
 CQEXTERN void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parentFile, DA::FILETYPE type, U32 subImage, struct IDrawAgent ** drawAgent,BOOL32 bHiRes = false);
+CQEXTERN BOOL32 __stdcall CreateJsonReplacementDrawAgent (const char* filename, U32 subImage, struct IDrawAgent** drawAgent, BOOL32 bHiRes = false);
 CQEXTERN void __stdcall DEBUGCreateFontDrawAgent (const VFX_FONT * font, U32 fontImageSize, struct IDebugFontDrawAgent ** _fontDrawAgent, const char *txm_name);
 namespace DA { CQEXTERN void LineDraw (const PANE * pane, S32 x0, S32 y0, S32 x1, S32 y1, COLORREF color, BOOL32 bSmooth=0); }
 namespace DA { CQEXTERN void PointDraw (const PANE * pane, S32 x0, S32 y0, COLORREF color); }

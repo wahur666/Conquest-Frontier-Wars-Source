@@ -37,6 +37,7 @@ struct SHPTYPE
 	PGENTYPE pArchetype;
 	const void * pImage;				
 	DA::FILETYPE fileType;
+	char filename[MAX_PATH];
 
 	SHPTYPE (void)
 	{
@@ -44,6 +45,9 @@ struct SHPTYPE
 
 	bool init (const char * filename)
 	{
+		strncpy(this->filename, filename, sizeof(this->filename) - 1);
+		this->filename[sizeof(this->filename) - 1] = 0;
+
 		// funky way to determine the file type
 		U32 file_type = ((U32 *)(filename + strlen(filename) - 4))[0] & ~0x20202000;
 
@@ -161,6 +165,10 @@ GENRESULT ShapeLoader::CreateDrawAgent (U32 subImage, struct IDrawAgent ** drawA
 	if (pShpType->fileType == DA::VFX)
 	{
 		GT_VFXSHAPE * data = (GT_VFXSHAPE *)(GENDATA->GetArchetypeData(pShpType->pArchetype));
+		if (pRect == 0 && ::CreateJsonReplacementDrawAgent(pShpType->filename, subImage, drawAgent, data->bHiRes))
+		{
+			return GR_OK;
+		}
 		::CreateDrawAgent((const VFX_SHAPETABLE *)pShpType->pImage, subImage, drawAgent, data->bHiRes,pRect);
 	}
 	else

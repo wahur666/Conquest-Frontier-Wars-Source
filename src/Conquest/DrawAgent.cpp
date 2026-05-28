@@ -128,11 +128,22 @@ static nlohmann::json DrawAgentRectJson(const BLOCKRECT& rect)
 	};
 }
 
-static bool IsMainscreenShapeFilename(const char* filename)
+struct JsonShapeReplacement
+{
+	const char* shapeFilename;
+	const char* jsonFilename;
+};
+
+static const JsonShapeReplacement kJsonShapeReplacements[] = {
+	{"mainscreen.shp", "mainscreen_frames.json"},
+	{"animSingle.shp", "animSingle_frames.json"}
+};
+
+static const char* ShapeBasename(const char* filename)
 {
 	if (!filename)
 	{
-		return false;
+		return "";
 	}
 
 	const char* basename = filename;
@@ -144,7 +155,20 @@ static bool IsMainscreenShapeFilename(const char* filename)
 		}
 	}
 
-	return _stricmp(basename, "mainscreen.shp") == 0;
+	return basename;
+}
+
+static const JsonShapeReplacement* FindJsonShapeReplacement(const char* filename)
+{
+	const char* basename = ShapeBasename(filename);
+	for (const JsonShapeReplacement& replacement : kJsonShapeReplacements)
+	{
+		if (_stricmp(basename, replacement.shapeFilename) == 0)
+		{
+			return &replacement;
+		}
+	}
+	return nullptr;
 }
 
 static bool DecodeBase64(const std::string& input, std::vector<U8>& output)
@@ -295,11 +319,18 @@ static bool LoadFramePngFromJson(const char* jsonPath, U32 frameIndex, std::vect
 	return DecodeBase64(data, *pngBytes);
 }
 
-static bool FindMainscreenFrameJson(std::string& result)
+static bool FindFrameJson(const char* jsonFilename, std::string& result)
 {
+	if (!jsonFilename || !jsonFilename[0])
+	{
+		return false;
+	}
+
+	const std::string localPath = jsonFilename;
+	const std::string debugBinPath = std::string("cmake-build-debug/bin/") + jsonFilename;
 	const char* paths[] = {
-		"mainscreen_frames.json",
-		"cmake-build-debug/bin/mainscreen_frames.json"
+		localPath.c_str(),
+		debugBinPath.c_str()
 	};
 
 	for (const char* path : paths)
@@ -1299,6 +1330,47 @@ void __stdcall CreateDrawAgentForFonts (struct IImageReader * reader, struct IDr
 }
 //--------------------------------------------------------------------------//
 //
+BOOL32 __stdcall CreateJsonReplacementDrawAgent(const char* filename, U32 subImage, struct IDrawAgent** drawAgent, BOOL32 bHiRes)
+{
+	if (drawAgent)
+	{
+		*drawAgent = 0;
+	}
+	if (!drawAgent)
+	{
+		return 0;
+	}
+
+	const JsonShapeReplacement* replacementInfo = FindJsonShapeReplacement(filename);
+	if (!replacementInfo)
+	{
+		return 0;
+	}
+
+	std::string jsonPath;
+	if (FindFrameJson(replacementInfo->jsonFilename, jsonPath))
+	{
+		DrawAgent * replacement = new DAComponentX<DrawAgent>;
+		if (replacement->initJsonReplacement(filename, jsonPath.c_str(), subImage, bHiRes))
+		{
+			*drawAgent = replacement;
+			return 1;
+		}
+		delete replacement;
+	}
+
+	nlohmann::json dump = {
+		{"event", "DrawAgent::jsonReplacementMiss"},
+		{"source", filename ? filename : ""},
+		{"json", replacementInfo->jsonFilename},
+		{"frame", subImage}
+	};
+	VTDUMP_LOG(dump);
+
+	return 0;
+}
+//--------------------------------------------------------------------------
+//
 void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parentFile,
 								DA::FILETYPE type, U32 subImage, struct IDrawAgent ** drawAgent, BOOL32 bHiRes)
 {
@@ -1307,26 +1379,9 @@ void __stdcall CreateDrawAgent (const char * filename, IComponentFactory *parent
 	DAFILEDESC fdesc = filename;
 	*drawAgent = 0;
 
-	if (IsMainscreenShapeFilename(filename))
+	if (CreateJsonReplacementDrawAgent(filename, subImage, drawAgent, bHiRes))
 	{
-		std::string jsonPath;
-		if (FindMainscreenFrameJson(jsonPath))
-		{
-			DrawAgent * replacement = new DAComponentX<DrawAgent>;
-			if (replacement->initJsonReplacement(filename, jsonPath.c_str(), subImage, bHiRes))
-			{
-				*drawAgent = replacement;
-				return;
-			}
-			delete replacement;
-		}
-
-		nlohmann::json dump = {
-			{"event", "DrawAgent::jsonReplacementMiss"},
-			{"source", filename ? filename : ""},
-			{"frame", subImage}
-		};
-		VTDUMP_LOG(dump);
+		return;
 	}
 
 	fdesc.lpImplementation = "DOS";
