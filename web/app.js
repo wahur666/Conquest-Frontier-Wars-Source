@@ -13,6 +13,9 @@ const D3DBLEND_ZERO = 1;
 const D3DBLEND_ONE = 2;
 const D3DBLEND_SRCALPHA = 5;
 const D3DBLEND_INVSRCALPHA = 6;
+const CHANNEL_DT_FLOAT = 1;
+const CHANNEL_DT_VECTOR = 2;
+const CHANNEL_DT_QUATERNION = 4;
 
 const fileInput = document.querySelector('#utf-file');
 const openButton = document.querySelector('#open-file');
@@ -750,7 +753,7 @@ function applyJointLocalTransform(object, joint) {
 }
 
 function createCompoundAnimationController(rootNode, byPartName, joints) {
-  const clips = readEmbeddedJointAnimationClips(rootNode.children?.Animation, joints);
+  const clips = readJointAnimationClips(rootNode.children?.Animation, joints);
   if (clips.length === 0) {
     return null;
   }
@@ -758,12 +761,13 @@ function createCompoundAnimationController(rootNode, byPartName, joints) {
   return new CompoundAnimationController(clips, byPartName);
 }
 
-function readEmbeddedJointAnimationClips(animationNode, joints) {
+function readJointAnimationClips(animationNode, joints) {
   const scriptRoot = animationNode?.children?.Script;
   if (!scriptRoot?.children) {
     return [];
   }
 
+  const namedChannels = readNamedAnimationChannels(animationNode.children?.Chnl);
   const jointByPair = new Map(joints.map((joint) => [jointKey(joint.parent, joint.child), joint]));
   const clips = [];
 
@@ -782,12 +786,14 @@ function readEmbeddedJointAnimationClips(animationNode, joints) {
 
       const parent = getString(jointMapNode.children['Parent name']);
       const child = getString(jointMapNode.children['Child name']);
-      const channelNode = jointMapNode.children.Channel;
-      if (!parent || !child || !channelNode?.children) {
+      if (!parent || !child) {
         continue;
       }
 
-      const channel = readFullTransformChannel(channelNode);
+      const channelName = getString(jointMapNode.children['Channel name']);
+      const channel = channelName
+        ? namedChannels.get(channelName)
+        : readAnimationChannel(jointMapNode.children.Channel);
       const joint = jointByPair.get(jointKey(parent, child));
       if (!channel || !joint) {
         continue;
@@ -809,19 +815,67 @@ function readEmbeddedJointAnimationClips(animationNode, joints) {
   return clips;
 }
 
-function readFullTransformChannel(channelNode) {
-  const headerBytes = channelNode.children?.Header?.value;
-  const frameBytes = channelNode.children?.Frames?.value;
+function readNamedAnimationChannels(channelRoot) {
+  const channels = new Map();
+  if (!channelRoot?.children) {
+    return channels;
+  }
+
+  for (const channelNode of Object.values(channelRoot.children)) {
+    const channel = readAnimationChannel(channelNode);
+    if (channel) {
+      channels.set(channelNode.name, channel);
+    }
+  }
+
+  return channels;
+}
+
+function readAnimationChannel(channelNode) {
+  const header = readAnimationChannelHeader(channelNode);
+  if (!header) {
+    return null;
+  }
+
+  if ((header.type & (CHANNEL_DT_VECTOR | CHANNEL_DT_QUATERNION)) === (CHANNEL_DT_VECTOR | CHANNEL_DT_QUATERNION)) {
+    return readFullTransformChannel(channelNode, header);
+  }
+
+  if ((header.type & CHANNEL_DT_QUATERNION) !== 0) {
+    return readQuaternionChannel(channelNode, header);
+  }
+
+  if ((header.type & CHANNEL_DT_FLOAT) !== 0) {
+    return readFloatChannel(channelNode, header);
+  }
+
+  return null;
+}
+
+function readAnimationChannelHeader(channelNode) {
+  const headerBytes = channelNode?.children?.Header?.value;
+  const frameBytes = channelNode?.children?.Frames?.value;
   if (!headerBytes || !frameBytes || headerBytes.byteLength < 12) {
     return null;
   }
 
   const headerView = new DataView(headerBytes.buffer, headerBytes.byteOffset, headerBytes.byteLength);
-  const frameCount = headerView.getUint32(0, true);
-  const captureRate = headerView.getFloat32(4, true);
-  const type = headerView.getUint32(8, true);
-  const hasVector = (type & 2) !== 0;
-  const hasQuaternion = (type & 4) !== 0;
+  return {
+    frameBytes,
+    frameCount: headerView.getUint32(0, true),
+    captureRate: headerView.getFloat32(4, true),
+    type: headerView.getUint32(8, true),
+  };
+}
+
+function readFullTransformChannel(channelNode, header = readAnimationChannelHeader(channelNode)) {
+  if (!header) {
+    return null;
+  }
+
+  const { frameBytes, frameCount, captureRate, type } = header;
+  const hasVector = (type & CHANNEL_DT_VECTOR) !== 0;
+  const hasQuaternion = (type & CHANNEL_DT_QUATERNION) !== 0;
 
   if (!hasVector || !hasQuaternion || frameCount < 1) {
     return null;
@@ -854,6 +908,86 @@ function readFullTransformChannel(channelNode) {
   }
 
   return {
+    kind: 'full',
+    frameCount,
+    captureRate,
+    type,
+    duration: Math.max(0, frames[frames.length - 1].time),
+    frames,
+  };
+}
+
+function readFloatChannel(channelNode, header = readAnimationChannelHeader(channelNode)) {
+  if (!header) {
+    return null;
+  }
+
+  const { frameBytes, frameCount, captureRate, type } = header;
+  if (frameCount < 1) {
+    return null;
+  }
+
+  const frameSize = (captureRate < 0 ? 4 : 0) + 4;
+  if (frameBytes.byteLength < frameSize * frameCount) {
+    return null;
+  }
+
+  const frameView = new DataView(frameBytes.buffer, frameBytes.byteOffset, frameBytes.byteLength);
+  const frames = [];
+
+  for (let i = 0; i < frameCount; i += 1) {
+    const offset = i * frameSize;
+    const dataOffset = captureRate < 0 ? offset + 4 : offset;
+    frames.push({
+      time: captureRate < 0 ? frameView.getFloat32(offset, true) : i * captureRate,
+      value: frameView.getFloat32(dataOffset, true),
+    });
+  }
+
+  return {
+    kind: 'float',
+    frameCount,
+    captureRate,
+    type,
+    duration: Math.max(0, frames[frames.length - 1].time),
+    frames,
+  };
+}
+
+function readQuaternionChannel(channelNode, header = readAnimationChannelHeader(channelNode)) {
+  if (!header) {
+    return null;
+  }
+
+  const { frameBytes, frameCount, captureRate, type } = header;
+  if (frameCount < 1) {
+    return null;
+  }
+
+  const frameSize = (captureRate < 0 ? 4 : 0) + 16;
+  if (frameBytes.byteLength < frameSize * frameCount) {
+    return null;
+  }
+
+  const frameView = new DataView(frameBytes.buffer, frameBytes.byteOffset, frameBytes.byteLength);
+  const frames = [];
+
+  for (let i = 0; i < frameCount; i += 1) {
+    const offset = i * frameSize;
+    const dataOffset = captureRate < 0 ? offset + 4 : offset;
+    const qw = frameView.getFloat32(dataOffset, true);
+    const qx = frameView.getFloat32(dataOffset + 4, true);
+    const qy = frameView.getFloat32(dataOffset + 8, true);
+    const qz = frameView.getFloat32(dataOffset + 12, true);
+
+    frames.push({
+      time: captureRate < 0 ? frameView.getFloat32(offset, true) : i * captureRate,
+      rotation: new THREE.Quaternion(qx, qy, qz, qw).normalize(),
+    });
+  }
+
+  return {
+    kind: 'quat',
     frameCount,
     captureRate,
     type,
@@ -866,7 +1000,7 @@ class CompoundAnimationController {
   constructor(clips, byPartName) {
     this.clips = clips;
     this.byPartName = byPartName;
-    this.activeClip = clips[0];
+    this.activeClip = clips.reduce((best, clip) => (clip.duration > best.duration ? clip : best), clips[0]);
     this.clipCount = clips.length;
     this.time = 0;
     this.playing = false;
@@ -915,8 +1049,16 @@ class CompoundAnimationController {
         continue;
       }
 
-      const sample = sampleTransformChannel(track.channel, this.time);
-      applyAnimatedJointLocalTransform(object, track.joint, sample);
+      if (track.channel.kind === 'full') {
+        const sample = sampleTransformChannel(track.channel, this.time);
+        applyAnimatedJointLocalTransform(object, track.joint, sample);
+      } else if (track.channel.kind === 'float') {
+        const sample = sampleFloatChannel(track.channel, this.time, track.joint);
+        applyFloatJointLocalTransform(object, track.joint, sample.value);
+      } else if (track.channel.kind === 'quat') {
+        const sample = sampleQuaternionChannel(track.channel, this.time);
+        applyQuaternionJointLocalTransform(object, track.joint, sample.rotation);
+      }
     }
   }
 }
@@ -949,6 +1091,60 @@ function sampleTransformChannel(channel, time) {
   };
 }
 
+function sampleFloatChannel(channel, time, joint) {
+  const frames = channel.frames;
+  if (frames.length === 1 || time <= frames[0].time) {
+    return frames[0];
+  }
+
+  const last = frames[frames.length - 1];
+  if (time >= last.time) {
+    return last;
+  }
+
+  let nextIndex = 1;
+  while (nextIndex < frames.length && frames[nextIndex].time < time) {
+    nextIndex += 1;
+  }
+
+  const previous = frames[nextIndex - 1];
+  const next = frames[nextIndex];
+  const span = Math.max(next.time - previous.time, 0.000001);
+  const ratio = (time - previous.time) / span;
+  const value = joint.type === 'revolute'
+    ? interpolateArc(previous.value, next.value, ratio)
+    : lerp(previous.value, next.value, ratio);
+
+  return { time, value };
+}
+
+function sampleQuaternionChannel(channel, time) {
+  const frames = channel.frames;
+  if (frames.length === 1 || time <= frames[0].time) {
+    return frames[0];
+  }
+
+  const last = frames[frames.length - 1];
+  if (time >= last.time) {
+    return last;
+  }
+
+  let nextIndex = 1;
+  while (nextIndex < frames.length && frames[nextIndex].time < time) {
+    nextIndex += 1;
+  }
+
+  const previous = frames[nextIndex - 1];
+  const next = frames[nextIndex];
+  const span = Math.max(next.time - previous.time, 0.000001);
+  const ratio = (time - previous.time) / span;
+
+  return {
+    time,
+    rotation: previous.rotation.clone().slerp(next.rotation, ratio),
+  };
+}
+
 function applyAnimatedJointLocalTransform(object, joint, sample) {
   const relOrientation = matrix4FromMatrix3(joint.relOrientation);
   const rotation = new THREE.Matrix4().makeRotationFromQuaternion(sample.rotation).multiply(relOrientation);
@@ -964,6 +1160,61 @@ function applyAnimatedJointLocalTransform(object, joint, sample) {
 
   object.matrixAutoUpdate = false;
   object.matrixWorldNeedsUpdate = true;
+}
+
+function applyQuaternionJointLocalTransform(object, joint, rotationValue) {
+  if (joint.type !== 'spherical') {
+    return;
+  }
+
+  const relOrientation = matrix4FromMatrix3(joint.relOrientation);
+  const rotation = new THREE.Matrix4().makeRotationFromQuaternion(rotationValue).multiply(relOrientation);
+  const childPoint = joint.childPoint.clone().applyMatrix4(rotation);
+  const translation = joint.parentPoint.clone().sub(childPoint);
+  object.matrix.copy(matrix4FromRotationMatrixTranslation(rotation, translation));
+  object.matrixAutoUpdate = false;
+  object.matrixWorldNeedsUpdate = true;
+}
+
+function applyFloatJointLocalTransform(object, joint, value) {
+  const relOrientation = matrix4FromMatrix3(joint.relOrientation);
+
+  if (joint.type === 'revolute') {
+    const axis = joint.axis.clone();
+    if (axis.lengthSq() <= 0.000001) {
+      axis.set(0, 1, 0);
+    } else {
+      axis.normalize();
+    }
+
+    const rotation = new THREE.Matrix4().makeRotationAxis(axis, value).multiply(relOrientation);
+    const childPoint = joint.childPoint.clone().applyMatrix4(rotation);
+    const translation = joint.parentPoint.clone().sub(childPoint);
+    object.matrix.copy(matrix4FromRotationMatrixTranslation(rotation, translation));
+  } else if (joint.type === 'prismatic') {
+    const axis = joint.axis.clone();
+    if (axis.lengthSq() > 0.000001) {
+      axis.normalize().multiplyScalar(value);
+    }
+
+    const childPoint = joint.childPoint.clone().applyMatrix4(relOrientation);
+    const translation = joint.parentPoint.clone().add(axis).sub(childPoint);
+    object.matrix.copy(matrix4FromRotationMatrixTranslation(relOrientation, translation));
+  }
+
+  object.matrixAutoUpdate = false;
+  object.matrixWorldNeedsUpdate = true;
+}
+
+function interpolateArc(base, next, ratio) {
+  let adjustedNext = next;
+  if (adjustedNext - base < -Math.PI) {
+    adjustedNext += Math.PI * 2;
+  } else if (adjustedNext - base > Math.PI) {
+    adjustedNext -= Math.PI * 2;
+  }
+
+  return base + (adjustedNext - base) * ratio;
 }
 
 function jointKey(parent, child) {
