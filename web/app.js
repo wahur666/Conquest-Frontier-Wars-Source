@@ -1,10 +1,25 @@
 import * as THREE from 'three';
-import { loadUtfFile } from './utfParser.js';
+import { loadUtfFile, parseUtfXmlString } from './utfParser.js';
 import { createThreePolyMesh } from './ThreePolyMesh.js';
+
+const PSP_NUM_COLOR_KEYS = 32;
+const PSP_TEXTURE_NAME_LEN = 16;
+const PSP_F_RELATIVE_TRANSFORM = 1 << 0;
+const PSP_F_RELATIVE_VELOCITY = 1 << 1;
+const PSP_F_RENDER_DITHER = 1 << 4;
+const PSP_F_RENDER_PARTICLE_LIFE = 1 << 3;
+const PSP_F_RENDER_FOG = 1 << 5;
+const D3DBLEND_ZERO = 1;
+const D3DBLEND_ONE = 2;
+const D3DBLEND_SRCALPHA = 5;
+const D3DBLEND_INVSRCALPHA = 6;
 
 const fileInput = document.querySelector('#utf-file');
 const openButton = document.querySelector('#open-file');
 const resetButton = document.querySelector('#reset-view');
+const animStartButton = document.querySelector('#anim-start');
+const animStopButton = document.querySelector('#anim-stop');
+const animRestartButton = document.querySelector('#anim-restart');
 const wireframeToggle = document.querySelector('#wireframe');
 const statusLine = document.querySelector('#status');
 const statsLine = document.querySelector('#stats');
@@ -27,7 +42,10 @@ const orbit = {
 
 let activeMesh = null;
 let activeTextureCanvases = new Map();
+let activeParticleSystems = [];
+let activeAnimationController = null;
 let animationFrame = 0;
+let lastTime = performance.now();
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x273044, 1.4));
 
@@ -48,6 +66,24 @@ scene.add(axes);
 
 openButton.addEventListener('click', () => fileInput.click());
 resetButton.addEventListener('click', frameActiveMesh);
+animStartButton.addEventListener('click', () => {
+  if (activeAnimationController) {
+    activeAnimationController.play();
+    updateAnimationButtons();
+  }
+});
+animStopButton.addEventListener('click', () => {
+  if (activeAnimationController) {
+    activeAnimationController.stop();
+    updateAnimationButtons();
+  }
+});
+animRestartButton.addEventListener('click', () => {
+  if (activeAnimationController) {
+    activeAnimationController.restart();
+    updateAnimationButtons();
+  }
+});
 wireframeToggle.addEventListener('change', () => setWireframe(wireframeToggle.checked));
 fileInput.addEventListener('change', onFileSelected);
 window.addEventListener('resize', resizeRenderer);
@@ -78,7 +114,7 @@ async function onFileSelected(event) {
     let stats;
 
     if (meshEntries.length > 0) {
-      const compound = buildCompoundObject(rootNode, meshEntries, textureCanvases);
+      const compound = await buildCompoundObject(rootNode, meshEntries, textureCanvases);
       threeMesh = compound.object;
       textureCanvases = compound.textureCanvases;
       stats = compound.stats;
@@ -168,13 +204,13 @@ function buildPolyMeshData(root, textureCanvases, name) {
   };
 }
 
-function buildCompoundObject(rootNode, meshEntries, textureCanvases) {
+async function buildCompoundObject(rootNode, meshEntries, textureCanvases) {
   const object = new THREE.Group();
   const partInfos = readCompoundParts(rootNode.children?.Cmpnd);
   const joints = readCompoundJoints(rootNode.children?.Cmpnd?.children?.Cons);
   const byFileName = new Map(meshEntries.map((entry) => [entry.containerNode.name.toLowerCase(), entry]));
   const byPartName = new Map();
-  const stats = { vertices: 0, faces: 0, materials: 0 };
+  const stats = { vertices: 0, faces: 0, materials: 0, particles: 0, animations: 0 };
   let mergedTextures = textureCanvases;
 
   object.name = rootNode.name || 'Compound';
@@ -197,31 +233,50 @@ function buildCompoundObject(rootNode, meshEntries, textureCanvases) {
       stats.materials += meshData.materialList.length;
     }
 
+    const particleEntries = findEmbeddedParticleEntries(rootNode);
+    for (const entry of particleEntries) {
+      const partTextures = mergeTextureCanvases(mergedTextures, loadTextureCanvases(entry.textureChildren));
+      const particleObject = createParticleObject(entry.parameters, partTextures, entry.name);
+      object.add(particleObject);
+      mergedTextures = mergeTextureCanvases(mergedTextures, partTextures);
+      stats.particles += 1;
+    }
+
     return { object, textureCanvases: mergedTextures, stats };
   }
 
   for (const part of partInfos) {
     const entry = byFileName.get(part.fileName.toLowerCase());
-    if (!entry) {
+    if (entry) {
+      const partTextures = mergeTextureCanvases(mergedTextures, loadTextureCanvases(entry.meshNode.children));
+      const meshData = buildPolyMeshData(entry.meshNode.children, partTextures, part.objectName);
+      const meshGroup = createThreePolyMesh(meshData, {
+        flipV: true,
+        vertexColors: true,
+        textureResolver: createTextureResolver(partTextures),
+      });
+
+      meshGroup.name = part.objectName;
+      meshGroup.userData.fileName = part.fileName;
+      meshGroup.userData.partName = part.objectName;
+      byPartName.set(part.objectName, meshGroup);
+      mergedTextures = mergeTextureCanvases(mergedTextures, partTextures);
+      stats.vertices += meshData.objectVertexList.length;
+      stats.faces += meshData.faceGroups.reduce((total, group) => total + group.faceCnt, 0);
+      stats.materials += meshData.materialList.length;
       continue;
     }
 
-    const partTextures = mergeTextureCanvases(mergedTextures, loadTextureCanvases(entry.meshNode.children));
-    const meshData = buildPolyMeshData(entry.meshNode.children, partTextures, part.objectName);
-    const meshGroup = createThreePolyMesh(meshData, {
-      flipV: true,
-      vertexColors: true,
-      textureResolver: createTextureResolver(partTextures),
-    });
-
-    meshGroup.name = part.objectName;
-    meshGroup.userData.fileName = part.fileName;
-    meshGroup.userData.partName = part.objectName;
-    byPartName.set(part.objectName, meshGroup);
-    mergedTextures = mergeTextureCanvases(mergedTextures, partTextures);
-    stats.vertices += meshData.objectVertexList.length;
-    stats.faces += meshData.faceGroups.reduce((total, group) => total + group.faceCnt, 0);
-    stats.materials += meshData.materialList.length;
+    const particleEntry = await loadCompoundParticlePart(rootNode, part);
+    if (particleEntry) {
+      const partTextures = mergeTextureCanvases(mergedTextures, loadTextureCanvases(particleEntry.textureChildren));
+      const particleObject = createParticleObject(particleEntry.parameters, partTextures, part.objectName);
+      particleObject.userData.fileName = part.fileName;
+      particleObject.userData.partName = part.objectName;
+      byPartName.set(part.objectName, particleObject);
+      mergedTextures = mergeTextureCanvases(mergedTextures, partTextures);
+      stats.particles += 1;
+    }
   }
 
   const childrenByParent = new Map();
@@ -262,6 +317,12 @@ function buildCompoundObject(rootNode, meshEntries, textureCanvases) {
   }
 
   object.userData.compoundJoints = joints;
+  const animationController = createCompoundAnimationController(rootNode, byPartName, joints);
+  if (animationController) {
+    object.userData.animationController = animationController;
+    stats.animations = animationController.clipCount;
+  }
+
   return { object, textureCanvases: mergedTextures, stats };
 }
 
@@ -279,6 +340,301 @@ function readCompoundParts(cmpndNode) {
       index: getInt32(node.children.Index) ?? -1,
     }))
     .filter((part) => part.fileName);
+}
+
+async function loadCompoundParticlePart(rootNode, part) {
+  if (!part.fileName.toLowerCase().endsWith('.pte')) {
+    return null;
+  }
+
+  const embedded = findEmbeddedParticleEntry(rootNode, part.fileName);
+  if (embedded) {
+    return embedded;
+  }
+
+  const url = `../xml_dump/${encodeURIComponent(part.fileName)}.xml`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.warn(`Particle part ${part.fileName} was not embedded and ${url} returned ${response.status}.`);
+      return null;
+    }
+
+    const utfRoot = parseUtfXmlString(await response.text());
+    const particleRoot = findUtfRootNode(utfRoot);
+    return particleRoot?.children ? loadParticleParameters(particleRoot.children) : null;
+  } catch (error) {
+    console.warn(`Could not load particle part ${part.fileName}.`, error);
+    return null;
+  }
+}
+
+function findEmbeddedParticleEntry(rootNode, fileName) {
+  const lowerFileName = fileName.toLowerCase();
+  return findEmbeddedParticleEntries(rootNode).find((entry) =>
+    entry.containerNode.name.toLowerCase() === lowerFileName ||
+    entry.name.toLowerCase() === lowerFileName ||
+    `${entry.name.toLowerCase()}.xml` === `${lowerFileName}.xml`,
+  ) || null;
+}
+
+function findEmbeddedParticleEntries(rootNode) {
+  const entries = [];
+
+  function visit(node, path) {
+    if (!node?.children) {
+      return;
+    }
+
+    try {
+      const particle = loadParticleParameters(node.children);
+      entries.push({
+        name: path || node.name || 'Particle',
+        containerNode: node,
+        parameters: particle.parameters,
+        textureChildren: particle.textureChildren,
+      });
+      return;
+    } catch {
+      // Not a particle node; keep walking.
+    }
+
+    for (const child of Object.values(node.children)) {
+      if (child?.children) {
+        visit(child, [path, child.name].filter(Boolean).join('/'));
+      }
+    }
+  }
+
+  visit(rootNode, rootNode.name === '\\' ? '' : rootNode.name);
+  return entries;
+}
+
+function loadParticleParameters(children) {
+  if (children.ParticleSystemParameters?.value) {
+    return {
+      parameters: parseParticleSystemParameters(children.ParticleSystemParameters.value),
+      textureChildren: children,
+    };
+  }
+
+  const eventChildren = children['Particle Event']?.children;
+  const eventBytes = eventChildren?.['particle1.Def']?.value;
+  if (eventBytes) {
+    return {
+      parameters: parseLegacyEventDef(eventBytes),
+      textureChildren: eventChildren,
+    };
+  }
+
+  throw new Error('No particle parameters found.');
+}
+
+function parseParticleSystemParameters(bytes) {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let offset = 0;
+  const parameters = createDefaultParticleParameters();
+
+  parameters.pspFlags = view.getUint32(offset, true);
+  offset += 4;
+  parameters.colorFrames = [];
+  for (let i = 0; i < PSP_NUM_COLOR_KEYS; i += 1) {
+    parameters.colorFrames.push({
+      r: view.getFloat32(offset, true),
+      g: view.getFloat32(offset + 4, true),
+      b: view.getFloat32(offset + 8, true),
+      a: view.getFloat32(offset + 12, true),
+    });
+    offset += 16;
+  }
+
+  parameters.colorKeyFrameBits = view.getUint32(offset, true);
+  offset += 4;
+  parameters.textureName = readCString(bytes, offset, PSP_TEXTURE_NAME_LEN);
+  offset += PSP_TEXTURE_NAME_LEN;
+  parameters.textureFps = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.srcBlend = view.getUint32(offset, true);
+  offset += 4;
+  parameters.dstBlend = view.getUint32(offset, true);
+  offset += 4;
+  parameters.gravity = readVector3(view, offset);
+  offset += 12;
+  parameters.emitterDirection = readVector3(view, offset);
+  offset += 12;
+  parameters.emitterNozzleSize = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.emitterNozzleDamp = readVector3(view, offset);
+  offset += 12;
+  parameters.initialParticleCount = view.getInt32(offset, true);
+  offset += 4;
+  parameters.maxParticleCount = view.getInt32(offset, true);
+  offset += 4;
+  parameters.lifetime = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.frequency = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.particleLifetime = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.particlePositionRandomizer = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.particleVelocity = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.particleVelocityRandomizer = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.particleTwistVelocity = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.particleSize = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.particleSizeVelocity = view.getFloat32(offset, true);
+  offset += 4;
+  parameters.boundingSphereRadius = view.getFloat32(offset, true);
+  return parameters;
+}
+
+function parseLegacyEventDef(bytes) {
+  if (bytes.byteLength < 176) {
+    throw new Error(`Legacy particle EventDef is too small: ${bytes.byteLength} bytes.`);
+  }
+
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const parameters = createDefaultParticleParameters();
+  const alpha = view.getFloat32(0, true);
+  const alphaDecay = view.getFloat32(4, true);
+  const color = readVector3(view, 16);
+  const colorVelocity = readVector3(view, 40);
+  const frequency = view.getFloat32(52, true);
+  const gravity = view.getFloat32(56, true);
+  const lifetime = view.getInt32(60, true);
+  const maxParticles = view.getInt32(64, true);
+  const nozzle = view.getFloat32(72, true);
+  const nozzleDamp = readVector3(view, 76);
+  const nParticles = view.getFloat32(88, true);
+  const partLife = view.getUint32(92, true);
+  const randPosition = view.getFloat32(100, true);
+  const size = view.getFloat32(104, true);
+  const sizeVelocity = view.getFloat32(108, true);
+  const textureName = readCString(bytes, 116, PSP_TEXTURE_NAME_LEN);
+  const twistSpeed = view.getFloat32(132, true);
+  const velocity = view.getFloat32(140, true);
+  const velocityRand = view.getFloat32(144, true);
+  const dither = view.getUint8(148);
+  const radius = view.getFloat32(152, true);
+  let direction = readVector3(view, 156);
+
+  if (direction.lengthSq() <= 0.000001) {
+    direction = new THREE.Vector3(1, 1, 1);
+  }
+
+  parameters.lifetime = lifetime * 0.001;
+  parameters.frequency = frequency;
+  parameters.initialParticleCount = nParticles;
+  parameters.maxParticleCount = maxParticles;
+  parameters.emitterDirection = direction;
+  parameters.emitterNozzleSize = nozzle;
+  parameters.emitterNozzleDamp = nozzleDamp;
+  parameters.gravity = new THREE.Vector3(0, 0, gravity * 1000);
+  parameters.particleLifetime = partLife * 0.001;
+  parameters.particlePositionRandomizer = randPosition;
+  parameters.particleSize = size;
+  parameters.particleSizeVelocity = sizeVelocity * 1000;
+  parameters.particleTwistVelocity = twistSpeed * 1000;
+  parameters.particleVelocity = velocity * 1000;
+  parameters.particleVelocityRandomizer = velocityRand;
+  parameters.textureName = textureName;
+  parameters.textureFps = view.getFloat32(172, true);
+  parameters.boundingSphereRadius = radius;
+
+  if (dither) {
+    parameters.pspFlags |= PSP_F_RENDER_DITHER;
+  }
+
+  const legacyFlags = view.getUint32(168, true);
+  if (legacyFlags & 1) {
+    parameters.pspFlags |= PSP_F_RELATIVE_VELOCITY;
+  }
+  if (legacyFlags & 2) {
+    parameters.pspFlags |= PSP_F_RELATIVE_TRANSFORM;
+  }
+
+  if (bytes.byteLength >= 204) {
+    const srcBlend = view.getUint32(176, true);
+    const dstBlend = view.getUint32(180, true);
+    const gravityVec = readVector3(view, 184);
+    if (srcBlend > 0) {
+      parameters.srcBlend = srcBlend;
+    }
+    if (dstBlend > 0) {
+      parameters.dstBlend = dstBlend;
+    }
+    parameters.gravity = new THREE.Vector3(gravityVec.x * 1000, gravityVec.y * 1000, (gravityVec.z + gravity) * 1000);
+    if (view.getInt32(196, true)) {
+      parameters.pspFlags |= PSP_F_RENDER_PARTICLE_LIFE;
+    }
+    if (view.getInt32(200, true)) {
+      parameters.pspFlags |= PSP_F_RENDER_FOG;
+    }
+  }
+
+  if (bytes.byteLength >= 720 && view.getUint32(204, true)) {
+    parameters.colorKeyFrameBits = view.getUint32(204, true) | 0x80000001;
+    parameters.colorFrames = [];
+    for (let i = 0; i < PSP_NUM_COLOR_KEYS; i += 1) {
+      parameters.colorFrames.push({
+        r: view.getFloat32(208 + i * 16, true),
+        g: view.getFloat32(212 + i * 16, true),
+        b: view.getFloat32(216 + i * 16, true),
+        a: view.getFloat32(220 + i * 16, true),
+      });
+    }
+  } else if (colorVelocity.lengthSq() > 0) {
+    const durationMs = partLife || lifetime || 1000;
+    const frameStepMs = durationMs / PSP_NUM_COLOR_KEYS;
+    let r = color.x;
+    let g = color.y;
+    let b = color.z;
+    let a = alpha;
+    parameters.colorFrames = [];
+    for (let i = 0; i < PSP_NUM_COLOR_KEYS; i += 1) {
+      parameters.colorFrames.push({ r: clamp(r, 0, 1), g: clamp(g, 0, 1), b: clamp(b, 0, 1), a: clamp(a, 0, 1) });
+      r += frameStepMs * 0.001 * colorVelocity.x;
+      g += frameStepMs * 0.001 * colorVelocity.y;
+      b += frameStepMs * 0.001 * colorVelocity.z;
+      a += frameStepMs * 0.001 * alphaDecay;
+    }
+  } else {
+    parameters.colorFrames = parameters.colorFrames.map(() => ({ r: color.x, g: color.y, b: color.z, a: alpha }));
+  }
+
+  return parameters;
+}
+
+function createDefaultParticleParameters() {
+  return {
+    pspFlags: 0,
+    colorFrames: Array.from({ length: PSP_NUM_COLOR_KEYS }, () => ({ r: 1, g: 1, b: 1, a: 1 })),
+    colorKeyFrameBits: 0x80000001,
+    textureName: '',
+    textureFps: 0,
+    srcBlend: D3DBLEND_ONE,
+    dstBlend: D3DBLEND_ONE,
+    gravity: new THREE.Vector3(),
+    emitterDirection: new THREE.Vector3(1, 1, 1),
+    emitterNozzleSize: 0,
+    emitterNozzleDamp: new THREE.Vector3(),
+    initialParticleCount: 0,
+    maxParticleCount: 0,
+    lifetime: 0,
+    frequency: 0,
+    particleLifetime: 0,
+    particlePositionRandomizer: 0,
+    particleVelocity: 0,
+    particleVelocityRandomizer: 0,
+    particleTwistVelocity: 0,
+    particleSize: 0,
+    particleSizeVelocity: 0,
+    boundingSphereRadius: 0,
+  };
 }
 
 function readCompoundJoints(consNode) {
@@ -393,6 +749,227 @@ function applyJointLocalTransform(object, joint) {
   object.matrixWorldNeedsUpdate = true;
 }
 
+function createCompoundAnimationController(rootNode, byPartName, joints) {
+  const clips = readEmbeddedJointAnimationClips(rootNode.children?.Animation, joints);
+  if (clips.length === 0) {
+    return null;
+  }
+
+  return new CompoundAnimationController(clips, byPartName);
+}
+
+function readEmbeddedJointAnimationClips(animationNode, joints) {
+  const scriptRoot = animationNode?.children?.Script;
+  if (!scriptRoot?.children) {
+    return [];
+  }
+
+  const jointByPair = new Map(joints.map((joint) => [jointKey(joint.parent, joint.child), joint]));
+  const clips = [];
+
+  for (const scriptNode of Object.values(scriptRoot.children)) {
+    if (!scriptNode?.children) {
+      continue;
+    }
+
+    const tracks = [];
+    let duration = 0;
+
+    for (const jointMapNode of Object.values(scriptNode.children)) {
+      if (!jointMapNode?.children || !jointMapNode.name?.startsWith('Joint map')) {
+        continue;
+      }
+
+      const parent = getString(jointMapNode.children['Parent name']);
+      const child = getString(jointMapNode.children['Child name']);
+      const channelNode = jointMapNode.children.Channel;
+      if (!parent || !child || !channelNode?.children) {
+        continue;
+      }
+
+      const channel = readFullTransformChannel(channelNode);
+      const joint = jointByPair.get(jointKey(parent, child));
+      if (!channel || !joint) {
+        continue;
+      }
+
+      tracks.push({ parent, child, joint, channel });
+      duration = Math.max(duration, channel.duration);
+    }
+
+    if (tracks.length > 0 && duration > 0) {
+      clips.push({
+        name: scriptNode.name || `Script ${clips.length + 1}`,
+        duration,
+        tracks,
+      });
+    }
+  }
+
+  return clips;
+}
+
+function readFullTransformChannel(channelNode) {
+  const headerBytes = channelNode.children?.Header?.value;
+  const frameBytes = channelNode.children?.Frames?.value;
+  if (!headerBytes || !frameBytes || headerBytes.byteLength < 12) {
+    return null;
+  }
+
+  const headerView = new DataView(headerBytes.buffer, headerBytes.byteOffset, headerBytes.byteLength);
+  const frameCount = headerView.getUint32(0, true);
+  const captureRate = headerView.getFloat32(4, true);
+  const type = headerView.getUint32(8, true);
+  const hasVector = (type & 2) !== 0;
+  const hasQuaternion = (type & 4) !== 0;
+
+  if (!hasVector || !hasQuaternion || frameCount < 1) {
+    return null;
+  }
+
+  const frameSize = (captureRate < 0 ? 4 : 0) + 12 + 16;
+  if (frameBytes.byteLength < frameSize * frameCount) {
+    return null;
+  }
+
+  const frameView = new DataView(frameBytes.buffer, frameBytes.byteOffset, frameBytes.byteLength);
+  const frames = [];
+
+  for (let i = 0; i < frameCount; i += 1) {
+    const offset = i * frameSize;
+    const dataOffset = captureRate < 0 ? offset + 4 : offset;
+    const time = captureRate < 0 ? frameView.getFloat32(offset, true) : i * captureRate;
+    const position = new THREE.Vector3(
+      frameView.getFloat32(dataOffset, true),
+      frameView.getFloat32(dataOffset + 4, true),
+      frameView.getFloat32(dataOffset + 8, true),
+    );
+    const qw = frameView.getFloat32(dataOffset + 12, true);
+    const qx = frameView.getFloat32(dataOffset + 16, true);
+    const qy = frameView.getFloat32(dataOffset + 20, true);
+    const qz = frameView.getFloat32(dataOffset + 24, true);
+    const rotation = new THREE.Quaternion(qx, qy, qz, qw).normalize();
+
+    frames.push({ time, position, rotation });
+  }
+
+  return {
+    frameCount,
+    captureRate,
+    type,
+    duration: Math.max(0, frames[frames.length - 1].time),
+    frames,
+  };
+}
+
+class CompoundAnimationController {
+  constructor(clips, byPartName) {
+    this.clips = clips;
+    this.byPartName = byPartName;
+    this.activeClip = clips[0];
+    this.clipCount = clips.length;
+    this.time = 0;
+    this.playing = false;
+    this.loop = true;
+  }
+
+  play() {
+    this.playing = true;
+  }
+
+  stop() {
+    this.playing = false;
+  }
+
+  restart() {
+    this.time = 0;
+    this.playing = true;
+    this.apply();
+  }
+
+  update(dt) {
+    if (!this.playing || !this.activeClip) {
+      return;
+    }
+
+    this.time += dt;
+    if (this.activeClip.duration > 0) {
+      if (this.loop) {
+        this.time %= this.activeClip.duration;
+      } else {
+        this.time = Math.min(this.time, this.activeClip.duration);
+      }
+    }
+
+    this.apply();
+  }
+
+  apply() {
+    if (!this.activeClip) {
+      return;
+    }
+
+    for (const track of this.activeClip.tracks) {
+      const object = this.byPartName.get(track.child);
+      if (!object) {
+        continue;
+      }
+
+      const sample = sampleTransformChannel(track.channel, this.time);
+      applyAnimatedJointLocalTransform(object, track.joint, sample);
+    }
+  }
+}
+
+function sampleTransformChannel(channel, time) {
+  const frames = channel.frames;
+  if (frames.length === 1 || time <= frames[0].time) {
+    return frames[0];
+  }
+
+  const last = frames[frames.length - 1];
+  if (time >= last.time) {
+    return last;
+  }
+
+  let nextIndex = 1;
+  while (nextIndex < frames.length && frames[nextIndex].time < time) {
+    nextIndex += 1;
+  }
+
+  const previous = frames[nextIndex - 1];
+  const next = frames[nextIndex];
+  const span = Math.max(next.time - previous.time, 0.000001);
+  const ratio = (time - previous.time) / span;
+
+  return {
+    time,
+    position: previous.position.clone().lerp(next.position, ratio),
+    rotation: previous.rotation.clone().slerp(next.rotation, ratio),
+  };
+}
+
+function applyAnimatedJointLocalTransform(object, joint, sample) {
+  const relOrientation = matrix4FromMatrix3(joint.relOrientation);
+  const rotation = new THREE.Matrix4().makeRotationFromQuaternion(sample.rotation).multiply(relOrientation);
+
+  if (joint.type === 'revolute' || joint.type === 'prismatic' || joint.type === 'spherical') {
+    const childPoint = joint.childPoint.clone().applyMatrix4(rotation);
+    const translation = joint.parentPoint.clone().add(sample.position).sub(childPoint);
+    object.matrix.copy(matrix4FromRotationMatrixTranslation(rotation, translation));
+  } else {
+    const translation = joint.relPosition.clone().add(sample.position);
+    object.matrix.copy(matrix4FromRotationMatrixTranslation(rotation, translation));
+  }
+
+  object.matrixAutoUpdate = false;
+  object.matrixWorldNeedsUpdate = true;
+}
+
+function jointKey(parent, child) {
+  return `${parent}\n${child}`;
+}
+
 function readFixedString(view, offset, maxLength) {
   const bytes = new Uint8Array(view.buffer, view.byteOffset + offset, maxLength);
   let end = 0;
@@ -402,6 +979,15 @@ function readFixedString(view, offset, maxLength) {
   }
 
   return new TextDecoder('ascii').decode(bytes.slice(0, end));
+}
+
+function readCString(bytes, offset, maxLength) {
+  let end = offset;
+  const limit = offset + maxLength;
+  while (end < limit && bytes[end] !== 0) {
+    end += 1;
+  }
+  return new TextDecoder('ascii').decode(bytes.slice(offset, end));
 }
 
 function readVector3(view, offset) {
@@ -442,6 +1028,12 @@ function matrix4FromRotationTranslation(matrix, translation) {
     matrix.e20, matrix.e21, matrix.e22, translation.z,
     0, 0, 0, 1,
   );
+}
+
+function matrix4FromRotationMatrixTranslation(rotation, translation) {
+  const out = rotation.clone();
+  out.setPosition(translation);
+  return out;
 }
 
 function buildShieldMesh(root, name) {
@@ -749,6 +1341,291 @@ function createTextureResolver(textureCanvases) {
   };
 }
 
+function createParticleObject(parameters, textureCanvases, name) {
+  const textureCanvas = findTextureCanvas(textureCanvases, parameters.textureName);
+  const preview = new ParticlePreview(parameters, textureCanvas);
+  preview.points.name = name;
+  preview.points.userData.particlePreview = preview;
+  return preview.points;
+}
+
+class ParticlePreview {
+  constructor(parameters, textureCanvas) {
+    this.parameters = parameters;
+    this.particles = [];
+    this.spawnAccumulator = Math.max(0, parameters.initialParticleCount);
+    this.createdParticles = 0;
+    this.elapsed = 0;
+    this.emitterLifetime = parameters.lifetime;
+    this.maxParticles = computeMaxParticles(parameters);
+    this.positions = new Float32Array(this.maxParticles * 3);
+    this.colors = new Float32Array(this.maxParticles * 4);
+    this.sizes = new Float32Array(this.maxParticles);
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3).setUsage(THREE.DynamicDrawUsage));
+    this.geometry.setAttribute('particleColor', new THREE.BufferAttribute(this.colors, 4).setUsage(THREE.DynamicDrawUsage));
+    this.geometry.setAttribute('particleSize', new THREE.BufferAttribute(this.sizes, 1).setUsage(THREE.DynamicDrawUsage));
+    this.geometry.setDrawRange(0, 0);
+    this.texture = makeParticleTexture(textureCanvas);
+    this.material = makeParticleMaterial(this.texture, parameters);
+    this.points = new THREE.Points(this.geometry, this.material);
+    this.points.frustumCulled = false;
+    this.restart();
+  }
+
+  restart() {
+    this.particles.length = 0;
+    this.spawnAccumulator = Math.max(0, this.parameters.initialParticleCount);
+    this.createdParticles = 0;
+    this.elapsed = 0;
+    this.emitterLifetime = this.parameters.lifetime;
+  }
+
+  update(dt) {
+    const p = this.parameters;
+    this.elapsed += dt;
+
+    if (dt > 0 && p.lifetime > 0) {
+      this.emitterLifetime -= dt;
+    }
+
+    for (let i = this.particles.length - 1; i >= 0; i -= 1) {
+      const particle = this.particles[i];
+      updateParticle(particle, p, dt);
+      if (p.particleLifetime > 0 && particle.lifetime <= 0) {
+        this.particles.splice(i, 1);
+      }
+    }
+
+    const canCreate = p.lifetime <= 0 || this.emitterLifetime > 0;
+    if (canCreate) {
+      this.spawnAccumulator += Math.max(0, p.frequency) * dt;
+      let count = Math.floor(this.spawnAccumulator);
+      this.spawnAccumulator -= count;
+
+      if (p.maxParticleCount > 0) {
+        count = Math.min(count, Math.max(0, p.maxParticleCount - this.createdParticles));
+      }
+
+      for (let i = 0; i < count; i += 1) {
+        this.spawnParticle();
+      }
+    }
+
+    this.syncGeometry();
+  }
+
+  spawnParticle() {
+    const p = this.parameters;
+    if (this.particles.length >= this.maxParticles) {
+      this.particles.shift();
+    }
+
+    const direction = makeEmitterDirection(p);
+    const randomVelocity = Math.random() * Math.max(0, p.particleVelocityRandomizer);
+    const velocity = p.particleVelocity + p.particleVelocity * randomVelocity;
+    const position = new THREE.Vector3();
+
+    if (p.particlePositionRandomizer) {
+      position.x += fRand() * p.particlePositionRandomizer;
+      position.y += fRand() * p.particlePositionRandomizer;
+      position.z += fRand() * p.particlePositionRandomizer;
+    }
+
+    this.particles.push({
+      position,
+      direction,
+      velocity,
+      size: p.particleSize,
+      lifetime: p.particleLifetime,
+      age: 0,
+    });
+    this.createdParticles += 1;
+  }
+
+  syncGeometry() {
+    const count = Math.min(this.particles.length, this.maxParticles);
+    const p = this.parameters;
+
+    for (let i = 0; i < count; i += 1) {
+      const particle = this.particles[i];
+      const color = particleColor(p, particle);
+      const pi = i * 3;
+      const ci = i * 4;
+      this.positions[pi] = particle.position.x;
+      this.positions[pi + 1] = particle.position.y;
+      this.positions[pi + 2] = particle.position.z;
+      this.colors[ci] = color.r;
+      this.colors[ci + 1] = color.g;
+      this.colors[ci + 2] = color.b;
+      this.colors[ci + 3] = color.a;
+      this.sizes[i] = Math.max(0.01, particle.size);
+    }
+
+    this.geometry.setDrawRange(0, count);
+    this.geometry.attributes.position.needsUpdate = true;
+    this.geometry.attributes.particleColor.needsUpdate = true;
+    this.geometry.attributes.particleSize.needsUpdate = true;
+  }
+}
+
+function updateParticle(particle, parameters, dt) {
+  if (parameters.particleTwistVelocity !== 0) {
+    const twist = parameters.particleTwistVelocity * dt;
+    particle.direction.x -= particle.direction.y * twist;
+    particle.direction.y += particle.direction.x * twist;
+    particle.direction.normalize();
+  }
+
+  if (parameters.particleSizeVelocity) {
+    particle.size += parameters.particleSizeVelocity * dt;
+  }
+
+  particle.direction.x += parameters.gravity.x * dt;
+  particle.direction.y += parameters.gravity.y * dt;
+  particle.direction.z += parameters.gravity.z * dt;
+  particle.position.addScaledVector(particle.direction, particle.velocity * dt);
+  particle.lifetime -= dt;
+  particle.age += dt;
+}
+
+function makeEmitterDirection(parameters) {
+  const damp = parameters.emitterNozzleDamp;
+  const degenerateDamp = damp.lengthSq() === 0;
+  const direction = parameters.emitterDirection.clone();
+
+  if (degenerateDamp) {
+    return direction.lengthSq() > 0 ? direction.normalize() : new THREE.Vector3(0, 0, 1);
+  }
+
+  direction.multiplyScalar(parameters.emitterNozzleSize);
+  direction.x += fRand() * damp.x;
+  direction.y += fRand() * damp.y;
+  direction.z += fRand() * damp.z;
+  return direction.lengthSq() > 0 ? direction.normalize() : new THREE.Vector3(0, 0, 1);
+}
+
+function particleColor(parameters, particle) {
+  const frameMax = PSP_NUM_COLOR_KEYS - 1;
+  const life = parameters.particleLifetime > 0 ? parameters.particleLifetime : Math.max(1, particle.age + particle.lifetime);
+  const t = clamp(particle.age / life, 0, 1);
+  const frame = t * frameMax;
+  const i0 = Math.min(frameMax, Math.floor(frame));
+  const i1 = Math.min(frameMax, i0 + 1);
+  const mix = frame - i0;
+  const c0 = parameters.colorFrames[i0];
+  const c1 = parameters.colorFrames[i1];
+
+  return {
+    r: lerp(c0.r, c1.r, mix),
+    g: lerp(c0.g, c1.g, mix),
+    b: lerp(c0.b, c1.b, mix),
+    a: lerp(c0.a, c1.a, mix),
+  };
+}
+
+function makeParticleTexture(textureCanvas) {
+  if (textureCanvas) {
+    const texture = new THREE.CanvasTexture(textureCanvas);
+    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.generateMipmaps = true;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }
+
+  const canvasTexture = document.createElement('canvas');
+  canvasTexture.width = 32;
+  canvasTexture.height = 32;
+  const ctx = canvasTexture.getContext('2d');
+  const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.55, 'rgba(255,255,255,0.7)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 32, 32);
+  return new THREE.CanvasTexture(canvasTexture);
+}
+
+function makeParticleMaterial(texture, parameters) {
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      pointTexture: { value: texture },
+    },
+    vertexShader: `
+      attribute vec4 particleColor;
+      attribute float particleSize;
+      varying vec4 vColor;
+
+      void main() {
+        vColor = particleColor;
+        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = max(1.0, particleSize * (300.0 / max(1.0, -mvPosition.z)));
+        gl_Position = projectionMatrix * mvPosition;
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D pointTexture;
+      varying vec4 vColor;
+
+      void main() {
+        vec4 texel = texture2D(pointTexture, gl_PointCoord);
+        gl_FragColor = vec4(texel.rgb * vColor.rgb, texel.a);
+        if (texel.a <= 0.01) {
+          discard;
+        }
+      }
+    `,
+    transparent: true,
+    depthWrite: false,
+  });
+
+  applyParticleBlendMode(material, parameters);
+  return material;
+}
+
+function applyParticleBlendMode(material, parameters) {
+  if (parameters.srcBlend === D3DBLEND_ONE && parameters.dstBlend === D3DBLEND_ONE) {
+    material.blending = THREE.CustomBlending;
+    material.blendEquation = THREE.AddEquation;
+    material.blendSrc = THREE.OneFactor;
+    material.blendDst = THREE.OneFactor;
+    material.blendSrcAlpha = THREE.OneFactor;
+    material.blendDstAlpha = THREE.OneFactor;
+    return;
+  }
+
+  if (parameters.srcBlend === D3DBLEND_SRCALPHA && parameters.dstBlend === D3DBLEND_INVSRCALPHA) {
+    material.blending = THREE.NormalBlending;
+    return;
+  }
+
+  if (parameters.srcBlend === D3DBLEND_ONE && parameters.dstBlend === D3DBLEND_ZERO) {
+    material.blending = THREE.NoBlending;
+    return;
+  }
+
+  material.blending = THREE.AdditiveBlending;
+}
+
+function computeMaxParticles(parameters) {
+  let maxPossible;
+
+  if (parameters.particleLifetime > 0) {
+    maxPossible = 1.25 * parameters.frequency * parameters.particleLifetime + parameters.initialParticleCount;
+  } else if (parameters.lifetime > 0) {
+    maxPossible = 1.25 * (1 + parameters.frequency) + parameters.initialParticleCount;
+  } else {
+    maxPossible = 128 + parameters.initialParticleCount;
+  }
+
+  if (parameters.maxParticleCount > 0) {
+    maxPossible = Math.min(maxPossible, parameters.maxParticleCount);
+  }
+
+  return Math.max(16, Math.min(20000, Math.ceil(maxPossible)));
+}
+
 function setActiveMesh(mesh, textureCanvases) {
   if (activeMesh) {
     scene.remove(activeMesh);
@@ -757,7 +1634,20 @@ function setActiveMesh(mesh, textureCanvases) {
 
   activeMesh = mesh;
   activeTextureCanvases = textureCanvases;
+  activeParticleSystems = collectParticleSystems(activeMesh);
+  activeAnimationController = activeMesh.userData?.animationController || null;
+  updateAnimationButtons();
   scene.add(activeMesh);
+}
+
+function collectParticleSystems(root) {
+  const systems = [];
+  root.traverse((object) => {
+    if (object.userData?.particlePreview) {
+      systems.push(object.userData.particlePreview);
+    }
+  });
+  return systems;
 }
 
 function frameActiveMesh() {
@@ -863,6 +1753,18 @@ function resizeRenderer() {
 
 function animate() {
   animationFrame = requestAnimationFrame(animate);
+  const now = performance.now();
+  const dt = Math.min(0.05, Math.max(0, (now - lastTime) / 1000));
+  lastTime = now;
+
+  for (const particleSystem of activeParticleSystems) {
+    particleSystem.update(dt);
+  }
+
+  if (activeAnimationController) {
+    activeAnimationController.update(dt);
+  }
+
   renderer.render(scene, camera);
 }
 
@@ -879,7 +1781,16 @@ function setWireframe(enabled) {
 }
 
 function updateStats(stats, textureCanvases) {
-  statsLine.textContent = `${stats.vertices} vertices | ${stats.faces} faces | ${stats.materials} materials | ${textureCanvases.size} textures`;
+  const particleText = stats.particles ? ` | ${stats.particles} particle systems` : '';
+  const animationText = stats.animations ? ` | ${stats.animations} animation clips` : '';
+  statsLine.textContent = `${stats.vertices} vertices | ${stats.faces} faces | ${stats.materials} materials | ${textureCanvases.size} textures${particleText}${animationText}`;
+}
+
+function updateAnimationButtons() {
+  const hasAnimation = Boolean(activeAnimationController);
+  animStartButton.disabled = !hasAnimation || activeAnimationController.playing;
+  animStopButton.disabled = !hasAnimation || !activeAnimationController.playing;
+  animRestartButton.disabled = !hasAnimation;
 }
 
 function setStatus(message, isError = false) {
@@ -1176,6 +2087,14 @@ function disposeObject(root) {
 
 function naturalSort(a, b) {
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+}
+
+function fRand() {
+  return Math.random() * 2 - 1;
+}
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
 }
 
 function clamp(value, min, max) {

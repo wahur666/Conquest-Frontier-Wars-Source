@@ -75,6 +75,15 @@
         background: #2d3542;
       }
 
+      button:disabled {
+        cursor: default;
+        opacity: 0.45;
+      }
+
+      button:disabled:hover {
+        background: #242a34;
+      }
+
       label.toggle {
         display: inline-flex;
         align-items: center;
@@ -166,6 +175,9 @@
         <input id="utf-file" type="file" accept=".utf,.cmp,.3db,.cmp.xml,.3db.xml,.shield,.shield.xml*/*" hidden>
         <button id="open-file" type="button">Open UTF File</button>
         <button id="reset-view" type="button">Reset View</button>
+        <button id="anim-start" type="button" disabled>Start</button>
+        <button id="anim-stop" type="button" disabled>Stop</button>
+        <button id="anim-restart" type="button" disabled>Restart</button>
         <label class="toggle">
           <input id="wireframe" type="checkbox">
           Wireframe
