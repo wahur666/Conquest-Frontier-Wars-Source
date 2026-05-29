@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://gk28nu2cc3mh"]
+
+[ext_resource type="Script" uid="uid://fb6rjlxi2t72" path="res://cfw_unified_particle/CFWUnifiedParticlePlayer.gd" id="1_script"]
+
+[node name="CFWUnifiedParticlePlayer" type="Node3D" unique_id=1777886940]
+script = ExtResource("1_script")
+
+[node name="Particles" type="MultiMeshInstance3D" parent="." unique_id=124172464]
+custom_aabb = AABB(-10000, -10000, -10000, 20000, 20000, 20000)

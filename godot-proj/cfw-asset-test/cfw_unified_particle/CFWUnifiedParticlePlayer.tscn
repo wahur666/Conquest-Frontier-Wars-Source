@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://gk28nu2cc3mh"]
+
+[ext_resource type="Script" uid="uid://fb6rjlxi2t72" path="res://cfw_unified_particle/CFWUnifiedParticlePlayer.gd" id="1_script"]
+
+[sub_resource type="Shader" id="Shader_okinn"]
+code = "
+shader_type spatial;
+render_mode unshaded, cull_disabled, depth_draw_never, blend_add;
+
+uniform sampler2D mask_texture : source_color;
+uniform bool has_texture = false;
+
+void fragment() {
+	vec4 mask = has_texture ? texture(mask_texture, UV) : vec4(1.0);
+	float shape = max(max(mask.r, mask.g), mask.b);
+	ALBEDO = COLOR.rgb * shape;
+	ALPHA = COLOR.a * shape;
+}
+"
+
+[sub_resource type="Image" id="Image_6bwvc"]
+data = {
+"data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 42, 255, 255, 255, 69, 255, 255, 255, 69, 255, 255, 255, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 42, 255, 255, 255, 100, 255, 255, 255, 139, 255, 255, 255, 139, 255, 255, 255, 100, 255, 255, 255, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 69, 255, 255, 255, 139, 255, 255, 255, 203, 255, 255, 255, 203, 255, 255, 255, 139, 255, 255, 255, 69, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 69, 255, 255, 255, 139, 255, 255, 255, 203, 255, 255, 255, 203, 255, 255, 255, 139, 255, 255, 255, 69, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 42, 255, 255, 255, 100, 255, 255, 255, 139, 255, 255, 255, 139, 255, 255, 255, 100, 255, 255, 255, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 42, 255, 255, 255, 69, 255, 255, 255, 69, 255, 255, 255, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
+"format": "RGBA8",
+"height": 8,
+"mipmaps": false,
+"width": 8
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_jo0fl"]
+image = SubResource("Image_6bwvc")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8do7d"]
+render_priority = 0
+shader = SubResource("Shader_okinn")
+shader_parameter/mask_texture = SubResource("ImageTexture_jo0fl")
+shader_parameter/has_texture = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_0rbn0"]
+material = SubResource("ShaderMaterial_8do7d")
+
+[sub_resource type="MultiMesh" id="MultiMesh_q2ca3"]
+transform_format = 1
+use_colors = true
+instance_count = 1
+visible_instance_count = 0
+mesh = SubResource("QuadMesh_0rbn0")
+buffer = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+[node name="CFWUnifiedParticlePlayer" type="Node3D" unique_id=1777886940]
+script = ExtResource("1_script")
+
+[node name="Particles" type="MultiMeshInstance3D" parent="." unique_id=124172464]
+custom_aabb = AABB(-10000, -10000, -10000, 20000, 20000, 20000)
+multimesh = SubResource("MultiMesh_q2ca3")

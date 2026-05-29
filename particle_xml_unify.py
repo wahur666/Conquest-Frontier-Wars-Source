@@ -47,7 +47,7 @@ def main() -> int:
     parser.add_argument(
         "--no-assets",
         action="store_true",
-        help="Do not copy the original Texture library subtree into the unified XML.",
+        help="Do not embed the decoded particle texture image into the unified XML.",
     )
     args = parser.parse_args()
 
@@ -96,8 +96,10 @@ def convert_file(path: Path, out_dir: Path, include_assets: bool, overwrite: boo
     output_root = build_unified_xml(path, source_root, parameters, source_format, source_notes)
 
     if include_assets and texture_library is not None:
-        assets = ET.SubElement(output_root, "embeddedAssets")
-        assets.append(copy.deepcopy(texture_library))
+        texture = decode_texture_library(texture_library, parameters["textureName"])
+        if texture is None:
+            raise ValueError("could not decode embedded particle texture")
+        add_embedded_image(output_root, texture)
 
     indent(output_root)
     output_path = out_dir / f"{path.stem}.unified.xml"
@@ -111,13 +113,19 @@ def convert_file(path: Path, out_dir: Path, include_assets: bool, overwrite: boo
 def parse_particle_root(root: ET.Element) -> tuple[dict, str, ET.Element | None, dict] | None:
     modern = find_child(root, "file", "ParticleSystemParameters")
     if modern is not None and modern.text:
-        parameters = parse_particle_system_parameters(decode_file(modern))
+        data = decode_file(modern)
+        if len(data) < 636:
+            return None
+        parameters = parse_particle_system_parameters(data)
         return parameters, "ParticleSystemParameters", find_child(root, "dir", "Texture library"), {}
 
     event_dir = find_child(root, "dir", "Particle Event")
     event_file = find_child(event_dir, "file", "particle1.Def") if event_dir is not None else None
     if event_file is not None and event_file.text:
-        parameters = parse_legacy_event_def(decode_file(event_file))
+        data = decode_file(event_file)
+        if len(data) < 176:
+            return None
+        parameters = parse_legacy_event_def(data)
         source_notes = read_legacy_notes(event_dir)
         return parameters, "Particle Event/EventDef", find_child(event_dir, "dir", "Texture library"), source_notes
 
@@ -148,7 +156,6 @@ def build_unified_xml(
             ET.SubElement(notes, "value", {"name": key, "value": fmt(value)})
 
     params = ET.SubElement(root, "parameters")
-    add_flags(params, p["pspFlags"])
     ET.SubElement(
         params,
         "rendering",
@@ -208,21 +215,240 @@ def build_unified_xml(
     return root
 
 
-def add_flags(parent: ET.Element, flags_value: int) -> None:
-    flags = ET.SubElement(parent, "flags", {"value": f"0x{flags_value:08x}"})
-    for name, bit in [
-        ("relativeTransform", PSP_F_RELATIVE_TRANSFORM),
-        ("relativeVelocity", PSP_F_RELATIVE_VELOCITY),
-        ("ignoreOrientation", PSP_F_IGNORE_ORIENTATION),
-        ("renderParticleLife", PSP_F_RENDER_PARTICLE_LIFE),
-        ("renderDither", PSP_F_RENDER_DITHER),
-        ("renderFog", PSP_F_RENDER_FOG),
-    ]:
-        ET.SubElement(flags, "flag", {"name": name, "bit": f"0x{bit:08x}", "value": bool_text(flags_value & bit)})
-
-
 def add_vector(parent: ET.Element, name: str, vector: dict) -> None:
     ET.SubElement(parent, name, {"x": fmt(vector["x"]), "y": fmt(vector["y"]), "z": fmt(vector["z"])})
+
+
+def add_embedded_image(parent: ET.Element, texture: dict) -> None:
+    assets = ET.SubElement(parent, "embeddedImages")
+    image = ET.SubElement(
+        assets,
+        "image",
+        {
+            "name": texture["name"],
+            "format": "bmp",
+            "encoding": "base64",
+            "width": str(texture["width"]),
+            "height": str(texture["height"]),
+            "channels": "rgba",
+            "alpha": texture["alpha"],
+        },
+    )
+    data = ET.SubElement(image, "file", {"name": "Image BMP"})
+    data.text = base64.b64encode(encode_bmp32(texture["width"], texture["height"], texture["rgba"])).decode("ascii")
+
+
+def decode_texture_library(texture_library: ET.Element, texture_name: str) -> dict | None:
+    textures = [child for child in list(texture_library) if child.tag == "dir"]
+    if not textures:
+        return None
+
+    chosen = choose_texture(textures, texture_name)
+    width = bytes_i32(find_texture_file(chosen, "Image X size") or b"")
+    height = bytes_i32(find_texture_file(chosen, "Image Y size") or b"")
+    if width <= 0 or height <= 0:
+        return None
+
+    format_node = find_texture_format_node(chosen)
+    if format_node is None:
+        return None
+
+    format_name = format_node.get("name", "")
+    data_node = find_child(format_node, "dir", "MIP0") or format_node
+    palette = find_texture_file(format_node, "Palette RGB 888") or find_texture_file(data_node, "Palette RGB 888")
+    indices = find_texture_file(data_node, "Image indices")
+    colors = find_texture_file(data_node, "Image colors")
+    alpha = find_texture_file(data_node, "Alpha 8 bit") or find_texture_file(data_node, "Image Alpha 8 bit")
+
+    rgba = None
+    alpha_mode = "source" if alpha else "luminance"
+    if is_indexed_texture_format(format_name) and palette and indices:
+        rgba = palette8_to_rgba(indices, palette, width, height, alpha)
+    elif format_name.lower() == "true rgb 565" and colors:
+        rgba = rgb565_to_rgba(colors, alpha, width, height)
+    elif format_name.lower() == "true 8 bit" and colors:
+        rgba = true8_to_rgba(colors, alpha, width, height)
+    elif format_name.startswith("Format_TRUE_") and colors:
+        rgba = format_true_to_rgba(format_name, colors, alpha, width, height)
+
+    if rgba is None:
+        return None
+
+    return {
+        "name": chosen.get("name", texture_name or "particle_texture.bmp"),
+        "width": width,
+        "height": height,
+        "rgba": rgba,
+        "alpha": alpha_mode,
+    }
+
+
+def choose_texture(textures: list[ET.Element], texture_name: str) -> ET.Element:
+    wanted = (texture_name or "").lower()
+    wanted_stem = Path(wanted).stem
+    for texture in textures:
+        name = (texture.get("name", "") or "").lower()
+        if name == wanted or Path(name).stem == wanted_stem:
+            return texture
+    return textures[0]
+
+
+def find_texture_format_node(node: ET.Element | None) -> ET.Element | None:
+    if node is None:
+        return None
+
+    name = node.get("name", "")
+    lower = name.lower()
+    if lower in {"palette 8 bit", "true rgb 565", "true 8 bit"} or name.startswith("Format_"):
+        return node
+
+    for child in list(node):
+        if child.tag != "dir":
+            continue
+        found = find_texture_format_node(child)
+        if found is not None:
+            return found
+    return None
+
+
+def find_texture_file(node: ET.Element | None, file_name: str) -> bytes | None:
+    if node is None:
+        return None
+
+    for child in list(node):
+        if child.tag == "file" and child.get("name", "").lower() == file_name.lower() and child.text:
+            return base64.b64decode("".join(child.text.split()))
+
+    for child in list(node):
+        if child.tag == "dir":
+            found = find_texture_file(child, file_name)
+            if found is not None:
+                return found
+    return None
+
+
+def palette8_to_rgba(indices: bytes, palette: bytes, width: int, height: int, alpha: bytes | None) -> bytes:
+    out = bytearray(width * height * 4)
+    pixel_count = min(len(indices), width * height)
+    for i in range(pixel_count):
+        p = indices[i] * 3
+        r = palette[p] if p < len(palette) else 0
+        g = palette[p + 1] if p + 1 < len(palette) else 0
+        b = palette[p + 2] if p + 2 < len(palette) else 0
+        a = alpha[i] if alpha and i < len(alpha) else max(r, g, b)
+        write_rgba(out, i, r, g, b, a)
+    return bytes(out)
+
+
+def rgb565_to_rgba(colors: bytes, alpha: bytes | None, width: int, height: int) -> bytes:
+    out = bytearray(width * height * 4)
+    pixel_count = min(len(colors) // 2, width * height)
+    for i in range(pixel_count):
+        value = struct.unpack_from("<H", colors, i * 2)[0]
+        r = round(((value >> 11) & 0x1F) * 255 / 31)
+        g = round(((value >> 5) & 0x3F) * 255 / 63)
+        b = round((value & 0x1F) * 255 / 31)
+        a = alpha[i] if alpha and i < len(alpha) else max(r, g, b)
+        write_rgba(out, i, r, g, b, a)
+    return bytes(out)
+
+
+def true8_to_rgba(colors: bytes, alpha: bytes | None, width: int, height: int) -> bytes:
+    out = bytearray(width * height * 4)
+    pixel_count = min(len(colors), width * height)
+    for i in range(pixel_count):
+        value = colors[i]
+        a = alpha[i] if alpha and i < len(alpha) else value
+        write_rgba(out, i, value, value, value, a)
+    return bytes(out)
+
+
+def format_true_to_rgba(format_name: str, colors: bytes, alpha: bytes | None, width: int, height: int) -> bytes | None:
+    bits = parse_format_true_bits(format_name)
+    if bits is None:
+        return None
+
+    r_bits, g_bits, b_bits, a_bits = bits
+    bits_per_pixel = r_bits + g_bits + b_bits + a_bits
+    bytes_per_pixel = math.ceil(bits_per_pixel / 8)
+    out = bytearray(width * height * 4)
+    pixel_count = min(len(colors) // bytes_per_pixel, width * height)
+
+    for i in range(pixel_count):
+        value = int.from_bytes(colors[i * bytes_per_pixel : (i + 1) * bytes_per_pixel], "little")
+        b_mask = (1 << b_bits) - 1
+        g_mask = (1 << g_bits) - 1
+        r_mask = (1 << r_bits) - 1
+        a_mask = (1 << a_bits) - 1 if a_bits else 0
+        b = value & b_mask if b_bits else 0
+        g = (value >> b_bits) & g_mask if g_bits else 0
+        r = (value >> (b_bits + g_bits)) & r_mask if r_bits else 0
+        embedded_alpha = (value >> (b_bits + g_bits + r_bits)) & a_mask if a_bits else None
+        rr = expand_bits(r, r_bits)
+        gg = expand_bits(g, g_bits)
+        bb = expand_bits(b, b_bits)
+        aa = alpha[i] if alpha and i < len(alpha) else (expand_bits(embedded_alpha, a_bits) if embedded_alpha is not None else max(rr, gg, bb))
+        write_rgba(out, i, rr, gg, bb, aa)
+    return bytes(out)
+
+
+def parse_format_true_bits(format_name: str) -> tuple[int, int, int, int] | None:
+    try:
+        parts = [int(part) for part in format_name.replace("Format_TRUE_", "").split("_") if part]
+    except ValueError:
+        return None
+    if not parts:
+        return None
+    component_count = parts[0]
+    sizes = parts[1 : 1 + component_count]
+    if len(sizes) < component_count:
+        return None
+    if component_count == 2:
+        return sizes[0], 0, 0, sizes[1]
+    return (
+        sizes[0] if len(sizes) > 0 else 0,
+        sizes[1] if len(sizes) > 1 else 0,
+        sizes[2] if len(sizes) > 2 else 0,
+        sizes[3] if len(sizes) > 3 else 0,
+    )
+
+
+def is_indexed_texture_format(format_name: str) -> bool:
+    lower = format_name.lower()
+    return lower == "palette 8 bit" or format_name.startswith("Format_PAL8")
+
+
+def expand_bits(value: int | None, bits: int) -> int:
+    if not value or not bits:
+        return 0
+    return round(value * 255 / ((1 << bits) - 1))
+
+
+def write_rgba(out: bytearray, index: int, r: int, g: int, b: int, a: int) -> None:
+    offset = index * 4
+    out[offset] = clamp_byte(r)
+    out[offset + 1] = clamp_byte(g)
+    out[offset + 2] = clamp_byte(b)
+    out[offset + 3] = clamp_byte(a)
+
+
+def clamp_byte(value: int) -> int:
+    return max(0, min(255, int(value)))
+
+
+def encode_bmp32(width: int, height: int, rgba: bytes) -> bytes:
+    row_size = width * 4
+    pixel_data_size = row_size * height
+    file_size = 14 + 40 + pixel_data_size
+    out = bytearray()
+    out.extend(b"BM")
+    out.extend(struct.pack("<IHHI", file_size, 0, 0, 54))
+    out.extend(struct.pack("<IiiHHIIiiII", 40, width, height, 1, 32, 0, pixel_data_size, 2835, 2835, 0, 0))
+    for y in range(height - 1, -1, -1):
+        for x in range(width):
+            i = (y * width + x) * 4
+            out.extend((rgba[i + 2], rgba[i + 1], rgba[i], rgba[i + 3]))
+    return bytes(out)
 
 
 def parse_particle_system_parameters(data: bytes) -> dict:
@@ -431,6 +657,12 @@ def i32(data: bytes, offset: int) -> int:
 
 def u32(data: bytes, offset: int) -> int:
     return struct.unpack_from("<I", data, offset)[0]
+
+
+def bytes_i32(data: bytes) -> int:
+    if len(data) < 4:
+        return 0
+    return struct.unpack_from("<i", data, 0)[0]
 
 
 def vec3(data: bytes, offset: int) -> dict:

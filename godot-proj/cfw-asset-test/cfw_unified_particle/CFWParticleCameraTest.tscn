@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://p3bk8ohu5nur"]
+
+[ext_resource type="Script" uid="uid://bkjb2c5kmw3w7" path="res://cfw_unified_particle/CFWParticleCameraRig.gd" id="1_camera_rig"]
+[ext_resource type="PackedScene" uid="uid://gk28nu2cc3mh" path="res://cfw_unified_particle/CFWUnifiedParticlePlayer.tscn" id="2_qoj8x"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_center"]
+radius = 0.08
+height = 0.16
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(40, 40)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.08, 0.09, 0.085, 1)
+
+[node name="CFWParticleCameraTest" type="Node3D" unique_id=1712776952]
+script = ExtResource("1_camera_rig")
+
+[node name="Target" type="Node3D" parent="." unique_id=1992234791]
+
+[node name="EffectSlot" type="Node3D" parent="." unique_id=1250156289]
+
+[node name="CenterMarker" type="MeshInstance3D" parent="." unique_id=285595672]
+visible = false
+mesh = SubResource("SphereMesh_center")
+
+[node name="Ground" type="MeshInstance3D" parent="." unique_id=1786484829]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0)
+visible = false
+mesh = SubResource("PlaneMesh_ground")
+surface_material_override/0 = SubResource("StandardMaterial3D_ground")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=539984661]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 8, 0)
+light_energy = 0.5
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1161059687]
+current = true
+fov = 45.0
+
+[node name="CFWUnifiedParticlePlayer" parent="." unique_id=1777886940 instance=ExtResource("2_qoj8x")]
+unified_xml_file = "res://xml_unified/displacement.pte.unified.xml"
+auto_restart = false
+debug_trace = true
+flags_value = 8
+flag_render_particle_life = true
+render_texture_name = "Test.bmp"
+render_bounding_sphere_radius = 1311.07947
+decoded_texture_size = Vector2i(64, 64)
+emitter_frequency = 4.1999998099999996
+emitter_nozzle_size = 0.100000001
+emitter_direction = Vector3(0, 0, 1)
+emitter_nozzle_damp = Vector3(0, 1, 1)
+particle_lifetime = 1.29999995
+particle_position_randomizer = 0.699999988
+particle_velocity = 41.382
+particle_size = 1000.0
+particle_size_velocity = -12.3000002
+particle_gravity = Vector3(0, 0.1, -24.5)
+color_frames = Array[Color]([Color(0.10980393, 0.69803923, 0.8000001, 0.49803925), Color(0.107269935, 0.6762799, 0.77452123, 0.4981025), Color(0.10473593, 0.6545206, 0.7490424, 0.49816576), Color(0.10220194, 0.63276124, 0.72356355, 0.498229), Color(0.09966794, 0.6110019, 0.6980848, 0.49829224), Color(0.09713394, 0.5892426, 0.67260593, 0.4983555), Color(0.09459994, 0.5674832, 0.6471271, 0.49841875), Color(0.092065945, 0.54572386, 0.62164825, 0.498482), Color(0.08953195, 0.5239645, 0.5961694, 0.49854526), Color(0.08699795, 0.5022052, 0.5706906, 0.4986085), Color(0.084463954, 0.48044586, 0.5452118, 0.49867174), Color(0.08192995, 0.45868653, 0.51973295, 0.498735), Color(0.07939596, 0.4369272, 0.4942541, 0.49879825), Color(0.07686196, 0.41516784, 0.46877527, 0.4988615), Color(0.07432796, 0.3934085, 0.44329646, 0.49892476), Color(0.071793966, 0.37164918, 0.41781762, 0.498988), Color(0.069259964, 0.34988984, 0.39233878, 0.49905124), Color(0.06672597, 0.3281305, 0.36685997, 0.49911448), Color(0.06419197, 0.30637115, 0.34138113, 0.49917775), Color(0.061657973, 0.28461182, 0.3159023, 0.499241), Color(0.059123974, 0.2628525, 0.29042345, 0.49930423), Color(0.056589976, 0.24109316, 0.26494464, 0.4993675), Color(0.05405598, 0.21933381, 0.2394658, 0.49943075), Color(0.051521983, 0.19757448, 0.21398698, 0.499494), Color(0.048987985, 0.17581514, 0.18850815, 0.49955726), Color(0.046453986, 0.1540558, 0.16302931, 0.4996205), Color(0.043919988, 0.13229647, 0.13755049, 0.49968374), Color(0.04138599, 0.11053713, 0.112071656, 0.499747), Color(0.038851995, 0.088777795, 0.08659282, 0.49981025), Color(0.036317997, 0.06701846, 0.061113995, 0.4998735), Color(0.033784, 0.045259118, 0.035635166, 0.49993676), Color(0.03125, 0.023499781, 0.010156334, 0.5)])

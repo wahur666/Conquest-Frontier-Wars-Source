@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://p3bk8ohu5nur"]
+
+[ext_resource type="Script" uid="uid://bkjb2c5kmw3w7" path="res://cfw_unified_particle/CFWParticleCameraRig.gd" id="1_camera_rig"]
+[ext_resource type="PackedScene" uid="uid://gk28nu2cc3mh" path="res://cfw_unified_particle/CFWUnifiedParticlePlayer.tscn" id="2_qoj8x"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_center"]
+radius = 0.08
+height = 0.16
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(40, 40)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.08, 0.09, 0.085, 1)
+
+[node name="CFWParticleCameraTest" type="Node3D" unique_id=1712776952]
+script = ExtResource("1_camera_rig")
+
+[node name="Target" type="Node3D" parent="." unique_id=1992234791]
+
+[node name="EffectSlot" type="Node3D" parent="." unique_id=1250156289]
+
+[node name="CenterMarker" type="MeshInstance3D" parent="." unique_id=285595672]
+visible = false
+mesh = SubResource("SphereMesh_center")
+
+[node name="Ground" type="MeshInstance3D" parent="." unique_id=1786484829]
+visible = false
+position = Vector3(0, -0.02, 0)
+mesh = SubResource("PlaneMesh_ground")
+surface_material_override/0 = SubResource("StandardMaterial3D_ground")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=539984661]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 8, 0)
+light_energy = 0.5
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1161059687]
+current = true
+fov = 45.0
+
+[node name="CFWUnifiedParticlePlayer" parent="." unique_id=1777886940 instance=ExtResource("2_qoj8x")]
+preview_running = false
