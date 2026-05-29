@@ -4,13 +4,6 @@ extends Node3D
 const CFWUnifiedParticleXml = preload("res://cfw_unified_particle/CFWUnifiedParticleXml.gd")
 const CFWParticleTextureDecoder = preload("res://cfw_unified_particle/CFWParticleTextureDecoder.gd")
 
-const PSP_F_RELATIVE_TRANSFORM := 1 << 0
-const PSP_F_RELATIVE_VELOCITY := 1 << 1
-const PSP_F_IGNORE_ORIENTATION := 1 << 2
-const PSP_F_RENDER_PARTICLE_LIFE := 1 << 3
-const PSP_F_RENDER_DITHER := 1 << 4
-const PSP_F_RENDER_FOG := 1 << 5
-
 const D3DBLEND_ZERO := 1
 const D3DBLEND_ONE := 2
 const D3DBLEND_SRCALPHA := 5
@@ -123,15 +116,6 @@ enum EndBehavior {
 		show_cpu_particles = value
 		if _multimesh_instance:
 			_multimesh_instance.visible = preview_running and value
-
-@export_group("XML Flags")
-@export var flags_value := 0
-@export var flag_relative_transform := false
-@export var flag_relative_velocity := false
-@export var flag_ignore_orientation := false
-@export var flag_render_particle_life := false
-@export var flag_render_dither := false
-@export var flag_render_fog := false
 
 @export_group("XML Rendering")
 @export var render_texture_name := ""
@@ -508,13 +492,6 @@ func _rendering() -> Dictionary:
 
 func _copy_parameters_to_exports() -> void:
 	if parameters.is_empty():
-		flags_value = 0
-		flag_relative_transform = false
-		flag_relative_velocity = false
-		flag_ignore_orientation = false
-		flag_render_particle_life = false
-		flag_render_dither = false
-		flag_render_fog = false
 		render_texture_name = ""
 		render_texture_fps = 0.0
 		render_src_blend = D3DBLEND_ONE
@@ -545,15 +522,6 @@ func _copy_parameters_to_exports() -> void:
 	var runtime: Dictionary = parameters.get("runtime", {})
 	end_behavior = _parse_end_behavior(str(runtime.get("endBehavior", "Legacy Source")))
 	zero_particle_lifetime_seconds = float(runtime.get("zeroParticleLifetimeSeconds", 0.0))
-
-	var flags: Dictionary = parameters.get("flags", {})
-	flags_value = int(flags.get("value", 0))
-	flag_relative_transform = (flags_value & PSP_F_RELATIVE_TRANSFORM) != 0
-	flag_relative_velocity = (flags_value & PSP_F_RELATIVE_VELOCITY) != 0
-	flag_ignore_orientation = (flags_value & PSP_F_IGNORE_ORIENTATION) != 0
-	flag_render_particle_life = (flags_value & PSP_F_RENDER_PARTICLE_LIFE) != 0
-	flag_render_dither = (flags_value & PSP_F_RENDER_DITHER) != 0
-	flag_render_fog = (flags_value & PSP_F_RENDER_FOG) != 0
 
 	var rendering: Dictionary = parameters.get("rendering", {})
 	render_texture_name = str(rendering.get("textureName", ""))
@@ -625,13 +593,6 @@ func _xml_state() -> Dictionary:
 	return {
 		"endBehavior": _end_behavior_name(),
 		"zeroParticleLifetimeSeconds": zero_particle_lifetime_seconds,
-		"flagsValue": flags_value,
-		"relativeTransform": flag_relative_transform,
-		"relativeVelocity": flag_relative_velocity,
-		"ignoreOrientation": flag_ignore_orientation,
-		"renderParticleLife": flag_render_particle_life,
-		"renderDither": flag_render_dither,
-		"renderFog": flag_render_fog,
 		"textureName": render_texture_name,
 		"textureFps": render_texture_fps,
 		"srcBlend": render_src_blend,

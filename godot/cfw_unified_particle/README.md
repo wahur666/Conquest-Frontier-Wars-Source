@@ -58,18 +58,6 @@ Use the `Authoring` controls to preserve tuning decisions:
 - `save_xml_file`: Optional output path for a tuned XML variant.
 - `save_xml`: Writes the current inspector values and authoring metadata to XML while preserving the existing embedded asset section.
 
-### XML Flags
-
-- `flags_value`: Raw legacy flag bitmask.
-- `flag_relative_transform`: Parsed bit `0x1`.
-- `flag_relative_velocity`: Parsed bit `0x2`.
-- `flag_ignore_orientation`: Parsed bit `0x4`.
-- `flag_render_particle_life`: Parsed bit `0x8`.
-- `flag_render_dither`: Parsed bit `0x10`.
-- `flag_render_fog`: Parsed bit `0x20`.
-
-These are currently exposed for inspection. Most are not yet mapped to rendering behavior.
-
 ### XML Rendering
 
 - `render_texture_name`: Texture name referenced by the effect.

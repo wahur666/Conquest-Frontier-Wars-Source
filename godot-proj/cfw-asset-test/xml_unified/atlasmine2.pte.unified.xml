@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <particleEditor format="cfw-unified-particle" version="1" sourceFile="xml_dump\atlasmine2.pte.xml" sourceRoot="atlasmine2.pte" sourceFormat="ParticleSystemParameters">
   <parameters>
+    <runtime endBehavior="Stop At Emitter End" zeroParticleLifetimeSeconds="0" />
     <rendering textureName="cloud_64.bmp" textureFps="10" srcBlend="2" dstBlend="2" boundingSphereRadius="252.285995" />
     <emitter initialParticleCount="59" maxParticleCount="5" lifetime="1" frequency="0" nozzleSize="0">
       <direction x="0" y="0" z="1" />
@@ -23,7 +24,7 @@
       <frame index="10" key="false" r="0.356121898" g="0.388904601" b="0.23753503" a="0" />
       <frame index="11" key="false" r="0.32193017" g="0.378775448" b="0.17815128" a="0" />
       <frame index="12" key="false" r="0.287738442" g="0.368646294" b="0.118767515" a="0" />
-      <frame index="13" key="false" r="0.253546715" g="0.35851714" b="0.0593837574" a="0" />
+      <frame index="13" key="false" r="0.253546715" g="0.35851714" b="0.059383757" a="0" />
       <frame index="14" key="true" r="0.219354972" g="0.348387986" b="0" a="0" />
       <frame index="15" key="false" r="0.206451744" g="0.327894568" b="0" a="0" />
       <frame index="16" key="false" r="0.193548501" g="0.30740115" b="0" a="0" />
@@ -34,13 +35,13 @@
       <frame index="21" key="false" r="0.129032344" g="0.204934105" b="0" a="0" />
       <frame index="22" key="false" r="0.1161291" g="0.184440702" b="0" a="0" />
       <frame index="23" key="false" r="0.103225872" g="0.163947284" b="0" a="0" />
-      <frame index="24" key="false" r="0.0903226361" g="0.143453881" b="0" a="0" />
-      <frame index="25" key="false" r="0.0774194002" g="0.122960463" b="0" a="0" />
-      <frame index="26" key="false" r="0.0645161718" g="0.102467053" b="0" a="0" />
-      <frame index="27" key="false" r="0.051612936" g="0.0819736421" b="0" a="0" />
-      <frame index="28" key="false" r="0.0387097001" g="0.0614802316" b="0" a="0" />
-      <frame index="29" key="false" r="0.025806468" g="0.0409868211" b="0" a="0" />
-      <frame index="30" key="false" r="0.012903234" g="0.0204934105" b="0" a="0" />
+      <frame index="24" key="false" r="0.090322636" g="0.143453881" b="0" a="0" />
+      <frame index="25" key="false" r="0.0774194" g="0.122960463" b="0" a="0" />
+      <frame index="26" key="false" r="0.064516172" g="0.102467053" b="0" a="0" />
+      <frame index="27" key="false" r="0.051612936" g="0.081973642" b="0" a="0" />
+      <frame index="28" key="false" r="0.0387097" g="0.061480232" b="0" a="0" />
+      <frame index="29" key="false" r="0.025806468" g="0.040986821" b="0" a="0" />
+      <frame index="30" key="false" r="0.012903234" g="0.020493411" b="0" a="0" />
       <frame index="31" key="true" r="0" g="0" b="0" a="0" />
     </colorFrames>
   </parameters>

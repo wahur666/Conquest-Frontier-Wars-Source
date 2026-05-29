@@ -4,8 +4,9 @@
     <value name="Scale" value="100" />
   </sourceValues>
   <parameters>
+    <runtime endBehavior="Stop At Emitter End" zeroParticleLifetimeSeconds="0" />
     <rendering textureName="spine2-64.bmp" textureFps="10" srcBlend="2" dstBlend="2" boundingSphereRadius="167.375992" />
-    <emitter initialParticleCount="59" maxParticleCount="10" lifetime="1.2" frequency="0" nozzleSize="0.00100000005">
+    <emitter initialParticleCount="59" maxParticleCount="10" lifetime="1.2" frequency="0" nozzleSize="0.001">
       <direction x="0" y="0" z="1" />
       <nozzleDamp x="1" y="1" z="1" />
     </emitter>
@@ -24,16 +25,16 @@
       <frame index="8" key="false" r="0.638095021" g="0.671428561" b="0.123809531" a="0" />
       <frame index="9" key="false" r="0.642856896" g="0.642857134" b="0.114285722" a="0" />
       <frame index="10" key="false" r="0.647618771" g="0.614285707" b="0.104761913" a="0" />
-      <frame index="11" key="false" r="0.652380645" g="0.585714281" b="0.0952381045" a="0" />
-      <frame index="12" key="false" r="0.65714252" g="0.557142854" b="0.0857142955" a="0" />
-      <frame index="13" key="false" r="0.661904395" g="0.528571427" b="0.0761904866" a="0" />
-      <frame index="14" key="false" r="0.666666269" g="0.5" b="0.0666666776" a="0" />
-      <frame index="15" key="false" r="0.671428144" g="0.471428573" b="0.0571428686" a="0" />
-      <frame index="16" key="false" r="0.676190019" g="0.442857146" b="0.0476190597" a="0" />
-      <frame index="17" key="false" r="0.680951893" g="0.414285719" b="0.0380952507" a="0" />
-      <frame index="18" key="false" r="0.685713768" g="0.385714293" b="0.0285714418" a="0" />
-      <frame index="19" key="false" r="0.690475643" g="0.357142866" b="0.0190476328" a="0" />
-      <frame index="20" key="false" r="0.695237517" g="0.328571439" b="0.00952382293" a="0" />
+      <frame index="11" key="false" r="0.652380645" g="0.585714281" b="0.095238104" a="0" />
+      <frame index="12" key="false" r="0.65714252" g="0.557142854" b="0.085714296" a="0" />
+      <frame index="13" key="false" r="0.661904395" g="0.528571427" b="0.076190487" a="0" />
+      <frame index="14" key="false" r="0.666666269" g="0.5" b="0.066666678" a="0" />
+      <frame index="15" key="false" r="0.671428144" g="0.471428573" b="0.057142869" a="0" />
+      <frame index="16" key="false" r="0.676190019" g="0.442857146" b="0.04761906" a="0" />
+      <frame index="17" key="false" r="0.680951893" g="0.414285719" b="0.038095251" a="0" />
+      <frame index="18" key="false" r="0.685713768" g="0.385714293" b="0.028571442" a="0" />
+      <frame index="19" key="false" r="0.690475643" g="0.357142866" b="0.019047633" a="0" />
+      <frame index="20" key="false" r="0.695237517" g="0.328571439" b="0.009523823" a="0" />
       <frame index="21" key="true" r="0.699999988" g="0.300000012" b="0" a="0" />
       <frame index="22" key="false" r="0.629999995" g="0.270000011" b="0" a="0" />
       <frame index="23" key="false" r="0.560000002" g="0.24000001" b="0" a="0" />
@@ -41,9 +42,9 @@
       <frame index="25" key="false" r="0.420000017" g="0.180000007" b="0" a="0" />
       <frame index="26" key="false" r="0.350000024" g="0.150000006" b="0" a="0" />
       <frame index="27" key="false" r="0.280000031" g="0.120000005" b="0" a="0" />
-      <frame index="28" key="false" r="0.210000038" g="0.0900000036" b="0" a="0" />
-      <frame index="29" key="false" r="0.140000045" g="0.0600000024" b="0" a="0" />
-      <frame index="30" key="false" r="0.070000045" g="0.0300000012" b="0" a="0" />
+      <frame index="28" key="false" r="0.210000038" g="0.090000004" b="0" a="0" />
+      <frame index="29" key="false" r="0.140000045" g="0.060000002" b="0" a="0" />
+      <frame index="30" key="false" r="0.070000045" g="0.030000001" b="0" a="0" />
       <frame index="31" key="true" r="0" g="0" b="0" a="0" />
     </colorFrames>
   </parameters>

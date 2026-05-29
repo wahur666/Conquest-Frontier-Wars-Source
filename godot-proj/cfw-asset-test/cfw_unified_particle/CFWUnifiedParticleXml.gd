@@ -1,13 +1,6 @@
 @tool
 extends RefCounted
 
-const PSP_F_RELATIVE_TRANSFORM := 1 << 0
-const PSP_F_RELATIVE_VELOCITY := 1 << 1
-const PSP_F_IGNORE_ORIENTATION := 1 << 2
-const PSP_F_RENDER_PARTICLE_LIFE := 1 << 3
-const PSP_F_RENDER_DITHER := 1 << 4
-const PSP_F_RENDER_FOG := 1 << 5
-
 const D3DBLEND_ONE := 2
 
 
@@ -21,7 +14,6 @@ static func load(path: String) -> Dictionary:
 		return {}
 
 	var out := {
-		"flags": {"value": 0},
 		"rendering": {},
 		"emitter": {},
 		"particles": {},
@@ -47,9 +39,7 @@ static func load(path: String) -> Dictionary:
 			var attrs := xml_attrs(parser)
 			stack.append(name)
 
-			if name == "flags" and parent(stack) == "parameters":
-				out["flags"]["value"] = parse_int(attrs.get("value", "0"))
-			elif name == "runtime":
+			if name == "runtime":
 				out["runtime"] = {
 					"endBehavior": attrs.get("endBehavior", "Legacy Source"),
 					"zeroParticleLifetimeSeconds": parse_float(attrs.get("zeroParticleLifetimeSeconds", "0")),
@@ -313,25 +303,6 @@ static func capture_image_file(current_image: Dictionary, file_name: String, tex
 	var files: Dictionary = current_image.get("files", {})
 	files[file_name] = str(files.get(file_name, "")) + text
 	current_image["files"] = files
-
-
-static func current_flags_value(state: Dictionary) -> int:
-	var flags := int(state.get("flagsValue", 0))
-	flags = set_flag_bit(flags, PSP_F_RELATIVE_TRANSFORM, bool(state.get("relativeTransform", false)))
-	flags = set_flag_bit(flags, PSP_F_RELATIVE_VELOCITY, bool(state.get("relativeVelocity", false)))
-	flags = set_flag_bit(flags, PSP_F_IGNORE_ORIENTATION, bool(state.get("ignoreOrientation", false)))
-	flags = set_flag_bit(flags, PSP_F_RENDER_PARTICLE_LIFE, bool(state.get("renderParticleLife", false)))
-	flags = set_flag_bit(flags, PSP_F_RENDER_DITHER, bool(state.get("renderDither", false)))
-	flags = set_flag_bit(flags, PSP_F_RENDER_FOG, bool(state.get("renderFog", false)))
-	return flags
-
-
-static func set_flag_bit(flags: int, bit: int, enabled: bool) -> int:
-	return (flags | bit) if enabled else (flags & ~bit)
-
-
-static func flag_xml(name: String, bit: int, flags: int) -> String:
-	return "      <flag name=\"%s\" bit=\"0x%08x\" value=\"%s\" />" % [name, bit, "true" if (flags & bit) != 0 else "false"]
 
 
 static func xml_escape(value: String) -> String:
