@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Convert one Conquest Frontier Wars .3db.xml dump to glTF 2.0 JSON.
+"""Convert Conquest Frontier Wars .3db.xml and .cmp.xml dumps to glTF 2.0 JSON.
 
-This intentionally supports only single openFLAME 3D N-mesh .3db XML dumps.
-Particles, shields, compound .cmp assembly, and animation are separate formats
-and are left for later converter stages.
+Single openFLAME 3D N-mesh .3db XML dumps are exported as one mesh. Compound
+.cmp XML dumps are exported as multiple mesh nodes wired by the CMP joint tree.
+Particles, shields, and animation are separate formats and are left for later
+converter stages.
 """
 
 from __future__ import annotations
@@ -57,6 +58,25 @@ class MaterialInfo:
 class Accessor:
     index: int
     count: int
+
+
+@dataclass
+class CompoundPart:
+    part_dir: str
+    object_name: str
+    file_name: str
+    index: int
+
+
+@dataclass
+class CompoundJoint:
+    type: str
+    parent: str
+    child: str
+    rel_position: tuple[float, float, float]
+    rel_orientation: tuple[float, ...]
+    parent_point: tuple[float, float, float]
+    child_point: tuple[float, float, float]
 
 
 class BinWriter:
@@ -116,9 +136,9 @@ class BinWriter:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Convert a single .3db.xml UTF dump to glTF 2.0 JSON."
+        description="Convert a .3db.xml or .cmp.xml UTF dump to glTF 2.0 JSON."
     )
-    parser.add_argument("input", type=Path, help="Input .3db.xml file")
+    parser.add_argument("input", type=Path, help="Input .3db.xml or .cmp.xml file")
     parser.add_argument(
         "-o",
         "--output",
@@ -150,13 +170,15 @@ def main() -> int:
         raise SystemExit(f"Expected <unit> root in {input_path}")
 
     mesh_root = child_dir(root, "openFLAME 3D N-mesh")
-    if mesh_root is None:
-        raise SystemExit("No openFLAME 3D N-mesh directory found. This converter only handles single .3db meshes.")
-
-    textures = {} if args.no_textures else load_textures(mesh_root)
-    write_textures(textures, output_path.parent)
-    materials, id_to_index = load_materials(mesh_root, textures)
-    gltf, bin_data = build_gltf(root, mesh_root, materials, id_to_index, textures, output_path, args.uv_transform)
+    if mesh_root is not None:
+        textures = {} if args.no_textures else load_textures(mesh_root)
+        write_textures(textures, output_path.parent)
+        materials, id_to_index = load_materials(mesh_root, textures)
+        gltf, bin_data = build_gltf(root, mesh_root, materials, id_to_index, textures, output_path, args.uv_transform)
+    elif child_dir(root, "Cmpnd") is not None:
+        gltf, bin_data, textures = build_compound_gltf(root, input_path, output_path, args.no_textures, args.uv_transform)
+    else:
+        raise SystemExit("No openFLAME 3D N-mesh or Cmpnd directory found.")
 
     bin_path = output_path.with_suffix(".bin")
     gltf["buffers"][0]["uri"] = bin_path.name
@@ -203,12 +225,149 @@ def build_gltf(
     material_variant_cache: dict[tuple[int, bool], int] = {}
 
     writer = BinWriter()
+    append_mesh_primitives(
+        gltf,
+        writer,
+        mesh_root,
+        0,
+        materials,
+        id_to_index,
+        textures,
+        texture_index_by_name,
+        material_variant_cache,
+        args_label="mesh",
+        uv_transform=uv_transform,
+    )
+
+    if not gltf["meshes"][0]["primitives"]:
+        raise SystemExit("No renderable face groups were found.")
+
+    add_hardpoint_nodes(gltf, unit_root)
+    prune_empty_gltf_arrays(gltf)
+    return gltf, bytes(writer.data)
+
+
+def build_compound_gltf(
+    unit_root: ET.Element,
+    input_path: Path,
+    output_path: Path,
+    no_textures: bool,
+    uv_transform: str,
+) -> tuple[dict, bytes, dict[str, TextureImage]]:
+    cmpnd = child_dir(unit_root, "Cmpnd")
+    if cmpnd is None:
+        raise SystemExit("Compound file is missing Cmpnd directory.")
+
+    parts = read_compound_parts(cmpnd)
+    if not parts:
+        raise SystemExit("Compound file has no Root/Part entries.")
+
+    part_units = resolve_compound_part_units(unit_root, input_path, parts)
+    if not part_units:
+        raise SystemExit("No compound .3db parts could be resolved.")
+
+    textures: dict[str, TextureImage] = {}
+    if not no_textures:
+        for name, texture in load_textures(unit_root).items():
+            textures.setdefault(name, texture)
+        for _, part_unit, mesh_root in part_units:
+            for name, texture in load_textures(mesh_root).items():
+                textures.setdefault(name, texture)
+        write_textures(textures, output_path.parent)
+
+    gltf = {
+        "asset": {
+            "version": "2.0",
+            "generator": "Conquest Frontier Wars CMP XML converter",
+        },
+        "scene": 0,
+        "scenes": [{"nodes": [0]}],
+        "nodes": [{"name": sanitize_name(unit_root.attrib.get("name", output_path.stem)), "children": []}],
+        "meshes": [],
+        "materials": [],
+        "buffers": [{"byteLength": 0, "uri": ""}],
+        "bufferViews": [],
+        "accessors": [],
+        "images": [],
+        "textures": [],
+        "samplers": [],
+    }
+
+    writer = BinWriter()
+    texture_index_by_name = add_gltf_textures(gltf, textures)
+    node_by_part: dict[str, int] = {}
+    material_variant_cache: dict[tuple[str, int, bool], int] = {}
+
+    for part, part_unit, mesh_root in part_units:
+        mesh_index = len(gltf["meshes"])
+        gltf["meshes"].append({"name": sanitize_name(part.object_name), "primitives": []})
+
+        part_textures = textures if not no_textures else {}
+        materials, id_to_index = load_materials(mesh_root, part_textures)
+        append_mesh_primitives(
+            gltf,
+            writer,
+            mesh_root,
+            mesh_index,
+            materials,
+            id_to_index,
+            part_textures,
+            texture_index_by_name,
+            material_variant_cache,
+            args_label=part.object_name,
+            uv_transform=uv_transform,
+        )
+
+        if not gltf["meshes"][mesh_index]["primitives"]:
+            continue
+
+        node_index = len(gltf["nodes"])
+        node_by_part[part.object_name] = node_index
+        gltf["nodes"].append(
+            {
+                "name": sanitize_name(part.object_name),
+                "mesh": mesh_index,
+                "extras": {
+                    "sourcePartDir": part.part_dir,
+                    "sourceFileName": part.file_name,
+                    "sourcePartIndex": part.index,
+                    "sourceUnitName": part_unit.attrib.get("name", ""),
+                },
+            }
+        )
+        add_hardpoint_nodes_to_parent(gltf, part_unit, node_index)
+
+    joints = read_compound_joints(child_dir(cmpnd, "Cons"))
+    attach_compound_nodes(gltf, node_by_part, joints)
+    gltf["nodes"][0].setdefault("extras", {})["sourceCompoundJoints"] = [
+        {"type": joint.type, "parent": joint.parent, "child": joint.child}
+        for joint in joints
+    ]
+
+    prune_empty_gltf_arrays(gltf)
+    return gltf, bytes(writer.data), textures
+
+
+def append_mesh_primitives(
+    gltf: dict,
+    writer: BinWriter,
+    mesh_root: ET.Element,
+    mesh_index: int,
+    materials: list[MaterialInfo],
+    id_to_index: dict[int, int],
+    textures: dict[str, TextureImage],
+    texture_index_by_name: dict[str, int],
+    material_variant_cache: dict,
+    *,
+    args_label: str,
+    uv_transform: str,
+) -> None:
     mesh_children = child_dirs(mesh_root)
     vertices_node = mesh_children.get("Vertices")
     normals_node = mesh_children.get("Normals")
     face_groups_node = mesh_children.get("Face groups")
     if vertices_node is None or face_groups_node is None:
-        raise SystemExit("Mesh is missing Vertices or Face groups.")
+        raise SystemExit(f"{args_label} is missing Vertices or Face groups.")
 
     vertices_children = child_dirs(vertices_node)
     normals_children = child_dirs(normals_node) if normals_node is not None else {}
@@ -224,7 +383,7 @@ def build_gltf(
     vertex_colors = file_bytes(vertices_children.get("Color")) or b""
 
     if not object_vertices:
-        raise SystemExit("Object vertex list is empty.")
+        raise SystemExit(f"{args_label} object vertex list is empty.")
 
     for group_name in sorted((name for name in groups_children if name.startswith("Group")), key=natural_key):
         group = groups_children[group_name]
@@ -242,6 +401,7 @@ def build_gltf(
         uvs: list[float] = []
         colors: list[int] = []
         has_vertex_colors = len(vertex_colors) >= len(object_vertices) * 3
+        color_material = materials[material_index] if 0 <= material_index < len(materials) else default_material()
 
         for face_index in range(face_count):
             prop = face_properties[face_index] if face_index < len(face_properties) else 0x04
@@ -265,7 +425,7 @@ def build_gltf(
                 normals.extend(normal)
                 uvs.extend(uv)
                 if has_vertex_colors:
-                    colors.extend(vertex_color(vertex_colors, object_index))
+                    colors.extend(vertex_color(vertex_colors, object_index, color_material))
 
         vertex_count = len(positions) // 3
         if vertex_count == 0:
@@ -320,23 +480,195 @@ def build_gltf(
                 materials,
                 material_index,
                 double_sided,
+                has_vertex_colors,
                 textures,
                 texture_index_by_name,
                 material_variant_cache,
+                cache_prefix=args_label,
             ),
             "extras": {
                 "sourceFaceGroup": group_name,
                 "sourceMaterialId": material_id,
             },
         }
-        gltf["meshes"][0]["primitives"].append(primitive)
+        gltf["meshes"][mesh_index]["primitives"].append(primitive)
 
-    if not gltf["meshes"][0]["primitives"]:
-        raise SystemExit("No renderable face groups were found.")
 
-    add_hardpoint_nodes(gltf, unit_root)
-    prune_empty_gltf_arrays(gltf)
-    return gltf, bytes(writer.data)
+def read_compound_parts(cmpnd_node: ET.Element) -> list[CompoundPart]:
+    parts: list[CompoundPart] = []
+    for node in cmpnd_node:
+        if node.tag != "dir":
+            continue
+        part_dir = node.attrib.get("name", "")
+        if part_dir != "Root" and not part_dir.startswith("Part"):
+            continue
+        children = child_dirs(node)
+        file_name = c_string(file_bytes(children.get("File name")))
+        object_name = c_string(file_bytes(children.get("Object name"))) or part_dir
+        index = int32(file_bytes(children.get("Index")))
+        if file_name:
+            parts.append(CompoundPart(part_dir, object_name, file_name, index if index is not None else -1))
+    return sorted(parts, key=lambda part: (part.index < 0, part.index, natural_key(part.part_dir)))
+
+
+def resolve_compound_part_units(
+    unit_root: ET.Element,
+    input_path: Path,
+    parts: list[CompoundPart],
+) -> list[tuple[CompoundPart, ET.Element, ET.Element]]:
+    embedded = {
+        child.attrib.get("name", "").lower(): child
+        for child in unit_root
+        if child.tag == "dir" and child_dir(child, "openFLAME 3D N-mesh") is not None
+    }
+
+    resolved: list[tuple[CompoundPart, ET.Element, ET.Element]] = []
+    for part in parts:
+        part_unit = embedded.get(part.file_name.lower())
+        if part_unit is None:
+            external_path = input_path.parent / f"{part.file_name}.xml"
+            if external_path.exists():
+                part_unit = ET.parse(external_path).getroot()
+        if part_unit is None:
+            continue
+
+        mesh_root = child_dir(part_unit, "openFLAME 3D N-mesh")
+        if mesh_root is not None:
+            resolved.append((part, part_unit, mesh_root))
+    return resolved
+
+
+def read_compound_joints(cons_node: ET.Element | None) -> list[CompoundJoint]:
+    if cons_node is None:
+        return []
+    children = child_dirs(cons_node)
+    return [
+        *read_fixed_like_joints(children.get("Fix"), "fixed"),
+        *read_fixed_like_joints(children.get("Trans"), "translational"),
+        *read_fixed_like_joints(children.get("Loose"), "loose"),
+        *read_rev_like_joints(children.get("Rev"), "revolute"),
+        *read_rev_like_joints(children.get("Pris"), "prismatic"),
+        *read_sphere_joints(children.get("Sphere")),
+    ]
+
+
+def read_fixed_like_joints(node: ET.Element | None, joint_type: str) -> list[CompoundJoint]:
+    data = file_bytes(node)
+    if not data:
+        return []
+    record_size = 64 + 64 + 12 + 36
+    out: list[CompoundJoint] = []
+    for offset in range(0, len(data) - record_size + 1, record_size):
+        out.append(
+            CompoundJoint(
+                joint_type,
+                fixed_string(data, offset, 64),
+                fixed_string(data, offset + 64, 64),
+                read_vec3_bytes(data, offset + 128),
+                read_mat3_bytes(data, offset + 140),
+                (0.0, 0.0, 0.0),
+                (0.0, 0.0, 0.0),
+            )
+        )
+    return out
+
+
+def read_rev_like_joints(node: ET.Element | None, joint_type: str) -> list[CompoundJoint]:
+    data = file_bytes(node)
+    if not data:
+        return []
+    record_size = 64 + 64 + 12 + 12 + 36 + 12 + 4 + 4
+    out: list[CompoundJoint] = []
+    for offset in range(0, len(data) - record_size + 1, record_size):
+        out.append(
+            CompoundJoint(
+                joint_type,
+                fixed_string(data, offset, 64),
+                fixed_string(data, offset + 64, 64),
+                (0.0, 0.0, 0.0),
+                read_mat3_bytes(data, offset + 152),
+                read_vec3_bytes(data, offset + 128),
+                read_vec3_bytes(data, offset + 140),
+            )
+        )
+    return out
+
+
+def read_sphere_joints(node: ET.Element | None) -> list[CompoundJoint]:
+    data = file_bytes(node)
+    if not data:
+        return []
+    record_size = 64 + 64 + 12 + 12 + 36 + 24
+    out: list[CompoundJoint] = []
+    for offset in range(0, len(data) - record_size + 1, record_size):
+        out.append(
+            CompoundJoint(
+                "spherical",
+                fixed_string(data, offset, 64),
+                fixed_string(data, offset + 64, 64),
+                (0.0, 0.0, 0.0),
+                read_mat3_bytes(data, offset + 152),
+                read_vec3_bytes(data, offset + 128),
+                read_vec3_bytes(data, offset + 140),
+            )
+        )
+    return out
+
+
+def attach_compound_nodes(gltf: dict, node_by_part: dict[str, int], joints: list[CompoundJoint]) -> None:
+    root_children = gltf["nodes"][0].setdefault("children", [])
+    children_by_parent: dict[str, list[CompoundJoint]] = {}
+    for joint in joints:
+        children_by_parent.setdefault(joint.parent, []).append(joint)
+
+    attached: set[str] = set()
+
+    def attach(part_name: str, parent_node_index: int) -> None:
+        node_index = node_by_part.get(part_name)
+        if node_index is None or part_name in attached:
+            return
+        attached.add(part_name)
+        parent_children = gltf["nodes"][parent_node_index].setdefault("children", [])
+        if node_index not in parent_children:
+            parent_children.append(node_index)
+        for joint in children_by_parent.get(part_name, []):
+            child_index = node_by_part.get(joint.child)
+            if child_index is None:
+                continue
+            gltf["nodes"][child_index]["matrix"] = joint_local_matrix(joint)
+            attach(joint.child, node_index)
+
+    if "Root" in node_by_part:
+        attach("Root", 0)
+
+    for part_name, node_index in node_by_part.items():
+        if part_name not in attached:
+            root_children.append(node_index)
+
+
+def joint_local_matrix(joint: CompoundJoint) -> list[float]:
+    if joint.type in {"fixed", "translational", "loose"}:
+        translation = joint.rel_position
+    else:
+        child_point = transform_point(joint.rel_orientation, joint.child_point)
+        translation = tuple(joint.parent_point[i] - child_point[i] for i in range(3))
+    return gltf_matrix_from_rows(joint.rel_orientation, translation)
+
+
+def gltf_matrix_from_rows(rotation: tuple[float, ...], translation: tuple[float, float, float]) -> list[float]:
+    e00, e01, e02, e10, e11, e12, e20, e21, e22 = rotation[:9]
+    tx, ty, tz = translation
+    return [e00, e10, e20, 0.0, e01, e11, e21, 0.0, e02, e12, e22, 0.0, tx, ty, tz, 1.0]
+
+
+def transform_point(rotation: tuple[float, ...], point: tuple[float, float, float]) -> tuple[float, float, float]:
+    e00, e01, e02, e10, e11, e12, e20, e21, e22 = rotation[:9]
+    x, y, z = point
+    return (
+        e00 * x + e01 * y + e02 * z,
+        e10 * x + e11 * y + e12 * z,
+        e20 * x + e21 * y + e22 * z,
+    )
 
 
 def add_gltf_textures(gltf: dict, textures: dict[str, TextureImage]) -> dict[str, int]:
@@ -360,18 +692,21 @@ def material_variant(
     materials: list[MaterialInfo],
     material_index: int,
     double_sided: bool,
+    use_vertex_colors: bool,
     textures: dict[str, TextureImage],
     texture_index_by_name: dict[str, int],
     cache: dict[tuple[int, bool], int],
+    cache_prefix: str = "",
 ) -> int:
-    key = (material_index, double_sided)
+    key = (cache_prefix, material_index, double_sided, use_vertex_colors)
     if key in cache:
         return cache[key]
 
     mat = materials[material_index] if 0 <= material_index < len(materials) else default_material()
     alpha = max(0.0, min(1.0, mat.transparency))
+    color_factor = (1.0, 1.0, 1.0) if use_vertex_colors else mat.diffuse
     pbr = {
-        "baseColorFactor": [mat.diffuse[0], mat.diffuse[1], mat.diffuse[2], alpha],
+        "baseColorFactor": [color_factor[0], color_factor[1], color_factor[2], alpha],
         "metallicFactor": 0.0,
         "roughnessFactor": shininess_to_roughness(mat.shininess),
     }
@@ -421,7 +756,8 @@ def load_materials(mesh_root: ET.Element, textures: dict[str, TextureImage]) -> 
         transparency_values = float_array(file_bytes(child_file(child_dirs(children.get("Transparency")), "Constant")))
         diffuse_texture_name = map_name(diffuse_node)
         texture_flags = int32(file_bytes(child_file(child_dirs(child_dirs(diffuse_node).get("Map")), "Flags"))) or 0
-        identifier = int32(file_bytes(children.get("Material identifier"))) or len(materials)
+        identifier_value = int32(file_bytes(children.get("Material identifier")))
+        identifier = identifier_value if identifier_value is not None else len(materials)
         material = MaterialInfo(
             name=mat_node.attrib.get("name", f"Material_{len(materials)}"),
             diffuse=read_color(child_file(child_dirs(diffuse_node), "Constant"), (1.0, 1.0, 1.0)),
@@ -443,7 +779,7 @@ def load_materials(mesh_root: ET.Element, textures: dict[str, TextureImage]) -> 
 
 
 def load_textures(mesh_root: ET.Element) -> dict[str, TextureImage]:
-    texture_library = child_dir(mesh_root, "Texture library")
+    texture_library = mesh_root if mesh_root.attrib.get("name") == "Texture library" else child_dir(mesh_root, "Texture library")
     if texture_library is None:
         return {}
 
@@ -510,12 +846,16 @@ def write_textures(textures: dict[str, TextureImage], out_dir: Path) -> None:
 
 
 def add_hardpoint_nodes(gltf: dict, unit_root: ET.Element) -> None:
+    add_hardpoint_nodes_to_parent(gltf, unit_root, 0)
+
+
+def add_hardpoint_nodes_to_parent(gltf: dict, unit_root: ET.Element, parent_node_index: int) -> None:
     hardpoints = child_dir(unit_root, "Hardpoints")
     fixed = child_dir(hardpoints, "Fixed") if hardpoints is not None else None
     if fixed is None:
         return
 
-    parent_children = gltf["nodes"][0].setdefault("children", [])
+    parent_children = gltf["nodes"][parent_node_index].setdefault("children", [])
     for hp in [child for child in fixed if child.tag == "dir"]:
         children = child_dirs(hp)
         position = vector_at(vector3_array(float_array(file_bytes(children.get("Position")))), 0)
@@ -613,6 +953,28 @@ def float_array(data: bytes | None) -> list[float]:
     return list(struct.unpack("<" + "f" * count, data[: count * 4]))
 
 
+def c_string(data: bytes | None) -> str:
+    if not data:
+        return ""
+    return data.split(b"\x00", 1)[0].decode("ascii", errors="replace")
+
+
+def fixed_string(data: bytes, offset: int, size: int) -> str:
+    return c_string(data[offset : offset + size])
+
+
+def read_vec3_bytes(data: bytes, offset: int) -> tuple[float, float, float]:
+    if offset + 12 > len(data):
+        return (0.0, 0.0, 0.0)
+    return struct.unpack_from("<fff", data, offset)
+
+
+def read_mat3_bytes(data: bytes, offset: int) -> tuple[float, ...]:
+    if offset + 36 > len(data):
+        return (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+    return struct.unpack_from("<fffffffff", data, offset)
+
+
 def vector3_array(values: list[float]) -> list[tuple[float, float, float]]:
     return [(values[i], values[i + 1], values[i + 2]) for i in range(0, len(values) - 2, 3)]
 
@@ -648,11 +1010,16 @@ def transform_uv(uv: tuple[float, float], transform: str) -> tuple[float, float]
     return (u, v)
 
 
-def vertex_color(vertex_colors: bytes, object_index: int) -> list[int]:
+def vertex_color(vertex_colors: bytes, object_index: int, material: MaterialInfo) -> list[int]:
+    base = tuple(max(0.0, min(1.0, material.diffuse[i] + material.emission[i])) for i in range(3))
     offset = object_index * 3
     if offset + 2 < len(vertex_colors):
-        return [vertex_colors[offset], vertex_colors[offset + 1], vertex_colors[offset + 2]]
-    return [255, 255, 255]
+        return [
+            round(base[0] * vertex_colors[offset]),
+            round(base[1] * vertex_colors[offset + 1]),
+            round(base[2] * vertex_colors[offset + 2]),
+        ]
+    return [round(base[0] * 255), round(base[1] * 255), round(base[2] * 255)]
 
 
 def read_color(node: ET.Element | None, fallback: tuple[float, float, float]) -> tuple[float, float, float]:
