@@ -29,6 +29,10 @@ const animPingPongToggle = document.querySelector('#anim-pingpong');
 const wireframeToggle = document.querySelector('#wireframe');
 const statusLine = document.querySelector('#status');
 const statsLine = document.querySelector('#stats');
+const animationPanel = document.querySelector('#animation-panel');
+const animationTitle = document.querySelector('#animation-title');
+const animationSelect = document.querySelector('#animation-select');
+const animationMeta = document.querySelector('#animation-meta');
 const canvas = document.querySelector('#viewport');
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -76,24 +80,28 @@ animStartButton.addEventListener('click', () => {
   if (activeAnimationController) {
     activeAnimationController.play();
     updateAnimationButtons();
+    updateAnimationPanel();
   }
 });
 animStopButton.addEventListener('click', () => {
   if (activeAnimationController) {
     activeAnimationController.stop();
     updateAnimationButtons();
+    updateAnimationPanel();
   }
 });
 animRestartButton.addEventListener('click', () => {
   if (activeAnimationController) {
     activeAnimationController.restart();
     updateAnimationButtons();
+    updateAnimationPanel();
   }
 });
 animResetButton.addEventListener('click', () => {
   if (activeAnimationController) {
     activeAnimationController.reset();
     updateAnimationButtons();
+    updateAnimationPanel();
   }
 });
 animLoopToggle.addEventListener('change', () => {
@@ -104,6 +112,13 @@ animLoopToggle.addEventListener('change', () => {
 animPingPongToggle.addEventListener('change', () => {
   if (activeAnimationController) {
     activeAnimationController.pingPong = animPingPongToggle.checked;
+  }
+});
+animationSelect.addEventListener('change', () => {
+  if (activeAnimationController) {
+    activeAnimationController.selectClip(Number(animationSelect.value));
+    updateAnimationButtons();
+    updateAnimationPanel();
   }
 });
 wireframeToggle.addEventListener('change', () => setWireframe(wireframeToggle.checked));
@@ -232,7 +247,7 @@ async function buildCompoundObject(rootNode, meshEntries, textureCanvases) {
   const joints = readCompoundJoints(rootNode.children?.Cmpnd?.children?.Cons);
   const byFileName = new Map(meshEntries.map((entry) => [entry.containerNode.name.toLowerCase(), entry]));
   const byPartName = new Map();
-  const stats = { vertices: 0, faces: 0, materials: 0, particles: 0, animations: 0 };
+  const stats = { vertices: 0, faces: 0, materials: 0, particles: 0, animations: 0, hardpoints: 0 };
   let mergedTextures = textureCanvases;
 
   object.name = rootNode.name || 'Compound';
@@ -248,11 +263,14 @@ async function buildCompoundObject(rootNode, meshEntries, textureCanvases) {
       });
 
       meshGroup.name = entry.name;
+      const hardpoints = readHardpoints(entry.containerNode);
+      addHardpointMarkers(meshGroup, hardpoints, entry.name);
       object.add(meshGroup);
       mergedTextures = mergeTextureCanvases(mergedTextures, partTextures);
       stats.vertices += meshData.objectVertexList.length;
       stats.faces += meshData.faceGroups.reduce((total, group) => total + group.faceCnt, 0);
       stats.materials += meshData.materialList.length;
+      stats.hardpoints += hardpoints.length;
     }
 
     const particleEntries = findEmbeddedParticleEntries(rootNode);
@@ -281,11 +299,14 @@ async function buildCompoundObject(rootNode, meshEntries, textureCanvases) {
       meshGroup.name = part.objectName;
       meshGroup.userData.fileName = part.fileName;
       meshGroup.userData.partName = part.objectName;
+      const hardpoints = readHardpoints(entry.containerNode);
+      addHardpointMarkers(meshGroup, hardpoints, part.objectName);
       byPartName.set(part.objectName, meshGroup);
       mergedTextures = mergeTextureCanvases(mergedTextures, partTextures);
       stats.vertices += meshData.objectVertexList.length;
       stats.faces += meshData.faceGroups.reduce((total, group) => total + group.faceCnt, 0);
       stats.materials += meshData.materialList.length;
+      stats.hardpoints += hardpoints.length;
       continue;
     }
 
@@ -362,6 +383,121 @@ function readCompoundParts(cmpndNode) {
       index: getInt32(node.children.Index) ?? -1,
     }))
     .filter((part) => part.fileName);
+}
+
+function readHardpoints(containerNode) {
+  const hardpointRoot = containerNode?.children?.Hardpoints;
+  if (!hardpointRoot?.children) {
+    return [];
+  }
+
+  const out = [];
+
+  for (const groupNode of Object.values(hardpointRoot.children)) {
+    if (!groupNode?.children) {
+      continue;
+    }
+
+    for (const hardpointNode of Object.values(groupNode.children)) {
+      const positionBytes = hardpointNode?.children?.Position?.value;
+      if (!positionBytes || positionBytes.byteLength < 12) {
+        continue;
+      }
+
+      const view = new DataView(positionBytes.buffer, positionBytes.byteOffset, positionBytes.byteLength);
+      out.push({
+        name: hardpointNode.name || `hardpoint_${out.length + 1}`,
+        type: groupNode.name || 'Hardpoint',
+        position: readVector3(view, 0),
+      });
+    }
+  }
+
+  return out;
+}
+
+function addHardpointMarkers(target, hardpoints, partName) {
+  if (hardpoints.length === 0) {
+    return;
+  }
+
+  target.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(target);
+  const size = box.getSize(new THREE.Vector3());
+  const maxSize = Math.max(size.x, size.y, size.z, 1);
+  const radius = clamp(maxSize * 0.018, 0.5, 25);
+  const markerRoot = new THREE.Group();
+  markerRoot.name = `${partName || target.name || 'Part'} hardpoints`;
+  markerRoot.userData.hardpointOverlay = true;
+
+  for (const hardpoint of hardpoints) {
+    const marker = createHardpointMarker(hardpoint, radius);
+    markerRoot.add(marker);
+  }
+
+  target.add(markerRoot);
+}
+
+function createHardpointMarker(hardpoint, radius) {
+  const marker = new THREE.Group();
+  marker.name = hardpoint.name;
+  marker.position.copy(hardpoint.position);
+  marker.userData.hardpoint = hardpoint;
+
+  const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(radius, 16, 12),
+    new THREE.MeshBasicMaterial({
+      color: 0xffd24a,
+      depthTest: false,
+      depthWrite: false,
+      transparent: true,
+      opacity: 0.95,
+    }),
+  );
+  sphere.userData.hardpointMarker = true;
+  sphere.renderOrder = 1000;
+  marker.add(sphere);
+
+  const labelMaterial = makeHardpointLabelMaterial(hardpoint.name);
+  const labelAspect = labelMaterial.userData.aspect || 3;
+  const label = new THREE.Sprite(labelMaterial);
+  label.position.set(radius * 1.8, radius * 1.8, 0);
+  label.scale.set(radius * 3 * labelAspect, radius * 3, 1);
+  label.renderOrder = 1001;
+  marker.add(label);
+
+  return marker;
+}
+
+function makeHardpointLabelMaterial(text) {
+  const canvasTexture = document.createElement('canvas');
+  const ctx = canvasTexture.getContext('2d');
+  const fontSize = 28;
+  ctx.font = `600 ${fontSize}px Inter, Segoe UI, sans-serif`;
+  const width = Math.ceil(Math.max(96, ctx.measureText(text).width + 26));
+  const height = 44;
+  canvasTexture.width = width;
+  canvasTexture.height = height;
+  ctx.font = `600 ${fontSize}px Inter, Segoe UI, sans-serif`;
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(11, 13, 18, 0.82)';
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = 'rgba(255, 210, 74, 0.85)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, width - 2, height - 2);
+  ctx.fillStyle = '#fff2b0';
+  ctx.fillText(text, 13, height / 2);
+
+  const texture = new THREE.CanvasTexture(canvasTexture);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+  });
+  material.userData.aspect = width / height;
+  return material;
 }
 
 async function loadCompoundParticlePart(rootNode, part) {
@@ -1081,7 +1217,8 @@ class CompoundAnimationController {
     this.clips = clips;
     this.byPartName = byPartName;
     this.bindTransforms = readBindTransforms(byPartName);
-    this.activeClip = clips.reduce((best, clip) => (clip.duration > best.duration ? clip : best), clips[0]);
+    this.activeClipIndex = Math.max(0, clips.indexOf(clips.reduce((best, clip) => (clip.duration > best.duration ? clip : best), clips[0])));
+    this.activeClip = clips[this.activeClipIndex];
     this.clipCount = clips.length;
     this.time = 0;
     this.direction = 1;
@@ -1093,6 +1230,19 @@ class CompoundAnimationController {
 
   play() {
     this.playing = true;
+  }
+
+  selectClip(index) {
+    const nextIndex = clamp(Math.floor(index), 0, this.clips.length - 1);
+    if (nextIndex === this.activeClipIndex) {
+      return;
+    }
+
+    this.activeClipIndex = nextIndex;
+    this.activeClip = this.clips[this.activeClipIndex];
+    this.time = 0;
+    this.direction = 1;
+    this.apply();
   }
 
   stop() {
@@ -2178,6 +2328,7 @@ function setActiveMesh(mesh, textureCanvases) {
   activeParticleSystems = collectParticleSystems(activeMesh);
   activeAnimationController = activeMesh.userData?.animationController || null;
   updateAnimationButtons();
+  updateAnimationPanel();
   scene.add(activeMesh);
 }
 
@@ -2305,6 +2456,7 @@ function animate() {
   if (activeAnimationController) {
     activeAnimationController.update(dt);
     updateAnimationButtons();
+    updateAnimationPanel();
   }
 
   renderer.render(scene, camera);
@@ -2316,16 +2468,17 @@ function setWireframe(enabled) {
   }
 
   activeMesh.traverse((object) => {
-    if (object.isMesh) {
+    if (object.isMesh && !object.userData?.hardpointMarker) {
       object.material.wireframe = enabled;
     }
   });
 }
 
 function updateStats(stats, textureCanvases) {
-  const particleText = stats.particles ? ` | ${stats.particles} particle systems` : '';
-  const animationText = stats.animations ? ` | ${stats.animations} animation clips` : '';
-  statsLine.textContent = `${stats.vertices} vertices | ${stats.faces} faces | ${stats.materials} materials | ${textureCanvases.size} textures${particleText}${animationText}`;
+  const particleCount = stats.particles || 0;
+  const animationCount = stats.animations || 0;
+  const hardpointCount = stats.hardpoints || 0;
+  statsLine.textContent = `${stats.vertices} vertices | ${stats.faces} faces | ${stats.materials} materials | ${textureCanvases.size} textures | ${animationCount} animation clips | ${hardpointCount} hardpoints | ${particleCount} particle systems`;
 }
 
 function updateAnimationButtons() {
@@ -2341,6 +2494,34 @@ function updateAnimationButtons() {
     animLoopToggle.checked = activeAnimationController.loop;
     animPingPongToggle.checked = activeAnimationController.pingPong;
   }
+}
+
+function updateAnimationPanel() {
+  if (!activeAnimationController) {
+    animationPanel.hidden = true;
+    animationSelect.replaceChildren();
+    animationMeta.textContent = '';
+    return;
+  }
+
+  const controller = activeAnimationController;
+  const clip = controller.activeClip;
+  animationPanel.hidden = false;
+  animationTitle.textContent = `${controller.clipCount} animation ${controller.clipCount === 1 ? 'clip' : 'clips'} available`;
+
+  if (animationSelect.options.length !== controller.clips.length) {
+    animationSelect.replaceChildren(...controller.clips.map((item, index) => {
+      const option = document.createElement('option');
+      option.value = String(index);
+      option.textContent = `${item.name} (${formatSeconds(item.duration)})`;
+      return option;
+    }));
+  }
+
+  animationSelect.value = String(controller.activeClipIndex);
+  animationMeta.textContent = clip
+    ? `${controller.playing ? 'Playing' : 'Stopped'} ${clip.name} at ${formatSeconds(controller.time)} / ${formatSeconds(clip.duration)} with ${clip.tracks.length} tracks.`
+    : 'No active animation clip.';
 }
 
 function setStatus(message, isError = false) {
@@ -2649,4 +2830,8 @@ function lerp(a, b, t) {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function formatSeconds(value) {
+  return `${Math.max(0, value).toFixed(2)}s`;
 }
