@@ -4,13 +4,12 @@
     <value name="Scale" value="167" />
   </sourceValues>
   <parameters>
-    <runtime endBehavior="Stop At Emitter End" zeroParticleLifetimeSeconds="0" />
     <rendering textureName="cloud_64.bmp" textureFps="10" srcBlend="2" dstBlend="2" boundingSphereRadius="85.9716034" />
     <emitter initialParticleCount="59" maxParticleCount="5" lifetime="1" frequency="0" nozzleSize="0">
       <direction x="0" y="0" z="1" />
       <nozzleDamp x="1" y="1" z="1" />
     </emitter>
-    <particles lifetime="0" positionRandomizer="0" velocity="78.1560019" velocityRandomizer="0.100000001" twistVelocity="0" size="116.900002" sizeVelocity="322.643995">
+    <particles lifetime="1" positionRandomizer="0" velocity="78.1560019" velocityRandomizer="0.100000001" twistVelocity="0" size="116.900002" sizeVelocity="322.643995">
       <gravity x="0" y="0" z="0" />
     </particles>
     <colorFrames keyFrameBits="0x80004001">

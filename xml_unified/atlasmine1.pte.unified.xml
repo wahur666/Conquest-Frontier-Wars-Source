@@ -1,13 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <particleEditor format="cfw-unified-particle" version="1" sourceFile="xml_dump\atlasmine1.pte.xml" sourceRoot="atlasmine1.pte" sourceFormat="ParticleSystemParameters">
   <parameters>
-	<runtime endBehavior="Stop At Emitter End" zeroParticleLifetimeSeconds="0" />
 	<rendering textureName="spine2-64.bmp" textureFps="10" srcBlend="2" dstBlend="2" boundingSphereRadius="270.701111" />
 	<emitter initialParticleCount="59" maxParticleCount="10" lifetime="1.20000005" frequency="0" nozzleSize="0.001">
 	  <direction x="0" y="0" z="1" />
 	  <nozzleDamp x="1" y="1" z="1" />
 	</emitter>
-	<particles lifetime="0" positionRandomizer="0" velocity="126.800003" velocityRandomizer="0.100000001" twistVelocity="1" size="40" sizeVelocity="220">
+	<particles lifetime="1.20000005" positionRandomizer="0" velocity="126.800003" velocityRandomizer="0.100000001" twistVelocity="1" size="40" sizeVelocity="220">
 	  <gravity x="0" y="0" z="0" />
 	</particles>
 	<colorFrames keyFrameBits="0x80200001">

@@ -24,6 +24,7 @@ const statusLine = document.querySelector('#status');
 const statsLine = document.querySelector('#stats');
 const canvas = document.querySelector('#viewport');
 const parameterPanel = document.querySelector('#parameter-panel');
+let runtimeLifecycleInput = null;
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -198,6 +199,10 @@ function renderParameterPanel() {
   parameterPanel.innerHTML = `
     <h2>Parameters</h2>
     <div class="section">
+      <div class="section-title">Runtime</div>
+      ${readOnlyField('Lifecycle', 'runtime-lifecycle')}
+    </div>
+    <div class="section">
       <div class="section-title">Emitter</div>
       ${numberField('Initial particles', 'initialParticleCount', 1)}
       ${numberField('Max particles', 'maxParticleCount', 1)}
@@ -245,6 +250,8 @@ function renderParameterPanel() {
     input.addEventListener('input', onColorInput);
     input.addEventListener('change', onColorInput);
   });
+  runtimeLifecycleInput = parameterPanel.querySelector('#runtime-lifecycle');
+  updateRuntimeReadout();
 }
 
 function onParameterInput(event) {
@@ -303,6 +310,15 @@ function textField(label, path) {
     <div class="field">
       <label>${label}</label>
       <input data-param="${path}" type="text" value="${escapeHtml(value)}">
+    </div>
+  `;
+}
+
+function readOnlyField(label, id) {
+  return `
+    <div class="field">
+      <label>${label}</label>
+      <input id="${id}" type="text" readonly value="">
     </div>
   `;
 }
@@ -714,6 +730,7 @@ class ParticlePreview {
     this.createdParticles = 0;
     this.elapsed = 0;
     this.emitterLifetime = parameters.lifetime;
+    this.finished = false;
     this.maxParticles = computeMaxParticles(parameters);
     this.positions = new Float32Array(this.maxParticles * 3);
     this.colors = new Float32Array(this.maxParticles * 4);
@@ -736,6 +753,7 @@ class ParticlePreview {
     this.createdParticles = 0;
     this.elapsed = 0;
     this.emitterLifetime = this.parameters.lifetime;
+    this.finished = false;
   }
 
   update(dt) {
@@ -749,12 +767,12 @@ class ParticlePreview {
     for (let i = this.particles.length - 1; i >= 0; i -= 1) {
       const particle = this.particles[i];
       updateParticle(particle, p, dt);
-      if (p.particleLifetime > 0 && particle.lifetime <= 0) {
+      if (particle.initialLifetime > 0 && particle.lifetime <= 0) {
         this.particles.splice(i, 1);
       }
     }
 
-    const canCreate = p.lifetime <= 0 || this.emitterLifetime > 0;
+    const canCreate = !this.finished && (p.lifetime <= 0 || this.emitterLifetime > 0);
     if (canCreate) {
       this.spawnAccumulator += Math.max(0, p.frequency) * dt;
       let count = Math.floor(this.spawnAccumulator);
@@ -769,6 +787,7 @@ class ParticlePreview {
       }
     }
 
+    this.updateFinishedState();
     this.syncGeometry();
   }
 
@@ -782,6 +801,7 @@ class ParticlePreview {
     const randomVelocity = Math.random() * Math.max(0, p.particleVelocityRandomizer);
     const velocity = p.particleVelocity + p.particleVelocity * randomVelocity;
     const position = new THREE.Vector3();
+    const lifetime = p.particleLifetime;
 
     if (!(p.pspFlags & PSP_F_RELATIVE_TRANSFORM)) {
       position.set(0, 0, 0);
@@ -802,10 +822,24 @@ class ParticlePreview {
       direction,
       velocity,
       size: p.particleSize,
-      lifetime: p.particleLifetime,
+      lifetime,
+      initialLifetime: lifetime,
       age: 0,
     });
     this.createdParticles += 1;
+  }
+
+  updateFinishedState() {
+    const p = this.parameters;
+    const emitterDone = p.lifetime > 0 && this.emitterLifetime <= 0;
+    const spawnLimitDone = p.maxParticleCount > 0 && this.createdParticles >= p.maxParticleCount;
+    if (emitterDone || spawnLimitDone) {
+      this.finished = this.particles.length === 0;
+    }
+  }
+
+  lifecycleText() {
+    return lifecycleText(this.parameters, this);
   }
 
   syncGeometry() {
@@ -860,6 +894,49 @@ function updateParticle(particle, parameters, dt) {
   particle.age += dt;
 }
 
+function lifecycleText(parameters, system = null) {
+  const particleLifetime = parameters.particleLifetime;
+  const hasFiniteEmitter = parameters.lifetime > 0;
+  const hasFiniteParticleLife = particleLifetime > 0;
+  const hasSpawnLimit = parameters.maxParticleCount > 0;
+
+  if (!hasFiniteEmitter && !hasSpawnLimit) {
+    return hasFiniteParticleLife
+      ? `Continuous emitter, particles ${formatNumber(particleLifetime)}s`
+      : 'Continuous emitter, infinite particles';
+  }
+
+  if (!system) {
+    if (!hasFiniteParticleLife) {
+      return 'One-shot emitter, infinite particles';
+    }
+    return 'One-shot effect';
+  }
+
+  const emitterDone = hasFiniteEmitter && system.emitterLifetime <= 0;
+  const spawnLimitDone = hasSpawnLimit && system.createdParticles >= parameters.maxParticleCount;
+  const spawningDone = emitterDone || spawnLimitDone;
+
+  if (system.finished || (spawningDone && system.particles.length === 0)) {
+    return 'Ended';
+  }
+
+  if (spawningDone) {
+    if (!hasFiniteParticleLife) {
+      return `Emitter ended, ${system.particles.length} infinite particles`;
+    }
+    return `Draining ${system.particles.length} particles`;
+  }
+
+  if (hasFiniteEmitter) {
+    return `One-shot, ${formatNumber(Math.max(0, system.emitterLifetime))}s emitter`;
+  }
+
+  return hasFiniteParticleLife
+    ? `Spawn-limited, ${Math.max(0, parameters.maxParticleCount - system.createdParticles)} left`
+    : `Spawn-limited, ${Math.max(0, parameters.maxParticleCount - system.createdParticles)} left, infinite particles`;
+}
+
 function makeEmitterDirection(parameters) {
   const damp = parameters.emitterNozzleDamp;
   const degenerateDamp = damp.x * damp.x + damp.y * damp.y + damp.z * damp.z === 0;
@@ -878,7 +955,7 @@ function makeEmitterDirection(parameters) {
 
 function particleColor(parameters, particle) {
   const frameMax = PSP_NUM_COLOR_KEYS - 1;
-  const life = parameters.particleLifetime > 0 ? parameters.particleLifetime : Math.max(1, particle.age + particle.lifetime);
+  const life = particle.initialLifetime > 0 ? particle.initialLifetime : Math.max(1, particle.age + particle.lifetime);
   const t = clamp(particle.age / life, 0, 1);
   const frame = t * frameMax;
   const i0 = Math.min(frameMax, Math.floor(frame));
@@ -982,9 +1059,10 @@ function applyBlendMode(material, parameters) {
 
 function computeMaxParticles(parameters) {
   let maxPossible;
+  const particleLifetime = parameters.particleLifetime;
 
-  if (parameters.particleLifetime > 0) {
-    maxPossible = 1.25 * parameters.frequency * parameters.particleLifetime + parameters.initialParticleCount;
+  if (particleLifetime > 0) {
+    maxPossible = 1.25 * parameters.frequency * particleLifetime + parameters.initialParticleCount;
   } else if (parameters.lifetime > 0) {
     maxPossible = 1.25 * (1 + parameters.frequency) + parameters.initialParticleCount;
   } else {
@@ -1102,6 +1180,7 @@ function animate(now = performance.now()) {
   lastTime = now;
 
   activeSystem?.update(dt);
+  updateRuntimeReadout();
   renderer.render(scene, camera);
 }
 
@@ -1109,7 +1188,20 @@ function updateStats(displayName, parameters, textureCanvas) {
   const textureText = textureCanvas
     ? `${textureCanvas.dataset.textureName} (${textureCanvas.width}x${textureCanvas.height})`
     : 'fallback sprite';
-  statsLine.textContent = `${displayName} | ${activeSystem.maxParticles} particle slots | ${parameters.textureName || 'no texture'} -> ${textureText}`;
+  const lifecycle = activeSystem?.lifecycleText() || lifecycleText(parameters);
+  statsLine.textContent = `${displayName} | ${lifecycle} | ${activeSystem.maxParticles} particle slots | ${parameters.textureName || 'no texture'} -> ${textureText}`;
+}
+
+function updateRuntimeReadout() {
+  if (!activeSystem || !currentParameters) {
+    return;
+  }
+
+  if (runtimeLifecycleInput) {
+    runtimeLifecycleInput.value = activeSystem.lifecycleText();
+  }
+
+  updateStats(currentDisplayName, currentParameters, currentTextureCanvas);
 }
 
 function setStatus(message, isError = false) {
