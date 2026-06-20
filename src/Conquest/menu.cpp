@@ -48,7 +48,6 @@
 #include <stdio.h>
 #include <commctrl.h>
 #include <ZMouse.h>
-#include <AfxRes.h>
 #include <math.h>
 
 //--------------------------------------------------------------------------//

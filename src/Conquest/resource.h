@@ -2197,6 +2197,7 @@
 #define IDM_SPECTATOR_MODE              40096
 #define IDM_COMMAND_TRACKING            40097
 #define IDM_FIX_CP                      40098
+#define ID_APP_EXIT                     57665
 #define IDS_DISABLED                    61729
 
 // Next default values for new objects
