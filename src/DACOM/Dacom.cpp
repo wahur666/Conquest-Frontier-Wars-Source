@@ -485,7 +485,7 @@ GENRESULT DACOManager::AddLibrary(const C8 *DLL_filename)
 		ptr = buffer;
 	}
 
-	len = strlen(ptr);
+	len = static_cast<S32>(strlen(ptr));
 	ptr = ptr + (len - __min(8, len));
 
 	memcpy(library.base_name, ptr, sizeof(library.base_name));
@@ -547,7 +547,7 @@ GENRESULT DACOManager::RemoveLibrary (const C8 *DLL_filename)
 	// Copy up to 8 characters to DLL descriptor
 	// 
 	
-	len = strlen(ptr);
+	len = static_cast<S32>(strlen(ptr));
 	
 	ptr = ptr + (len - __min(8, len));
 	
@@ -754,7 +754,6 @@ BOOL32 DACOManager::initialize (void)
 		}
 		else
 		{
-			U32 line = 0;
 			char buffer[MAX_PATH];
 
 			GENERAL_TRACE_1("DACOM: initialize: Loading DLL's from [Libraries] group.\n");
@@ -828,9 +827,9 @@ BOOL32 DACOManager::GetAbsolutePath (C8 *lpOutput, const C8 *lpBaseDir, const C8
 	// is this already an absolute path?
 	if (lpInput[0] == DA_SWITCH_CHAR || lpInput[1]==':')
 	{
-		strncpy(lpOutput, lpInput, lSize);
+		strncpy_s(lpOutput, static_cast<size_t>(lSize) + 1, lpInput, static_cast<size_t>(lSize));
 		lpOutput[lSize-1] = 0;
-		len = strlen(lpOutput);
+		len = static_cast<int>(strlen(lpOutput));
 		if (len && len < lSize && lpOutput[len-1] != DA_SWITCH_CHAR)
 		{
 			lpOutput[len] = DA_SWITCH_CHAR;
@@ -840,7 +839,7 @@ BOOL32 DACOManager::GetAbsolutePath (C8 *lpOutput, const C8 *lpBaseDir, const C8
 		return 1;
 	}
 	
-	strncpy(lpOutput, lpBaseDir, lSize);
+	strncpy_s(lpOutput, static_cast<size_t>(lSize) + 1, lpBaseDir, static_cast<size_t>(lSize));
 	
 	// output now of the form "\\Path\\"
 	
@@ -849,7 +848,7 @@ BOOL32 DACOManager::GetAbsolutePath (C8 *lpOutput, const C8 *lpBaseDir, const C8
 	
 	while (lpInput[0] == '.' && lpInput[1] == '.')
 	{
-		len = strlen(lpOutput);
+		len = static_cast<int>(strlen(lpOutput));
 		if (len > 2)
 		{
 			lpOutput[len-1] = 0;		// get rid of trailing '\\'
@@ -866,10 +865,10 @@ BOOL32 DACOManager::GetAbsolutePath (C8 *lpOutput, const C8 *lpBaseDir, const C8
 			lpInput++;
 	}
 	
-	len = strlen(lpOutput);
+	len = static_cast<int>(strlen(lpOutput));
 	if (lSize - len > 0)
-		strncpy(lpOutput+len, lpInput, lSize-len);
-	len = strlen(lpOutput);
+		strncpy_s(lpOutput+len, static_cast<size_t>(lSize - len) + 1, lpInput, static_cast<size_t>(lSize - len));
+	len = static_cast<int>(strlen(lpOutput));
 	if (len && len < lSize && lpOutput[len-1] != DA_SWITCH_CHAR)
 	{
 		lpOutput[len] = DA_SWITCH_CHAR;

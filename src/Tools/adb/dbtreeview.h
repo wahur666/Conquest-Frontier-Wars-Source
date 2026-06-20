@@ -17,7 +17,7 @@
 class DbTreeView
 {
 	private:
-		class CTreeCtrl* m_TreeCtrl;
+		HWND m_TreeCtrl;
 		char  m_CurrentItemName[512];
 
 	protected:

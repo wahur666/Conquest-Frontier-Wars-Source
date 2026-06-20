@@ -29,9 +29,12 @@
 
 static char interface_name[] = "IHeap";
 
+struct MSHeap;
+
 IHeap * HEAP;
 extern HINSTANCE hInstance;
 IHeap * g_pMSHeap;
+static DAComponentX<MSHeap> * g_pMSHeapComponent;
 
 int __cdecl STANDARD_DUMP (ErrorCode code, const C8 *fmt, ...);
 
@@ -152,7 +155,7 @@ BOOL32 MSHeap::EnumerateBlocks (IHEAP_ENUM_PROC proc, void *context)
 //
 U32 MSHeap::GetBlockSize (void *allocatedBlock)
 {
-	return _msize(allocatedBlock);
+	return static_cast<U32>(_msize(allocatedBlock));
 }
 //--------------------------------------------------------------------------//
 //
@@ -260,15 +263,16 @@ BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 		{
 			hInstance = hinstDLL;
 
-			auto heap = new DAComponentX<MSHeap>();
-			HEAP = g_pMSHeap = heap;
+			g_pMSHeapComponent = new DAComponentX<MSHeap>();
+			HEAP = g_pMSHeap = g_pMSHeapComponent;
 			// Setup the standard error report function.
 			FDUMP = STANDARD_DUMP;
 		}
 		break;
 
 		case DLL_PROCESS_DETACH:
-			delete g_pMSHeap;
+			delete g_pMSHeapComponent;
+			g_pMSHeapComponent = 0;
 			g_pMSHeap = HEAP = 0;
 		break;
 	}

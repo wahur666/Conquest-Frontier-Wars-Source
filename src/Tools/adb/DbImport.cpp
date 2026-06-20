@@ -12,7 +12,7 @@
 */
 //--------------------------------------------------------------------------//
 
-#include <afxwin.h>
+#include <windows.h>
 #include "dbimport.h"
 
 #include "typedefs.h"
@@ -35,12 +35,6 @@
 using namespace std;
 
 //-------------------------------------------------------------------------------------
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 #ifdef _DEBUG
 	#define IMPORT_MEMSET(x,size) { memset(##x, 0xFE, size); }

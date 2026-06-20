@@ -230,7 +230,7 @@ template <class Base>
 struct DAComponentAggregateX : public Base
 {
 	IDAComponent *outerComponent;
-	DAComponentInnerX<Base> innerComponent;
+	DAComponentInnerX<DAComponentAggregateX<Base>> innerComponent;
 
 
 	DAComponentAggregateX (struct AGGDESC * desc) : innerComponent(this)
@@ -287,6 +287,8 @@ struct DACOM_NO_VTABLE DAComponentFactoryBaseX : public IComponentFactory
 		else
 			className = ClassType::GetInterfaceMap().front().interface_name;
 	}
+
+	virtual ~DAComponentFactoryBaseX() = default;
 
 	/* IDAComponent methods */
 
