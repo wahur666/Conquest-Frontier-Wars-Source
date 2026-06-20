@@ -26,7 +26,7 @@
 //-------------------------BaseHeap Class static data-----------------------//
 //--------------------------------------------------------------------------//
 
-static char interface_name[] = "IHeap";
+static char heap_interface_name[] = "IHeap";
 
 extern IHeap * HEAP;
 extern IHeap * g_pMSHeap;
@@ -46,7 +46,7 @@ int __cdecl STANDARD_DUMP (ErrorCode code, const C8 *fmt, ...);
 
 //--------------------------------------------------------------------------//
 //
-GENRESULT BaseHeap::QueryInterface (const C8 *interface_name, void **instance)
+GENRESULT BaseHeap::QueryInterface (const C8 *requested_interface_name, void **instance)
 {
 	ASSERT(instance);
 
@@ -72,7 +72,7 @@ GENRESULT BaseHeap::CreateInstance (DACOMDESC *descriptor, void **instance)
 	//
 
 	if ((lpInfo->size != sizeof(*lpInfo)) || 
-		strcmp(lpInfo->interface_name, interface_name))
+		strcmp(lpInfo->interface_name, heap_interface_name))
 	{
 		result = GR_INTERFACE_UNSUPPORTED;
 		goto Done;
@@ -146,7 +146,7 @@ Done:
 U32 BaseHeap::AddRef (void)
 {
 	dwRefs++;
-	return dwRefs;
+	return static_cast<U32>(dwRefs);
 }
 //--------------------------------------------------------------------------//
 //
@@ -172,7 +172,7 @@ U32 BaseHeap::Release (void)
 			dwRefs--;
 	}
 
-	return dwRefs;
+	return static_cast<U32>(dwRefs);
 }
 //--------------------------------------------------------------------------//
 //
@@ -244,12 +244,12 @@ void * BaseHeap::AllocateMemory (U32 numBytes, const char *msg)
 	{
 		if (pHeapList && (pHeapList->dwFlags & DAHEAPFLAG_GROWHEAP))
 		{
-			DAHEAPDESC desc(interface_name);
+			DAHEAPDESC desc(heap_interface_name);
 			BaseHeap * pHeap;
 
-			desc.growSize = pHeapList->dwGrowSize;
-			desc.heapSize = __max(desc.growSize, numBytes + sizeof(FREE_BLOCK)*4 + sizeof(HeapInstance));
-			desc.flags = pHeapList->dwFlags;
+			desc.growSize = static_cast<U32>(pHeapList->dwGrowSize);
+			desc.heapSize = __max(desc.growSize, static_cast<U32>(numBytes + sizeof(FREE_BLOCK)*4 + sizeof(HeapInstance)));
+			desc.flags = static_cast<U32>(pHeapList->dwFlags);
 
 			if (CreateInstance(&desc, (void **)&pHeap) == GR_OK)
 			{
@@ -327,7 +327,7 @@ BOOL32 BaseHeap::FreeMemory (void *allocatedBlock)
 {
 	BOOL32 result;
 	
-	if ((result = U32(allocatedBlock)) != 0)
+	if (allocatedBlock != nullptr)
 	{
 		BaseHeap *pHeap = FindTheHeap(allocatedBlock);
 
@@ -335,6 +335,10 @@ BOOL32 BaseHeap::FreeMemory (void *allocatedBlock)
 			result = pHeap->FreeMemory(allocatedBlock);
 		else
 			result = g_pMSHeap->FreeMemory(allocatedBlock);
+	}
+	else
+	{
+		result = 0;
 	}
 
 	return result;
@@ -489,7 +493,7 @@ BOOL32 BaseHeap::doError (uintptr_t dwErrorNum, uintptr_t dwNum1, uintptr_t dwNu
 
 	if (pErrorHandler)
 	{
-		LoadString(hInstance, dwErrorNum, buffer, sizeof(buffer));
+		LoadString(hInstance, static_cast<UINT>(dwErrorNum), buffer, sizeof(buffer));
  		if (dwErrorNum == DAHEAP_VALLOC_FAILED)
 		{
 			result = pErrorHandler(ErrorCode(ERR_MEMORY, SEV_WARNING),
@@ -561,7 +565,7 @@ void BaseHeap::HeapMinimize (void)
 	{
 		// if only allocated block is the control block, free it.
 		if (((BASE_BLOCK *)pList->pHeapBase)->isAllocated() == 0 &&
-			(((DWORD)((BASE_BLOCK *)pList->pHeapBase)->getLower()) + pList->dwBaseBlockSize) == (DWORD) pList)
+			(reinterpret_cast<uintptr_t>(((BASE_BLOCK *)pList->pHeapBase)->getLower()) + pList->dwBaseBlockSize) == reinterpret_cast<uintptr_t>(pList))
 		{
 			HeapInstance *pTmp;
 
@@ -588,7 +592,7 @@ void BaseHeap::HeapMinimize (void)
 //
 U32 BaseHeap::GetHeapFlags (void)
 {
-	return (pHeapList) ? pHeapList->dwFlags : dwFlags;
+	return static_cast<U32>((pHeapList) ? pHeapList->dwFlags : dwFlags);
 }
 
 //--------------------------------------------------------------------------//
@@ -632,7 +636,7 @@ void * BaseHeap::calloc_pass_through (const C8 * msg)
 
 void RegisterHeap(ICOManager *pManager)
 {
-	pManager->RegisterComponent(&g_heap, interface_name);
+	pManager->RegisterComponent(&g_heap, heap_interface_name);
 }
 //--------------------------------------------------------------------------//
 //---------------------------END BaseHeap.cpp-------------------------------//

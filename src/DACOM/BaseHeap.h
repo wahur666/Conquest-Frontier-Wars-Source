@@ -54,12 +54,12 @@ struct BASE_BLOCK
 		pMsg = _pMsg;
 	}
 
-	U32 getOwner (void)
+	ULONG_PTR getOwner (void)
 	{
 		return pOwner;
 	}
 
-	void setOwner (U32 _pOwner)
+	void setOwner (ULONG_PTR _pOwner)
 	{
 		pOwner = _pOwner;
 	}
@@ -260,9 +260,9 @@ struct HeapInstance : public BaseHeap
 //
 inline void HeapInstance::RELINK (FREE_BLOCK *pBlock)
 {
-	FREE_BLOCK *pStart;
+	FREE_BLOCK *pStartBlock;
 
-  	if ((pStart = pFirstFreeBlock) == 0)		
+  	if ((pStartBlock = pFirstFreeBlock) == 0)		
 	{
 		// empty list
 		pFirstFreeBlock = pBlock;
@@ -276,26 +276,26 @@ inline void HeapInstance::RELINK (FREE_BLOCK *pBlock)
 		FREE_BLOCK *pTmp;
 		uintptr_t dwSize;
 
-		pTmp = pStart;
+		pTmp = pStartBlock;
 		dwSize = pBlock->dwSize;
 
-		if (dwSize < pStart->dwSize)
+		if (dwSize < pStartBlock->dwSize)
 			pFirstFreeBlock = pBlock;
 		else
 		{
-			while ((pStart = pStart->getNext()) != pTmp)
+			while ((pStartBlock = pStartBlock->getNext()) != pTmp)
 			{
-				if (dwSize <= pStart->dwSize)
+				if (dwSize <= pStartBlock->dwSize)
 					break;
 			}
 		}
 		
-		pStart = pStart->getPrev();
+		pStartBlock = pStartBlock->getPrev();
 	}
 
-	pBlock->pNext = pStart->pNext;
-	pBlock->pPrev = pStart;
-	pStart->pNext = pBlock;
+	pBlock->pNext = pStartBlock->pNext;
+	pBlock->pPrev = pStartBlock;
+	pStartBlock->pNext = pBlock;
 	pBlock->pNext->pPrev = pBlock;
 }
 
@@ -303,9 +303,9 @@ inline void HeapInstance::RELINK (FREE_BLOCK *pBlock)
 //
 inline void HeapInstance::UNLINK (FREE_BLOCK *pBlock)
 {
-	FREE_BLOCK *pPrev, *pNext;
+	FREE_BLOCK *pPrevBlock, *pNextBlock;
 
-	if ((pNext = pBlock->getNext()) == pBlock)
+	if ((pNextBlock = pBlock->getNext()) == pBlock)
 	{
 		// list is empty
 
@@ -314,14 +314,14 @@ inline void HeapInstance::UNLINK (FREE_BLOCK *pBlock)
 	}
 
 	if (pBlock == pFirstFreeBlock)
-		pFirstFreeBlock = pNext;
+		pFirstFreeBlock = pNextBlock;
 
 	// unlink the element
 
-	pPrev = pBlock->getPrev();
+	pPrevBlock = pBlock->getPrev();
 
-	pPrev->pNext = pNext;
-	pNext->pPrev = pPrev;
+	pPrevBlock->pNext = pNextBlock;
+	pNextBlock->pPrev = pPrevBlock;
 }	
 
 //--------------------------------------------------------------------------//
@@ -460,7 +460,7 @@ struct MTHeapInstance : public HeapInstance
 		return result;
 	}
 
-	DEFMETHOD_(BOOL32,SetBlockOwner) (void *allocatedBlock, U32 caller)
+	DEFMETHOD_(BOOL32,SetBlockOwner) (void *allocatedBlock, ULONG_PTR caller)
 	{
 		EnterCriticalSection(&criticalSection);
 		BOOL32 result = HeapInstance::SetBlockOwner(allocatedBlock, caller);

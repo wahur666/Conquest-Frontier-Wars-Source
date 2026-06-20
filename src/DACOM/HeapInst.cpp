@@ -59,7 +59,7 @@ U32 HeapInstance::Release (void)
 		return 0;
 	}
 
-	return dwRefs;
+	return static_cast<U32>(dwRefs);
 }
 //--------------------------------------------------------------------------//
 //
@@ -128,31 +128,31 @@ Done:
 BOOL32 HeapInstance::EnumerateBlocks (IHEAP_ENUM_PROC proc, void *context)
 {
 	BOOL32 result=1;
-	DWORD dwFlags;
+	DWORD blockFlags;
 	FREE_BLOCK *pBlock = (FREE_BLOCK *) pHeapBase;
 
 	while (result && pBlock->dwSize != 1)
 	{
-		if ((dwFlags = pBlock->isAllocated()) == 0)
+		if ((blockFlags = pBlock->isAllocated()) == 0)
 		{
 			// check the free list (circular list)
 			if (pBlock->getNext()->getPrev() != pBlock)
-				dwFlags |= DAHEAPFLAG_CORRUPTED_BLOCK;
+				blockFlags |= DAHEAPFLAG_CORRUPTED_BLOCK;
 			if (pBlock->getPrev()->getNext() != pBlock)
-				dwFlags |= DAHEAPFLAG_CORRUPTED_BLOCK;
+				blockFlags |= DAHEAPFLAG_CORRUPTED_BLOCK;
 		}
 
 		// lower block check
 		if (pBlock->getLower()->getUpper() != pBlock)
-			dwFlags |= DAHEAPFLAG_CORRUPTED_BLOCK;
+			blockFlags |= DAHEAPFLAG_CORRUPTED_BLOCK;
 		// upper block check
 		if (pBlock->getUpper() && pBlock->getUpper()->getLower() != pBlock)
-			dwFlags |= DAHEAPFLAG_CORRUPTED_BLOCK;
+			blockFlags |= DAHEAPFLAG_CORRUPTED_BLOCK;
 
 		if (proc)
-			result = proc(this, ((char *)pBlock)+dwBaseBlockSize, dwFlags, context);
+			result = proc(this, ((char *)pBlock)+dwBaseBlockSize, blockFlags, context);
 
-		if (dwFlags & DAHEAPFLAG_CORRUPTED_BLOCK)
+		if (blockFlags & DAHEAPFLAG_CORRUPTED_BLOCK)
 			result=0;
 		else
 			pBlock = (FREE_BLOCK *) pBlock->getLower();
@@ -171,7 +171,7 @@ U32 HeapInstance::GetBlockSize (void *allocatedBlock)
 	if ((pBlock = verifyBlock(allocatedBlock)) == 0)
 		result = 0;
 	else
-		result = (pBlock->dwSize - dwBaseBlockSize) & ~1;
+		result = static_cast<U32>((pBlock->dwSize - dwBaseBlockSize) & ~1);
 
 	return result;
 }
@@ -206,8 +206,9 @@ BOOL32 HeapInstance::SetBlockMessage (void *allocatedBlock, const C8 *msg)
 //
 BOOL32 HeapInstance::DidAlloc (void *allocatedBlock)
 {
-	if (((DWORD)(pHeapBase) > (DWORD)allocatedBlock) ||
-			((DWORD)(pHeapBase) + dwHeapSize <= (DWORD)allocatedBlock))
+	const uintptr_t heapBase = reinterpret_cast<uintptr_t>(pHeapBase);
+	const uintptr_t blockAddress = reinterpret_cast<uintptr_t>(allocatedBlock);
+	if (heapBase > blockAddress || heapBase + dwHeapSize <= blockAddress)
 	{
 		return 0;
 	}
@@ -226,7 +227,7 @@ U32 HeapInstance::GetAvailableMemory (void)
 	do
 	{
 		pBlock = pBlock->getNext();
-		result += pBlock->dwSize - dwBaseBlockSize;
+		result += static_cast<U32>(pBlock->dwSize - dwBaseBlockSize);
 		if (--loops <= 0)
 			break;
 
@@ -244,7 +245,7 @@ U32 HeapInstance::GetLargestBlock (void)
 	if (pBlock)
 	{
 		if ((dwFlags & DAHEAPFLAG_NOBESTFIT) == 0)
-			result = pBlock->getPrev()->dwSize - dwBaseBlockSize;
+			result = static_cast<U32>(pBlock->getPrev()->dwSize - dwBaseBlockSize);
 		else
 		{
 			FREE_BLOCK *pStart = pFirstFreeBlock;
@@ -253,13 +254,13 @@ U32 HeapInstance::GetLargestBlock (void)
 			do
 			{
 				pBlock = pBlock->getNext();
-				result = __max(result, pBlock->dwSize);
+				result = __max(result, static_cast<U32>(pBlock->dwSize));
 				if (--loops <= 0)
 					break;
 
 			} while (pBlock != pStart);
 
-			result -= dwBaseBlockSize;
+			result -= static_cast<U32>(dwBaseBlockSize);
 		}
 	}
 	
@@ -269,7 +270,7 @@ U32 HeapInstance::GetLargestBlock (void)
 //
 U32 HeapInstance::GetHeapSize (void)
 {
-	return dwHeapSize - (dwBaseBlockSize*3) - sizeof(HeapInstance);
+	return static_cast<U32>(dwHeapSize - (dwBaseBlockSize*3) - sizeof(HeapInstance));
 }
 //--------------------------------------------------------------------------//
 //
@@ -347,7 +348,7 @@ void HeapInstance::sort (FREE_BLOCK *pBlock)
 	ASSERT(pBlock);
 
 	FREE_BLOCK *pFirst = pFirstFreeBlock, *edi, *esi;
-	DWORD dwSize = pBlock->dwSize;
+	uintptr_t dwSize = pBlock->dwSize;
 
 	// see if we have any work to do at all
 
@@ -416,7 +417,7 @@ void HeapInstance::sort (FREE_BLOCK *pBlock)
 BASE_BLOCK * HeapInstance::xmalloc (uintptr_t dwNumBytes)
 {
 	FREE_BLOCK *pBlock, *pStart;
-	DWORD dwRemainder;
+	uintptr_t dwRemainder = 0;
 
 
 	dwNumBytes = (dwNumBytes + dwBaseBlockSize + 7) & ~7;	// enforce quad-word alignment
@@ -431,11 +432,14 @@ BASE_BLOCK * HeapInstance::xmalloc (uintptr_t dwNumBytes)
 
 	do
 	{
-		if ((long)(dwRemainder = pBlock->dwSize - dwNumBytes) >= 0)
+		if (pBlock->dwSize >= dwNumBytes)
+		{
+			dwRemainder = pBlock->dwSize - dwNumBytes;
 			break;		// found a block
+		}
 	} while ((pBlock = pBlock->getNext()) != pStart);
 
-	if ((long)dwRemainder < 0)
+	if (pBlock->dwSize < dwNumBytes)
 		goto Error;		// out of memory
 
 
@@ -475,18 +479,18 @@ inline BOOL HeapInstance::mergeWithLower (BASE_BLOCK *pBlock)
 	ASSERT(pBlock);
 
 	FREE_BLOCK *pLower;
-	DWORD dwSize;
+	uintptr_t dwSize;
 
 	if (((dwSize = pBlock->dwSize) & 1) == 0)
 	{
-		doError(DAHEAP_INVALID_PTR, ((DWORD)pBlock) + dwBaseBlockSize);
+		doError(DAHEAP_INVALID_PTR, reinterpret_cast<uintptr_t>(pBlock) + dwBaseBlockSize);
 		return 0;
 	}
 
 	if (dwFlags & DAHEAPFLAG_DEBUGFILL_SNAN)		// includes regular mem fill too
 	{
 		if ((dwFlags & DAHEAPFLAG_DEBUGFILL_SNAN) == DAHEAPFLAG_DEBUGFILL_SNAN)
-			snanfill(&pBlock->pMsg, ((dwSize&~1)-daoffsetofmember(BASE_BLOCK,pMsg)) >> 2);
+			snanfill(&pBlock->pMsg, static_cast<U32>(((dwSize&~1)-daoffsetofmember(BASE_BLOCK,pMsg)) >> 2));
 		else
 			memset(&pBlock->pMsg, 0xCB, (dwSize&~1)-daoffsetofmember(BASE_BLOCK,pMsg));
 	}
@@ -514,7 +518,7 @@ BOOL HeapInstance::free (FREE_BLOCK *pBlock)
 	ASSERT(pBlock);
 
 	FREE_BLOCK *pUpper;
-	DWORD dwSize;
+	uintptr_t dwSize;
 	
 	// merge this block with lower one if possible
 	if (mergeWithLower(pBlock) == 0)
@@ -572,7 +576,7 @@ Done:
 //
 ULONG_PTR HeapInstance::GetBlockOwner (void *allocatedBlock)
 {
-	U32 result=0;
+	ULONG_PTR result=0;
 	BASE_BLOCK *pBlock;
 
 	if ((pBlock = verifyBlock(allocatedBlock)) == 0)

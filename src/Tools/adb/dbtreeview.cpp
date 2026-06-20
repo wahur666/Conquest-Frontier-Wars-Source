@@ -12,9 +12,11 @@
 */
 //--------------------------------------------------------------------------
 
-#include <Afxcmn.h>
-#include <Afxtempl.h>
+#include <windows.h>
+#include <commctrl.h>
 #include <malloc.h>
+#include <string>
+#include <vector>
 
 #include "dbTreeView.h"
 
@@ -29,18 +31,38 @@ extern HWND hMainWindow;
 
 //-------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
-#ifndef DEBUG_NEW
-	void* __cdecl operator new(size_t nSize, LPCSTR lpszFileName, int nLine);
-	#define DEBUG_NEW new(THIS_FILE, __LINE__)
-	#if _MSC_VER >= 1200
-		void __cdecl operator delete(void* p, LPCSTR lpszFileName, int nLine);
-	#endif
-#endif
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+namespace
+{
+	std::string GetTreeItemText(HWND tree, HTREEITEM item)
+	{
+		char buffer[512] = {};
+		TVITEM tvi = {};
+		tvi.mask = TVIF_HANDLE | TVIF_TEXT;
+		tvi.hItem = item;
+		tvi.pszText = buffer;
+		tvi.cchTextMax = sizeof(buffer);
+		TreeView_GetItem(tree, &tvi);
+		return buffer;
+	}
+
+	bool SetTreeItemData(HWND tree, HTREEITEM item, DWORD data)
+	{
+		TVITEM tvi = {};
+		tvi.mask = TVIF_HANDLE | TVIF_PARAM;
+		tvi.hItem = item;
+		tvi.lParam = data;
+		return TreeView_SetItem(tree, &tvi) != FALSE;
+	}
+
+	DWORD GetTreeItemData(HWND tree, HTREEITEM item)
+	{
+		TVITEM tvi = {};
+		tvi.mask = TVIF_HANDLE | TVIF_PARAM;
+		tvi.hItem = item;
+		TreeView_GetItem(tree, &tvi);
+		return static_cast<DWORD>(tvi.lParam);
+	}
+}
 
 //--------------------------------------------------------------------------
 
@@ -53,7 +75,10 @@ DbTreeView::DbTreeView()
 
 DbTreeView::~DbTreeView()
 {
-	delete m_TreeCtrl;
+	if (m_TreeCtrl)
+	{
+		DestroyWindow(m_TreeCtrl);
+	}
 	m_TreeCtrl = NULL;
 }
 
@@ -68,17 +93,34 @@ bool DbTreeView::Init( HWND _hwnd )
 	::ShowWindow( _hwnd, SW_HIDE );
 	::GetWindowPlacement( _hwnd, &winPlace );
 
-	CWnd* cWnd = new CWnd();
-	cWnd->Attach( ::GetParent(_hwnd) );
+	INITCOMMONCONTROLSEX icc = {};
+	icc.dwSize = sizeof(icc);
+	icc.dwICC = ICC_TREEVIEW_CLASSES;
+	InitCommonControlsEx(&icc);
 
 	DWORD dwStyle = TVS_LINESATROOT | TVS_HASLINES | TVS_NOTOOLTIPS | WS_CHILD | WS_BORDER | TVS_HASBUTTONS;
 	
-	m_TreeCtrl = new CTreeCtrl();
-	m_TreeCtrl->Create( dwStyle, r, cWnd, IDD_TREE_DLG );
+	m_TreeCtrl = CreateWindowEx(
+		0,
+		WC_TREEVIEW,
+		"",
+		dwStyle,
+		r.left,
+		r.top,
+		r.right - r.left,
+		r.bottom - r.top,
+		::GetParent(_hwnd),
+		reinterpret_cast<HMENU>(static_cast<UINT_PTR>(IDD_TREE_DLG)),
+		GetModuleHandle(NULL),
+		NULL);
 
+	if (!m_TreeCtrl)
+	{
+		return false;
+	}
 
-	m_TreeCtrl->ShowWindow( SW_NORMAL );
-	m_TreeCtrl->SetWindowPos( NULL, winPlace.rcNormalPosition.left, winPlace.rcNormalPosition.top, 0, 0, SWP_NOSIZE );
+	::ShowWindow( m_TreeCtrl, SW_NORMAL );
+	::SetWindowPos( m_TreeCtrl, NULL, winPlace.rcNormalPosition.left, winPlace.rcNormalPosition.top, 0, 0, SWP_NOSIZE );
 
 	return true;
 }
@@ -104,7 +146,7 @@ bool DbTreeView::CreateBranch( DWORD _data, char* _label, ... )
 
 	if( item != TVI_ROOT )
 	{
-		return( m_TreeCtrl->SetItemData(item,_data) != false );
+		return SetTreeItemData(m_TreeCtrl, item, _data);
 	}
 
 	return false;
@@ -115,7 +157,7 @@ bool DbTreeView::CreateBranch( DWORD _data, char* _label, ... )
 bool DbTreeView::Clear()
 {
 	if( !m_TreeCtrl ) return false;
-	return( m_TreeCtrl->DeleteAllItems() != false );
+	return( TreeView_DeleteAllItems(m_TreeCtrl) != false );
 }
 
 //--------------------------------------------------------------------------
@@ -149,7 +191,7 @@ bool DbTreeView::CreateBranchByParsing( char* _label, const char* _parser, DWORD
 
 	if( hItem != TVI_ROOT )
 	{
-		return( m_TreeCtrl->SetItemData(hItem,_data) != false );
+		return SetTreeItemData(m_TreeCtrl, hItem, _data);
 	}
 
 	return false;
@@ -195,15 +237,15 @@ bool DbTreeView::OnNotify( HWND _hwnd, WPARAM _wParam, LPARAM _lParam )
 		case TVN_ITEMEXPANDING:
 		{
 			LPNMTREEVIEW lpnmtv = (LPNMTREEVIEW)_lParam;
-			m_TreeCtrl->SortChildren( lpnmtv->itemNew.hItem );
+			TreeView_SortChildren( m_TreeCtrl, lpnmtv->itemNew.hItem, 0 );
 			break;
 		}
 		case NM_RCLICK:
 		{
-			HTREEITEM hCurItem = m_TreeCtrl->GetDropHilightItem();
+			HTREEITEM hCurItem = TreeView_GetDropHilight(m_TreeCtrl);
 			if (hCurItem == NULL)
 			{
-				hCurItem = m_TreeCtrl->GetSelectedItem();
+				hCurItem = TreeView_GetSelection(m_TreeCtrl);
 				if (hCurItem == NULL)
 				{
 					return false;
@@ -211,24 +253,24 @@ bool DbTreeView::OnNotify( HWND _hwnd, WPARAM _wParam, LPARAM _lParam )
 			}
 
 			// setting up the location for the pop-up menu
-			m_TreeCtrl->Select(hCurItem, TVGN_CARET);
+			TreeView_Select(m_TreeCtrl, hCurItem, TVGN_CARET);
 
 			RECT rectSel;
-			m_TreeCtrl->GetItemRect(hCurItem, &rectSel, TRUE);
-			m_TreeCtrl->ClientToScreen(&rectSel);
+			TreeView_GetItemRect(m_TreeCtrl, hCurItem, &rectSel, TRUE);
+			MapWindowPoints(m_TreeCtrl, HWND_DESKTOP, reinterpret_cast<POINT*>(&rectSel), 2);
 
 			rectSel.top  += 10;
 			rectSel.left += 10;
 			 
 			// Load the menu resource. 	
-			CMenu menu;
-			menu.LoadMenu(IDR_FILEPOPUP);
+			HMENU menu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_FILEPOPUP));
+			HMENU subMenu = menu ? GetSubMenu(menu, 0) : NULL;
 
-			// Display the shortcut menu. Track the right mouse button. 
-
-			CMenu* pSubMenu = menu.GetSubMenu(0); 
-
-			BOOL ret = pSubMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, rectSel.left, rectSel.top, m_TreeCtrl); 
+			BOOL ret = subMenu ? TrackPopupMenu(subMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, rectSel.left, rectSel.top, 0, m_TreeCtrl, NULL) : 0;
+			if (menu)
+			{
+				DestroyMenu(menu);
+			}
 
 			if( ret == IDM_UNDOCHECKOUT )
 			{
@@ -273,14 +315,14 @@ int DbTreeView::GetCurrentSelectionData( void )
 {
 	if( !m_TreeCtrl ) return false;
 
-	HTREEITEM hitem = m_TreeCtrl->GetSelectedItem();
+	HTREEITEM hitem = TreeView_GetSelection(m_TreeCtrl);
 
 	if( !hitem )
 	{
 		return -1;
 	}
 
-	return (int)m_TreeCtrl->GetItemData( hitem );
+	return (int)GetTreeItemData( m_TreeCtrl, hitem );
 }
 
 //--------------------------------------------------------------------------
@@ -291,27 +333,27 @@ bool DbTreeView::GetRootToSelected( char* _rootLabel, int _rootLabelMax, const c
 
 	if( !m_TreeCtrl ) return false;
 
-	HTREEITEM hitem = m_TreeCtrl->GetSelectedItem();
+	HTREEITEM hitem = TreeView_GetSelection(m_TreeCtrl);
 
 	if( !hitem )
 		return false;
 
-	CArray<CString, const CString&> stringArray;
+	std::vector<std::string> stringArray;
 
-	if( m_TreeCtrl->GetItemData(hitem) != 0xFFFFFFFF )
+	if( GetTreeItemData(m_TreeCtrl, hitem) != 0xFFFFFFFF )
 	{
-		hitem = m_TreeCtrl->GetParentItem( hitem );
+		hitem = TreeView_GetParent(m_TreeCtrl, hitem);
 	}
 
 	while( hitem )
 	{
-		stringArray.Add( m_TreeCtrl->GetItemText(hitem) );
-		hitem = m_TreeCtrl->GetParentItem( hitem );
+		stringArray.push_back( GetTreeItemText(m_TreeCtrl, hitem) );
+		hitem = TreeView_GetParent(m_TreeCtrl, hitem);
 	}
 
-	for( int i = stringArray.GetSize()-1; i >= 0; i-- )
+	for( int i = static_cast<int>(stringArray.size())-1; i >= 0; i-- )
 	{
-		strcat( _rootLabel, (const char*)stringArray[i] );
+		strcat( _rootLabel, stringArray[i].c_str() );
 		strcat( _rootLabel, _seperator );
 	}
 	
@@ -326,17 +368,17 @@ void DbTreeView::SavePlace()
 
 	if( m_TreeCtrl )
 	{
-		CArray<CString,const CString&> stringArray;
-		HTREEITEM item = m_TreeCtrl->GetSelectedItem();
+		std::vector<std::string> stringArray;
+		HTREEITEM item = TreeView_GetSelection(m_TreeCtrl);
 		while( item )
 		{
-			stringArray.Add( m_TreeCtrl->GetItemText(item) );
-			item = m_TreeCtrl->GetParentItem( item );
+			stringArray.push_back( GetTreeItemText(m_TreeCtrl, item) );
+			item = TreeView_GetParent(m_TreeCtrl, item);
 		}
 
-		for( int i = stringArray.GetSize()-1; i >= 0; i-- )
+		for( int i = static_cast<int>(stringArray.size())-1; i >= 0; i-- )
 		{
-			strcat( m_CurrentItemName, (const char*)stringArray[i] );
+			strcat( m_CurrentItemName, stringArray[i].c_str() );
 
 			if( i )
 				strcat( m_CurrentItemName, "!!" );
@@ -353,41 +395,40 @@ HTREEITEM DbTreeView::FindPlace( HTREEITEM _item, const char* _archname, int _ar
 		return NULL;
 	}
 
-	CString mask = _archname;
-	mask = mask.Left( _archindex );
+	std::string mask(_archname, _archindex);
 	
-	int nPrev = mask.Find("!!",0);
-	while( nPrev > 0 )
+	size_t nPrev = mask.find("!!");
+	while( nPrev != std::string::npos && nPrev > 0 )
 	{
-		mask = mask.Mid( nPrev + 2 );
-		nPrev = mask.Find("!!",0);
+		mask = mask.substr( nPrev + 2 );
+		nPrev = mask.find("!!");
 	}
 
 	HTREEITEM item = _item;
 
 	while( item )
 	{
-		CString label = m_TreeCtrl->GetItemText(item);
+		std::string label = GetTreeItemText(m_TreeCtrl, item);
 		if( label == mask )
 		{
 			break;
 		}
-		item = m_TreeCtrl->GetNextSiblingItem(item);
+		item = TreeView_GetNextSibling(m_TreeCtrl, item);
 	}
 
 	if( item && _archindex < (int)strlen(_archname) )
 	{
 		mask = _archname;
-		int nextIndex = mask.Find("!!", _archindex + 2);
+		size_t nextIndex = mask.find("!!", _archindex + 2);
 
-		if( nextIndex < 0 )
+		if( nextIndex == std::string::npos )
 		{
-			nextIndex = mask.GetLength();
+			nextIndex = mask.length();
 		}
 		else
-			mask = mask.Left( _archindex + nextIndex );
+			mask = mask.substr( 0, _archindex + nextIndex );
 
-		return FindPlace( m_TreeCtrl->GetChildItem(item), _archname, nextIndex );
+		return FindPlace( TreeView_GetChild(m_TreeCtrl, item), _archname, static_cast<int>(nextIndex) );
 	}
 
 	return item;
@@ -399,16 +440,17 @@ void DbTreeView::RestorePlace()
 {
 	if( m_TreeCtrl )
 	{
-		CString string = m_CurrentItemName;
-		int index = string.Find("!!",0);
+		std::string string = m_CurrentItemName;
+		size_t index = string.find("!!");
 
-		if( index != -1 )
+		if( index != std::string::npos )
 		{
-			string = string.Left( index );
-			HTREEITEM item = FindPlace( m_TreeCtrl->GetRootItem(), m_CurrentItemName, index );
+			string = string.substr( 0, index );
+			HTREEITEM item = FindPlace( TreeView_GetRoot(m_TreeCtrl), m_CurrentItemName, static_cast<int>(index) );
 			if( item )
 			{
-				m_TreeCtrl->SelectSetFirstVisible( item );
+				TreeView_SelectItem(m_TreeCtrl, item);
+				TreeView_EnsureVisible(m_TreeCtrl, item);
 			}
 		}
 	}
@@ -422,27 +464,34 @@ HTREEITEM DbTreeView::InsertBranch( char* _label, HTREEITEM _item )
 
 	if( hItem == TVI_ROOT )
 	{
-		hItem = m_TreeCtrl->GetNextItem( hItem, TVGN_ROOT );
+		hItem = TreeView_GetRoot(m_TreeCtrl);
 	}
 	else
 	{
-		hItem = m_TreeCtrl->GetNextItem( _item, TVGN_CHILD );
+		hItem = TreeView_GetChild(m_TreeCtrl, _item);
 	}
 
 	while( hItem != NULL )
 	{
-		CString s = m_TreeCtrl->GetItemText( hItem );
+		std::string s = GetTreeItemText( m_TreeCtrl, hItem );
 
-		if( s.Compare(_label)==0 )
+		if( s == _label )
 		{
 			return hItem;
 		}
 
-		hItem = m_TreeCtrl->GetNextSiblingItem( hItem );
+		hItem = TreeView_GetNextSibling(m_TreeCtrl, hItem);
 	}
 	
-	hItem = m_TreeCtrl->InsertItem( _label, _item );
-	m_TreeCtrl->SetItemData( hItem, (DWORD)-1 );
+	TVINSERTSTRUCT insert = {};
+	insert.hParent = _item;
+	insert.hInsertAfter = TVI_SORT;
+	insert.item.mask = TVIF_TEXT | TVIF_PARAM;
+	insert.item.pszText = _label;
+	insert.item.lParam = (DWORD)-1;
+
+	hItem = TreeView_InsertItem( m_TreeCtrl, &insert );
+	SetTreeItemData( m_TreeCtrl, hItem, (DWORD)-1 );
 
 	return hItem;
 }

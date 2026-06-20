@@ -22,20 +22,6 @@
 #define printf _localprintf
 
 //-------------------------------------------------------------------------------------
-
-#ifdef _DEBUG
-#ifndef DEBUG_NEW
-	void* __cdecl operator new(size_t nSize, LPCSTR lpszFileName, int nLine);
-	#define DEBUG_NEW new(THIS_FILE, __LINE__)
-	#if _MSC_VER >= 1200
-		void __cdecl operator delete(void* p, LPCSTR lpszFileName, int nLine);
-	#endif
-#endif
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 #define PRINT_MDB_ERRORS
 
 //-------------------------------------------------------------------------------------

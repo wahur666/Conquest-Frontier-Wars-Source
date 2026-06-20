@@ -27,8 +27,8 @@
 #define compare strcmp
 #define compare_len strncmp
 #else
-#define compare stricmp
-#define compare_len strnicmp
+#define compare _stricmp
+#define compare_len _strnicmp
 #endif
 #pragma warning (disable : 4100)		// formal parameter unused
 
@@ -79,9 +79,9 @@ struct DACOM_NO_VTABLE ProfileParser : IProfileParser
 
 	DEFMETHOD_(BOOL32,CloseSection) (HANDLE hSection);
 
-	DEFMETHOD_(U32,ReadProfileLine) (HANDLE hSection, U32 lineNumber, C8 * buffer, U32 bufferSize);
+	DEFMETHOD_(U32,ReadProfileLine) (HANDLE hSection, U32 lineNumber, C8 * buffer, U32 outBufferSize);
 
-	DEFMETHOD_(U32,ReadKeyValue) (HANDLE hSection, const C8 * keyName, C8 * buffer, U32 bufferSize);
+	DEFMETHOD_(U32,ReadKeyValue) (HANDLE hSection, const C8 * keyName, C8 * buffer, U32 outBufferSize);
 
 	/* ProfileParser methods */
 
@@ -97,7 +97,7 @@ struct DACOM_NO_VTABLE ProfileParser : IProfileParser
 
 	const char * getLine (HANDLE hSection, int line) const
 	{
-		return getLine(fileBuffer+((U32)hSection), line);
+		return getLine(fileBuffer + reinterpret_cast<uintptr_t>(hSection), line);
 	}
 
 	static IDAComponent* GetIProfileParser(void* self) {
@@ -143,19 +143,19 @@ struct DACOM_NO_VTABLE ProfileParser2 : IProfileParser2, ProfileParser
 		return ProfileParser::CloseSection(hSection);
 	}
 
-	virtual U32 __stdcall ReadProfileLine (HANDLE hSection, U32 lineNumber, C8 * buffer, U32 bufferSize)
+	virtual U32 __stdcall ReadProfileLine (HANDLE hSection, U32 lineNumber, C8 * buffer, U32 outBufferSize)
 	{
-		return ProfileParser::ReadProfileLine(hSection, lineNumber, buffer, bufferSize);
+		return ProfileParser::ReadProfileLine(hSection, lineNumber, buffer, outBufferSize);
 	}
 
-	virtual U32 __stdcall ReadKeyValue (HANDLE hSection, const C8 * keyName, C8 * buffer, U32 bufferSize)
+	virtual U32 __stdcall ReadKeyValue (HANDLE hSection, const C8 * keyName, C8 * buffer, U32 outBufferSize)
 	{
-		return ProfileParser::ReadKeyValue(hSection, keyName, buffer, bufferSize);
+		return ProfileParser::ReadKeyValue(hSection, keyName, buffer, outBufferSize);
 	}
 
 	/* IProfileParser2 methods */
 
-	virtual GENRESULT __stdcall Initialize2 (const C8 *buffer, U32 bufferSize );
+	virtual GENRESULT __stdcall Initialize2 (const C8 *buffer, U32 inputBufferSize );
 
 	virtual BOOL32 __stdcall EnumerateSections (IProfileCallback * callback, void *context);
 
@@ -226,9 +226,9 @@ GENRESULT ProfileParser::Initialize (const C8 *fileName, ACCESS access)
 			if (bBufferType)
 				memcpy(fileBuffer+1, fileName, fileSize);
 			else
-				::ReadFile(hFile, fileBuffer+1, fileSize, LPDWORD(&bytesRead), 0);
+				::ReadFile(hFile, fileBuffer+1, static_cast<DWORD>(fileSize), LPDWORD(&bytesRead), 0);
 			::free(oldBuffer);
-			bufferSize = fileSize+1;
+			bufferSize = static_cast<U32>(fileSize+1);
 
 			oldBuffer = fileBuffer+1;
 			while (*oldBuffer == ' ')
@@ -273,9 +273,9 @@ GENRESULT ProfileParser::Initialize (const C8 *fileName, ACCESS access)
 }
 //--------------------------------------------------------------------------//
 //
-GENRESULT ProfileParser2::Initialize2 (const C8 *buffer, U32 bufferSize )
+GENRESULT ProfileParser2::Initialize2 (const C8 *buffer, U32 inputBufferSize )
 {
-	return Initialize(buffer, ACCESS(bufferSize | 0x80000000));
+	return Initialize(buffer, ACCESS(inputBufferSize | 0x80000000));
 }
 //--------------------------------------------------------------------------//
 // find 0D0A, then skip white space
@@ -288,7 +288,7 @@ const char * ProfileParser::getLine (const char * buffer, int line)
 	{
 		if ((tmp = strchr(buffer, '\n')) == 0)
 		{
-			int len = strlen(buffer);
+			int len = static_cast<int>(strlen(buffer));
 
 			buffer += len+1;
 			if (buffer[0] == 0)
@@ -334,7 +334,7 @@ const char * ProfileParser::getSection (const char * buffer, int count)
 
 	while (count>0)
 	{
-		len = strlen(buffer);
+		len = static_cast<int>(strlen(buffer));
 		buffer += len;
 		if (buffer[1] != 0)		// found a ']'
 		{
@@ -407,7 +407,7 @@ BOOL32 ProfileParser2::EnumerateKeys (IProfileCallback * callback, HANDLE hSecti
 	char value[256];
 	int len;
 
-	tmp = fileBuffer+((U32)hSection);
+	tmp = fileBuffer + reinterpret_cast<uintptr_t>(hSection);
 
 	while ((tmp = getLine(tmp, 1)) != 0)
 	{
@@ -425,7 +425,7 @@ BOOL32 ProfileParser2::EnumerateKeys (IProfileCallback * callback, HANDLE hSecti
 			// tmp2 -> last char of keyName
 			if (tmp2 >= tmp)
 			{
-				len = tmp2-tmp+1;
+				len = static_cast<int>(tmp2-tmp+1);
 				len = __min(255, len);
 				memcpy(name, tmp, len);
 				name[len] = 0;
@@ -444,10 +444,10 @@ BOOL32 ProfileParser2::EnumerateKeys (IProfileCallback * callback, HANDLE hSecti
 					}
 					else
 					{
-						tmp2 = tmp3 + strlen(tmp2);
+						tmp2 = tmp3 + strlen(tmp3);
 					}
 
-					len = tmp2-tmp3;
+					len = static_cast<int>(tmp2-tmp3);
 					len = __min(255, len);
 					memcpy(value, tmp3, len);
 					value[len] = 0;
@@ -478,7 +478,7 @@ HANDLE ProfileParser::CreateSection (const C8 *sectionName, CREATE_MODE mode)
 
 	if (sectionName > fileBuffer && sectionName < fileBuffer+bufferSize)
 	{
-		result = (HANDLE) (sectionName - fileBuffer);
+		result = reinterpret_cast<HANDLE>(static_cast<uintptr_t>(sectionName - fileBuffer));
 	}
 	else
 	{
@@ -492,7 +492,7 @@ HANDLE ProfileParser::CreateSection (const C8 *sectionName, CREATE_MODE mode)
 		{
 			if (_stricmp(buffer, sectionName) == 0)
 			{
-				result = (HANDLE) (buffer - fileBuffer);
+				result = reinterpret_cast<HANDLE>(static_cast<uintptr_t>(buffer - fileBuffer));
 				goto Done;
 			}
 
@@ -513,7 +513,7 @@ BOOL32 ProfileParser::CloseSection (HANDLE hSection)
 }
 //--------------------------------------------------------------------------//
 //
-U32 ProfileParser::ReadProfileLine (HANDLE hSection, U32 lineNumber, C8 * buffer, U32 bufferSize)
+U32 ProfileParser::ReadProfileLine (HANDLE hSection, U32 lineNumber, C8 * buffer, U32 outBufferSize)
 {
 	U32 result = 0;
 	const char * tmp, * tmp2;
@@ -522,18 +522,18 @@ U32 ProfileParser::ReadProfileLine (HANDLE hSection, U32 lineNumber, C8 * buffer
 	{
 		if ((tmp2 = strchr(tmp, '\n')) != 0)
 		{
-			result = tmp2 - tmp;
+			result = static_cast<U32>(tmp2 - tmp);
 			if (result && tmp[result-1] == '\r')
 				result--;	// get rid of extra char
 		}
 		else
-			result = strlen(tmp);
-		if (bufferSize < result+1)
-			result = bufferSize-1;
+			result = static_cast<U32>(strlen(tmp));
+		if (outBufferSize < result+1)
+			result = outBufferSize-1;
 
 		if (buffer)
 		{
-			if (result == 0 && bufferSize>1)
+			if (result == 0 && outBufferSize>1)
 			{
 				*buffer = ' ';
 				result++;
@@ -557,13 +557,13 @@ U32 ProfileParser::ReadKeyValue (HANDLE hSection, const C8 * keyName, C8 * buffe
 	const char * tmp, * tmp2;
 	int cmplen;
 
-	cmplen = strlen(keyName);
-	tmp = fileBuffer+((U32)hSection);
+	cmplen = static_cast<int>(strlen(keyName));
+	tmp = fileBuffer + reinterpret_cast<uintptr_t>(hSection);
 
 	while ((tmp = getLine(tmp, 1)) != 0)
 	{
 		// is there enough room in the buffer for a match to be possible?
-		if (U32(tmp) - U32(fileBuffer) + cmplen <= bufferSize)
+		if (reinterpret_cast<uintptr_t>(tmp) - reinterpret_cast<uintptr_t>(fileBuffer) + static_cast<uintptr_t>(cmplen) <= bufferSize)
 		{
 			// make sure last character of tmp[] is not a letter,number,or underscore
 			if (__iscsym(tmp[cmplen])==0)
@@ -578,12 +578,12 @@ U32 ProfileParser::ReadKeyValue (HANDLE hSection, const C8 * keyName, C8 * buffe
 
 						if ((tmp2 = strchr(tmp, '\n')) != 0)
 						{
-							result = tmp2 - tmp;
+							result = static_cast<U32>(tmp2 - tmp);
 							if (result && tmp[result-1] == '\r')
 								result--;	// get rid of extra char
 						}
 						else
-							result = strlen(tmp);
+							result = static_cast<U32>(strlen(tmp));
 						if (outBufferSize < result+1)
 							result = outBufferSize-1;
 

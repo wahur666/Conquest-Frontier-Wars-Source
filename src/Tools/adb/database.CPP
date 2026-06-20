@@ -57,12 +57,6 @@ using namespace std;
 
 //-------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 //--------------------------------------------------------------------------
 //-----------------------Game Global instances------------------------------
 //--------------------------------------------------------------------------
@@ -737,9 +731,6 @@ int WINAPI WinMain (HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 	InitCommonControls();  	// This MUST be called once per instance
 	// to register the common controls
 
-	extern BOOL __stdcall AfxWinInit( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow );
-	AfxWinInit( hInstance, hPrevInstance, lpszCmdLine, nCmdShow );
-	
 	SetupParser();
 	
 	if (CreateUserDefaults() == 0)
