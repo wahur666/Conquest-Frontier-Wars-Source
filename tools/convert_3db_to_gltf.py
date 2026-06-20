@@ -14,6 +14,7 @@ import base64
 import json
 import math
 import re
+import shutil
 import struct
 import sys
 import zlib
@@ -156,6 +157,12 @@ def main() -> int:
         default="none",
         help="Texture coordinate transform to apply. Default preserves source UVs.",
     )
+    parser.add_argument(
+        "--scale",
+        type=float,
+        default=1.0,
+        help="Scale factor to apply to all coordinates (e.g., 0.01 for 1/100 scale).",
+    )
     args = parser.parse_args()
 
     input_path = args.input
@@ -170,13 +177,14 @@ def main() -> int:
         raise SystemExit(f"Expected <unit> root in {input_path}")
 
     mesh_root = child_dir(root, "openFLAME 3D N-mesh")
+    sidecar_data = None
     if mesh_root is not None:
         textures = {} if args.no_textures else load_textures(mesh_root)
         write_textures(textures, output_path.parent)
         materials, id_to_index = load_materials(mesh_root, textures)
-        gltf, bin_data = build_gltf(root, mesh_root, materials, id_to_index, textures, output_path, args.uv_transform)
+        gltf, bin_data = build_gltf(root, mesh_root, materials, id_to_index, textures, output_path, args.uv_transform, args.scale)
     elif child_dir(root, "Cmpnd") is not None:
-        gltf, bin_data, textures = build_compound_gltf(root, input_path, output_path, args.no_textures, args.uv_transform)
+        gltf, bin_data, textures, sidecar_data = build_compound_gltf(root, input_path, output_path, args.no_textures, args.uv_transform, args.scale)
     else:
         raise SystemExit("No openFLAME 3D N-mesh or Cmpnd directory found.")
 
@@ -186,9 +194,14 @@ def main() -> int:
 
     bin_path.write_bytes(bin_data)
     output_path.write_text(json.dumps(gltf, indent=2), encoding="utf-8")
+    if sidecar_data is not None:
+        sidecar_path = output_path.with_suffix(".cfwcmp.json")
+        sidecar_path.write_text(json.dumps(sidecar_data, indent=2), encoding="utf-8")
 
     print(f"Wrote {output_path}")
     print(f"Wrote {bin_path}")
+    if sidecar_data is not None:
+        print(f"Wrote {sidecar_path}")
     if textures:
         print(f"Wrote {len(textures)} texture PNG(s)")
     return 0
@@ -202,6 +215,7 @@ def build_gltf(
     textures: dict[str, TextureImage],
     output_path: Path,
     uv_transform: str,
+    scale: float = 1.0
 ) -> tuple[dict, bytes]:
     gltf = {
         "asset": {
@@ -237,6 +251,7 @@ def build_gltf(
         material_variant_cache,
         args_label="mesh",
         uv_transform=uv_transform,
+        scale=scale
     )
 
     if not gltf["meshes"][0]["primitives"]:
@@ -253,7 +268,8 @@ def build_compound_gltf(
     output_path: Path,
     no_textures: bool,
     uv_transform: str,
-) -> tuple[dict, bytes, dict[str, TextureImage]]:
+    scale: float = 1.0
+) -> tuple[dict, bytes, dict[str, TextureImage], dict]:
     cmpnd = child_dir(unit_root, "Cmpnd")
     if cmpnd is None:
         raise SystemExit("Compound file is missing Cmpnd directory.")
@@ -316,6 +332,7 @@ def build_compound_gltf(
             material_variant_cache,
             args_label=part.object_name,
             uv_transform=uv_transform,
+            scale=scale
         )
 
         if not gltf["meshes"][mesh_index]["primitives"]:
@@ -339,13 +356,14 @@ def build_compound_gltf(
 
     joints = read_compound_joints(child_dir(cmpnd, "Cons"))
     attach_compound_nodes(gltf, node_by_part, joints)
+    sidecar = build_compound_sidecar(unit_root, input_path, output_path, parts, node_by_part, joints)
     gltf["nodes"][0].setdefault("extras", {})["sourceCompoundJoints"] = [
         {"type": joint.type, "parent": joint.parent, "child": joint.child}
         for joint in joints
     ]
 
     prune_empty_gltf_arrays(gltf)
-    return gltf, bytes(writer.data), textures
+    return gltf, bytes(writer.data), textures, sidecar
 
 
 def append_mesh_primitives(
@@ -361,6 +379,7 @@ def append_mesh_primitives(
     *,
     args_label: str,
     uv_transform: str,
+    scale: float = 1.0,
 ) -> None:
     mesh_children = child_dirs(mesh_root)
     vertices_node = mesh_children.get("Vertices")
@@ -417,6 +436,7 @@ def append_mesh_primitives(
                 object_index = vertex_batch[chain_index] if chain_index < len(vertex_batch) else 0
                 tex_index = texture_batch[chain_index] if chain_index < len(texture_batch) else 0
                 position = vector_at(object_vertices, object_index)
+                position = tuple(p * scale for p in position)
                 normal_index = vertex_normals[object_index] if object_index < len(vertex_normals) else 0
                 normal = face_normal if flat else vector_at(surface_normals, normal_index)
                 uv = transform_uv(tex_at(tex_vertices, tex_index), uv_transform)
@@ -644,6 +664,104 @@ def attach_compound_nodes(gltf: dict, node_by_part: dict[str, int], joints: list
     for part_name, node_index in node_by_part.items():
         if part_name not in attached:
             root_children.append(node_index)
+
+
+def build_compound_sidecar(
+    unit_root: ET.Element,
+    input_path: Path,
+    output_path: Path,
+    parts: list[CompoundPart],
+    node_by_part: dict[str, int],
+    joints: list[CompoundJoint],
+) -> dict:
+    joint_by_child = {joint.child: joint for joint in joints}
+    mesh_parts = [part for part in parts if part.object_name in node_by_part]
+    particle_parts = [part for part in parts if part.file_name.lower().endswith(".pte")]
+    attachments = []
+
+    for part in particle_parts:
+        joint = joint_by_child.get(part.object_name)
+        pte_stem = Path(part.file_name).stem
+        unified_xml = copy_compound_particle_xml(output_path, pte_stem)
+        entry = {
+            "objectName": part.object_name,
+            "partDir": part.part_dir,
+            "sourceFileName": part.file_name,
+            "sourcePartIndex": part.index,
+            "unifiedXml": unified_xml,
+            "parentName": joint.parent if joint is not None else "",
+            "jointType": joint.type if joint is not None else "",
+            "localTransform": transform_sidecar_dict(joint) if joint is not None else identity_transform_sidecar_dict(),
+        }
+        attachments.append(entry)
+
+    return {
+        "format": "cfw-compound-sidecar",
+        "version": 1,
+        "sourceFile": str(input_path),
+        "sourceUnit": unit_root.attrib.get("name", input_path.name),
+        "gltf": output_path.name,
+        "meshParts": [
+            {
+                "objectName": part.object_name,
+                "partDir": part.part_dir,
+                "sourceFileName": part.file_name,
+                "sourcePartIndex": part.index,
+            }
+            for part in mesh_parts
+        ],
+        "particleAttachments": attachments,
+        "joints": [
+            {
+                "type": joint.type,
+                "parent": joint.parent,
+                "child": joint.child,
+                "localTransform": transform_sidecar_dict(joint),
+            }
+            for joint in joints
+        ],
+    }
+
+
+def copy_compound_particle_xml(output_path: Path, pte_stem: str) -> str:
+    file_name = f"{pte_stem}.pte.unified.xml"
+    source_path = Path("godot-proj") / "cfw-asset-test" / "xml_unified" / file_name
+    particle_dir = output_path.parent / "particles"
+    if source_path.exists():
+        particle_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source_path, particle_dir / file_name)
+
+    parts = output_path.parent.parts
+    if "assets" in parts:
+        asset_index = parts.index("assets")
+        asset_rel = "/".join(parts[asset_index:])
+        return f"res://{asset_rel}/particles/{file_name}"
+    return f"res://xml_unified/{file_name}"
+
+
+def transform_sidecar_dict(joint: CompoundJoint) -> dict:
+    if joint.type in {"fixed", "translational", "loose"}:
+        translation = joint.rel_position
+    else:
+        child_point = transform_point(joint.rel_orientation, joint.child_point)
+        translation = tuple(joint.parent_point[i] - child_point[i] for i in range(3))
+    return {
+        "basisRows": [
+            list(joint.rel_orientation[0:3]),
+            list(joint.rel_orientation[3:6]),
+            list(joint.rel_orientation[6:9]),
+        ],
+        "origin": list(translation),
+        "matrix": gltf_matrix_from_rows(joint.rel_orientation, translation),
+    }
+
+
+def identity_transform_sidecar_dict() -> dict:
+    return {
+        "basisRows": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        "origin": [0.0, 0.0, 0.0],
+        "matrix": gltf_matrix_from_rows((1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0)),
+    }
 
 
 def joint_local_matrix(joint: CompoundJoint) -> list[float]:
