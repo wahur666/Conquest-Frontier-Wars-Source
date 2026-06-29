@@ -29,6 +29,7 @@ FACE_HIDDEN = 0x08
 
 COMPONENT_FLOAT = 5126
 COMPONENT_UNSIGNED_BYTE = 5121
+COMPONENT_UNSIGNED_SHORT = 5123
 
 
 @dataclass
@@ -201,6 +202,7 @@ def main() -> int:
 
     mesh_root = child_dir(root, "openFLAME 3D N-mesh")
     particle_doc = None
+    root_children = child_dirs(root)
     if mesh_root is not None:
         textures = {} if args.no_textures else load_textures(mesh_root)
         write_textures(textures, output_path.parent)
@@ -216,8 +218,11 @@ def main() -> int:
             args.scale,
             write_particles=args.write_particles,
         )
+    elif root_children.get("Vertices") is not None and root_children.get("Faces") is not None:
+        textures = {}
+        gltf, bin_data = build_shield_gltf(root, output_path, args.scale)
     else:
-        raise SystemExit("No openFLAME 3D N-mesh or Cmpnd directory found.")
+        raise SystemExit("No openFLAME 3D N-mesh, Cmpnd, or shield Vertices/Faces found.")
 
     bin_path = output_path.with_suffix(".bin")
     gltf["buffers"][0]["uri"] = bin_path.name
@@ -546,6 +551,107 @@ def append_mesh_primitives(
             },
         }
         gltf["meshes"][mesh_index]["primitives"].append(primitive)
+
+
+def build_shield_gltf(
+    unit_root: ET.Element,
+    output_path: Path,
+    scale: float = 1.0,
+) -> tuple[dict, bytes]:
+    root_children = child_dirs(unit_root)
+    vertices_data = file_bytes(root_children.get("Vertices"))
+    faces_data = file_bytes(root_children.get("Faces"))
+    if not vertices_data or not faces_data:
+        raise SystemExit("Shield file missing Vertices or Faces payload.")
+
+    positions, normals = parse_shield_vertices(vertices_data, scale)
+    indices = parse_shield_faces(faces_data)
+    if not positions or not indices:
+        raise SystemExit("Shield file has no geometry.")
+
+    name = sanitize_name(unit_root.attrib.get("name", output_path.stem))
+    gltf = {
+        "asset": {"version": "2.0", "generator": "Conquest Frontier Wars shield XML converter"},
+        "scene": 0,
+        "scenes": [{"nodes": [0]}],
+        "nodes": [{"name": name, "mesh": 0}],
+        "meshes": [{"name": name, "primitives": []}],
+        "materials": [
+            {
+                "name": "shield",
+                "pbrMetallicRoughness": {
+                    "baseColorFactor": [0.3, 0.6, 1.0, 0.35],
+                    "metallicFactor": 0.0,
+                    "roughnessFactor": 0.2,
+                },
+                "alphaMode": "BLEND",
+                "doubleSided": True,
+            }
+        ],
+        "buffers": [{"byteLength": 0, "uri": ""}],
+        "bufferViews": [],
+        "accessors": [],
+    }
+
+    writer = BinWriter()
+    vertex_count = len(positions) // 3
+    pos_min, pos_max = min_max_vec3(positions)
+
+    pos_acc = writer.add_accessor(
+        gltf, pack_floats(positions),
+        component_type=COMPONENT_FLOAT, type_name="VEC3",
+        count=vertex_count, target=34962,
+        min_value=pos_min, max_value=pos_max,
+    )
+    norm_acc = writer.add_accessor(
+        gltf, pack_floats(normals),
+        component_type=COMPONENT_FLOAT, type_name="VEC3",
+        count=vertex_count, target=34962,
+    )
+    index_count = len(indices)
+    idx_acc = writer.add_accessor(
+        gltf, struct.pack("<" + "H" * index_count, *indices),
+        component_type=COMPONENT_UNSIGNED_SHORT, type_name="SCALAR",
+        count=index_count, target=34963,
+    )
+
+    gltf["meshes"][0]["primitives"].append({
+        "attributes": {"POSITION": pos_acc, "NORMAL": norm_acc},
+        "indices": idx_acc,
+        "mode": 4,
+        "material": 0,
+    })
+    return gltf, bytes(writer.data)
+
+
+def parse_shield_vertices(data: bytes, scale: float) -> tuple[list[float], list[float]]:
+    if len(data) < 2:
+        return [], []
+    count = struct.unpack_from("<H", data, 0)[0]
+    positions: list[float] = []
+    normals: list[float] = []
+    for i in range(count):
+        offset = 2 + i * 24
+        if offset + 24 > len(data):
+            break
+        px, py, pz, nx, ny, nz = struct.unpack_from("<ffffff", data, offset)
+        positions.extend([px * scale, py * scale, pz * scale])
+        normals.extend([nx, ny, nz])
+    return positions, normals
+
+
+def parse_shield_faces(data: bytes) -> list[int]:
+    if len(data) < 2:
+        return []
+    count = struct.unpack_from("<H", data, 0)[0]
+    indices: list[int] = []
+    for i in range(count):
+        offset = 2 + i * 20
+        if offset + 18 > len(data):
+            break
+        i0, i1, i2 = struct.unpack_from("<HHH", data, offset + 12)
+        indices.extend([i0, i1, i2])
+    return indices
 
 
 def read_compound_parts(cmpnd_node: ET.Element) -> list[CompoundPart]:
