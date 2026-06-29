@@ -3,8 +3,8 @@
 
 Single openFLAME 3D N-mesh .3db XML dumps are exported as one mesh. Compound
 .cmp XML dumps are exported as multiple mesh nodes wired by the CMP joint tree.
-Particles, shields, and animation are separate formats and are left for later
-converter stages.
+Compound animation channels are exported as glTF animation samplers where the
+source channel format is understood.
 """
 
 from __future__ import annotations
@@ -14,7 +14,6 @@ import base64
 import json
 import math
 import re
-import shutil
 import struct
 import sys
 import zlib
@@ -52,6 +51,11 @@ class MaterialInfo:
     shininess: tuple[float, ...]
     diffuse_texture_name: str | None
     diffuse_texture_flags: int
+    second_diffuse_texture_name: str | None
+    second_diffuse_texture_flags: int
+    emission_texture_name: str | None
+    emission_texture_flags: int
+    emission_texture_blend: float
     identifier: int
 
 
@@ -78,6 +82,20 @@ class CompoundJoint:
     rel_orientation: tuple[float, ...]
     parent_point: tuple[float, float, float]
     child_point: tuple[float, float, float]
+    axis: tuple[float, float, float]
+
+
+@dataclass
+class CompoundAnimationTrack:
+    script_name: str
+    map_name: str
+    target_name: str
+    parent_name: str
+    channel_name: str
+    channel_type: int
+    times: list[float]
+    rotations: list[tuple[float, float, float, float]] | None = None
+    translations: list[tuple[float, float, float]] | None = None
 
 
 class BinWriter:
@@ -163,6 +181,11 @@ def main() -> int:
         default=1.0,
         help="Scale factor to apply to all coordinates (e.g., 0.01 for 1/100 scale).",
     )
+    parser.add_argument(
+        "--write-particles",
+        action="store_true",
+        help="For .cmp.xml input, write <output>.particles.json with skipped .pte particle part attachments.",
+    )
     args = parser.parse_args()
 
     input_path = args.input
@@ -177,14 +200,22 @@ def main() -> int:
         raise SystemExit(f"Expected <unit> root in {input_path}")
 
     mesh_root = child_dir(root, "openFLAME 3D N-mesh")
-    sidecar_data = None
+    particle_doc = None
     if mesh_root is not None:
         textures = {} if args.no_textures else load_textures(mesh_root)
         write_textures(textures, output_path.parent)
         materials, id_to_index = load_materials(mesh_root, textures)
         gltf, bin_data = build_gltf(root, mesh_root, materials, id_to_index, textures, output_path, args.uv_transform, args.scale)
     elif child_dir(root, "Cmpnd") is not None:
-        gltf, bin_data, textures, sidecar_data = build_compound_gltf(root, input_path, output_path, args.no_textures, args.uv_transform, args.scale)
+        gltf, bin_data, textures, particle_doc = build_compound_gltf(
+            root,
+            input_path,
+            output_path,
+            args.no_textures,
+            args.uv_transform,
+            args.scale,
+            write_particles=args.write_particles,
+        )
     else:
         raise SystemExit("No openFLAME 3D N-mesh or Cmpnd directory found.")
 
@@ -194,16 +225,15 @@ def main() -> int:
 
     bin_path.write_bytes(bin_data)
     output_path.write_text(json.dumps(gltf, indent=2), encoding="utf-8")
-    if sidecar_data is not None:
-        sidecar_path = output_path.with_suffix(".cfwcmp.json")
-        sidecar_path.write_text(json.dumps(sidecar_data, indent=2), encoding="utf-8")
 
     print(f"Wrote {output_path}")
     print(f"Wrote {bin_path}")
-    if sidecar_data is not None:
-        print(f"Wrote {sidecar_path}")
     if textures:
         print(f"Wrote {len(textures)} texture PNG(s)")
+    if args.write_particles and particle_doc is not None and particle_doc.get("particles"):
+        particles_path = output_path.with_suffix(".particles.json")
+        particles_path.write_text(json.dumps(particle_doc, indent=2), encoding="utf-8")
+        print(f"Wrote {particles_path}")
     return 0
 
 
@@ -268,8 +298,10 @@ def build_compound_gltf(
     output_path: Path,
     no_textures: bool,
     uv_transform: str,
-    scale: float = 1.0
-) -> tuple[dict, bytes, dict[str, TextureImage], dict]:
+    scale: float = 1.0,
+    *,
+    write_particles: bool = False,
+) -> tuple[dict, bytes, dict[str, TextureImage], dict | None]:
     cmpnd = child_dir(unit_root, "Cmpnd")
     if cmpnd is None:
         raise SystemExit("Compound file is missing Cmpnd directory.")
@@ -307,6 +339,7 @@ def build_compound_gltf(
         "images": [],
         "textures": [],
         "samplers": [],
+        "animations": [],
     }
 
     writer = BinWriter()
@@ -355,15 +388,16 @@ def build_compound_gltf(
         add_hardpoint_nodes_to_parent(gltf, part_unit, node_index)
 
     joints = read_compound_joints(child_dir(cmpnd, "Cons"))
-    attach_compound_nodes(gltf, node_by_part, joints)
-    sidecar = build_compound_sidecar(unit_root, input_path, output_path, parts, node_by_part, joints)
+    attach_compound_nodes(gltf, node_by_part, joints, scale)
+    add_compound_animations(gltf, writer, unit_root, node_by_part, joints, scale)
     gltf["nodes"][0].setdefault("extras", {})["sourceCompoundJoints"] = [
         {"type": joint.type, "parent": joint.parent, "child": joint.child}
         for joint in joints
     ]
 
     prune_empty_gltf_arrays(gltf)
-    return gltf, bytes(writer.data), textures, sidecar
+    particle_doc = build_particle_sidecar(unit_root, input_path, output_path, parts, joints, node_by_part, scale) if write_particles else None
+    return gltf, bytes(writer.data), textures, particle_doc
 
 
 def append_mesh_primitives(
@@ -588,6 +622,7 @@ def read_fixed_like_joints(node: ET.Element | None, joint_type: str) -> list[Com
                 read_mat3_bytes(data, offset + 140),
                 (0.0, 0.0, 0.0),
                 (0.0, 0.0, 0.0),
+                (0.0, 0.0, 1.0),
             )
         )
     return out
@@ -609,6 +644,7 @@ def read_rev_like_joints(node: ET.Element | None, joint_type: str) -> list[Compo
                 read_mat3_bytes(data, offset + 152),
                 read_vec3_bytes(data, offset + 128),
                 read_vec3_bytes(data, offset + 140),
+                read_vec3_bytes(data, offset + 188),
             )
         )
     return out
@@ -630,12 +666,13 @@ def read_sphere_joints(node: ET.Element | None) -> list[CompoundJoint]:
                 read_mat3_bytes(data, offset + 152),
                 read_vec3_bytes(data, offset + 128),
                 read_vec3_bytes(data, offset + 140),
+                (0.0, 0.0, 1.0),
             )
         )
     return out
 
 
-def attach_compound_nodes(gltf: dict, node_by_part: dict[str, int], joints: list[CompoundJoint]) -> None:
+def attach_compound_nodes(gltf: dict, node_by_part: dict[str, int], joints: list[CompoundJoint], scale: float) -> None:
     root_children = gltf["nodes"][0].setdefault("children", [])
     children_by_parent: dict[str, list[CompoundJoint]] = {}
     for joint in joints:
@@ -655,7 +692,9 @@ def attach_compound_nodes(gltf: dict, node_by_part: dict[str, int], joints: list
             child_index = node_by_part.get(joint.child)
             if child_index is None:
                 continue
-            gltf["nodes"][child_index]["matrix"] = joint_local_matrix(joint)
+            translation, rotation = joint_local_trs(joint, scale)
+            gltf["nodes"][child_index]["translation"] = list(translation)
+            gltf["nodes"][child_index]["rotation"] = list(rotation)
             attach(joint.child, node_index)
 
     if "Root" in node_by_part:
@@ -666,117 +705,607 @@ def attach_compound_nodes(gltf: dict, node_by_part: dict[str, int], joints: list
             root_children.append(node_index)
 
 
-def build_compound_sidecar(
+def build_particle_sidecar(
     unit_root: ET.Element,
     input_path: Path,
     output_path: Path,
     parts: list[CompoundPart],
+    joints: list[CompoundJoint],
+    node_by_part: dict[str, int],
+    scale: float,
+) -> dict:
+    part_by_name = {part.object_name: part for part in parts}
+    joints_by_child = {joint.child: joint for joint in joints}
+    local_transforms = compute_part_local_transforms(parts, joints, scale)
+    world_transforms = compute_part_world_transforms(parts, joints, scale)
+
+    particles = []
+    for part in parts:
+        if not is_particle_part(part):
+            continue
+        local_translation, local_rotation = local_transforms.get(part.object_name, identity_trs())
+        world_translation, world_rotation = world_transforms.get(part.object_name, identity_trs())
+        joint = joints_by_child.get(part.object_name)
+        parent_name = joint.parent if joint is not None else None
+        parent_part = part_by_name.get(parent_name or "")
+        source_path = input_path.parent / f"{part.file_name}.xml"
+        particles.append(
+            {
+                "name": sanitize_name(part.object_name),
+                "sourcePartDir": part.part_dir,
+                "sourcePartIndex": part.index,
+                "fileName": part.file_name,
+                "sourceXml": source_path.name,
+                "sourceXmlExists": source_path.exists(),
+                "parentPartName": parent_name,
+                "parentPartFileName": parent_part.file_name if parent_part is not None else None,
+                "attachedToExportedMesh": parent_name in node_by_part if parent_name else False,
+                "attachedToNodeName": sanitize_name(parent_name) if parent_name in node_by_part else None,
+                "joint": particle_joint_extras(joint),
+                "localTransform": trs_extras(local_translation, local_rotation),
+                "worldTransform": trs_extras(world_translation, world_rotation),
+                "notes": [
+                    "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+                    "worldTransform is composed through CMP joints at bind pose using the exporter scale.",
+                ],
+            }
+        )
+
+    return {
+        "asset": {
+            "version": 1,
+            "generator": "Conquest Frontier Wars 3db XML converter",
+            "source": input_path.name,
+            "gltf": output_path.name,
+            "unitName": unit_root.attrib.get("name", ""),
+            "scale": scale,
+        },
+        "particles": particles,
+        "extras": {
+            "particleCount": len(particles),
+            "exportedMeshPartNames": sorted(node_by_part.keys(), key=natural_key),
+            "allCompoundParts": [
+                {
+                    "name": part.object_name,
+                    "partDir": part.part_dir,
+                    "fileName": part.file_name,
+                    "index": part.index,
+                    "isParticle": is_particle_part(part),
+                    "isExportedMesh": part.object_name in node_by_part,
+                }
+                for part in parts
+            ],
+        },
+    }
+
+
+def is_particle_part(part: CompoundPart) -> bool:
+    return part.file_name.lower().endswith(".pte")
+
+
+def particle_joint_extras(joint: CompoundJoint | None) -> dict | None:
+    if joint is None:
+        return None
+    return {
+        "type": joint.type,
+        "parent": joint.parent,
+        "child": joint.child,
+        "relativePosition": list(joint.rel_position),
+        "relativeOrientationRows": list(joint.rel_orientation),
+        "parentPoint": list(joint.parent_point),
+        "childPoint": list(joint.child_point),
+        "axis": list(joint.axis),
+    }
+
+
+def trs_extras(
+    translation: tuple[float, float, float],
+    rotation: tuple[float, float, float, float],
+) -> dict:
+    return {
+        "translation": list(translation),
+        "rotation": list(rotation),
+        "rotationFormat": "xyzw",
+    }
+
+
+def identity_trs() -> tuple[tuple[float, float, float], tuple[float, float, float, float]]:
+    return (0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 1.0)
+
+
+def compute_part_local_transforms(
+    parts: list[CompoundPart],
+    joints: list[CompoundJoint],
+    scale: float,
+) -> dict[str, tuple[tuple[float, float, float], tuple[float, float, float, float]]]:
+    transforms = {"Root": identity_trs()}
+    for joint in joints:
+        transforms[joint.child] = joint_local_trs(joint, scale)
+    for part in parts:
+        transforms.setdefault(part.object_name, identity_trs())
+    return transforms
+
+
+def compute_part_world_transforms(
+    parts: list[CompoundPart],
+    joints: list[CompoundJoint],
+    scale: float,
+) -> dict[str, tuple[tuple[float, float, float], tuple[float, float, float, float]]]:
+    local = compute_part_local_transforms(parts, joints, scale)
+    children_by_parent: dict[str, list[str]] = {}
+    for joint in joints:
+        children_by_parent.setdefault(joint.parent, []).append(joint.child)
+
+    world: dict[str, tuple[tuple[float, float, float], tuple[float, float, float, float]]] = {}
+
+    def attach(part_name: str, parent_transform: tuple[tuple[float, float, float], tuple[float, float, float, float]]) -> None:
+        if part_name in world:
+            return
+        local_transform = local.get(part_name, identity_trs())
+        world_transform = compose_trs(parent_transform, local_transform)
+        world[part_name] = world_transform
+        for child in children_by_parent.get(part_name, []):
+            attach(child, world_transform)
+
+    attach("Root", identity_trs())
+    for part in parts:
+        if part.object_name not in world:
+            world[part.object_name] = local.get(part.object_name, identity_trs())
+    return world
+
+
+def compose_trs(
+    parent: tuple[tuple[float, float, float], tuple[float, float, float, float]],
+    child: tuple[tuple[float, float, float], tuple[float, float, float, float]],
+) -> tuple[tuple[float, float, float], tuple[float, float, float, float]]:
+    parent_translation, parent_rotation = parent
+    child_translation, child_rotation = child
+    rotated_child = rotate_vector_by_quaternion(child_translation, parent_rotation)
+    translation = tuple(parent_translation[i] + rotated_child[i] for i in range(3))
+    rotation = quaternion_multiply(parent_rotation, child_rotation)
+    return translation, rotation
+
+
+def quaternion_multiply(
+    a: tuple[float, float, float, float],
+    b: tuple[float, float, float, float],
+) -> tuple[float, float, float, float]:
+    ax, ay, az, aw = a
+    bx, by, bz, bw = b
+    return normalize_quaternion(
+        (
+            aw * bx + ax * bw + ay * bz - az * by,
+            aw * by - ax * bz + ay * bw + az * bx,
+            aw * bz + ax * by - ay * bx + az * bw,
+            aw * bw - ax * bx - ay * by - az * bz,
+        )
+    )
+
+
+def rotate_vector_by_quaternion(
+    vector: tuple[float, float, float],
+    quat: tuple[float, float, float, float],
+) -> tuple[float, float, float]:
+    rotation = quaternion_to_rows(quat)
+    return transform_point(rotation, vector)
+
+
+def add_compound_animations(
+    gltf: dict,
+    writer: BinWriter,
+    unit_root: ET.Element,
     node_by_part: dict[str, int],
     joints: list[CompoundJoint],
-) -> dict:
+    scale: float,
+) -> None:
+    tracks = read_compound_animation_tracks(unit_root, joints, scale)
+    if not tracks:
+        return
+
+    animations_by_name: dict[str, dict] = {}
+    skipped_tracks = []
+    for track in tracks:
+        node_index = node_by_part.get(track.target_name)
+        if node_index is None:
+            skipped_tracks.append(animation_track_extras(track, "target node was not exported"))
+            continue
+        if not track.times:
+            skipped_tracks.append(animation_track_extras(track, "channel has no keyframes"))
+            continue
+
+        animation = animations_by_name.setdefault(
+            track.script_name,
+            {
+                "name": sanitize_name(track.script_name),
+                "samplers": [],
+                "channels": [],
+                "extras": {"sourceTracks": []},
+            },
+        )
+        input_accessor = add_animation_input_accessor(gltf, writer, track.times)
+
+        if track.translations is not None:
+            output_accessor = writer.add_accessor(
+                gltf,
+                pack_floats(value for vec in track.translations for value in vec),
+                component_type=COMPONENT_FLOAT,
+                type_name="VEC3",
+                count=len(track.translations),
+            )
+            sampler_index = len(animation["samplers"])
+            animation["samplers"].append({"input": input_accessor, "output": output_accessor, "interpolation": "LINEAR"})
+            animation["channels"].append({"sampler": sampler_index, "target": {"node": node_index, "path": "translation"}})
+
+        if track.rotations is not None:
+            output_accessor = writer.add_accessor(
+                gltf,
+                pack_floats(value for quat in track.rotations for value in quat),
+                component_type=COMPONENT_FLOAT,
+                type_name="VEC4",
+                count=len(track.rotations),
+            )
+            sampler_index = len(animation["samplers"])
+            animation["samplers"].append({"input": input_accessor, "output": output_accessor, "interpolation": "LINEAR"})
+            animation["channels"].append({"sampler": sampler_index, "target": {"node": node_index, "path": "rotation"}})
+
+        animation["extras"]["sourceTracks"].append(animation_track_extras(track, ""))
+
+    for animation in animations_by_name.values():
+        if animation["channels"]:
+            gltf["animations"].append(animation)
+
+    if skipped_tracks:
+        gltf["nodes"][0].setdefault("extras", {})["skippedCompoundAnimationTracks"] = skipped_tracks
+
+
+def read_compound_animation_tracks(
+    unit_root: ET.Element,
+    joints: list[CompoundJoint],
+    scale: float,
+) -> list[CompoundAnimationTrack]:
+    animation_root = child_dir(unit_root, "Animation")
+    if animation_root is None:
+        return []
+
+    chnl = child_dir(animation_root, "Chnl")
+    channel_nodes = list(chnl) if chnl is not None else []
+    channel_library = {
+        channel.attrib.get("name", ""): channel
+        for channel in channel_nodes
+        if channel.tag == "dir"
+    }
     joint_by_child = {joint.child: joint for joint in joints}
-    mesh_parts = [part for part in parts if part.object_name in node_by_part]
-    particle_parts = [part for part in parts if part.file_name.lower().endswith(".pte")]
-    attachments = []
+    tracks: list[CompoundAnimationTrack] = []
 
-    for part in particle_parts:
-        joint = joint_by_child.get(part.object_name)
-        pte_stem = Path(part.file_name).stem
-        unified_xml = copy_compound_particle_xml(output_path, pte_stem)
-        entry = {
-            "objectName": part.object_name,
-            "partDir": part.part_dir,
-            "sourceFileName": part.file_name,
-            "sourcePartIndex": part.index,
-            "unifiedXml": unified_xml,
-            "parentName": joint.parent if joint is not None else "",
-            "jointType": joint.type if joint is not None else "",
-            "localTransform": transform_sidecar_dict(joint) if joint is not None else identity_transform_sidecar_dict(),
-        }
-        attachments.append(entry)
+    script_root = child_dir(animation_root, "Script")
+    if script_root is None:
+        return tracks
 
-    return {
-        "format": "cfw-compound-sidecar",
-        "version": 1,
-        "sourceFile": str(input_path),
-        "sourceUnit": unit_root.attrib.get("name", input_path.name),
-        "gltf": output_path.name,
-        "meshParts": [
-            {
-                "objectName": part.object_name,
-                "partDir": part.part_dir,
-                "sourceFileName": part.file_name,
-                "sourcePartIndex": part.index,
-            }
-            for part in mesh_parts
-        ],
-        "particleAttachments": attachments,
-        "joints": [
-            {
-                "type": joint.type,
-                "parent": joint.parent,
-                "child": joint.child,
-                "localTransform": transform_sidecar_dict(joint),
-            }
-            for joint in joints
-        ],
+    for script in [child for child in script_root if child.tag == "dir"]:
+        script_name = script.attrib.get("name", "Animation")
+        for map_node in [child for child in script if child.tag == "dir"]:
+            map_name = map_node.attrib.get("name", "")
+            if not (map_name.startswith("Joint map") or map_name.startswith("Object map")):
+                continue
+
+            children = child_dirs(map_node)
+            channel_node = child_dir(map_node, "Channel")
+            channel_name = c_string(file_bytes(children.get("Channel name")))
+            if channel_node is None and channel_name:
+                channel_node = channel_library.get(channel_name)
+            if channel_node is None:
+                continue
+
+            child_name = c_string(file_bytes(children.get("Child name")))
+            parent_name = c_string(file_bytes(children.get("Parent name")))
+            target_name = child_name or parent_name
+            joint = joint_by_child.get(child_name)
+            track = decode_compound_animation_channel(
+                channel_node,
+                script_name,
+                map_name,
+                target_name,
+                parent_name,
+                channel_name or channel_node.attrib.get("name", ""),
+                joint,
+                scale,
+            )
+            if track is not None:
+                tracks.append(track)
+    return tracks
+
+
+def decode_compound_animation_channel(
+    channel_node: ET.Element,
+    script_name: str,
+    map_name: str,
+    target_name: str,
+    parent_name: str,
+    channel_name: str,
+    joint: CompoundJoint | None,
+    scale: float,
+) -> CompoundAnimationTrack | None:
+    children = child_dirs(channel_node)
+    header = file_bytes(children.get("Header"))
+    frames = file_bytes(children.get("Frames"))
+    if not header or not frames or len(header) < 12:
+        return None
+
+    frame_count, frame_step, channel_type = struct.unpack_from("<ifi", header, 0)
+    if frame_count <= 0:
+        return None
+
+    values = float_array(frames)
+    explicit_times = frame_step < 0.0
+    if channel_type == 1:
+        stride = 2 if explicit_times else 1
+        if len(values) < frame_count * stride:
+            return None
+        times = [values[i * stride] if explicit_times else i * frame_step for i in range(frame_count)]
+        scalars = [values[i * stride + (1 if explicit_times else 0)] for i in range(frame_count)]
+        if joint is not None:
+            translations: list[tuple[float, float, float]] | None = None
+            rotations: list[tuple[float, float, float, float]] | None = None
+            if joint.type == "prismatic":
+                translations = [joint_state_trs(joint, scale, scalar=value)[0] for value in scalars]
+            elif joint.type == "revolute":
+                poses = [joint_state_trs(joint, scale, scalar=value) for value in scalars]
+                translations = [pose[0] for pose in poses]
+                rotations = [pose[1] for pose in poses]
+            else:
+                rotations = [axis_angle_quaternion(joint.axis, value) for value in scalars]
+            return CompoundAnimationTrack(
+                script_name,
+                map_name,
+                target_name,
+                parent_name,
+                channel_name,
+                channel_type,
+                times,
+                rotations=rotations,
+                translations=translations,
+            )
+        rotations = [axis_angle_quaternion((0.0, 0.0, 1.0), value) for value in scalars]
+        return CompoundAnimationTrack(script_name, map_name, target_name, parent_name, channel_name, channel_type, times, rotations=rotations)
+
+    if channel_type == 4:
+        stride = 5 if explicit_times else 4
+        if len(values) < frame_count * stride:
+            return None
+        times = [values[i * stride] if explicit_times else i * frame_step for i in range(frame_count)]
+        offset = 1 if explicit_times else 0
+        rotations = [
+            source_quat_to_gltf(values[i * stride + offset : i * stride + offset + 4])
+            for i in range(frame_count)
+        ]
+        if joint is not None:
+            poses = [joint_state_trs(joint, scale, rotation=quat) for quat in rotations]
+            return CompoundAnimationTrack(
+                script_name,
+                map_name,
+                target_name,
+                parent_name,
+                channel_name,
+                channel_type,
+                times,
+                rotations=[pose[1] for pose in poses],
+                translations=[pose[0] for pose in poses],
+            )
+        return CompoundAnimationTrack(script_name, map_name, target_name, parent_name, channel_name, channel_type, times, rotations=rotations)
+
+    if channel_type == 6:
+        stride = 8 if explicit_times else 7
+        if len(values) < frame_count * stride:
+            return None
+        times = [values[i * stride] if explicit_times else i * frame_step for i in range(frame_count)]
+        offset = 1 if explicit_times else 0
+        raw_translations = [
+            (
+                values[i * stride + offset],
+                values[i * stride + offset + 1],
+                values[i * stride + offset + 2],
+            )
+            for i in range(frame_count)
+        ]
+        rotations = [
+            source_quat_to_gltf(values[i * stride + offset + 3 : i * stride + offset + 7])
+            for i in range(frame_count)
+        ]
+        if joint is not None:
+            poses = [
+                joint_state_trs(joint, scale, translation=translation, rotation=rotation)
+                for translation, rotation in zip(raw_translations, rotations)
+            ]
+            return CompoundAnimationTrack(
+                script_name,
+                map_name,
+                target_name,
+                parent_name,
+                channel_name,
+                channel_type,
+                times,
+                rotations=[pose[1] for pose in poses],
+                translations=[pose[0] for pose in poses],
+            )
+        translations = [tuple(value * scale for value in translation) for translation in raw_translations]
+        return CompoundAnimationTrack(
+            script_name,
+            map_name,
+            target_name,
+            parent_name,
+            channel_name,
+            channel_type,
+            times,
+            rotations=rotations,
+            translations=translations,
+        )
+
+    return None
+
+
+def add_animation_input_accessor(gltf: dict, writer: BinWriter, times: list[float]) -> int:
+    return writer.add_accessor(
+        gltf,
+        pack_floats(times),
+        component_type=COMPONENT_FLOAT,
+        type_name="SCALAR",
+        count=len(times),
+        min_value=[min(times)],
+        max_value=[max(times)],
+    )
+
+
+def animation_track_extras(track: CompoundAnimationTrack, reason: str) -> dict:
+    out = {
+        "script": track.script_name,
+        "map": track.map_name,
+        "targetName": track.target_name,
+        "parentName": track.parent_name,
+        "channelName": track.channel_name,
+        "channelType": track.channel_type,
+        "keyframes": len(track.times),
     }
+    if reason:
+        out["reason"] = reason
+    return out
 
 
-def copy_compound_particle_xml(output_path: Path, pte_stem: str) -> str:
-    file_name = f"{pte_stem}.pte.unified.xml"
-    source_path = Path("godot-proj") / "cfw-asset-test" / "xml_unified" / file_name
-    particle_dir = output_path.parent / "particles"
-    if source_path.exists():
-        particle_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source_path, particle_dir / file_name)
-
-    parts = output_path.parent.parts
-    if "assets" in parts:
-        asset_index = parts.index("assets")
-        asset_rel = "/".join(parts[asset_index:])
-        return f"res://{asset_rel}/particles/{file_name}"
-    return f"res://xml_unified/{file_name}"
+def source_quat_to_gltf(values: list[float]) -> tuple[float, float, float, float]:
+    if len(values) < 4:
+        return (0.0, 0.0, 0.0, 1.0)
+    w, x, y, z = values[:4]
+    return normalize_quaternion((x, y, z, w))
 
 
-def transform_sidecar_dict(joint: CompoundJoint) -> dict:
-    if joint.type in {"fixed", "translational", "loose"}:
-        translation = joint.rel_position
+def axis_angle_quaternion(axis: tuple[float, float, float], angle: float) -> tuple[float, float, float, float]:
+    half = angle * 0.5
+    sin_half = math.sin(half)
+    x, y, z = axis
+    return normalize_quaternion((x * sin_half, y * sin_half, z * sin_half, math.cos(half)))
+
+
+def normalize_quaternion(quat: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+    length = math.sqrt(sum(value * value for value in quat))
+    if length <= 0.0:
+        return (0.0, 0.0, 0.0, 1.0)
+    return tuple(value / length for value in quat)  # type: ignore[return-value]
+
+
+def joint_state_trs(
+    joint: CompoundJoint,
+    scale: float,
+    *,
+    scalar: float = 0.0,
+    translation: tuple[float, float, float] | None = None,
+    rotation: tuple[float, float, float, float] | None = None,
+) -> tuple[tuple[float, float, float], tuple[float, float, float, float]]:
+    state_translation = translation if translation is not None else (0.0, 0.0, 0.0)
+    state_rotation = rotation if rotation is not None else (0.0, 0.0, 0.0, 1.0)
+    rel_orientation = joint.rel_orientation
+
+    if joint.type == "revolute":
+        local_rotation = mat3_multiply(quaternion_to_rows(axis_angle_quaternion(joint.axis, scalar)), rel_orientation)
+        local_translation = tuple(
+            joint.parent_point[i] - transform_point(local_rotation, joint.child_point)[i]
+            for i in range(3)
+        )
+    elif joint.type == "prismatic":
+        local_rotation = rel_orientation
+        child_point = transform_point(local_rotation, joint.child_point)
+        local_translation = tuple(
+            joint.parent_point[i] + joint.axis[i] * scalar - child_point[i]
+            for i in range(3)
+        )
+    elif joint.type == "spherical":
+        local_rotation = mat3_multiply(quaternion_to_rows(state_rotation), rel_orientation)
+        local_translation = tuple(
+            joint.parent_point[i] - transform_point(local_rotation, joint.child_point)[i]
+            for i in range(3)
+        )
+    elif joint.type == "translational":
+        local_rotation = rel_orientation
+        local_translation = tuple(joint.rel_position[i] + state_translation[i] for i in range(3))
+    elif joint.type == "loose":
+        local_rotation = mat3_multiply(quaternion_to_rows(state_rotation), rel_orientation)
+        local_translation = tuple(joint.rel_position[i] + state_translation[i] for i in range(3))
     else:
-        child_point = transform_point(joint.rel_orientation, joint.child_point)
-        translation = tuple(joint.parent_point[i] - child_point[i] for i in range(3))
-    return {
-        "basisRows": [
-            list(joint.rel_orientation[0:3]),
-            list(joint.rel_orientation[3:6]),
-            list(joint.rel_orientation[6:9]),
-        ],
-        "origin": list(translation),
-        "matrix": gltf_matrix_from_rows(joint.rel_orientation, translation),
-    }
+        local_rotation = rel_orientation
+        local_translation = joint.rel_position
+
+    scaled_translation = tuple(value * scale for value in local_translation)
+    return scaled_translation, rotation_rows_to_quaternion(local_rotation)
 
 
-def identity_transform_sidecar_dict() -> dict:
-    return {
-        "basisRows": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
-        "origin": [0.0, 0.0, 0.0],
-        "matrix": gltf_matrix_from_rows((1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0)),
-    }
+def joint_local_trs(joint: CompoundJoint, scale: float) -> tuple[tuple[float, float, float], tuple[float, float, float, float]]:
+    return joint_state_trs(joint, scale)
 
 
-def joint_local_matrix(joint: CompoundJoint) -> list[float]:
-    if joint.type in {"fixed", "translational", "loose"}:
-        translation = joint.rel_position
+def rotation_rows_to_quaternion(rotation: tuple[float, ...]) -> tuple[float, float, float, float]:
+    r00, r01, r02, r10, r11, r12, r20, r21, r22 = rotation[:9]
+    trace = r00 + r11 + r22
+    if trace > 0.0:
+        s = math.sqrt(trace + 1.0) * 2.0
+        w = 0.25 * s
+        x = (r21 - r12) / s
+        y = (r02 - r20) / s
+        z = (r10 - r01) / s
+    elif r00 > r11 and r00 > r22:
+        s = math.sqrt(1.0 + r00 - r11 - r22) * 2.0
+        w = (r21 - r12) / s
+        x = 0.25 * s
+        y = (r01 + r10) / s
+        z = (r02 + r20) / s
+    elif r11 > r22:
+        s = math.sqrt(1.0 + r11 - r00 - r22) * 2.0
+        w = (r02 - r20) / s
+        x = (r01 + r10) / s
+        y = 0.25 * s
+        z = (r12 + r21) / s
     else:
-        child_point = transform_point(joint.rel_orientation, joint.child_point)
-        translation = tuple(joint.parent_point[i] - child_point[i] for i in range(3))
-    return gltf_matrix_from_rows(joint.rel_orientation, translation)
+        s = math.sqrt(1.0 + r22 - r00 - r11) * 2.0
+        w = (r10 - r01) / s
+        x = (r02 + r20) / s
+        y = (r12 + r21) / s
+        z = 0.25 * s
+    return normalize_quaternion((x, y, z, w))
 
 
-def gltf_matrix_from_rows(rotation: tuple[float, ...], translation: tuple[float, float, float]) -> list[float]:
-    e00, e01, e02, e10, e11, e12, e20, e21, e22 = rotation[:9]
-    tx, ty, tz = translation
-    return [e00, e10, e20, 0.0, e01, e11, e21, 0.0, e02, e12, e22, 0.0, tx, ty, tz, 1.0]
+def quaternion_to_rows(quat: tuple[float, float, float, float]) -> tuple[float, ...]:
+    x, y, z, w = normalize_quaternion(quat)
+    xx = x * x
+    yy = y * y
+    zz = z * z
+    xy = x * y
+    xz = x * z
+    yz = y * z
+    wx = w * x
+    wy = w * y
+    wz = w * z
+    return (
+        1.0 - 2.0 * (yy + zz),
+        2.0 * (xy - wz),
+        2.0 * (xz + wy),
+        2.0 * (xy + wz),
+        1.0 - 2.0 * (xx + zz),
+        2.0 * (yz - wx),
+        2.0 * (xz - wy),
+        2.0 * (yz + wx),
+        1.0 - 2.0 * (xx + yy),
+    )
+
+
+def mat3_multiply(a: tuple[float, ...], b: tuple[float, ...]) -> tuple[float, ...]:
+    return (
+        a[0] * b[0] + a[1] * b[3] + a[2] * b[6],
+        a[0] * b[1] + a[1] * b[4] + a[2] * b[7],
+        a[0] * b[2] + a[1] * b[5] + a[2] * b[8],
+        a[3] * b[0] + a[4] * b[3] + a[5] * b[6],
+        a[3] * b[1] + a[4] * b[4] + a[5] * b[7],
+        a[3] * b[2] + a[4] * b[5] + a[5] * b[8],
+        a[6] * b[0] + a[7] * b[3] + a[8] * b[6],
+        a[6] * b[1] + a[7] * b[4] + a[8] * b[7],
+        a[6] * b[2] + a[7] * b[5] + a[8] * b[8],
+    )
 
 
 def transform_point(rotation: tuple[float, ...], point: tuple[float, float, float]) -> tuple[float, float, float]:
@@ -805,6 +1334,58 @@ def add_gltf_textures(gltf: dict, textures: dict[str, TextureImage]) -> dict[str
     return texture_index_by_name
 
 
+def texture_info(
+    gltf: dict,
+    texture_index_by_name: dict[str, int],
+    texture_name: str | None,
+    texture_flags: int,
+) -> dict | None:
+    texture_index = texture_lookup_with_sampler(gltf, texture_index_by_name, texture_name, texture_flags)
+    if texture_index is None:
+        return None
+    return {"index": texture_index}
+
+
+def texture_lookup_with_sampler(
+    gltf: dict,
+    texture_index_by_name: dict[str, int],
+    texture_name: str | None,
+    texture_flags: int,
+) -> int | None:
+    base_index = texture_lookup(texture_index_by_name, texture_name)
+    if base_index is None or not texture_name:
+        return None
+
+    variant_key = f"{Path(texture_name).stem.lower()}#sampler:{texture_flags & 0xff}"
+    variant_index = texture_index_by_name.get(variant_key)
+    if variant_index is not None:
+        return variant_index
+
+    sampler = sampler_from_texture_flags(texture_flags)
+    base_texture = gltf["textures"][base_index]
+    base_sampler = gltf.get("samplers", [])[base_texture.get("sampler", -1)] if base_texture.get("sampler", -1) >= 0 else None
+    if base_sampler == sampler:
+        texture_index_by_name[variant_key] = base_index
+        return base_index
+
+    sampler_index = len(gltf["samplers"])
+    gltf["samplers"].append(sampler)
+    new_texture = {
+        "sampler": sampler_index,
+        "source": base_texture["source"],
+        "name": f"{base_texture.get('name', Path(texture_name).stem)}_flags_{texture_flags & 0xff:02x}",
+        "extras": {
+            "sourceTextureName": texture_name,
+            "sourceTextureFlags": texture_flags,
+            "sourceTextureAddress": texture_address_extras(texture_flags),
+        },
+    }
+    new_index = len(gltf["textures"])
+    gltf["textures"].append(new_texture)
+    texture_index_by_name[variant_key] = new_index
+    return new_index
+
+
 def material_variant(
     gltf: dict,
     materials: list[MaterialInfo],
@@ -822,17 +1403,20 @@ def material_variant(
 
     mat = materials[material_index] if 0 <= material_index < len(materials) else default_material()
     alpha = max(0.0, min(1.0, mat.transparency))
-    color_factor = (1.0, 1.0, 1.0) if use_vertex_colors else mat.diffuse
+    color_factor = (1.0, 1.0, 1.0) if use_vertex_colors else material_tint_color(mat)
     pbr = {
         "baseColorFactor": [color_factor[0], color_factor[1], color_factor[2], alpha],
         "metallicFactor": 0.0,
         "roughnessFactor": shininess_to_roughness(mat.shininess),
     }
 
-    texture_index = texture_lookup(texture_index_by_name, mat.diffuse_texture_name)
-    texture_has_alpha = texture_name_has_alpha(textures, mat.diffuse_texture_name)
+    texture_name, texture_flags = material_base_color_texture(mat)
+    texture_index = texture_lookup_with_sampler(gltf, texture_index_by_name, texture_name, texture_flags)
+    texture_has_alpha = texture_name_has_alpha(textures, texture_name)
     if texture_index is not None:
         pbr["baseColorTexture"] = {"index": texture_index}
+
+    emissive_texture = texture_info(gltf, texture_index_by_name, mat.emission_texture_name, mat.emission_texture_flags)
 
     out = {
         "name": mat.name + ("_doubleSided" if double_sided else ""),
@@ -841,11 +1425,24 @@ def material_variant(
         "extras": {
             "sourceMaterialIdentifier": mat.identifier,
             "sourceSpecular": list(mat.specular),
+            "sourceDiffuseTextureName": mat.diffuse_texture_name,
             "sourceDiffuseTextureFlags": mat.diffuse_texture_flags,
+            "sourceSecondDiffuseTextureName": mat.second_diffuse_texture_name,
+            "sourceSecondDiffuseTextureFlags": mat.second_diffuse_texture_flags,
+            "sourceEmissionTextureName": mat.emission_texture_name,
+            "sourceEmissionTextureFlags": mat.emission_texture_flags,
+            "sourceEmissionTextureBlend": mat.emission_texture_blend,
+            "cfwMaterial": legacy_material_extras(mat, texture_name, texture_flags, use_vertex_colors),
         },
     }
-    if any(mat.emission):
+    if emissive_texture is not None:
+        out["emissiveTexture"] = emissive_texture
+        out["emissiveFactor"] = [mat.emission_texture_blend] * 3
+    elif any(mat.emission):
         out["emissiveFactor"] = list(mat.emission)
+    if texture_index is not None:
+        out.setdefault("extensions", {})["KHR_materials_unlit"] = {}
+        add_gltf_extension_used(gltf, "KHR_materials_unlit")
     if alpha < 1.0 or texture_has_alpha:
         out["alphaMode"] = "BLEND"
         out["alphaCutoff"] = 0.01
@@ -870,10 +1467,17 @@ def load_materials(mesh_root: ET.Element, textures: dict[str, TextureImage]) -> 
         children = child_dirs(mat_node)
         diffuse_node = children.get("Diffuse")
         emission_node = children.get("Emission")
+        bump_node = children.get("Bump")
         shininess = tuple(float_array(file_bytes(child_file(child_dirs(children.get("Shininess")), "Constant"))))
         transparency_values = float_array(file_bytes(child_file(child_dirs(children.get("Transparency")), "Constant")))
         diffuse_texture_name = map_name(diffuse_node)
         texture_flags = int32(file_bytes(child_file(child_dirs(child_dirs(diffuse_node).get("Map")), "Flags"))) or 0
+        second_diffuse_texture_name = map_name(bump_node)
+        second_diffuse_texture_flags = int32(file_bytes(child_file(child_dirs(child_dirs(bump_node).get("Map")), "Flags"))) or 0
+        emission_texture_name = map_name(emission_node)
+        emission_texture_flags = int32(file_bytes(child_file(child_dirs(child_dirs(emission_node).get("Map")), "Flags"))) or 0
+        emission_texture_blend_values = float_array(file_bytes(child_file(child_dirs(child_dirs(emission_node).get("Map")), "Blend")))
+        emission_texture_blend = max(0.0, min(1.0, emission_texture_blend_values[0] if emission_texture_blend_values else 1.0))
         identifier_value = int32(file_bytes(children.get("Material identifier")))
         identifier = identifier_value if identifier_value is not None else len(materials)
         material = MaterialInfo(
@@ -885,6 +1489,11 @@ def load_materials(mesh_root: ET.Element, textures: dict[str, TextureImage]) -> 
             shininess=shininess,
             diffuse_texture_name=diffuse_texture_name,
             diffuse_texture_flags=texture_flags,
+            second_diffuse_texture_name=second_diffuse_texture_name,
+            second_diffuse_texture_flags=second_diffuse_texture_flags,
+            emission_texture_name=emission_texture_name,
+            emission_texture_flags=emission_texture_flags,
+            emission_texture_blend=emission_texture_blend,
             identifier=identifier,
         )
         id_to_index[identifier] = len(materials)
@@ -1160,7 +1769,103 @@ def map_name(property_node: ET.Element | None) -> str | None:
 
 
 def default_material() -> MaterialInfo:
-    return MaterialInfo("Default", (1.0, 1.0, 1.0), (0.0, 0.0, 0.0), (0.08, 0.08, 0.08), 1.0, (0.15,), None, 0, 0)
+    return MaterialInfo(
+        "Default",
+        (1.0, 1.0, 1.0),
+        (0.0, 0.0, 0.0),
+        (0.08, 0.08, 0.08),
+        1.0,
+        (0.15,),
+        None,
+        0,
+        None,
+        0,
+        None,
+        0,
+        1.0,
+        0,
+    )
+
+
+def material_base_color_texture_name(mat: MaterialInfo) -> str | None:
+    return material_base_color_texture(mat)[0]
+
+
+def material_base_color_texture(mat: MaterialInfo) -> tuple[str | None, int]:
+    if mat.emission_texture_name and is_environment_texture_name(mat.diffuse_texture_name):
+        return mat.emission_texture_name, mat.emission_texture_flags
+    return mat.diffuse_texture_name, mat.diffuse_texture_flags
+
+
+def material_tint_color(mat: MaterialInfo) -> tuple[float, float, float]:
+    return tuple(
+        max(0.0, min(1.0, mat.diffuse[i] + mat.emission[i]))
+        for i in range(3)
+    )
+
+
+def is_environment_texture_name(name: str | None) -> bool:
+    if not name:
+        return False
+    stem = Path(name).stem.lower()
+    return stem.startswith("environ")
+
+
+def sampler_from_texture_flags(texture_flags: int) -> dict:
+    return {
+        "magFilter": 9728,
+        "minFilter": 9987,
+        "wrapS": gltf_wrap_mode(texture_flags & 0x03),
+        "wrapT": gltf_wrap_mode((texture_flags & 0x0c) >> 2),
+    }
+
+
+def gltf_wrap_mode(address_mode: int) -> int:
+    if address_mode == 1:
+        return 33648
+    if address_mode in (2, 3):
+        return 33071
+    return 10497
+
+
+def texture_address_extras(texture_flags: int) -> dict:
+    wrap_mode = (texture_flags & 0xf0) >> 4
+    return {
+        "u": texture_flags & 0x03,
+        "v": (texture_flags & 0x0c) >> 2,
+        "coordinateSet": 1 if wrap_mode == 5 else 0,
+        "wrapMode": wrap_mode,
+    }
+
+
+def legacy_material_extras(
+    mat: MaterialInfo,
+    exported_base_texture_name: str | None,
+    exported_base_texture_flags: int,
+    use_vertex_colors: bool,
+) -> dict:
+    return {
+        "diffuseTexture": mat.diffuse_texture_name,
+        "diffuseFlags": mat.diffuse_texture_flags,
+        "diffuseAddress": texture_address_extras(mat.diffuse_texture_flags),
+        "secondDiffuseTexture": mat.second_diffuse_texture_name,
+        "secondDiffuseFlags": mat.second_diffuse_texture_flags,
+        "secondDiffuseAddress": texture_address_extras(mat.second_diffuse_texture_flags),
+        "emissionTexture": mat.emission_texture_name,
+        "emissionFlags": mat.emission_texture_flags,
+        "emissionAddress": texture_address_extras(mat.emission_texture_flags),
+        "emissionBlend": mat.emission_texture_blend,
+        "diffuseConstant": list(mat.diffuse),
+        "emissionConstant": list(mat.emission),
+        "specular": list(mat.specular),
+        "transparency": mat.transparency,
+        "shininess": list(mat.shininess),
+        "exportedBaseColorTexture": exported_base_texture_name,
+        "exportedBaseColorFlags": exported_base_texture_flags,
+        "usesVertexColors": use_vertex_colors,
+        "usesEnvironmentDiffuseAsChrome": is_environment_texture_name(mat.diffuse_texture_name),
+        "recommendedGodotShader": "cfw_legacy_lit",
+    }
 
 
 def texture_lookup(texture_index_by_name: dict[str, int], name: str | None) -> int | None:
@@ -1170,6 +1875,12 @@ def texture_lookup(texture_index_by_name: dict[str, int], name: str | None) -> i
     if exact is not None:
         return exact
     return texture_index_by_name.get(Path(name).stem.lower())
+
+
+def add_gltf_extension_used(gltf: dict, extension_name: str) -> None:
+    extensions = gltf.setdefault("extensionsUsed", [])
+    if extension_name not in extensions:
+        extensions.append(extension_name)
 
 
 def texture_name_has_alpha(textures: dict[str, TextureImage], name: str | None) -> bool:
