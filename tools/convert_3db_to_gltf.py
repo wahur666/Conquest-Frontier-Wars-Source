@@ -287,7 +287,7 @@ def build_gltf(
     if not gltf["meshes"][0]["primitives"]:
         raise SystemExit("No renderable face groups were found.")
 
-    add_hardpoint_nodes(gltf, unit_root)
+    add_hardpoint_nodes(gltf, unit_root, scale)
     prune_empty_gltf_arrays(gltf)
     return gltf, bytes(writer.data)
 
@@ -385,7 +385,7 @@ def build_compound_gltf(
                 },
             }
         )
-        add_hardpoint_nodes_to_parent(gltf, part_unit, node_index)
+        add_hardpoint_nodes_to_parent(gltf, part_unit, node_index, scale)
 
     joints = read_compound_joints(child_dir(cmpnd, "Cons"))
     attach_compound_nodes(gltf, node_by_part, joints, scale)
@@ -1572,11 +1572,11 @@ def write_textures(textures: dict[str, TextureImage], out_dir: Path) -> None:
         (out_dir / file_name).write_bytes(write_png_rgba(texture.width, texture.height, texture.rgba))
 
 
-def add_hardpoint_nodes(gltf: dict, unit_root: ET.Element) -> None:
-    add_hardpoint_nodes_to_parent(gltf, unit_root, 0)
+def add_hardpoint_nodes(gltf: dict, unit_root: ET.Element, scale: float = 1.0) -> None:
+    add_hardpoint_nodes_to_parent(gltf, unit_root, 0, scale)
 
 
-def add_hardpoint_nodes_to_parent(gltf: dict, unit_root: ET.Element, parent_node_index: int) -> None:
+def add_hardpoint_nodes_to_parent(gltf: dict, unit_root: ET.Element, parent_node_index: int, scale: float = 1.0) -> None:
     hardpoints = child_dir(unit_root, "Hardpoints")
     fixed = child_dir(hardpoints, "Fixed") if hardpoints is not None else None
     if fixed is None:
@@ -1589,7 +1589,7 @@ def add_hardpoint_nodes_to_parent(gltf: dict, unit_root: ET.Element, parent_node
         orientation = float_array(file_bytes(children.get("Orientation")))
         node = {
             "name": hp.attrib.get("name", "hardpoint"),
-            "translation": list(position),
+            "translation": [value * scale for value in position],
             "extras": {
                 "sourceType": "hardpoint",
                 "sourceOrientation3x3": orientation,
