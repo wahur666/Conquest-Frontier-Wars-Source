@@ -21,6 +21,7 @@ $Author: Jasony $
 */
 
 #define WIN32_LEAN_AND_MEAN
+#include <deque>
 #include <string>
 #include <vector>
 #include <windows.h>
@@ -90,7 +91,7 @@ struct DACOManager : public ICOManager
 	ADDED_LIBRARY *pCurrentLibrary;	 // temp pointer to DLL being loaded
 	
 	std::vector<REGISTERED_OBJECT> object_list;
-	std::vector<ADDED_LIBRARY>     library_list;
+	std::deque<ADDED_LIBRARY>      library_list;
 	IProfileParser2 * parser;
 	IDAComponent   * innerParser;
 	
@@ -183,6 +184,8 @@ struct DACOManager : public ICOManager
 void RegisterHeap (ICOManager *pManager);		// extern to the heap manager module
 IComponentFactory * CreateProfileParserFactory (void);  // extern to profile parser
 IComponentFactory * CreateProfileParserFactory2 (void);  // extern to profile parser
+
+using DACOMREGISTERLIBRARYPROC = GENRESULT (COMAPI *)(ICOManager *manager);
 
 //--------------------------------------------------------------------------//
 //
@@ -400,6 +403,7 @@ GENRESULT DACOManager::AddLibrary(const C8 *DLL_filename)
 	C8        buffer[MAX_PATH+8];
 	C8       *ptr;
 	S32       len;
+	const size_t first_registration = object_list.size();
 	
 	//
 	// Reject invalid library name
@@ -447,6 +451,21 @@ GENRESULT DACOManager::AddLibrary(const C8 *DLL_filename)
 		GENERAL_NOTICE(
 		   TempStr("DACOM: AddLibrary: DLL '%s' [%d.%d.%d]\n",
 				 DLL_filename, m, n, b));
+
+		auto registerLibrary = reinterpret_cast<DACOMREGISTERLIBRARYPROC>(
+			GetProcAddress(library.instance, "DACOM_RegisterLibrary"));
+
+		if (registerLibrary != nullptr)
+		{
+			GENRESULT registerResult = registerLibrary(this);
+			if (registerResult != GR_OK)
+			{
+				GENERAL_NOTICE(
+					TempStr("DACOM: AddLibrary: DACOM_RegisterLibrary failed for '%s' with %d\n",
+						DLL_filename,
+						registerResult));
+			}
+		}
 	}
 
 
@@ -491,6 +510,13 @@ GENRESULT DACOManager::AddLibrary(const C8 *DLL_filename)
 	memcpy(library.base_name, ptr, sizeof(library.base_name));
 
 	library_list.push_back(std::move(library));
+	ADDED_LIBRARY* stored_library = &library_list.back();
+	for (size_t i = first_registration; i < object_list.size(); ++i)
+	{
+		if (object_list[i].library == &library)
+			object_list[i].library = stored_library;
+	}
+
 	return GR_OK;
 }
 
