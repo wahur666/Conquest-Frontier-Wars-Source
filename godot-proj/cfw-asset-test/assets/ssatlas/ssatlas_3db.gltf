@@ -1,0 +1,781 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars 3db XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "ssatlas.3db",
+      "mesh": 0,
+      "children": [
+        1,
+        2
+      ]
+    },
+    {
+      "name": "hp_eglow0",
+      "translation": [
+        0.004716796875,
+        -0.04333366394042969,
+        2.2054443359375
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999619126319885,
+          0.00872659683227539,
+          5.3203210725882855e-09,
+          0.00872659683227539,
+          0.9999619126319885,
+          -3.660225544876994e-08,
+          -5.639531508450091e-09,
+          -3.6554432369939605e-08,
+          -1.0
+        ]
+      }
+    },
+    {
+      "name": "hp_mdrop",
+      "translation": [
+        0.00623046875,
+        2.2753787231445313,
+        7.592291259765625
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          0.0,
+          0.0,
+          -0.0,
+          0.0,
+          1.0,
+          0.0,
+          -1.0,
+          0.0
+        ]
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "ssatlas.3db",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 3,
+            "NORMAL": 4,
+            "TEXCOORD_0": 5
+          },
+          "mode": 4,
+          "material": 1,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 6,
+            "NORMAL": 7,
+            "TEXCOORD_0": 8
+          },
+          "mode": 4,
+          "material": 2,
+          "extras": {
+            "sourceFaceGroup": "Group2",
+            "sourceMaterialId": 2
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 9,
+            "NORMAL": 10,
+            "TEXCOORD_0": 11
+          },
+          "mode": 4,
+          "material": 3,
+          "extras": {
+            "sourceFaceGroup": "Group3",
+            "sourceMaterialId": 3
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material sol_tm5_chrome",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.858431451022625,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "environ1.tga",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": "c_solarian_tm5.tif",
+        "sourceEmissionTextureFlags": 64,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "environ1.tga",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": "c_solarian_tm5.tif",
+          "emissionFlags": 64,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.7803922295570374,
+            0.960784375667572,
+            1.0
+          ],
+          "emissionConstant": [
+            0.07803922146558762,
+            0.09607843309640884,
+            0.09999999403953552
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "c_solarian_tm5.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": true,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveTexture": {
+        "index": 0
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "Material sol_tm6_chrome",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.8282353729009628,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 1
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "environ1.tga",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": "c_solarian_tm6.tif",
+        "sourceEmissionTextureFlags": 64,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "environ1.tga",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": "c_solarian_tm6.tif",
+          "emissionFlags": 64,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.7529412508010864,
+            0.9333333969116211,
+            0.9843137860298157
+          ],
+          "emissionConstant": [
+            0.0752941220998764,
+            0.09333333373069763,
+            0.09843137115240097
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "c_solarian_tm6.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": true,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveTexture": {
+        "index": 1
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "Material_sol_lt2_chrome",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.8109804019331932,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 1
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 2,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "environ1.tga",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": "c_solarian_tm6.tif",
+        "sourceEmissionTextureFlags": 64,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "environ1.tga",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": "c_solarian_tm6.tif",
+          "emissionFlags": 64,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.7372549176216125,
+            1.0,
+            0.9647059440612793
+          ],
+          "emissionConstant": [
+            0.07372548431158066,
+            0.09999999403953552,
+            0.09647058695554733
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "c_solarian_tm6.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": true,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveTexture": {
+        "index": 1
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings_soltm5_tc",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 3
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 3,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "solarian_tm6.tif",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "solarian_tm6.tif",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.988235354423523,
+            1.0,
+            0.0
+          ],
+          "emissionConstant": [
+            0.4941176772117615,
+            0.5,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "solarian_tm6.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        0.4941176772117615,
+        0.5,
+        0.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 28416,
+      "uri": "ssatlas_3db.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 216,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 216,
+      "byteLength": 216,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 432,
+      "byteLength": 144,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 5616,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 6192,
+      "byteLength": 5616,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 11808,
+      "byteLength": 3744,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 15552,
+      "byteLength": 3672,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 19224,
+      "byteLength": 3672,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 22896,
+      "byteLength": 2448,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 25344,
+      "byteLength": 1152,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 26496,
+      "byteLength": 1152,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 27648,
+      "byteLength": 768,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 18,
+      "type": "VEC3",
+      "min": [
+        -1.3378746032714843,
+        -0.13656514167785644,
+        -2.3769818115234376
+      ],
+      "max": [
+        1.3378717041015624,
+        0.5470169067382813,
+        2.072664947509766
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 18,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 18,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 468,
+      "type": "VEC3",
+      "min": [
+        -2.626412353515625,
+        -0.14088605880737304,
+        -2.976527099609375
+      ],
+      "max": [
+        2.6264105224609375,
+        3.596995849609375,
+        7.244007568359375
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 468,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 468,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 306,
+      "type": "VEC3",
+      "min": [
+        -2.2040460205078127,
+        1.8324761962890626,
+        -2.7429354858398436
+      ],
+      "max": [
+        2.2040411376953126,
+        3.6942727661132815,
+        9.19876708984375
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 306,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 8,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 306,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 9,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC3",
+      "min": [
+        -2.4932156372070313,
+        0.017948942184448244,
+        1.0815589141845703
+      ],
+      "max": [
+        2.493212890625,
+        1.8096316528320313,
+        3.7446609497070313
+      ]
+    },
+    {
+      "bufferView": 10,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 11,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 96,
+      "type": "VEC2"
+    }
+  ],
+  "images": [
+    {
+      "name": "c_solarian_tm5.tif",
+      "uri": "c_solarian_tm5.png"
+    },
+    {
+      "name": "c_solarian_tm6.tif",
+      "uri": "c_solarian_tm6.png"
+    },
+    {
+      "name": "environ1.tga",
+      "uri": "environ1.png"
+    },
+    {
+      "name": "solarian_tm6.tif",
+      "uri": "solarian_tm6.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "c_solarian_tm5.tif"
+    },
+    {
+      "sampler": 1,
+      "source": 1,
+      "name": "c_solarian_tm6.tif"
+    },
+    {
+      "sampler": 2,
+      "source": 2,
+      "name": "environ1.tga"
+    },
+    {
+      "sampler": 3,
+      "source": 3,
+      "name": "solarian_tm6.tif"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

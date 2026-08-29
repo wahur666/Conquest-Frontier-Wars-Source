@@ -1,0 +1,1086 @@
+[gd_scene format=3 uid="uid://c3skslgqqam61"]
+
+[ext_resource type="PackedScene" uid="uid://cyunu0ocov4uo" path="res://assets/tfabricator/tfabricator_cmp.gltf" id="1_m68kt"]
+[ext_resource type="Texture2D" uid="uid://qtu6xcg118ww" path="res://assets/tfabricator/Terranshp01.png" id="2_hddvq"]
+[ext_resource type="Texture2D" uid="uid://7nc8mnk8lono" path="res://assets/tfabricator/Terranshp02.png" id="3_mkvwq"]
+[ext_resource type="Texture2D" uid="uid://bacugsxq2d6g7" path="res://assets/tfabricator/admintx01.png" id="4_swivf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ko6dg"]
+resource_local_to_scene = true
+resource_name = "Material #1terrans3"
+shading_mode = 0
+albedo_color = Color(0.9948106, 0.991331, 0.991331, 1)
+albedo_texture = ExtResource("2_hddvq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.98823535, 0.9803922, 0.9803922],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 0.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c3iur"]
+resource_local_to_scene = true
+resource_name = "markings_1terrans3"
+shading_mode = 0
+albedo_color = Color(1, 1, 0, 1)
+albedo_texture = ExtResource("2_hddvq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [1.0, 1.0, 0.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [1.0, 1.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 1.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wom8t"]
+resource_local_to_scene = true
+resource_name = "Material #23terrans3"
+shading_mode = 0
+albedo_color = Color(0.9948106, 0.991331, 0.991331, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.98823535, 0.9803922, 0.9803922],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 1.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 5.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 80.0,
+"emissionTexture": "Terranshp03.tif",
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 80.0,
+"sourceEmissionTextureName": "Terranshp03.tif",
+"sourceMaterialIdentifier": 2.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jnuo8"]
+resource_local_to_scene = true
+resource_name = "markings_1terrans3"
+shading_mode = 0
+albedo_color = Color(1, 1, 0, 1)
+albedo_texture = ExtResource("2_hddvq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [1.0, 1.0, 0.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [1.0, 1.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 1.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3m85g"]
+resource_local_to_scene = true
+resource_name = "Material #22terrans3"
+shading_mode = 0
+albedo_color = Color(0.9948106, 0.991331, 0.991331, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.98823535, 0.9803922, 0.9803922],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 0.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1k75k"]
+resource_local_to_scene = true
+resource_name = "Tfab_2sided_doubleSided"
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(0.97902256, 1, 1, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.9529412388801576, 1.0, 1.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 3.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mg7ga"]
+resource_local_to_scene = true
+resource_name = "Material #13terrans3"
+shading_mode = 0
+albedo_color = Color(0.9965444, 0.9825601, 0.9807934, 1)
+albedo_texture = ExtResource("4_swivf")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.9921569, 0.9607844, 0.9568628],
+"diffuseFlags": 64.0,
+"diffuseTexture": "admintx01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "admintx01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "admintx01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 2.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b03bj"]
+resource_local_to_scene = true
+resource_name = "markings_1terrans3"
+shading_mode = 0
+albedo_color = Color(1, 1, 0, 1)
+albedo_texture = ExtResource("2_hddvq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [1.0, 1.0, 0.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [1.0, 1.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 1.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cceae"]
+resource_local_to_scene = true
+resource_name = "Material #22terrans3"
+shading_mode = 0
+albedo_color = Color(0.9948106, 0.991331, 0.991331, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.98823535, 0.9803922, 0.9803922],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 0.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dji6v"]
+resource_local_to_scene = true
+resource_name = "Tfab_2sided_doubleSided"
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(0.97902256, 1, 1, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.9529412388801576, 1.0, 1.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 3.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h5gtt"]
+resource_local_to_scene = true
+resource_name = "Material #13terrans3"
+shading_mode = 0
+albedo_color = Color(0.9965444, 0.9825601, 0.9807934, 1)
+albedo_texture = ExtResource("4_swivf")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.9921569, 0.9607844, 0.9568628],
+"diffuseFlags": 64.0,
+"diffuseTexture": "admintx01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "admintx01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "admintx01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 2.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fvoi3"]
+resource_local_to_scene = true
+resource_name = "markings_1terrans3"
+shading_mode = 0
+albedo_color = Color(1, 1, 0, 1)
+albedo_texture = ExtResource("2_hddvq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [1.0, 1.0, 0.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [1.0, 1.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 1.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_87705"]
+resource_local_to_scene = true
+resource_name = "Material #22terrans3"
+shading_mode = 0
+albedo_color = Color(0.9948106, 0.991331, 0.991331, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.98823535, 0.9803922, 0.9803922],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 0.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1g7tj"]
+resource_local_to_scene = true
+resource_name = "Tfab_2sided_doubleSided"
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(0.97902256, 1, 1, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.9529412388801576, 1.0, 1.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 3.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ikqt1"]
+resource_local_to_scene = true
+resource_name = "Material #13terrans3"
+shading_mode = 0
+albedo_color = Color(0.9965444, 0.9825601, 0.9807934, 1)
+albedo_texture = ExtResource("4_swivf")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.9921569, 0.9607844, 0.9568628],
+"diffuseFlags": 64.0,
+"diffuseTexture": "admintx01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "admintx01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "admintx01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 2.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1t3ym"]
+resource_local_to_scene = true
+resource_name = "markings_1terrans3"
+albedo_color = Color(1, 1, 0, 1)
+albedo_texture = ExtResource("2_hddvq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [1.0, 1.0, 0.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [1.0, 1.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 1.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3822d"]
+resource_local_to_scene = true
+resource_name = "Material #22terrans3"
+albedo_color = Color(0.9948106, 0.991331, 0.991331, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.98823535, 0.9803922, 0.9803922],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 0.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7k820"]
+resource_local_to_scene = true
+resource_name = "Tfab_2sided_doubleSided"
+shading_mode = 0
+albedo_color = Color(0.97902256, 1, 1, 1)
+albedo_texture = ExtResource("3_mkvwq")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.9529412388801576, 1.0, 1.0],
+"diffuseFlags": 64.0,
+"diffuseTexture": "Terranshp02.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "Terranshp02.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "Terranshp02.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 3.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ngumx"]
+resource_local_to_scene = true
+resource_name = "Material #13terrans3"
+albedo_color = Color(0.9965444, 0.9825601, 0.9807934, 1)
+albedo_texture = ExtResource("4_swivf")
+metadata/extras = {
+"cfwMaterial": {
+"diffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 4.0
+},
+"diffuseConstant": [0.9921569, 0.9607844, 0.9568628],
+"diffuseFlags": 64.0,
+"diffuseTexture": "admintx01.tif",
+"emissionAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"emissionBlend": 1.0,
+"emissionConstant": [0.0, 0.0, 0.0],
+"emissionFlags": 0.0,
+"emissionTexture": null,
+"exportedBaseColorFlags": 64.0,
+"exportedBaseColorTexture": "admintx01.tif",
+"recommendedGodotShader": "cfw_legacy_lit",
+"secondDiffuseAddress": {
+"coordinateSet": 0.0,
+"u": 0.0,
+"v": 0.0,
+"wrapMode": 0.0
+},
+"secondDiffuseFlags": 0.0,
+"secondDiffuseTexture": null,
+"shininess": [0.25, 0.05],
+"specular": [0.9, 0.9, 0.9],
+"transparency": 1.0,
+"usesEnvironmentDiffuseAsChrome": false,
+"usesVertexColors": false
+},
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "admintx01.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 2.0,
+"sourceSecondDiffuseTextureFlags": 0.0,
+"sourceSecondDiffuseTextureName": null,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[node name="tfabricator_cmp2" unique_id=323178565 instance=ExtResource("1_m68kt")]
+
+[node name="Root" parent="tfabricator_cmp" parent_id_path=PackedInt32Array(1557970364) index="0" unique_id=1736920525]
+surface_material_override/0 = SubResource("StandardMaterial3D_ko6dg")
+surface_material_override/1 = SubResource("StandardMaterial3D_c3iur")
+surface_material_override/2 = SubResource("StandardMaterial3D_wom8t")
+
+[node name="bottomleftflap" parent="tfabricator_cmp/Root" index="4" unique_id=1422402595]
+transform = Transform3D(0.5735767, -0.8191519, -2.5105157e-07, 0.8191519, 0.5735767, -1.6692283e-07, 2.8073248e-07, -1.09906324e-07, 1, 2.4543269, -0.014376326, -3.652831)
+surface_material_override/0 = SubResource("StandardMaterial3D_jnuo8")
+surface_material_override/1 = SubResource("StandardMaterial3D_3m85g")
+surface_material_override/2 = SubResource("StandardMaterial3D_1k75k")
+surface_material_override/3 = SubResource("StandardMaterial3D_mg7ga")
+
+[node name="bottomrightflap" parent="tfabricator_cmp/Root" index="5" unique_id=1696502345]
+transform = Transform3D(0.64278775, 0.7660443, -1.6090267e-08, -0.7660443, 0.64278775, -9.7536066e-08, -6.4374326e-08, 7.502084e-08, 1, -2.559975, 0.05046775, -3.6528323)
+surface_material_override/0 = SubResource("StandardMaterial3D_b03bj")
+surface_material_override/1 = SubResource("StandardMaterial3D_cceae")
+surface_material_override/2 = SubResource("StandardMaterial3D_dji6v")
+surface_material_override/3 = SubResource("StandardMaterial3D_h5gtt")
+
+[node name="topleftflap" parent="tfabricator_cmp/Root" index="6" unique_id=1951007778]
+transform = Transform3D(0.57357657, 0.81915194, -8.919875e-08, -0.81915194, 0.57357657, 1.4673888e-07, 1.7136375e-07, -1.1098656e-08, 1, 2.4831939, -0.049962632, -3.7746632)
+surface_material_override/0 = SubResource("StandardMaterial3D_fvoi3")
+surface_material_override/1 = SubResource("StandardMaterial3D_87705")
+surface_material_override/2 = SubResource("StandardMaterial3D_1g7tj")
+surface_material_override/3 = SubResource("StandardMaterial3D_ikqt1")
+
+[node name="toprightflap" parent="tfabricator_cmp/Root" index="7" unique_id=1859687496]
+transform = Transform3D(0.46941158, -0.8001016, 0.3734838, 0.86251616, 0.5060295, -1.937151e-07, -0.18899366, 0.3221359, 0.9276367, -3.022597, 0.009596689, -4.076781)
+surface_material_override/0 = SubResource("StandardMaterial3D_1t3ym")
+surface_material_override/1 = SubResource("StandardMaterial3D_3822d")
+surface_material_override/2 = SubResource("StandardMaterial3D_7k820")
+surface_material_override/3 = SubResource("StandardMaterial3D_ngumx")

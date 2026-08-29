@@ -1,0 +1,209 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars 3db XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "asteroid4.3db",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "asteroid4.3db",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material #1",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "polyroid256_4",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "polyroid256_4",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [],
+          "exportedBaseColorTexture": "polyroid256_4",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 4032,
+      "uri": "asteroid4_3db.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1512,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1512,
+      "byteLength": 1512,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3024,
+      "byteLength": 1008,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 126,
+      "type": "VEC3",
+      "min": [
+        -1.4158238220214845,
+        -1.5038792419433593,
+        -1.1306296539306642
+      ],
+      "max": [
+        1.4158236694335937,
+        1.5038792419433593,
+        1.1306296539306642
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 126,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 126,
+      "type": "VEC2"
+    }
+  ],
+  "images": [
+    {
+      "name": "polyroid256_4",
+      "uri": "polyroid256_4.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "polyroid256_4"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

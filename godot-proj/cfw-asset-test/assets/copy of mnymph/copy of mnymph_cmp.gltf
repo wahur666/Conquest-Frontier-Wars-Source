@@ -1,0 +1,2622 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars CMP XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "copy of mnymph.cmp",
+      "children": [
+        1
+      ],
+      "extras": {
+        "sourceCompoundJoints": [
+          {
+            "type": "revolute",
+            "parent": "Root",
+            "child": "left front"
+          },
+          {
+            "type": "revolute",
+            "parent": "Root",
+            "child": "rightfront"
+          },
+          {
+            "type": "spherical",
+            "parent": "Root",
+            "child": "backleg"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Root",
+      "mesh": 0,
+      "extras": {
+        "sourcePartDir": "Root",
+        "sourceFileName": "MNymph000624172556.3db",
+        "sourcePartIndex": 0,
+        "sourceUnitName": "MNymph000624172556.3db"
+      },
+      "children": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        8
+      ]
+    },
+    {
+      "name": "hp_meglow1",
+      "translation": [
+        2.609793395996094,
+        -0.1453854274749756,
+        3.0955233764648438
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          1.237935171038984e-10,
+          -1.1842165470454802e-08,
+          -1.237935032261106e-10,
+          1.0,
+          1.4899366185261442e-09,
+          1.1842165470454802e-08,
+          -1.4899366185261442e-09,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "hp_meglow2",
+      "translation": [
+        -2.5985147094726564,
+        -0.14538532257080078,
+        3.09552490234375
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          1.237935171038984e-10,
+          -1.1842165470454802e-08,
+          -1.237935032261106e-10,
+          1.0,
+          1.4899366185261442e-09,
+          1.1842165470454802e-08,
+          -1.4899366185261442e-09,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "hp_mlaunchcrane",
+      "translation": [
+        -0.008983809351921081,
+        -2.3723957824707034,
+        -6.332505493164063
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          1.6497980936946988e-07,
+          -3.833236394967798e-09,
+          3.833234618610959e-09,
+          -9.561690106352216e-09,
+          -1.0,
+          -1.6497980936946988e-07,
+          -1.0,
+          9.561689218173797e-09
+        ]
+      }
+    },
+    {
+      "name": "hp_supply",
+      "translation": [
+        -0.008983275890350343,
+        1.3290480041503907,
+        -3.7317413330078124
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -1.6849332951096585e-07,
+          -5.765406374536042e-09,
+          -5.765387722789228e-09,
+          -1.1146452294497067e-07,
+          1.0,
+          -1.6849332951096585e-07,
+          1.0,
+          1.1146452294497067e-07
+        ]
+      }
+    },
+    {
+      "name": "mouth",
+      "translation": [
+        -0.019897379875183106,
+        -1.163336639404297,
+        -7.6560211181640625
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          7.269837709600324e-08,
+          1.5229919547721238e-09,
+          -1.523004944381512e-09,
+          1.7843693456143228e-07,
+          1.0,
+          7.269837709600324e-08,
+          -1.0,
+          1.7843693456143228e-07
+        ]
+      }
+    },
+    {
+      "name": "left front",
+      "mesh": 1,
+      "extras": {
+        "sourcePartDir": "Part_left front",
+        "sourceFileName": "left front000624172556.3db",
+        "sourcePartIndex": 1,
+        "sourceUnitName": "left front000624172556.3db"
+      },
+      "translation": [
+        -0.4064461135864258,
+        -0.6049289321899414,
+        -2.4161236572265627
+      ],
+      "rotation": [
+        1.5949861873962301e-12,
+        -2.0397045163988992e-10,
+        -5.95273275116881e-11,
+        1.0
+      ]
+    },
+    {
+      "name": "backleg",
+      "mesh": 2,
+      "extras": {
+        "sourcePartDir": "Part_backleg",
+        "sourceFileName": "backleg000624172556.3db",
+        "sourcePartIndex": 2,
+        "sourceUnitName": "backleg000624172556.3db"
+      },
+      "translation": [
+        -0.0029443028569221498,
+        -2.2201959228515626,
+        -0.0028303545713424683
+      ],
+      "rotation": [
+        1.5949861873962301e-12,
+        -2.0397045163988992e-10,
+        -5.95273275116881e-11,
+        1.0
+      ]
+    },
+    {
+      "name": "rightfront",
+      "mesh": 3,
+      "extras": {
+        "sourcePartDir": "Part_rightfront",
+        "sourceFileName": "rightfront000624172556.3db",
+        "sourcePartIndex": 3,
+        "sourceUnitName": "rightfront000624172556.3db"
+      },
+      "translation": [
+        1.2210368347167968,
+        -1.5450402832031251,
+        -2.4536949157714845
+      ],
+      "rotation": [
+        -2.4164355141419874e-13,
+        -1.9879442536563374e-09,
+        -4.7725212670712835e-11,
+        1.0
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Root",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 2
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 3,
+            "NORMAL": 4,
+            "TEXCOORD_0": 5
+          },
+          "mode": 4,
+          "material": 1,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 3
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 6,
+            "NORMAL": 7,
+            "TEXCOORD_0": 8
+          },
+          "mode": 4,
+          "material": 2,
+          "extras": {
+            "sourceFaceGroup": "Group2",
+            "sourceMaterialId": 0
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 9,
+            "NORMAL": 10,
+            "TEXCOORD_0": 11
+          },
+          "mode": 4,
+          "material": 3,
+          "extras": {
+            "sourceFaceGroup": "Group3",
+            "sourceMaterialId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "left front",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 12,
+            "NORMAL": 13,
+            "TEXCOORD_0": 14
+          },
+          "mode": 4,
+          "material": 4,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 15,
+            "NORMAL": 16,
+            "TEXCOORD_0": 17
+          },
+          "mode": 4,
+          "material": 5,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 2
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 18,
+            "NORMAL": 19,
+            "TEXCOORD_0": 20
+          },
+          "mode": 4,
+          "material": 6,
+          "extras": {
+            "sourceFaceGroup": "Group2",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "backleg",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 21,
+            "NORMAL": 22,
+            "TEXCOORD_0": 23
+          },
+          "mode": 4,
+          "material": 7,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 24,
+            "NORMAL": 25,
+            "TEXCOORD_0": 26
+          },
+          "mode": 4,
+          "material": 8,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 2
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 27,
+            "NORMAL": 28,
+            "TEXCOORD_0": 29
+          },
+          "mode": 4,
+          "material": 9,
+          "extras": {
+            "sourceFaceGroup": "Group2",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "rightfront",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 30,
+            "NORMAL": 31,
+            "TEXCOORD_0": 32
+          },
+          "mode": 4,
+          "material": 10,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 33,
+            "NORMAL": 34,
+            "TEXCOORD_0": 35
+          },
+          "mode": 4,
+          "material": 11,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 2
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 36,
+            "NORMAL": 37,
+            "TEXCOORD_0": 38
+          },
+          "mode": 4,
+          "material": 12,
+          "extras": {
+            "sourceFaceGroup": "Group2",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "MantisTex_2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 2,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 3,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            0.0
+          ],
+          "emissionConstant": [
+            0.75,
+            0.75,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        0.75,
+        0.75,
+        0.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "M_map1_wlights",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "smoothShit8.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": "newmantisLights.bmp",
+        "sourceEmissionTextureFlags": 80,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "smoothShit8.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": "newmantisLights.bmp",
+          "emissionFlags": 80,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 1,
+            "wrapMode": 5
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "smoothShit8.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveTexture": {
+        "index": 1
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "MantisTex_1",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "smoothShit8.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "smoothShit8.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "smoothShit8.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "MantisTex_2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 2,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            0.0
+          ],
+          "emissionConstant": [
+            0.75,
+            0.75,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        0.75,
+        0.75,
+        0.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "MantisTex_1",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "smoothShit8.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "smoothShit8.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "smoothShit8.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            0.0
+          ],
+          "emissionConstant": [
+            0.75,
+            0.75,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        0.75,
+        0.75,
+        0.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "MantisTex_2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 2,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "MantisTex_1",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "smoothShit8.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "smoothShit8.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "smoothShit8.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "MantisTex_2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 2,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            0.0
+          ],
+          "emissionConstant": [
+            0.75,
+            0.75,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        0.75,
+        0.75,
+        0.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "MantisTex_1",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "smoothShit8.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "smoothShit8.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "smoothShit8.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 52128,
+      "uri": "copy of mnymph_cmp.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 576,
+      "byteLength": 576,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1152,
+      "byteLength": 384,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1536,
+      "byteLength": 144,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1680,
+      "byteLength": 144,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1824,
+      "byteLength": 96,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1920,
+      "byteLength": 1800,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3720,
+      "byteLength": 1800,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 5520,
+      "byteLength": 1200,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 6720,
+      "byteLength": 4104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 10824,
+      "byteLength": 4104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 14928,
+      "byteLength": 2736,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 17664,
+      "byteLength": 432,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 18096,
+      "byteLength": 432,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 18528,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 18816,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 19104,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 19392,
+      "byteLength": 192,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 19584,
+      "byteLength": 2592,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 22176,
+      "byteLength": 2592,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 24768,
+      "byteLength": 1728,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 26496,
+      "byteLength": 360,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 26856,
+      "byteLength": 360,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 27216,
+      "byteLength": 240,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 27456,
+      "byteLength": 432,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 27888,
+      "byteLength": 432,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 28320,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 28608,
+      "byteLength": 3528,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 32136,
+      "byteLength": 3528,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 35664,
+      "byteLength": 2352,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 38016,
+      "byteLength": 432,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 38448,
+      "byteLength": 432,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 38880,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 39168,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 39456,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 39744,
+      "byteLength": 192,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 39936,
+      "byteLength": 2340,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 42276,
+      "byteLength": 2340,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 44616,
+      "byteLength": 1560,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 46176,
+      "byteLength": 244
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 46420,
+      "byteLength": 732
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 47152,
+      "byteLength": 976
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48128,
+      "byteLength": 12
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48140,
+      "byteLength": 36
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48176,
+      "byteLength": 48
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48224,
+      "byteLength": 244
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48468,
+      "byteLength": 732
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 49200,
+      "byteLength": 976
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 50176,
+      "byteLength": 244
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 50420,
+      "byteLength": 732
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51152,
+      "byteLength": 976
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3",
+      "min": [
+        -2.8480902099609375,
+        0.43813720703125003,
+        -0.0348256516456604
+      ],
+      "max": [
+        2.84220458984375,
+        3.042281188964844,
+        7.793792114257813
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 12,
+      "type": "VEC3",
+      "min": [
+        -2.7105783081054686,
+        1.5039599609375,
+        -1.9713597106933594
+      ],
+      "max": [
+        2.7046923828125,
+        2.6147271728515626,
+        2.23859130859375
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 12,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 12,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 150,
+      "type": "VEC3",
+      "min": [
+        -3.840350952148438,
+        -1.6093006896972657,
+        -7.587285766601562
+      ],
+      "max": [
+        3.8344650268554688,
+        1.5039599609375,
+        2.110528869628906
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 150,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 8,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 150,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 9,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 342,
+      "type": "VEC3",
+      "min": [
+        -3.840350952148438,
+        -2.3156578063964846,
+        -7.587285766601562
+      ],
+      "max": [
+        3.8344650268554688,
+        2.484557800292969,
+        7.793792114257813
+      ]
+    },
+    {
+      "bufferView": 10,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 342,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 11,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 342,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 12,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3",
+      "min": [
+        -5.3455224609375005,
+        -2.5618231201171877,
+        -4.357491149902343
+      ],
+      "max": [
+        -2.569786376953125,
+        -0.5475560760498047,
+        -1.1637014770507812
+      ]
+    },
+    {
+      "bufferView": 13,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 14,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 15,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        -5.3455224609375005,
+        -2.5618231201171877,
+        -5.503062133789062
+      ],
+      "max": [
+        -2.569786376953125,
+        -0.5475560760498047,
+        -1.2072013092041016
+      ]
+    },
+    {
+      "bufferView": 16,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 17,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 18,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 216,
+      "type": "VEC3",
+      "min": [
+        -5.27869384765625,
+        -2.3547236633300783,
+        -4.287883605957031
+      ],
+      "max": [
+        0.18405946731567382,
+        0.9401786804199219,
+        2.7489407348632815
+      ]
+    },
+    {
+      "bufferView": 19,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 216,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 20,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 216,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 21,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 30,
+      "type": "VEC3",
+      "min": [
+        -8.169302978515626,
+        -2.2826739501953126,
+        -0.787970199584961
+      ],
+      "max": [
+        8.169301147460938,
+        -0.4251198577880859,
+        1.4263687133789062
+      ]
+    },
+    {
+      "bufferView": 22,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 30,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 23,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 30,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 24,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3",
+      "min": [
+        -7.205391845703125,
+        -1.8971022033691407,
+        -0.0619265079498291
+      ],
+      "max": [
+        7.2053900146484375,
+        -0.4251198577880859,
+        1.4263687133789062
+      ]
+    },
+    {
+      "bufferView": 25,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 26,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 27,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 294,
+      "type": "VEC3",
+      "min": [
+        -7.169766845703125,
+        -1.8971022033691407,
+        0.10841814041137696
+      ],
+      "max": [
+        7.169765014648438,
+        2.9106179809570314,
+        2.6944815063476564
+      ]
+    },
+    {
+      "bufferView": 28,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 294,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 29,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 294,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 30,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3",
+      "min": [
+        1.7493057250976562,
+        -1.6217102050781251,
+        -4.319915771484375
+      ],
+      "max": [
+        4.525042114257813,
+        0.3925564193725586,
+        -1.1261277770996094
+      ]
+    },
+    {
+      "bufferView": 31,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 32,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 33,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3",
+      "min": [
+        1.7493057250976562,
+        -1.6217102050781251,
+        -5.465486450195312
+      ],
+      "max": [
+        4.525042114257813,
+        0.3925564193725586,
+        -1.1696276092529296
+      ]
+    },
+    {
+      "bufferView": 34,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 35,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 24,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 36,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 195,
+      "type": "VEC3",
+      "min": [
+        -0.20246051788330077,
+        -1.4146107482910157,
+        -4.250308532714844
+      ],
+      "max": [
+        4.458214416503906,
+        1.716334686279297,
+        2.5911788940429688
+      ]
+    },
+    {
+      "bufferView": 37,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 195,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 38,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 195,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 39,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        2.0000001043081284
+      ]
+    },
+    {
+      "bufferView": 40,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 41,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 42,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.6666666865348816
+      ]
+    },
+    {
+      "bufferView": 43,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 44,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 45,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        2.0000001043081284
+      ]
+    },
+    {
+      "bufferView": 46,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 47,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 48,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        2.0000001043081284
+      ]
+    },
+    {
+      "bufferView": 49,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 50,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 61,
+      "type": "VEC4"
+    }
+  ],
+  "images": [
+    {
+      "name": "MantisTex_2.bmp",
+      "uri": "MantisTex_2.png"
+    },
+    {
+      "name": "newmantisLights.bmp",
+      "uri": "newmantisLights.png"
+    },
+    {
+      "name": "smoothShit8.bmp",
+      "uri": "smoothShit8.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "MantisTex_2.bmp"
+    },
+    {
+      "sampler": 1,
+      "source": 1,
+      "name": "newmantisLights.bmp"
+    },
+    {
+      "sampler": 2,
+      "source": 2,
+      "name": "smoothShit8.bmp"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "animations": [
+    {
+      "name": "Sc_",
+      "samplers": [
+        {
+          "input": 39,
+          "output": 40,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 39,
+          "output": 41,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 7,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 7,
+            "path": "rotation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_",
+            "map": "Joint map 0",
+            "targetName": "left front",
+            "parentName": "Root",
+            "channelName": "Channel",
+            "channelType": 1,
+            "keyframes": 61
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sc_build",
+      "samplers": [
+        {
+          "input": 42,
+          "output": 43,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 42,
+          "output": 44,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 1,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 1,
+            "path": "rotation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_build",
+            "map": "Object map 0",
+            "targetName": "Root",
+            "parentName": "Root",
+            "channelName": "Channel",
+            "channelType": 6,
+            "keyframes": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sc_construct",
+      "samplers": [
+        {
+          "input": 45,
+          "output": 46,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 45,
+          "output": 47,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 48,
+          "output": 49,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 48,
+          "output": 50,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 8,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 8,
+            "path": "rotation"
+          }
+        },
+        {
+          "sampler": 2,
+          "target": {
+            "node": 9,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 3,
+          "target": {
+            "node": 9,
+            "path": "rotation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_construct",
+            "map": "Joint map 0",
+            "targetName": "backleg",
+            "parentName": "Root",
+            "channelName": "Channel",
+            "channelType": 4,
+            "keyframes": 61
+          },
+          {
+            "script": "Sc_construct",
+            "map": "Joint map 1",
+            "targetName": "rightfront",
+            "parentName": "Root",
+            "channelName": "Channel",
+            "channelType": 1,
+            "keyframes": 61
+          }
+        ]
+      }
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

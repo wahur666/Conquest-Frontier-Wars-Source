@@ -1,0 +1,1147 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "holeplat.cmp.xml",
+    "gltf": "holeplat_cmp.gltf",
+    "unitName": "holeplat.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "particle.pte",
+      "sourcePartDir": "Part_particle.pte",
+      "sourcePartIndex": 2,
+      "fileName": "particle.pte",
+      "sourceXml": "particle.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Sphere01",
+      "parentPartFileName": "Sphere01000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Sphere01",
+      "joint": {
+        "type": "fixed",
+        "parent": "Sphere01",
+        "child": "particle.pte",
+        "relativePosition": [
+          -21.239267349243164,
+          1606.6053466796875,
+          537.8922729492188
+        ],
+        "relativeOrientationRows": [
+          -9.920550780861959e-08,
+          1.663193955891984e-07,
+          -1.0,
+          -1.0,
+          -5.1614307494673994e-08,
+          9.920550070319223e-08,
+          -5.16142897311056e-08,
+          1.0,
+          1.663193955891984e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.21239267349243166,
+          16.066053466796877,
+          5.378922729492188
+        ],
+        "rotation": [
+          0.4999999465223494,
+          -0.49999997031795473,
+          -0.5000000792847965,
+          0.5000000038748895
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -0.07218333771421875,
+          15.922861516109805,
+          -5.7925324741678805
+        ],
+        "rotation": [
+          0.3058557153895563,
+          -0.6396627482072299,
+          -0.3085366759408979,
+          0.6341048568800418
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "particle1.pte",
+      "sourcePartDir": "Part_particle1.pte",
+      "sourcePartIndex": 4,
+      "fileName": "particle.pte",
+      "sourceXml": "particle.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Sphere02",
+      "parentPartFileName": "Sphere02000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Sphere02",
+      "joint": {
+        "type": "fixed",
+        "parent": "Sphere02",
+        "child": "particle1.pte",
+        "relativePosition": [
+          41.72355270385742,
+          1707.082763671875,
+          575.3687133789062
+        ],
+        "relativeOrientationRows": [
+          0.8241263628005981,
+          -3.7181882817094447e-07,
+          -0.5664060115814209,
+          -0.5664060115814209,
+          -1.991536464629462e-07,
+          -0.8241263628005981,
+          1.9362387604360265e-07,
+          1.0,
+          -3.7472818803507835e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.41723552703857425,
+          17.07082763671875,
+          5.753687133789063
+        ],
+        "rotation": [
+          0.6753012144171707,
+          -0.20968656888512394,
+          -0.2096863595552482,
+          0.6753010019630844
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          14.385676339424577,
+          10.781739061705528,
+          -1.2242337969908572
+        ],
+        "rotation": [
+          0.3058557866217248,
+          -0.6396628021965147,
+          -0.3085364699574596,
+          0.634104868284654
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "particle2.pte",
+      "sourcePartDir": "Part_particle2.pte",
+      "sourcePartIndex": 6,
+      "fileName": "particle.pte",
+      "sourceXml": "particle.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Sphere03",
+      "parentPartFileName": "Sphere03000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Sphere03",
+      "joint": {
+        "type": "fixed",
+        "parent": "Sphere03",
+        "child": "particle2.pte",
+        "relativePosition": [
+          59.69195556640625,
+          1784.9207763671875,
+          575.3364868164062
+        ],
+        "relativeOrientationRows": [
+          0.7660443186759949,
+          -4.86759176965279e-07,
+          0.6427878141403198,
+          0.6427878141403198,
+          4.895168785878923e-07,
+          -0.7660443186759949,
+          5.8223626808739937e-08,
+          1.0,
+          6.878745466565306e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.5969195556640625,
+          17.849207763671874,
+          5.753364868164063
+        ],
+        "rotation": [
+          0.6644627726956303,
+          0.24184474309875278,
+          0.24184494814501412,
+          0.6644632156815523
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          13.184972825647012,
+          -5.8457682995288,
+          12.001473002778468
+        ],
+        "rotation": [
+          -0.3058555032628227,
+          0.6396626305976735,
+          0.30853697242472966,
+          -0.6341049335777885
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "particle3.pte",
+      "sourcePartDir": "Part_particle3.pte",
+      "sourcePartIndex": 8,
+      "fileName": "particle.pte",
+      "sourceXml": "particle.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Sphere04",
+      "parentPartFileName": "Sphere04000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Sphere04",
+      "joint": {
+        "type": "fixed",
+        "parent": "Sphere04",
+        "child": "particle3.pte",
+        "relativePosition": [
+          18.047138214111328,
+          1826.1781005859375,
+          575.362060546875
+        ],
+        "relativeOrientationRows": [
+          0.008726404048502445,
+          1.294263398676776e-07,
+          0.9999619126319885,
+          0.9999619126319885,
+          -2.571260893091676e-07,
+          -0.008726404048502445,
+          2.559868619300687e-07,
+          1.0,
+          -1.316652031846388e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.18047138214111327,
+          18.261781005859376,
+          5.75362060546875
+        ],
+        "rotation": [
+          0.5021769619413967,
+          0.4978135843143753,
+          0.49781364732033834,
+          0.5021767683883884
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -0.1804698433221193,
+          -10.710102756608256,
+          15.871061854102104
+        ],
+        "rotation": [
+          -0.3058559695958244,
+          0.6396626645838217,
+          0.308536617338464,
+          -0.6341048471360724
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "particle4.pte",
+      "sourcePartDir": "Part_particle4.pte",
+      "sourcePartIndex": 10,
+      "fileName": "particle.pte",
+      "sourceXml": "particle.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Sphere05",
+      "parentPartFileName": "Sphere05000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Sphere05",
+      "joint": {
+        "type": "fixed",
+        "parent": "Sphere05",
+        "child": "particle4.pte",
+        "relativePosition": [
+          -43.184593200683594,
+          1814.5487060546875,
+          575.3780517578125
+        ],
+        "relativeOrientationRows": [
+          -0.8090171217918396,
+          3.5626933936327987e-07,
+          0.5877850651741028,
+          0.5877850651741028,
+          1.0517624815520321e-07,
+          0.8090171217918396,
+          2.2640696784037573e-07,
+          1.0,
+          -2.944991877029679e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.43184593200683596,
+          18.145487060546877,
+          5.753780517578125
+        ],
+        "rotation": [
+          0.21850804368955973,
+          0.6724986112197843,
+          0.672498462641248,
+          0.21850782708081895
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -14.521751849185128,
+          -4.939768289840288,
+          11.281343551358363
+        ],
+        "rotation": [
+          -0.3058558612667177,
+          0.6396628071356558,
+          0.3085366390074878,
+          -0.6341047450430333
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "particle5.pte",
+      "sourcePartDir": "Part_particle5.pte",
+      "sourcePartIndex": 12,
+      "fileName": "particle.pte",
+      "sourceXml": "particle.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Sphere06",
+      "parentPartFileName": "Sphere06000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Sphere06",
+      "joint": {
+        "type": "fixed",
+        "parent": "Sphere06",
+        "child": "particle5.pte",
+        "relativePosition": [
+          -66.02091979980469,
+          1737.0828857421875,
+          575.3147583007812
+        ],
+        "relativeOrientationRows": [
+          -0.8290377855300903,
+          3.10960388105741e-07,
+          -0.5591925978660583,
+          -0.5591925978660583,
+          -2.5249624968637363e-07,
+          0.8290377855300903,
+          1.1660387855272347e-07,
+          1.0,
+          3.832156778571516e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.6602091979980469,
+          17.370828857421877,
+          5.753147583007813
+        ],
+        "rotation": [
+          -0.20673781065817154,
+          0.6762094986292791,
+          0.6762097336569245,
+          -0.20673796873200723
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -14.689702833495954,
+          10.855650942485083,
+          -1.2837088275040471
+        ],
+        "rotation": [
+          -0.3058559865391962,
+          0.6396627827802048,
+          0.30853691470237676,
+          -0.6341045750426013
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "bluespray.pte",
+      "sourcePartDir": "Part_bluespray.pte",
+      "sourcePartIndex": 14,
+      "fileName": "bluespray.pte",
+      "sourceXml": "bluespray.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "emitter",
+      "parentPartFileName": "emitter000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "emitter",
+      "joint": {
+        "type": "fixed",
+        "parent": "emitter",
+        "child": "bluespray.pte",
+        "relativePosition": [
+          357.11639404296875,
+          282.1215515136719,
+          -224.71241760253906
+        ],
+        "relativeOrientationRows": [
+          0.7132503390312195,
+          0.006116560660302639,
+          -0.7008826732635498,
+          -0.5485373735427856,
+          0.627362072467804,
+          -0.5527418255805969,
+          0.4363263249397278,
+          0.7787036299705505,
+          0.4508213698863983
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          3.5711639404296878,
+          2.8212155151367186,
+          -2.2471241760253906
+        ],
+        "rotation": [
+          0.39845540689709086,
+          -0.34032717766763454,
+          -0.16598866902022627,
+          0.8353792328111526
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          3.571164225742139,
+          2.8212134354271083,
+          -2.247128328793859
+        ],
+        "rotation": [
+          0.3984553997821459,
+          -0.34032717909486293,
+          -0.1659886661296233,
+          0.8353792361977236
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "bluespray1.pte",
+      "sourcePartDir": "Part_bluespray1.pte",
+      "sourcePartIndex": 15,
+      "fileName": "bluespray.pte",
+      "sourceXml": "bluespray.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "emitter",
+      "parentPartFileName": "emitter000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "emitter",
+      "joint": {
+        "type": "fixed",
+        "parent": "emitter",
+        "child": "bluespray1.pte",
+        "relativePosition": [
+          -354.9622497558594,
+          -282.9131164550781,
+          224.73651123046875
+        ],
+        "relativeOrientationRows": [
+          -0.7193398475646973,
+          -0.006061901338398457,
+          0.6946318745613098,
+          0.5436453819274902,
+          0.6175780892372131,
+          0.5683722496032715,
+          -0.4324348568916321,
+          0.7864862084388733,
+          -0.44095301628112793
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -3.5496224975585937,
+          -2.8291311645507813,
+          2.2473651123046876
+        ],
+        "rotation": [
+          0.16127233885468412,
+          0.8333473066346349,
+          0.4064507192558649,
+          0.33811434761265313
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -3.5496222124899517,
+          -2.829133167542474,
+          2.247361055597569
+        ],
+        "rotation": [
+          0.16127233598280968,
+          0.8333473100893612,
+          0.4064507121581989,
+          0.3381143489998123
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "greenspray.pte",
+      "sourcePartDir": "Part_greenspray.pte",
+      "sourcePartIndex": 16,
+      "fileName": "greenspray.pte",
+      "sourceXml": "greenspray.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "emitter",
+      "parentPartFileName": "emitter000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "emitter",
+      "joint": {
+        "type": "fixed",
+        "parent": "emitter",
+        "child": "greenspray.pte",
+        "relativePosition": [
+          -361.4814147949219,
+          279.1529235839844,
+          -222.35107421875
+        ],
+        "relativeOrientationRows": [
+          0.6691306233406067,
+          -2.71427538223179e-08,
+          0.7431448101997375,
+          0.5815912485122681,
+          0.6225146055221558,
+          -0.5236670970916748,
+          -0.46261849999427795,
+          0.7826082110404968,
+          0.4165436029434204
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -3.6148141479492186,
+          2.791529235839844,
+          -2.2235107421875
+        ],
+        "rotation": [
+          0.39688551338375316,
+          0.36634696178244286,
+          0.17670482675501964,
+          0.8228287774867663
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -3.6148138626380484,
+          2.7915271567222195,
+          -2.22351489460155
+        ],
+        "rotation": [
+          0.39688550638139525,
+          0.3663469632729668,
+          0.1767048236293397,
+          0.8228287808719278
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "greenspray1.pte",
+      "sourcePartDir": "Part_greenspray1.pte",
+      "sourcePartIndex": 17,
+      "fileName": "greenspray.pte",
+      "sourceXml": "greenspray.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "emitter",
+      "parentPartFileName": "emitter000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "emitter",
+      "joint": {
+        "type": "fixed",
+        "parent": "emitter",
+        "child": "greenspray1.pte",
+        "relativePosition": [
+          363.52239990234375,
+          -278.3016357421875,
+          221.06834411621094
+        ],
+        "relativeOrientationRows": [
+          -0.6946583390235901,
+          6.099500637901656e-08,
+          -0.7193398475646973,
+          -0.5629611015319824,
+          0.6225148439407349,
+          0.5436452031135559,
+          0.4477997422218323,
+          0.7826080322265625,
+          -0.4324350655078888
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          3.6352239990234376,
+          -2.783016357421875,
+          2.2106834411621095
+        ],
+        "rotation": [
+          -0.16975123070271284,
+          0.8290971319849835,
+          0.39990887949847864,
+          -0.3519308930847938
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          3.635224284094069,
+          -2.7830183612280432,
+          2.2106793838208127
+        ],
+        "rotation": [
+          -0.16975122769971634,
+          0.8290971353956417,
+          0.3999088724426363,
+          -0.3519308945160108
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "redspray.pte",
+      "sourcePartDir": "Part_redspray.pte",
+      "sourcePartIndex": 18,
+      "fileName": "redspray.pte",
+      "sourceXml": "redspray.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "emitter",
+      "parentPartFileName": "emitter000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "emitter",
+      "joint": {
+        "type": "fixed",
+        "parent": "emitter",
+        "child": "redspray.pte",
+        "relativePosition": [
+          3.9847657680511475,
+          397.5044860839844,
+          -316.49224853515625
+        ],
+        "relativeOrientationRows": [
+          0.9998477101325989,
+          -2.3053660314076296e-08,
+          -0.017452459782361984,
+          -0.013658422976732254,
+          0.6225147247314453,
+          -0.7824888825416565,
+          0.010864431969821453,
+          0.7826080918312073,
+          0.6224198937416077
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.039847657680511475,
+          3.975044860839844,
+          -3.1649224853515627
+        ],
+        "rotation": [
+          0.434428663759474,
+          -0.007860004617702372,
+          -0.003791203053120875,
+          0.9006639679763911
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          0.03984794304274999,
+          3.9750427655957856,
+          -3.1649266578410478
+        ],
+        "rotation": [
+          0.4344286560914007,
+          -0.00786000466518702,
+          -0.003791202993537934,
+          0.9006639716748663
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "redspray1.pte",
+      "sourcePartDir": "Part_redspray1.pte",
+      "sourcePartIndex": 19,
+      "fileName": "redspray.pte",
+      "sourceXml": "redspray.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "emitter",
+      "parentPartFileName": "emitter000914173505.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "emitter",
+      "joint": {
+        "type": "fixed",
+        "parent": "emitter",
+        "child": "redspray1.pte",
+        "relativePosition": [
+          -3.7452540397644043,
+          -397.58599853515625,
+          315.9513854980469
+        ],
+        "relativeOrientationRows": [
+          -0.9999619126319885,
+          6.96838355906948e-08,
+          0.008726578205823898,
+          0.006829534657299519,
+          0.6225146651268005,
+          0.7825783491134644,
+          -0.005432368256151676,
+          0.782608151435852,
+          -0.6224909424781799
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.03745254039764404,
+          -3.9758599853515624,
+          3.1595138549804687
+        ],
+        "rotation": [
+          0.0018956596728402337,
+          0.9006896681758895,
+          0.43444111567261434,
+          0.0039300291023022845
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -0.03745225537848276,
+          -3.9758619729044993,
+          3.1595098178730603
+        ],
+        "rotation": [
+          0.0018956596467162505,
+          0.9006896718745372,
+          0.43444110800435437,
+          0.003930029133649227
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 12,
+    "exportedMeshPartNames": [
+      "emitter",
+      "Root",
+      "Sphere01",
+      "Sphere02",
+      "Sphere03",
+      "Sphere04",
+      "Sphere05",
+      "Sphere06"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "Generator000914173505.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "Sphere01",
+        "partDir": "Part_Sphere01",
+        "fileName": "Sphere01000914173505.3db",
+        "index": 1,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "particle.pte",
+        "partDir": "Part_particle.pte",
+        "fileName": "particle.pte",
+        "index": 2,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "Sphere02",
+        "partDir": "Part_Sphere02",
+        "fileName": "Sphere02000914173505.3db",
+        "index": 3,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "particle1.pte",
+        "partDir": "Part_particle1.pte",
+        "fileName": "particle.pte",
+        "index": 4,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "Sphere03",
+        "partDir": "Part_Sphere03",
+        "fileName": "Sphere03000914173505.3db",
+        "index": 5,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "particle2.pte",
+        "partDir": "Part_particle2.pte",
+        "fileName": "particle.pte",
+        "index": 6,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "Sphere04",
+        "partDir": "Part_Sphere04",
+        "fileName": "Sphere04000914173505.3db",
+        "index": 7,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "particle3.pte",
+        "partDir": "Part_particle3.pte",
+        "fileName": "particle.pte",
+        "index": 8,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "Sphere05",
+        "partDir": "Part_Sphere05",
+        "fileName": "Sphere05000914173505.3db",
+        "index": 9,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "particle4.pte",
+        "partDir": "Part_particle4.pte",
+        "fileName": "particle.pte",
+        "index": 10,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "Sphere06",
+        "partDir": "Part_Sphere06",
+        "fileName": "Sphere06000914173505.3db",
+        "index": 11,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "particle5.pte",
+        "partDir": "Part_particle5.pte",
+        "fileName": "particle.pte",
+        "index": 12,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "emitter",
+        "partDir": "Part_emitter",
+        "fileName": "emitter000914173505.3db",
+        "index": 13,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "bluespray.pte",
+        "partDir": "Part_bluespray.pte",
+        "fileName": "bluespray.pte",
+        "index": 14,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "bluespray1.pte",
+        "partDir": "Part_bluespray1.pte",
+        "fileName": "bluespray.pte",
+        "index": 15,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "greenspray.pte",
+        "partDir": "Part_greenspray.pte",
+        "fileName": "greenspray.pte",
+        "index": 16,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "greenspray1.pte",
+        "partDir": "Part_greenspray1.pte",
+        "fileName": "greenspray.pte",
+        "index": 17,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "redspray.pte",
+        "partDir": "Part_redspray.pte",
+        "fileName": "redspray.pte",
+        "index": 18,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "redspray1.pte",
+        "partDir": "Part_redspray1.pte",
+        "fileName": "redspray.pte",
+        "index": 19,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

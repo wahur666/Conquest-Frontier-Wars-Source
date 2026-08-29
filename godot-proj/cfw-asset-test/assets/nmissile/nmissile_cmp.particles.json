@@ -1,0 +1,110 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "nmissile.cmp.xml",
+    "gltf": "nmissile_cmp.gltf",
+    "unitName": "nmissile.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "nmtrail.pte",
+      "sourcePartDir": "Part_nmtrail.pte",
+      "sourcePartIndex": 1,
+      "fileName": "nmtrail.pte",
+      "sourceXml": "nmtrail.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "nmissile.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "nmtrail.pte",
+        "relativePosition": [
+          0.0,
+          0.0,
+          194.93499755859375
+        ],
+        "relativeOrientationRows": [
+          1.0, 0.0, 0.0,
+          0.0, 1.0, 0.0,
+          0.0, 0.0, 1.0
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.0,
+          0.0,
+          1.9493499755859376
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          0.0,
+          0.0,
+          1.9493499755859376
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 1,
+    "exportedMeshPartNames": [
+      "Root"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "nmissile.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "nmtrail.pte",
+        "partDir": "Part_nmtrail.pte",
+        "fileName": "nmtrail.pte",
+        "index": 1,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

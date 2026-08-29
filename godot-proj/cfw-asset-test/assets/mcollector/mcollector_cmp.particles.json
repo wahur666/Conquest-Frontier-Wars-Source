@@ -1,0 +1,486 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "mcollector.cmp.xml",
+    "gltf": "mcollector_cmp.gltf",
+    "unitName": "mcollector.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "msmoke.pte",
+      "sourcePartDir": "Part_msmoke.pte",
+      "sourcePartIndex": 3,
+      "fileName": "msmoke.pte",
+      "sourceXml": "msmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "M_plat_collector1",
+      "parentPartFileName": "M_plat_collector1000918113337.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "M_plat_collector1",
+      "joint": {
+        "type": "fixed",
+        "parent": "M_plat_collector1",
+        "child": "msmoke.pte",
+        "relativePosition": [
+          758.5242919921875,
+          2245.369140625,
+          124.96822357177734
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          -1.6081507681064977e-07,
+          3.57002849504795e-09,
+          7.628715437135725e-10,
+          0.017452426254749298,
+          0.9998477101325989,
+          -1.6085289189504692e-07,
+          0.9998477101325989,
+          -0.017452426254749298
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          7.585242919921875,
+          22.45369140625,
+          1.2496822357177735
+        ],
+        "rotation": [
+          -5.609957999082616e-08,
+          0.7132504507306511,
+          0.7009092626956194,
+          5.763155065164783e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          7.58524173316232,
+          22.45369357955414,
+          1.2496833049952447
+        ],
+        "rotation": [
+          -5.609958131797316e-08,
+          0.713250450730656,
+          0.7009092626956144,
+          5.763154941121677e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "msmoke1.pte",
+      "sourcePartDir": "Part_msmoke1.pte",
+      "sourcePartIndex": 4,
+      "fileName": "msmoke.pte",
+      "sourceXml": "msmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "M_plat_collector1",
+      "parentPartFileName": "M_plat_collector1000918113337.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "M_plat_collector1",
+      "joint": {
+        "type": "fixed",
+        "parent": "M_plat_collector1",
+        "child": "msmoke1.pte",
+        "relativePosition": [
+          1297.7567138671875,
+          1446.560546875,
+          279.1659240722656
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          -1.6081507681064977e-07,
+          3.57002849504795e-09,
+          7.628715437135725e-10,
+          0.017452426254749298,
+          0.9998477101325989,
+          -1.6085289189504692e-07,
+          0.9998477101325989,
+          -0.017452426254749298
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          12.977567138671875,
+          14.46560546875,
+          2.791659240722656
+        ],
+        "rotation": [
+          -5.609957999082616e-08,
+          0.7132504507306511,
+          0.7009092626956194,
+          5.763155065164783e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          12.977565951912348,
+          14.465607642054179,
+          2.7916603100002404
+        ],
+        "rotation": [
+          -5.609958131797316e-08,
+          0.713250450730656,
+          0.7009092626956144,
+          5.763154941121677e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "msmoke3.pte",
+      "sourcePartDir": "Part_msmoke3.pte",
+      "sourcePartIndex": 5,
+      "fileName": "msmoke.pte",
+      "sourceXml": "msmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "M_plat_collector1",
+      "parentPartFileName": "M_plat_collector1000918113337.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "M_plat_collector1",
+      "joint": {
+        "type": "fixed",
+        "parent": "M_plat_collector1",
+        "child": "msmoke3.pte",
+        "relativePosition": [
+          -653.0738525390625,
+          1809.037841796875,
+          142.39602661132812
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          -1.6081507681064977e-07,
+          3.57002849504795e-09,
+          7.628715437135725e-10,
+          0.017452426254749298,
+          0.9998477101325989,
+          -1.6085289189504692e-07,
+          0.9998477101325989,
+          -0.017452426254749298
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -6.530738525390625,
+          18.09037841796875,
+          1.4239602661132813
+        ],
+        "rotation": [
+          -5.609957999082616e-08,
+          0.7132504507306511,
+          0.7009092626956194,
+          5.763155065164783e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -6.530739712150163,
+          18.09038059127284,
+          1.423961335390813
+        ],
+        "rotation": [
+          -5.609958131797316e-08,
+          0.713250450730656,
+          0.7009092626956144,
+          5.763154941121677e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "msmoke4.pte",
+      "sourcePartDir": "Part_msmoke4.pte",
+      "sourcePartIndex": 6,
+      "fileName": "msmoke.pte",
+      "sourceXml": "msmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "M_plat_collector1",
+      "parentPartFileName": "M_plat_collector1000918113337.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "M_plat_collector1",
+      "joint": {
+        "type": "fixed",
+        "parent": "M_plat_collector1",
+        "child": "msmoke4.pte",
+        "relativePosition": [
+          -1070.6705322265625,
+          1547.912841796875,
+          211.14599609375
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          -1.6081507681064977e-07,
+          3.57002849504795e-09,
+          7.628715437135725e-10,
+          0.017452426254749298,
+          0.9998477101325989,
+          -1.6085289189504692e-07,
+          0.9998477101325989,
+          -0.017452426254749298
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -10.706705322265625,
+          15.47912841796875,
+          2.1114599609375
+        ],
+        "rotation": [
+          -5.609957999082616e-08,
+          0.7132504507306511,
+          0.7009092626956194,
+          5.763155065164783e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -10.706706509025155,
+          15.479130591272833,
+          2.111461030215068
+        ],
+        "rotation": [
+          -5.609958131797316e-08,
+          0.713250450730656,
+          0.7009092626956144,
+          5.763154941121677e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "msmoke2.pte",
+      "sourcePartDir": "Part_msmoke2.pte",
+      "sourcePartIndex": 7,
+      "fileName": "msmoke.pte",
+      "sourceXml": "msmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "M_plat_collector000918113337.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "msmoke2.pte",
+        "relativePosition": [
+          31.3631534576416,
+          2198.322509765625,
+          64.81015014648438
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          -1.6081507681064977e-07,
+          3.57002893913716e-09,
+          7.628719878027823e-10,
+          0.017452426254749298,
+          0.9998477101325989,
+          -1.6085289189504692e-07,
+          0.9998477101325989,
+          -0.017452426254749298
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.313631534576416,
+          21.983225097656252,
+          0.6481015014648438
+        ],
+        "rotation": [
+          -5.609957983516933e-08,
+          0.7132504507306511,
+          0.7009092626956194,
+          5.763155080730465e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          0.313631534576416,
+          21.983225097656252,
+          0.6481015014648438
+        ],
+        "rotation": [
+          -5.609957983516933e-08,
+          0.7132504507306511,
+          0.7009092626956194,
+          5.763155080730465e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 5,
+    "exportedMeshPartNames": [
+      "M_plat_collector1",
+      "Root",
+      "roots"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "M_plat_collector000918113337.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "roots",
+        "partDir": "Part_roots",
+        "fileName": "roots000918113337.3db",
+        "index": 1,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "M_plat_collector1",
+        "partDir": "Part_M_plat_collector1",
+        "fileName": "M_plat_collector1000918113337.3db",
+        "index": 2,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "msmoke.pte",
+        "partDir": "Part_msmoke.pte",
+        "fileName": "msmoke.pte",
+        "index": 3,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "msmoke1.pte",
+        "partDir": "Part_msmoke1.pte",
+        "fileName": "msmoke.pte",
+        "index": 4,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "msmoke3.pte",
+        "partDir": "Part_msmoke3.pte",
+        "fileName": "msmoke.pte",
+        "index": 5,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "msmoke4.pte",
+        "partDir": "Part_msmoke4.pte",
+        "fileName": "msmoke.pte",
+        "index": 6,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "msmoke2.pte",
+        "partDir": "Part_msmoke2.pte",
+        "fileName": "msmoke.pte",
+        "index": 7,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

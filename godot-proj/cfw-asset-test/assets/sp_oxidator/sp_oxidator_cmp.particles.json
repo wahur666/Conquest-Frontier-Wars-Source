@@ -1,0 +1,204 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "sp_oxidator.cmp.xml",
+    "gltf": "sp_oxidator_cmp.gltf",
+    "unitName": "sp_oxidator.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "ssmoke.pte",
+      "sourcePartDir": "Part_ssmoke.pte",
+      "sourcePartIndex": 1,
+      "fileName": "ssmoke.pte",
+      "sourceXml": "ssmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "S_plat_Oxidator001002134400.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "ssmoke.pte",
+        "relativePosition": [
+          1399.0230712890625,
+          1067.4100341796875,
+          455.25933837890625
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          1.7926335260654014e-07,
+          -1.920384966498656e-14,
+          -1.1617180538403028e-14,
+          4.23213606381978e-08,
+          1.0,
+          1.7926335260654014e-07,
+          1.0,
+          -4.23213606381978e-08
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          13.990230712890625,
+          10.674100341796875,
+          4.552593383789063
+        ],
+        "rotation": [
+          6.337916067471986e-08,
+          0.7071067961494049,
+          0.7071067662236843,
+          -6.337917157159935e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          13.990230712890625,
+          10.674100341796875,
+          4.552593383789063
+        ],
+        "rotation": [
+          6.337916067471986e-08,
+          0.7071067961494049,
+          0.7071067662236843,
+          -6.337917157159935e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "ssmoke1.pte",
+      "sourcePartDir": "Part_ssmoke1.pte",
+      "sourcePartIndex": 2,
+      "fileName": "ssmoke.pte",
+      "sourceXml": "ssmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "S_plat_Oxidator001002134400.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "ssmoke1.pte",
+        "relativePosition": [
+          -1368.3480224609375,
+          1067.4100341796875,
+          455.259765625
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          1.7926335260654014e-07,
+          -1.920384966498656e-14,
+          -1.1617180538403028e-14,
+          4.23213606381978e-08,
+          1.0,
+          1.7926335260654014e-07,
+          1.0,
+          -4.23213606381978e-08
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -13.683480224609376,
+          10.674100341796875,
+          4.55259765625
+        ],
+        "rotation": [
+          6.337916067471986e-08,
+          0.7071067961494049,
+          0.7071067662236843,
+          -6.337917157159935e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -13.683480224609376,
+          10.674100341796875,
+          4.55259765625
+        ],
+        "rotation": [
+          6.337916067471986e-08,
+          0.7071067961494049,
+          0.7071067662236843,
+          -6.337917157159935e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 2,
+    "exportedMeshPartNames": [
+      "Root"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "S_plat_Oxidator001002134400.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "ssmoke.pte",
+        "partDir": "Part_ssmoke.pte",
+        "fileName": "ssmoke.pte",
+        "index": 1,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "ssmoke1.pte",
+        "partDir": "Part_ssmoke1.pte",
+        "fileName": "ssmoke.pte",
+        "index": 2,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

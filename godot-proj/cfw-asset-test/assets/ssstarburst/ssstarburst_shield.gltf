@@ -1,0 +1,112 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars shield XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "ssstarburst.shield",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "ssstarburst.shield",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "mode": 4,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "shield",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.3,
+          0.6,
+          1.0,
+          0.35
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.2
+      },
+      "alphaMode": "BLEND",
+      "doubleSided": true
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 3288,
+      "uri": "ssstarburst_shield.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1104,
+      "byteLength": 1104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2208,
+      "byteLength": 1080,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 92,
+      "type": "VEC3",
+      "min": [
+        -10.36258544921875,
+        -10.880771484375,
+        -9.99423095703125
+      ],
+      "max": [
+        10.356422119140625,
+        10.95228271484375,
+        9.978170166015625
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 92,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 540,
+      "type": "SCALAR"
+    }
+  ]
+}

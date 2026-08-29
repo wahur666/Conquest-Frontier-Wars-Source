@@ -1,0 +1,1018 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars 3db XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "tstation.3db",
+      "mesh": 0,
+      "children": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "name": "hp_blink1",
+      "translation": [
+        -0.08683184623718262,
+        6.7752783203125,
+        0.28272491455078125
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          4.111517171168089e-08,
+          -1.2436741769761284e-07,
+          1.0,
+          6.302861521589875e-08,
+          1.0,
+          1.2436741769761284e-07,
+          -1.0,
+          6.30286081104714e-08,
+          4.1115178817108244e-08
+        ]
+      }
+    },
+    {
+      "name": "hp_blink10",
+      "translation": [
+        -6.357163085937501,
+        0.753582992553711,
+        -4.3195825195312505
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink11",
+      "translation": [
+        -6.357163085937501,
+        0.7535825347900391,
+        2.98218505859375
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink12",
+      "translation": [
+        -3.76916015625,
+        0.753582763671875,
+        5.6478662109375
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink2",
+      "translation": [
+        0.090634765625,
+        1.5262835693359376,
+        -9.39597412109375
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink3",
+      "translation": [
+        -7.1927734375000005,
+        0.7535826110839844,
+        -0.5273901748657227
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink4",
+      "translation": [
+        7.1305322265625,
+        0.7535846710205079,
+        -0.5273901748657227
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink5",
+      "translation": [
+        6.208271484375,
+        0.7535845184326172,
+        2.98218505859375
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink6",
+      "translation": [
+        3.4071435546875,
+        0.7535839080810547,
+        5.6478662109375
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink7",
+      "translation": [
+        6.208271484375,
+        0.7535847473144531,
+        -4.3195825195312505
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink8",
+      "translation": [
+        3.4071435546875,
+        0.7535846710205079,
+        -6.93005126953125
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink9",
+      "translation": [
+        -3.6454248046875,
+        0.7535835266113281,
+        -6.93005126953125
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_fabricator",
+      "translation": [
+        -0.061640625000000004,
+        1.5262831115722657,
+        0.19442138671875
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -4.009832466067564e-09,
+          -1.629332757602242e-07,
+          -1.629332757602242e-07,
+          -1.0442015252465353e-07,
+          1.0,
+          -4.009849341457539e-09,
+          1.0,
+          1.0442015252465353e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_fighter1",
+      "translation": [
+        -0.05607421875,
+        1.5262826538085938,
+        -1.77665283203125
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          -1.8865010531499138e-07,
+          -3.3266175591961655e-07,
+          1.8865016215841024e-07,
+          1.0,
+          1.5464212310689618e-07,
+          3.326617274979071e-07,
+          -1.5464217995031504e-07,
+          1.0
+        ]
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "tstation.3db",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 3,
+            "NORMAL": 4,
+            "TEXCOORD_0": 5
+          },
+          "mode": 4,
+          "material": 1,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 6,
+            "NORMAL": 7,
+            "TEXCOORD_0": 8
+          },
+          "mode": 4,
+          "material": 2,
+          "extras": {
+            "sourceFaceGroup": "Group2",
+            "sourceMaterialId": 2
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 9,
+            "NORMAL": 10,
+            "TEXCOORD_0": 11
+          },
+          "mode": 4,
+          "material": 3,
+          "extras": {
+            "sourceFaceGroup": "Group3",
+            "sourceMaterialId": 3
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material #1terrans3",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.988235354423523,
+          0.9803922176361084,
+          0.9803922176361084,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "Terranshp01.tif",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "Terranshp01.tif",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.988235354423523,
+            0.9803922176361084,
+            0.9803922176361084
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "Terranshp01.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings_1terrans3",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "Terranshp01.tif",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "Terranshp01.tif",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            0.0
+          ],
+          "emissionConstant": [
+            1.0,
+            1.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "Terranshp01.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        0.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "Material #22terrans3",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.988235354423523,
+          0.9803922176361084,
+          0.9803922176361084,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 1
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 2,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "Terranshp02.tif",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "Terranshp02.tif",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.988235354423523,
+            0.9803922176361084,
+            0.9803922176361084
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "Terranshp02.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "Material #13terrans3",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.9921569228172302,
+          0.960784375667572,
+          0.9568628072738647,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 3,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "admintx01.tif",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "admintx01.tif",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.9921569228172302,
+            0.960784375667572,
+            0.9568628072738647
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "admintx01.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 37056,
+      "uri": "tstation_3db.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 7488,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 7488,
+      "byteLength": 7488,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 14976,
+      "byteLength": 4992,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 19968,
+      "byteLength": 5616,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 25584,
+      "byteLength": 5616,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 31200,
+      "byteLength": 3744,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 34944,
+      "byteLength": 720,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 35664,
+      "byteLength": 720,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 36384,
+      "byteLength": 480,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 36864,
+      "byteLength": 72,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 36936,
+      "byteLength": 72,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 37008,
+      "byteLength": 48,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 624,
+      "type": "VEC3",
+      "min": [
+        -7.236802368164063,
+        -6.65733154296875,
+        -9.803773193359374
+      ],
+      "max": [
+        7.83713623046875,
+        6.657330322265625,
+        9.8037744140625
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 624,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 624,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 468,
+      "type": "VEC3",
+      "min": [
+        -7.83713623046875,
+        -1.5535490417480469,
+        -9.290879516601562
+      ],
+      "max": [
+        7.6772180175781255,
+        1.1708686065673828,
+        8.791424560546876
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 468,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 468,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 60,
+      "type": "VEC3",
+      "min": [
+        -2.4951966857910155,
+        -1.5535490417480469,
+        -9.803773193359374
+      ],
+      "max": [
+        2.3466188049316408,
+        1.7850376892089843,
+        9.8037744140625
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 60,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 8,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 60,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 9,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 6,
+      "type": "VEC3",
+      "min": [
+        -2.4951995849609374,
+        -1.55354736328125,
+        4.743025817871094
+      ],
+      "max": [
+        2.3466156005859378,
+        -1.1323095703125001,
+        4.743026123046875
+      ]
+    },
+    {
+      "bufferView": 10,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 6,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 11,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 6,
+      "type": "VEC2"
+    }
+  ],
+  "images": [
+    {
+      "name": "Terranshp01.tif",
+      "uri": "Terranshp01.png"
+    },
+    {
+      "name": "Terranshp02.tif",
+      "uri": "Terranshp02.png"
+    },
+    {
+      "name": "admintx01.tif",
+      "uri": "admintx01.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "Terranshp01.tif"
+    },
+    {
+      "sampler": 1,
+      "source": 1,
+      "name": "Terranshp02.tif"
+    },
+    {
+      "sampler": 2,
+      "source": 2,
+      "name": "admintx01.tif"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

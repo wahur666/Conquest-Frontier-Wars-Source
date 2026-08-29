@@ -1,0 +1,134 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "mblast.cmp.xml",
+    "gltf": "mblast_cmp.gltf",
+    "unitName": "mblast.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "blast.pte",
+      "sourcePartDir": "Part_blast.pte",
+      "sourcePartIndex": 2,
+      "fileName": "blast.pte",
+      "sourceXml": "blast.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "M_plat_blast000624171104.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "blast.pte",
+        "relativePosition": [
+          -12.269174575805664,
+          309.9176940917969,
+          -796.02099609375
+        ],
+        "relativeOrientationRows": [
+          -0.9999619126319885,
+          -7.615562208229676e-05,
+          -0.008726369589567184,
+          7.615204231115058e-05,
+          0.9998477101325989,
+          -0.017452064901590347,
+          0.008726369589567184,
+          -0.017452064901590347,
+          -0.9998096227645874
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.12269174575805665,
+          3.099176940917969,
+          -7.9602099609375
+        ],
+        "rotation": [
+          -8.949853831124949e-10,
+          0.9999524038249228,
+          -0.008726447783528917,
+          -0.004363392469173857
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -0.12269174575805665,
+          3.099176940917969,
+          -7.9602099609375
+        ],
+        "rotation": [
+          -8.949853831124949e-10,
+          0.9999524038249228,
+          -0.008726447783528917,
+          -0.004363392469173857
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 1,
+    "exportedMeshPartNames": [
+      "M_plat_explosive",
+      "Root",
+      "roots"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "M_plat_blast000624171104.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "roots",
+        "partDir": "Part_roots",
+        "fileName": "roots000624171104.3db",
+        "index": 1,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "blast.pte",
+        "partDir": "Part_blast.pte",
+        "fileName": "blast.pte",
+        "index": 2,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "M_plat_explosive",
+        "partDir": "Part_M_plat_explosive",
+        "fileName": "M_plat_explosive000624171104.3db",
+        "index": 3,
+        "isParticle": false,
+        "isExportedMesh": true
+      }
+    ]
+  }
+}

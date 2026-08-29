@@ -1,0 +1,116 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "smissile.cmp.xml",
+    "gltf": "smissile_cmp.gltf",
+    "unitName": "smissile.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "smissile.pte",
+      "sourcePartDir": "Part_smissile.pte",
+      "sourcePartIndex": 1,
+      "fileName": "smissile.pte",
+      "sourceXml": "smissile.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "Sphere01000707095009.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "smissile.pte",
+        "relativePosition": [
+          -1.9088134765625,
+          -7.222095155157149e-05,
+          -180.373779296875
+        ],
+        "relativeOrientationRows": [
+          -0.9996573328971863,
+          0.02617674320936203,
+          1.1836681634846968e-09,
+          0.02617674320936203,
+          0.9996573328971863,
+          2.0468938544127013e-07,
+          4.174839141057873e-09,
+          2.0465023453652975e-07,
+          -1.0
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.019088134765625,
+          -7.222095155157149e-07,
+          -1.8037377929687501
+        ],
+        "rotation": [
+          0.013089492979029194,
+          0.9999143289170035,
+          1.0234367275722827e-07,
+          -7.478568131427647e-10
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -0.019088134765625,
+          -7.222095155157149e-07,
+          -1.8037377929687501
+        ],
+        "rotation": [
+          0.013089492979029196,
+          0.9999143289170036,
+          1.0234367275722829e-07,
+          -7.478568131427648e-10
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 1,
+    "exportedMeshPartNames": [
+      "Root"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "Sphere01000707095009.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "smissile.pte",
+        "partDir": "Part_smissile.pte",
+        "fileName": "smissile.pte",
+        "index": 1,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

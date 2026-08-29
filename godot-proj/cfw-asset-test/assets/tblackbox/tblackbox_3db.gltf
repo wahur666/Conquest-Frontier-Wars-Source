@@ -1,0 +1,306 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars 3db XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "tblackbox.3db",
+      "mesh": 0,
+      "children": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "name": "hp_blink1",
+      "translation": [
+        2.940361328125,
+        -0.8354926300048828,
+        1.4589698791503907
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          3.785516966559044e-08,
+          2.185570302515316e-08,
+          -2.1855690590655286e-08,
+          0.866025447845459,
+          -0.49999991059303284,
+          -3.7855176771017796e-08,
+          0.49999991059303284,
+          0.866025447845459
+        ]
+      }
+    },
+    {
+      "name": "hp_blink2",
+      "translation": [
+        0.02752446413040161,
+        1.25465087890625,
+        0.6032977676391602
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          3.785516966559044e-08,
+          2.185570302515316e-08,
+          -2.1855690590655286e-08,
+          0.866025447845459,
+          -0.49999991059303284,
+          -3.7855176771017796e-08,
+          0.49999991059303284,
+          0.866025447845459
+        ]
+      }
+    },
+    {
+      "name": "hp_blink3",
+      "translation": [
+        -0.004438549280166626,
+        1.7098171997070313,
+        -2.9179263305664063
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          3.785516966559044e-08,
+          2.185570302515316e-08,
+          -2.1855690590655286e-08,
+          0.866025447845459,
+          -0.49999991059303284,
+          -3.7855176771017796e-08,
+          0.49999991059303284,
+          0.866025447845459
+        ]
+      }
+    },
+    {
+      "name": "hp_blink4",
+      "translation": [
+        -2.950693359375,
+        -0.8427465057373047,
+        1.478055419921875
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          3.785516966559044e-08,
+          2.185570302515316e-08,
+          -2.1855690590655286e-08,
+          0.866025447845459,
+          -0.49999991059303284,
+          -3.7855176771017796e-08,
+          0.49999991059303284,
+          0.866025447845459
+        ]
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "tblackbox.3db",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material #10864",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.988235354423523,
+          0.9803922176361084,
+          0.9803922176361084,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "admintx02.tif",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "admintx02.tif",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.988235354423523,
+            0.9803922176361084,
+            0.9803922176361084
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "admintx02.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 8256,
+      "uri": "tblackbox_3db.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 3096,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3096,
+      "byteLength": 3096,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 6192,
+      "byteLength": 2064,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 258,
+      "type": "VEC3",
+      "min": [
+        -2.9666912841796877,
+        -0.9824415588378906,
+        -2.966690979003906
+      ],
+      "max": [
+        2.966690979003906,
+        2.5266357421875,
+        1.483345489501953
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 258,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 258,
+      "type": "VEC2"
+    }
+  ],
+  "images": [
+    {
+      "name": "admintx02.tif",
+      "uri": "admintx02.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "admintx02.tif"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

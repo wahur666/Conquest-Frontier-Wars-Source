@@ -1,0 +1,329 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars 3db XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "sacropolis.3db",
+      "mesh": 0,
+      "children": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "name": "hp_blink1",
+      "translation": [
+        0.04465001106262207,
+        8.178545532226563,
+        -3.4755545043945313
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -2.3930445536279876e-07,
+          -5.316415396805496e-08,
+          -5.3164082913781385e-08,
+          -2.981168734095263e-07,
+          1.0,
+          -2.393044837845082e-07,
+          1.0,
+          2.981168734095263e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink2",
+      "translation": [
+        -9.09448974609375,
+        3.2811050415039062,
+        -3.071252746582031
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -2.393043985193799e-07,
+          -5.316412199363185e-08,
+          -5.3164050939358276e-08,
+          -2.981168734095263e-07,
+          1.0,
+          -2.3930442694108933e-07,
+          1.0,
+          2.981168734095263e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_blink3",
+      "translation": [
+        8.848124389648438,
+        3.3363092041015627,
+        -2.741820983886719
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -2.3930442694108933e-07,
+          -5.316413620448657e-08,
+          -5.316406515021299e-08,
+          -2.981168734095263e-07,
+          1.0,
+          -2.3930445536279876e-07,
+          1.0,
+          2.981168734095263e-07
+        ]
+      }
+    },
+    {
+      "name": "hp_fabricator",
+      "translation": [
+        0.03356964826583862,
+        -0.45063438415527346,
+        -15.82162353515625
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          -5.316412199363185e-08,
+          2.3930445536279876e-07,
+          -5.3164086466495064e-08,
+          1.0,
+          1.4565242167918768e-07,
+          -2.3930445536279876e-07,
+          1.4565240746833297e-07,
+          -1.0
+        ]
+      }
+    },
+    {
+      "name": "hp_putship",
+      "translation": [
+        0.3394219207763672,
+        -0.14123642921447754,
+        -7.622487182617188
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          0.006661697290837765,
+          -0.9999778270721436,
+          -6.285607412337413e-08,
+          2.0256769062143576e-07,
+          -6.150799691795328e-08,
+          1.0,
+          -0.9999778270721436,
+          -0.006661697290837765,
+          2.0215344420648762e-07
+        ]
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "sacropolis.3db",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "MantisTex_1",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "solarian_tm5.tif",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "solarian_tm5.tif",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "solarian_tm5.tif",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 36864,
+      "uri": "sacropolis_3db.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 13824,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 13824,
+      "byteLength": 13824,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 27648,
+      "byteLength": 9216,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1152,
+      "type": "VEC3",
+      "min": [
+        -26.346105957031252,
+        -7.586627807617187,
+        -12.961123046875
+      ],
+      "max": [
+        26.33826416015625,
+        8.048103637695313,
+        4.858212280273437
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1152,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1152,
+      "type": "VEC2"
+    }
+  ],
+  "images": [
+    {
+      "name": "solarian_tm5.tif",
+      "uri": "solarian_tm5.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "solarian_tm5.tif"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

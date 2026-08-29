@@ -1,0 +1,596 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars CMP XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "pcraterplanet.cmp",
+      "children": [
+        1
+      ],
+      "extras": {
+        "sourceCompoundJoints": [
+          {
+            "type": "revolute",
+            "parent": "Root",
+            "child": "clouds"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Root",
+      "mesh": 0,
+      "extras": {
+        "sourcePartDir": "Root",
+        "sourceFileName": "earth10001211409.3db",
+        "sourcePartIndex": 0,
+        "sourceUnitName": "earth10001211409.3db"
+      },
+      "children": [
+        2
+      ]
+    },
+    {
+      "name": "clouds",
+      "mesh": 1,
+      "extras": {
+        "sourcePartDir": "Part_clouds",
+        "sourceFileName": "clouds10001211409.3db",
+        "sourcePartIndex": 1,
+        "sourceUnitName": "clouds10001211409.3db"
+      },
+      "translation": [
+        -0.003955955505371094,
+        4.3580339337268015e-10,
+        5.694754889873366e-10
+      ],
+      "rotation": [
+        6.866861163281539e-16,
+        1.3027006739768556e-15,
+        3.5538876664653954e-16,
+        1.0
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Root",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "clouds",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 3,
+            "NORMAL": 4,
+            "TEXCOORD_0": 5
+          },
+          "mode": 4,
+          "material": 1,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material #1",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8,
+        "baseColorTexture": {
+          "index": 1
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "testbd_sat.jpg",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "testbd_sat.jpg",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [],
+          "exportedBaseColorTexture": "testbd_sat.jpg",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "Material #2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "clouds1.TGAclouds1a.TGA",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "clouds1.TGAclouds1a.TGA",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [],
+          "exportedBaseColorTexture": "clouds1.TGAclouds1a.TGA",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      },
+      "alphaMode": "BLEND",
+      "alphaCutoff": 0.01
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 79904,
+      "uri": "pcraterplanet_cmp.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 12960,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 12960,
+      "byteLength": 12960,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 25920,
+      "byteLength": 8640,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 34560,
+      "byteLength": 12960,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 47520,
+      "byteLength": 12960,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 60480,
+      "byteLength": 8640,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 69120,
+      "byteLength": 4
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 69124,
+      "byteLength": 12
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 69136,
+      "byteLength": 16
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 69152,
+      "byteLength": 1344
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 70496,
+      "byteLength": 4032
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 74528,
+      "byteLength": 5376
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1080,
+      "type": "VEC3",
+      "min": [
+        -21.51751708984375,
+        -21.51751953125,
+        -21.51751953125
+      ],
+      "max": [
+        21.51751708984375,
+        21.51751953125,
+        21.51751953125
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1080,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1080,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1080,
+      "type": "VEC3",
+      "min": [
+        -22.13819580078125,
+        -22.13821533203125,
+        -22.13821533203125
+      ],
+      "max": [
+        22.13819580078125,
+        22.13821533203125,
+        22.13821533203125
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1080,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1080,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.0
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 8,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 1,
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 9,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 336,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        233.33334350585938
+      ]
+    },
+    {
+      "bufferView": 10,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 336,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 11,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 336,
+      "type": "VEC4"
+    }
+  ],
+  "images": [
+    {
+      "name": "clouds1.TGAclouds1a.TGA",
+      "uri": "clouds1.TGAclouds1a.png"
+    },
+    {
+      "name": "testbd_sat.jpg",
+      "uri": "testbd_sat.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "clouds1.TGAclouds1a.TGA"
+    },
+    {
+      "sampler": 1,
+      "source": 1,
+      "name": "testbd_sat.jpg"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "animations": [
+    {
+      "name": "Sc_end anim",
+      "samplers": [
+        {
+          "input": 6,
+          "output": 7,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 6,
+          "output": 8,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 2,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 2,
+            "path": "rotation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_end anim",
+            "map": "Joint map 0",
+            "targetName": "clouds",
+            "parentName": "Root",
+            "channelName": "Channel",
+            "channelType": 1,
+            "keyframes": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sc_rotate_clouds",
+      "samplers": [
+        {
+          "input": 9,
+          "output": 10,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 9,
+          "output": 11,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 2,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 2,
+            "path": "rotation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_rotate_clouds",
+            "map": "Joint map 0",
+            "targetName": "clouds",
+            "parentName": "Root",
+            "channelName": "Channel",
+            "channelType": 1,
+            "keyframes": 336
+          }
+        ]
+      }
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

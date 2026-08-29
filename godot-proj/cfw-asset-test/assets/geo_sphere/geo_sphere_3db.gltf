@@ -1,0 +1,179 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars 3db XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "geo_sphere.3db",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "geo_sphere.3db",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "GeoSphere01",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.5686274766921997,
+          0.1098039299249649,
+          0.6941176652908325,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.08,
+          0.08,
+          0.08
+        ],
+        "sourceDiffuseTextureName": null,
+        "sourceDiffuseTextureFlags": 0,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": null,
+          "diffuseFlags": 0,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.5686274766921997,
+            0.1098039299249649,
+            0.6941176652908325
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.08,
+            0.08,
+            0.08
+          ],
+          "transparency": 1.0,
+          "shininess": [],
+          "exportedBaseColorTexture": null,
+          "exportedBaseColorFlags": 0,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 17280,
+      "uri": "geo_sphere_3db.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 6480,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 6480,
+      "byteLength": 6480,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 12960,
+      "byteLength": 4320,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 540,
+      "type": "VEC3",
+      "min": [
+        -0.009854555726051331,
+        -0.009830234050750732,
+        -0.009999999403953552
+      ],
+      "max": [
+        0.009854555726051331,
+        0.00983023464679718,
+        0.009999999403953552
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 540,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 540,
+      "type": "VEC2"
+    }
+  ]
+}

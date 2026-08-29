@@ -1,0 +1,112 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars shield XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "tfleetcar.shield",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "tfleetcar.shield",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "mode": 4,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "shield",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.3,
+          0.6,
+          1.0,
+          0.35
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.2
+      },
+      "alphaMode": "BLEND",
+      "doubleSided": true
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 3288,
+      "uri": "tfleetcar_shield.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1104,
+      "byteLength": 1104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2208,
+      "byteLength": 1080,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 92,
+      "type": "VEC3",
+      "min": [
+        -4.4575830078125005,
+        -2.9052423095703124,
+        -17.917856445312502
+      ],
+      "max": [
+        4.469479675292969,
+        3.466436767578125,
+        17.881540527343752
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 92,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 540,
+      "type": "SCALAR"
+    }
+  ]
+}

@@ -45,7 +45,7 @@ use_colors = true
 instance_count = 1
 visible_instance_count = 0
 mesh = SubResource("QuadMesh_0rbn0")
-buffer = PackedFloat32Array(0, 2.5e-44, 1e-45, 0, 2.7e-44, 2.5e-44, 1e-45, 2.4e-44, 3e-45, 1e-45, 2.5e-44, 2.4e-44, 3e-45, 2.2e-44, 4e-45, 3e-45)
+buffer = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 [node name="CFWUnifiedParticlePlayer" type="Node3D" unique_id=1777886940]
 script = ExtResource("1_script")

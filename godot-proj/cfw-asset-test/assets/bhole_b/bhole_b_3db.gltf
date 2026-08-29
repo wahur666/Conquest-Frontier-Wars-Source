@@ -1,0 +1,179 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars 3db XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "bhole_b.3db",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "bhole_b.3db",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "DEFAULT",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.7843137979507446,
+          0.7843137979507446,
+          0.7843137979507446,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.7843137979507446,
+          0.7843137979507446,
+          0.7843137979507446
+        ],
+        "sourceDiffuseTextureName": null,
+        "sourceDiffuseTextureFlags": 0,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": null,
+          "diffuseFlags": 0,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.7843137979507446,
+            0.7843137979507446,
+            0.7843137979507446
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.7843137979507446,
+            0.7843137979507446,
+            0.7843137979507446
+          ],
+          "transparency": 1.0,
+          "shininess": [],
+          "exportedBaseColorTexture": null,
+          "exportedBaseColorFlags": 0,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 6912,
+      "uri": "bhole_b_3db.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 2592,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2592,
+      "byteLength": 2592,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 5184,
+      "byteLength": 1728,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 216,
+      "type": "VEC3",
+      "min": [
+        -14.6051708984375,
+        -14.21390380859375,
+        -7.295631103515625
+      ],
+      "max": [
+        13.0682958984375,
+        12.653646240234375,
+        7.2863708496093755
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 216,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 216,
+      "type": "VEC2"
+    }
+  ]
+}

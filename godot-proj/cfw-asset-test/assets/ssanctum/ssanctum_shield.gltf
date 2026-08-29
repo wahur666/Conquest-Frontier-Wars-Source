@@ -1,0 +1,112 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars shield XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "ssanctum.shield",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "ssanctum.shield",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1
+          },
+          "indices": 2,
+          "mode": 4,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "shield",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.3,
+          0.6,
+          1.0,
+          0.35
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.2
+      },
+      "alphaMode": "BLEND",
+      "doubleSided": true
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 3288,
+      "uri": "ssanctum_shield.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1104,
+      "byteLength": 1104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2208,
+      "byteLength": 1080,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 92,
+      "type": "VEC3",
+      "min": [
+        -25.95324462890625,
+        -14.92641845703125,
+        -7.702573852539063
+      ],
+      "max": [
+        22.642421875,
+        9.961934204101563,
+        10.075003662109376
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 92,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 540,
+      "type": "SCALAR"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "destable.cmp.xml",
+    "gltf": "destable_cmp.gltf",
+    "unitName": "destable.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "destable.pte",
+      "sourcePartDir": "Part_destable.pte",
+      "sourcePartIndex": 1,
+      "fileName": "destable.pte",
+      "sourceXml": "destable.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "Destabelizer000504192119.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "destable.pte",
+        "relativePosition": [
+          -0.3828125,
+          -0.026822544634342194,
+          124.280029296875
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          -2.6054019832284217e-15,
+          8.742278367890322e-08,
+          5.210803966456843e-15,
+          1.0,
+          8.940696716308594e-08,
+          -8.742278367890322e-08,
+          8.940696716308594e-08,
+          -1.0
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.003828125,
+          -0.00026822544634342194,
+          1.24280029296875
+        ],
+        "rotation": [
+          6.513504958071041e-16,
+          0.999999999999998,
+          4.470348358154288e-08,
+          4.371139183945152e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -0.003828125,
+          -0.00026822544634342194,
+          1.24280029296875
+        ],
+        "rotation": [
+          6.513504958071042e-16,
+          0.9999999999999981,
+          4.470348358154289e-08,
+          4.371139183945153e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 1,
+    "exportedMeshPartNames": [
+      "Root"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "Destabelizer000504192119.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "destable.pte",
+        "partDir": "Part_destable.pte",
+        "fileName": "destable.pte",
+        "index": 1,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

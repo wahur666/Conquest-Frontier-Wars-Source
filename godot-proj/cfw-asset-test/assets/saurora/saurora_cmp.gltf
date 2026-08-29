@@ -1,0 +1,3570 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars CMP XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "saurora.cmp",
+      "children": [
+        1
+      ],
+      "extras": {
+        "sourceCompoundJoints": [
+          {
+            "type": "revolute",
+            "parent": "Root",
+            "child": "nwc_turret"
+          },
+          {
+            "type": "revolute",
+            "parent": "nwc_turret",
+            "child": "gun_barrell1"
+          },
+          {
+            "type": "prismatic",
+            "parent": "nwc_turret",
+            "child": "gun_shield1"
+          },
+          {
+            "type": "prismatic",
+            "parent": "nwc_turret",
+            "child": "gun_shield2"
+          },
+          {
+            "type": "prismatic",
+            "parent": "Root",
+            "child": "gun_door1"
+          },
+          {
+            "type": "prismatic",
+            "parent": "Root",
+            "child": "gun_door2"
+          },
+          {
+            "type": "prismatic",
+            "parent": "Root",
+            "child": "gun_door3"
+          },
+          {
+            "type": "prismatic",
+            "parent": "Root",
+            "child": "gun_door4"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Root",
+      "mesh": 0,
+      "extras": {
+        "sourcePartDir": "Root",
+        "sourceFileName": "nwarcruiser9907011246.3db",
+        "sourcePartIndex": 0,
+        "sourceUnitName": "nwarcruiser9907011246.3db"
+      },
+      "children": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "name": "hp_eglow1",
+      "translation": [
+        -0.0018491725623607635,
+        -1.1517723083496094,
+        8.720824584960937
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          3.148464244873139e-08,
+          9.62836992357552e-08,
+          7.884511177280729e-08,
+          0.8386704921722412,
+          0.5446391701698303,
+          -6.360252768899954e-08,
+          0.5446391701698303,
+          -0.8386704921722412
+        ]
+      }
+    },
+    {
+      "name": "hp_eglow2",
+      "translation": [
+        -0.0018487077951431276,
+        -2.9325149536132815,
+        2.492897186279297
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -1.0,
+          3.232532819197331e-08,
+          9.638672793244041e-08,
+          7.905146759412673e-08,
+          0.8433913588523865,
+          0.5372997522354126,
+          -6.392334483962259e-08,
+          0.5372997522354126,
+          -0.8433913588523865
+        ]
+      }
+    },
+    {
+      "name": "hp_lgun",
+      "translation": [
+        2.0141387939453126,
+        -0.7892575073242187,
+        -0.050954041481018064
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          2.093550044435233e-08,
+          5.042764072982209e-08,
+          -1.0,
+          -2.9373348198191707e-08,
+          1.0,
+          5.042764072982209e-08,
+          1.0,
+          2.9373346421834867e-08,
+          2.0935502220709168e-08
+        ]
+      }
+    },
+    {
+      "name": "hp_rgun",
+      "translation": [
+        -1.9733793640136719,
+        -0.7892572784423828,
+        -0.050877161026000976
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.1920930376163597e-07,
+          7.198796936336294e-08,
+          1.0,
+          1.2665987014770508e-07,
+          1.0,
+          -7.198798357421765e-08,
+          -1.0,
+          1.266598843585598e-07,
+          1.1920928955078125e-07
+        ]
+      }
+    },
+    {
+      "name": "nwc_turret",
+      "mesh": 1,
+      "extras": {
+        "sourcePartDir": "Part_nwc_turret",
+        "sourceFileName": "nwc_turret9907011246.3db",
+        "sourcePartIndex": 1,
+        "sourceUnitName": "nwc_turret9907011246.3db"
+      },
+      "translation": [
+        -0.0018486668169498445,
+        1.5060169982910157,
+        4.164341735839844
+      ],
+      "rotation": [
+        -8.543551765063993e-16,
+        6.657266318071953e-12,
+        7.628658260649956e-10,
+        1.0
+      ],
+      "children": [
+        9,
+        7,
+        8
+      ]
+    },
+    {
+      "name": "gun_shield1",
+      "mesh": 2,
+      "extras": {
+        "sourcePartDir": "Part_gun_shield1",
+        "sourceFileName": "gun_shield19907011246.3db",
+        "sourcePartIndex": 2,
+        "sourceUnitName": "gun_shield19907011246.3db"
+      },
+      "translation": [
+        -0.01395879864692688,
+        -0.3944297790527344,
+        -0.6735368347167969
+      ],
+      "rotation": [
+        -8.210143185761348e-16,
+        -4.736561654233949e-16,
+        4.736561124838356e-16,
+        1.0
+      ]
+    },
+    {
+      "name": "gun_shield2",
+      "mesh": 3,
+      "extras": {
+        "sourcePartDir": "Part_gun_shield2",
+        "sourceFileName": "gun_shield29907011246.3db",
+        "sourcePartIndex": 3,
+        "sourceUnitName": "gun_shield29907011246.3db"
+      },
+      "translation": [
+        0.017346471548080444,
+        -0.3944297790527344,
+        -0.6726567077636719
+      ],
+      "rotation": [
+        -0.0043644280543675175,
+        -0.008729052627157731,
+        -3.80975139165592e-05,
+        0.999952375844255
+      ]
+    },
+    {
+      "name": "gun_barrell1",
+      "mesh": 4,
+      "extras": {
+        "sourcePartDir": "Part_gun_barrell1",
+        "sourceFileName": "gun_barrell19907011246.3db",
+        "sourcePartIndex": 4,
+        "sourceUnitName": "gun_barrell19907011246.3db"
+      },
+      "children": [
+        10
+      ],
+      "translation": [
+        -0.002230553776025772,
+        0.011559700965881348,
+        0.10634902000427246
+      ],
+      "rotation": [
+        -8.210143185761348e-16,
+        -4.736561654233949e-16,
+        4.736561124838356e-16,
+        1.0
+      ]
+    },
+    {
+      "name": "hp_maingun",
+      "translation": [
+        0.016000401973724366,
+        0.36504322052001953,
+        0.9875038146972657
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          1.0,
+          -1.6443429728951742e-07,
+          1.986740016945987e-07,
+          -1.0536056294085938e-07,
+          -0.9636304378509521,
+          -0.26723843812942505,
+          2.3539148230611318e-07,
+          0.26723843812942505,
+          -0.9636304378509521
+        ]
+      }
+    },
+    {
+      "name": "gun_door1",
+      "mesh": 5,
+      "extras": {
+        "sourcePartDir": "Part_gun_door1",
+        "sourceFileName": "gun_door19907011246.3db",
+        "sourcePartIndex": 5,
+        "sourceUnitName": "gun_door19907011246.3db"
+      },
+      "translation": [
+        1.84945068359375,
+        -0.8408568572998047,
+        0.2949517059326172
+      ],
+      "rotation": [
+        -0.0043633083094986765,
+        1.9405768914326233e-10,
+        7.628872197720508e-10,
+        0.9999904807249899
+      ]
+    },
+    {
+      "name": "gun_door2",
+      "mesh": 6,
+      "extras": {
+        "sourcePartDir": "Part_gun_door2",
+        "sourceFileName": "gun_door29907011246.3db",
+        "sourcePartIndex": 6,
+        "sourceUnitName": "gun_door29907011246.3db"
+      },
+      "translation": [
+        1.668846435546875,
+        -0.8408567810058594,
+        -0.21505882263183596
+      ],
+      "rotation": [
+        -8.543551765063993e-16,
+        6.657266318071953e-12,
+        7.628658260649956e-10,
+        1.0
+      ]
+    },
+    {
+      "name": "gun_door3",
+      "mesh": 7,
+      "extras": {
+        "sourcePartDir": "Part_gun_door3",
+        "sourceFileName": "gun_door39907011246.3db",
+        "sourcePartIndex": 7,
+        "sourceUnitName": "gun_door39907011246.3db"
+      },
+      "translation": [
+        -1.855454864501953,
+        -0.8408566284179688,
+        0.2949517059326172
+      ],
+      "rotation": [
+        -0.004363272334138262,
+        -0.004363344513012724,
+        -1.903848023832777e-05,
+        0.9999809611771292
+      ]
+    },
+    {
+      "name": "gun_door4",
+      "mesh": 8,
+      "extras": {
+        "sourcePartDir": "Part_gun_door4",
+        "sourceFileName": "gun_door49907011246.3db",
+        "sourcePartIndex": 8,
+        "sourceUnitName": "gun_door49907011246.3db"
+      },
+      "translation": [
+        -1.6748507690429688,
+        -0.8408566284179688,
+        -0.21505897521972656
+      ],
+      "rotation": [
+        -8.543551765063993e-16,
+        6.657266318071953e-12,
+        7.628658260649956e-10,
+        1.0
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Root",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 3,
+            "NORMAL": 4,
+            "TEXCOORD_0": 5
+          },
+          "mode": 4,
+          "material": 1,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 2
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 6,
+            "NORMAL": 7,
+            "TEXCOORD_0": 8
+          },
+          "mode": 4,
+          "material": 2,
+          "extras": {
+            "sourceFaceGroup": "Group2",
+            "sourceMaterialId": 3
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 9,
+            "NORMAL": 10,
+            "TEXCOORD_0": 11
+          },
+          "mode": 4,
+          "material": 3,
+          "extras": {
+            "sourceFaceGroup": "Group3",
+            "sourceMaterialId": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "nwc_turret",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 12,
+            "NORMAL": 13,
+            "TEXCOORD_0": 14
+          },
+          "mode": 4,
+          "material": 4,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "gun_shield1",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 15,
+            "NORMAL": 16,
+            "TEXCOORD_0": 17
+          },
+          "mode": 4,
+          "material": 5,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 18,
+            "NORMAL": 19,
+            "TEXCOORD_0": 20
+          },
+          "mode": 4,
+          "material": 6,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "gun_shield2",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 21,
+            "NORMAL": 22,
+            "TEXCOORD_0": 23
+          },
+          "mode": 4,
+          "material": 7,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 24,
+            "NORMAL": 25,
+            "TEXCOORD_0": 26
+          },
+          "mode": 4,
+          "material": 8,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "gun_barrell1",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 27,
+            "NORMAL": 28,
+            "TEXCOORD_0": 29
+          },
+          "mode": 4,
+          "material": 9,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 30,
+            "NORMAL": 31,
+            "TEXCOORD_0": 32
+          },
+          "mode": 4,
+          "material": 10,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "gun_door1",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 33,
+            "NORMAL": 34,
+            "TEXCOORD_0": 35
+          },
+          "mode": 4,
+          "material": 11,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "gun_door2",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 36,
+            "NORMAL": 37,
+            "TEXCOORD_0": 38
+          },
+          "mode": 4,
+          "material": 12,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "gun_door3",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 39,
+            "NORMAL": 40,
+            "TEXCOORD_0": 41
+          },
+          "mode": 4,
+          "material": 13,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "gun_door4",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 42,
+            "NORMAL": 43,
+            "TEXCOORD_0": 44
+          },
+          "mode": 4,
+          "material": 14,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "decal1_with_illum",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal1",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": "cruiser_decal1_illum",
+        "sourceEmissionTextureFlags": 64,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal1",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": "cruiser_decal1_illum",
+          "emissionFlags": 64,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal1",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveTexture": {
+        "index": 1
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "engines",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 2,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal1",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal1",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [],
+          "exportedBaseColorTexture": "cruiser_decal1",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 3,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal1",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal1",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.14999999105930328,
+            0.14999999105930328,
+            0.14999999105930328
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal1",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        0.14999999105930328,
+        0.14999999105930328,
+        0.14999999105930328
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal2",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal2",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal2",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal1_with_illum",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal1",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": "cruiser_decal1_illum",
+        "sourceEmissionTextureFlags": 64,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal1",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": "cruiser_decal1_illum",
+          "emissionFlags": 64,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal1",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveTexture": {
+        "index": 1
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal1",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal1",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.14999999105930328,
+            0.14999999105930328,
+            0.14999999105930328
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal1",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        0.14999999105930328,
+        0.14999999105930328,
+        0.14999999105930328
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal2",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal2",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal2",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal1",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal1",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.14999999105930328,
+            0.14999999105930328,
+            0.14999999105930328
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal1",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveFactor": [
+        0.14999999105930328,
+        0.14999999105930328,
+        0.14999999105930328
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal2",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal2",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal2",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal1_with_illum",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal1",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": "cruiser_decal1_illum",
+        "sourceEmissionTextureFlags": 64,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal1",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": "cruiser_decal1_illum",
+          "emissionFlags": 64,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal1",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "emissiveTexture": {
+        "index": 1
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal2",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal2",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal2",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal2",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal2",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal2",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal2",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal2",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal2",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal2",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal2",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal2",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "decal2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.16333998059004218,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "sourceDiffuseTextureName": "cruiser_decal2",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "cruiser_decal2",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.3999999761581421,
+            0.699999988079071
+          ],
+          "exportedBaseColorTexture": "cruiser_decal2",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 54048,
+      "uri": "saurora_cmp.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 5904,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 5904,
+      "byteLength": 5904,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 11808,
+      "byteLength": 3936,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 15744,
+      "byteLength": 432,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 16176,
+      "byteLength": 432,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 16608,
+      "byteLength": 288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 16896,
+      "byteLength": 2628,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 19524,
+      "byteLength": 2628,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 22152,
+      "byteLength": 1752,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 23904,
+      "byteLength": 5076,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 28980,
+      "byteLength": 5076,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 34056,
+      "byteLength": 3384,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 37440,
+      "byteLength": 504,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 37944,
+      "byteLength": 504,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 38448,
+      "byteLength": 336,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 38784,
+      "byteLength": 252,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 39036,
+      "byteLength": 252,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 39288,
+      "byteLength": 168,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 39456,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 39924,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 40392,
+      "byteLength": 312,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 40704,
+      "byteLength": 252,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 40956,
+      "byteLength": 252,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 41208,
+      "byteLength": 168,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 41376,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 41844,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 42312,
+      "byteLength": 312,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 42624,
+      "byteLength": 144,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 42768,
+      "byteLength": 144,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 42912,
+      "byteLength": 96,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 43008,
+      "byteLength": 1260,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 44268,
+      "byteLength": 1260,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 45528,
+      "byteLength": 840,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 46368,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 46836,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 47304,
+      "byteLength": 312,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 47616,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48084,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48552,
+      "byteLength": 312,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48864,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 49332,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 49800,
+      "byteLength": 312,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 50112,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 50580,
+      "byteLength": 468,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51048,
+      "byteLength": 312,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51360,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51368,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51392,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51400,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51424,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51432,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51456,
+      "byteLength": 32
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51488,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51496,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51520,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51528,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51552,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51560,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51584,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51592,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51616,
+      "byteLength": 76
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51692,
+      "byteLength": 228
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51920,
+      "byteLength": 76
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51996,
+      "byteLength": 228
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 52224,
+      "byteLength": 76
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 52300,
+      "byteLength": 228
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 52528,
+      "byteLength": 76
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 52604,
+      "byteLength": 228
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 52832,
+      "byteLength": 76
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 52908,
+      "byteLength": 228
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 53136,
+      "byteLength": 76
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 53212,
+      "byteLength": 228
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 53440,
+      "byteLength": 76
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 53516,
+      "byteLength": 228
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 53744,
+      "byteLength": 304
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 492,
+      "type": "VEC3",
+      "min": [
+        -3.7304946899414064,
+        -1.914802703857422,
+        -12.51270751953125
+      ],
+      "max": [
+        3.7333172607421874,
+        1.130276107788086,
+        9.104086914062501
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 492,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 492,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3",
+      "min": [
+        -0.3097268295288086,
+        -3.779756774902344,
+        1.1451881408691407
+      ],
+      "max": [
+        0.30972618103027344,
+        -0.12687863349914552,
+        8.806771240234376
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 219,
+      "type": "VEC3",
+      "min": [
+        -3.993824157714844,
+        -1.180447006225586,
+        -11.03405029296875
+      ],
+      "max": [
+        3.9966464233398438,
+        0.6835165405273438,
+        5.616347045898437
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 219,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 8,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 219,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 9,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 423,
+      "type": "VEC3",
+      "min": [
+        -3.993824157714844,
+        -3.779756774902344,
+        -12.51270751953125
+      ],
+      "max": [
+        3.9966464233398438,
+        0.8473236083984376,
+        8.806771240234376
+      ]
+    },
+    {
+      "bufferView": 10,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 423,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 11,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 423,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 12,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 42,
+      "type": "VEC3",
+      "min": [
+        -0.3275632858276367,
+        -0.3582002639770508,
+        -0.341600227355957
+      ],
+      "max": [
+        0.3219220352172852,
+        0.38628276824951174,
+        0.3353461837768555
+      ]
+    },
+    {
+      "bufferView": 13,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 42,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 14,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 42,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 15,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21,
+      "type": "VEC3",
+      "min": [
+        0.01061696171760559,
+        0.013157986402511597,
+        -0.03131478309631348
+      ],
+      "max": [
+        0.7524492645263672,
+        1.2969639587402344,
+        3.0051300048828127
+      ]
+    },
+    {
+      "bufferView": 16,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 17,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 18,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3",
+      "min": [
+        0.01061696171760559,
+        0.013157845735549928,
+        -0.03131478309631348
+      ],
+      "max": [
+        0.7524492645263672,
+        1.2969639587402344,
+        3.0051300048828127
+      ]
+    },
+    {
+      "bufferView": 19,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 20,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 21,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21,
+      "type": "VEC3",
+      "min": [
+        -0.7404471588134766,
+        0.013432575464248657,
+        -0.03145075082778931
+      ],
+      "max": [
+        0.03579750299453736,
+        1.2706998443603517,
+        3.0152850341796875
+      ]
+    },
+    {
+      "bufferView": 22,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 23,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 24,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3",
+      "min": [
+        -0.7404471588134766,
+        0.0019245399534702301,
+        -0.03145075082778931
+      ],
+      "max": [
+        0.03579750299453736,
+        1.2706998443603517,
+        3.0152850341796875
+      ]
+    },
+    {
+      "bufferView": 25,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 26,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 27,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 12,
+      "type": "VEC3",
+      "min": [
+        -0.11220671653747559,
+        -0.5766437149047852,
+        0.20897619247436525
+      ],
+      "max": [
+        0.11224744796752929,
+        0.5609558486938476,
+        0.9007797241210938
+      ]
+    },
+    {
+      "bufferView": 28,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 12,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 29,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 12,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 30,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 105,
+      "type": "VEC3",
+      "min": [
+        -0.2144266700744629,
+        -0.5766437149047852,
+        -0.037488694190979006
+      ],
+      "max": [
+        0.21446821212768555,
+        0.5609558486938476,
+        0.9007797241210938
+      ]
+    },
+    {
+      "bufferView": 31,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 105,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 32,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 105,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 33,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3",
+      "min": [
+        -0.2832640266418457,
+        -0.3827921676635742,
+        -0.3203717041015625
+      ],
+      "max": [
+        0.26389404296875,
+        0.38254573822021487,
+        0.4168059158325195
+      ]
+    },
+    {
+      "bufferView": 34,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 35,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 36,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3",
+      "min": [
+        -0.31798271179199217,
+        -0.38098236083984377,
+        -0.27885200500488283
+      ],
+      "max": [
+        0.28366947174072266,
+        0.3809823226928711,
+        0.31877952575683594
+      ]
+    },
+    {
+      "bufferView": 37,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 38,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 39,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3",
+      "min": [
+        -0.26280309677124025,
+        -0.3827810287475586,
+        -0.3194228935241699
+      ],
+      "max": [
+        0.28167524337768557,
+        0.3825672149658203,
+        0.41616477966308596
+      ]
+    },
+    {
+      "bufferView": 40,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 41,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 42,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3",
+      "min": [
+        -0.2836698913574219,
+        -0.3809823989868164,
+        -0.27885213851928714
+      ],
+      "max": [
+        0.3179823684692383,
+        0.38098236083984377,
+        0.3187793922424316
+      ]
+    },
+    {
+      "bufferView": 43,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 44,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 39,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 45,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.40000003576278687
+      ]
+    },
+    {
+      "bufferView": 46,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 47,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.40000003576278687
+      ]
+    },
+    {
+      "bufferView": 48,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 49,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.40000003576278687
+      ]
+    },
+    {
+      "bufferView": 50,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 51,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 52,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.40000003576278687
+      ]
+    },
+    {
+      "bufferView": 53,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 54,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.40000003576278687
+      ]
+    },
+    {
+      "bufferView": 55,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 56,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.40000003576278687
+      ]
+    },
+    {
+      "bufferView": 57,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 58,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.40000003576278687
+      ]
+    },
+    {
+      "bufferView": 59,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 60,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.6000000312924385
+      ]
+    },
+    {
+      "bufferView": 61,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 62,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.6000000312924385
+      ]
+    },
+    {
+      "bufferView": 63,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 64,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.6000000312924385
+      ]
+    },
+    {
+      "bufferView": 65,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 66,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.6000000312924385
+      ]
+    },
+    {
+      "bufferView": 67,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 68,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.6000000312924385
+      ]
+    },
+    {
+      "bufferView": 69,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 70,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.6000000312924385
+      ]
+    },
+    {
+      "bufferView": 71,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 72,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "SCALAR",
+      "min": [
+        0.0
+      ],
+      "max": [
+        0.6000000312924385
+      ]
+    },
+    {
+      "bufferView": 73,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 74,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 19,
+      "type": "VEC4"
+    }
+  ],
+  "images": [
+    {
+      "name": "cruiser_decal1",
+      "uri": "cruiser_decal1.png"
+    },
+    {
+      "name": "cruiser_decal1_illum",
+      "uri": "cruiser_decal1_illum.png"
+    },
+    {
+      "name": "cruiser_decal2",
+      "uri": "cruiser_decal2.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "cruiser_decal1"
+    },
+    {
+      "sampler": 1,
+      "source": 1,
+      "name": "cruiser_decal1_illum"
+    },
+    {
+      "sampler": 2,
+      "source": 2,
+      "name": "cruiser_decal2"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "animations": [
+    {
+      "name": "Sc_end anim",
+      "samplers": [
+        {
+          "input": 45,
+          "output": 46,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 47,
+          "output": 48,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 49,
+          "output": 50,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 49,
+          "output": 51,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 52,
+          "output": 53,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 54,
+          "output": 55,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 56,
+          "output": 57,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 58,
+          "output": 59,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 7,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 8,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 2,
+          "target": {
+            "node": 9,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 3,
+          "target": {
+            "node": 9,
+            "path": "rotation"
+          }
+        },
+        {
+          "sampler": 4,
+          "target": {
+            "node": 11,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 5,
+          "target": {
+            "node": 12,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 6,
+          "target": {
+            "node": 13,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 7,
+          "target": {
+            "node": 14,
+            "path": "translation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_end anim",
+            "map": "Joint map 0",
+            "targetName": "gun_shield1",
+            "parentName": "nwc_turret",
+            "channelName": "Ch_end anim_gun_shield1",
+            "channelType": 1,
+            "keyframes": 2
+          },
+          {
+            "script": "Sc_end anim",
+            "map": "Joint map 1",
+            "targetName": "gun_shield2",
+            "parentName": "nwc_turret",
+            "channelName": "Ch_end anim_gun_shield2",
+            "channelType": 1,
+            "keyframes": 2
+          },
+          {
+            "script": "Sc_end anim",
+            "map": "Joint map 2",
+            "targetName": "gun_barrell1",
+            "parentName": "nwc_turret",
+            "channelName": "Ch_end anim_gun_barrell1",
+            "channelType": 1,
+            "keyframes": 2
+          },
+          {
+            "script": "Sc_end anim",
+            "map": "Joint map 3",
+            "targetName": "gun_door1",
+            "parentName": "Root",
+            "channelName": "Ch_end anim_gun_door1",
+            "channelType": 1,
+            "keyframes": 2
+          },
+          {
+            "script": "Sc_end anim",
+            "map": "Joint map 4",
+            "targetName": "gun_door2",
+            "parentName": "Root",
+            "channelName": "Ch_end anim_gun_door2",
+            "channelType": 1,
+            "keyframes": 2
+          },
+          {
+            "script": "Sc_end anim",
+            "map": "Joint map 5",
+            "targetName": "gun_door3",
+            "parentName": "Root",
+            "channelName": "Ch_end anim_gun_door3",
+            "channelType": 1,
+            "keyframes": 2
+          },
+          {
+            "script": "Sc_end anim",
+            "map": "Joint map 6",
+            "targetName": "gun_door4",
+            "parentName": "Root",
+            "channelName": "Ch_end anim_gun_door4",
+            "channelType": 1,
+            "keyframes": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sc_openlgun",
+      "samplers": [
+        {
+          "input": 60,
+          "output": 61,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 62,
+          "output": 63,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 13,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 14,
+            "path": "translation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_openlgun",
+            "map": "Joint map 0",
+            "targetName": "gun_door3",
+            "parentName": "Root",
+            "channelName": "Ch_openlgun_gun_door3",
+            "channelType": 1,
+            "keyframes": 19
+          },
+          {
+            "script": "Sc_openlgun",
+            "map": "Joint map 1",
+            "targetName": "gun_door4",
+            "parentName": "Root",
+            "channelName": "Ch_openlgun_gun_door4",
+            "channelType": 1,
+            "keyframes": 19
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sc_openrgun",
+      "samplers": [
+        {
+          "input": 64,
+          "output": 65,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 66,
+          "output": 67,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 11,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 12,
+            "path": "translation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_openrgun",
+            "map": "Joint map 0",
+            "targetName": "gun_door1",
+            "parentName": "Root",
+            "channelName": "Ch_openrgun_gun_door1",
+            "channelType": 1,
+            "keyframes": 19
+          },
+          {
+            "script": "Sc_openrgun",
+            "map": "Joint map 1",
+            "targetName": "gun_door2",
+            "parentName": "Root",
+            "channelName": "Ch_openrgun_gun_door2",
+            "channelType": 1,
+            "keyframes": 19
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sc_unfold_gun",
+      "samplers": [
+        {
+          "input": 68,
+          "output": 69,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 70,
+          "output": 71,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 72,
+          "output": 73,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 72,
+          "output": 74,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 7,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 8,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 2,
+          "target": {
+            "node": 9,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 3,
+          "target": {
+            "node": 9,
+            "path": "rotation"
+          }
+        }
+      ],
+      "extras": {
+        "sourceTracks": [
+          {
+            "script": "Sc_unfold_gun",
+            "map": "Joint map 0",
+            "targetName": "gun_shield1",
+            "parentName": "nwc_turret",
+            "channelName": "Ch_unfold_gun_gun_shield1",
+            "channelType": 1,
+            "keyframes": 19
+          },
+          {
+            "script": "Sc_unfold_gun",
+            "map": "Joint map 1",
+            "targetName": "gun_shield2",
+            "parentName": "nwc_turret",
+            "channelName": "Ch_unfold_gun_gun_shield2",
+            "channelType": 1,
+            "keyframes": 19
+          },
+          {
+            "script": "Sc_unfold_gun",
+            "map": "Joint map 2",
+            "targetName": "gun_barrell1",
+            "parentName": "nwc_turret",
+            "channelName": "Ch_unfold_gun_gun_barrell1",
+            "channelType": 1,
+            "keyframes": 19
+          }
+        ]
+      }
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

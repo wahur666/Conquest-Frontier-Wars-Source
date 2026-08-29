@@ -1,0 +1,204 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "thull.cmp.xml",
+    "gltf": "thull_cmp.gltf",
+    "unitName": "thull.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "hullsmoke.pte",
+      "sourcePartDir": "Part_hullsmoke.pte",
+      "sourcePartIndex": 1,
+      "fileName": "hullsmoke.pte",
+      "sourceXml": "hullsmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "Thull001004165943.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "hullsmoke.pte",
+        "relativePosition": [
+          226.3955078125,
+          265.47796630859375,
+          -96.28776550292969
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          0.0,
+          0.0,
+          0.0,
+          9.386614863160503e-08,
+          1.0,
+          0.0,
+          1.0,
+          -9.386614863160503e-08
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          2.263955078125,
+          2.6547796630859377,
+          -0.9628776550292969
+        ],
+        "rotation": [
+          0.0,
+          0.7071068143732403,
+          0.7071067479998532,
+          0.0
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          2.263955078125,
+          2.6547796630859377,
+          -0.9628776550292969
+        ],
+        "rotation": [
+          0.0,
+          0.7071068143732403,
+          0.7071067479998532,
+          0.0
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "hullsmoke1.pte",
+      "sourcePartDir": "Part_hullsmoke1.pte",
+      "sourcePartIndex": 2,
+      "fileName": "hullsmoke.pte",
+      "sourceXml": "hullsmoke.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "Thull001004165943.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "hullsmoke1.pte",
+        "relativePosition": [
+          -238.216796875,
+          265.47796630859375,
+          -96.28776550292969
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          0.0,
+          0.0,
+          0.0,
+          9.386614863160503e-08,
+          1.0,
+          0.0,
+          1.0,
+          -9.386614863160503e-08
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -2.38216796875,
+          2.6547796630859377,
+          -0.9628776550292969
+        ],
+        "rotation": [
+          0.0,
+          0.7071068143732403,
+          0.7071067479998532,
+          0.0
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -2.38216796875,
+          2.6547796630859377,
+          -0.9628776550292969
+        ],
+        "rotation": [
+          0.0,
+          0.7071068143732403,
+          0.7071067479998532,
+          0.0
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 2,
+    "exportedMeshPartNames": [
+      "Root"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "Thull001004165943.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "hullsmoke.pte",
+        "partDir": "Part_hullsmoke.pte",
+        "fileName": "hullsmoke.pte",
+        "index": 1,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "hullsmoke1.pte",
+        "partDir": "Part_hullsmoke1.pte",
+        "fileName": "hullsmoke.pte",
+        "index": 2,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

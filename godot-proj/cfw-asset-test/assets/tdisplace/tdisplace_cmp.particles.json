@@ -1,0 +1,134 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "tdisplace.cmp.xml",
+    "gltf": "tdisplace_cmp.gltf",
+    "unitName": "tdisplace.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "displacement.pte",
+      "sourcePartDir": "Part_displacement.pte",
+      "sourcePartIndex": 3,
+      "fileName": "displacement.pte",
+      "sourceXml": "displacement.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "Tdisplace0110004201143.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "displacement.pte",
+        "relativePosition": [
+          -4.799129962921143,
+          520.599365234375,
+          -122.88116455078125
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          -1.5099578831723193e-07,
+          1.4210851327070215e-14,
+          5.3334141031542714e-15,
+          -1.2943583271862735e-07,
+          -1.0,
+          1.5099578831723193e-07,
+          -1.0,
+          1.2943583271862735e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.04799129962921143,
+          5.20599365234375,
+          -1.2288116455078126
+        ],
+        "rotation": [
+          5.33850744941852e-08,
+          -0.7071067354240695,
+          0.7071068269490187,
+          5.338507135553738e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -0.04799129962921143,
+          5.20599365234375,
+          -1.2288116455078126
+        ],
+        "rotation": [
+          5.33850744941852e-08,
+          -0.7071067354240695,
+          0.7071068269490187,
+          5.338507135553738e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 1,
+    "exportedMeshPartNames": [
+      "connect_L2",
+      "connect_R2",
+      "Root"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "Tdisplace0110004201143.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "connect_L2",
+        "partDir": "Part_connect_L2",
+        "fileName": "connect_L210004201143.3db",
+        "index": 1,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "connect_R2",
+        "partDir": "Part_connect_R2",
+        "fileName": "connect_R210004201143.3db",
+        "index": 2,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "displacement.pte",
+        "partDir": "Part_displacement.pte",
+        "fileName": "displacement.pte",
+        "index": 3,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

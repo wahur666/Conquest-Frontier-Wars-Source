@@ -1,0 +1,107 @@
+[gd_scene format=3 uid="uid://d12r6kmix5bxi"]
+
+[ext_resource type="PackedScene" uid="uid://cs4dlhc3s0ftg" path="res://assets/ssmonolith/ssmonolith_3db.gltf" id="1_xj2eb"]
+[ext_resource type="Texture2D" uid="uid://br1iry136vvds" path="res://assets/ssmonolith/c_solarian_tm5.png" id="2_1vskx"]
+[ext_resource type="Texture2D" uid="uid://806wju3ymdct" path="res://assets/ssmonolith/c_solarian_tm6.png" id="3_4j7oj"]
+[ext_resource type="Texture2D" uid="uid://cb4hleqa2t1w1" path="res://assets/ssmonolith/solarian_lm.tifsolarian_op.png" id="4_76jjg"]
+[ext_resource type="Texture2D" uid="uid://nj7ddlofpe5x" path="res://assets/ssmonolith/solarian_tm6.png" id="5_f8lco"]
+[ext_resource type="Shader" path="res://cfw_compound/cfw_legacy_lit.gdshader" id="6_qkv43"]
+
+[sub_resource type="ShaderMaterial" id="StandardMaterial3D_xj2eb"]
+resource_local_to_scene = true
+resource_name = "Material #59_chrome"
+shader = ExtResource("6_qkv43")
+shader_parameter/albedo_texture = ExtResource("2_1vskx")
+shader_parameter/emission_texture = ExtResource("2_1vskx")
+shader_parameter/albedo_tint = Color(0.8698269, 1, 1, 1)
+shader_parameter/emission_strength = 1.0
+metadata/extras = {
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "environ.tga",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 64.0,
+"sourceEmissionTextureName": "c_solarian_tm5.tif",
+"sourceMaterialIdentifier": 0.0,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="ShaderMaterial" id="StandardMaterial3D_1vskx"]
+resource_local_to_scene = true
+resource_name = "Material sol_tm5_chrome"
+shader = ExtResource("6_qkv43")
+shader_parameter/albedo_texture = ExtResource("2_1vskx")
+shader_parameter/emission_texture = ExtResource("2_1vskx")
+shader_parameter/albedo_tint = Color(0.9349877, 1, 1, 1)
+shader_parameter/emission_strength = 1.0
+metadata/extras = {
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "environ.tga",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 64.0,
+"sourceEmissionTextureName": "c_solarian_tm5.tif",
+"sourceMaterialIdentifier": 1.0,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="ShaderMaterial" id="StandardMaterial3D_4j7oj"]
+resource_local_to_scene = true
+resource_name = "Material sol_tm6_chrome"
+shader = ExtResource("6_qkv43")
+shader_parameter/albedo_texture = ExtResource("3_4j7oj")
+shader_parameter/emission_texture = ExtResource("3_4j7oj")
+shader_parameter/albedo_tint = Color(0.9203262, 1, 1, 1)
+shader_parameter/emission_strength = 1.0
+metadata/extras = {
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "environ.tga",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 64.0,
+"sourceEmissionTextureName": "c_solarian_tm6.tif",
+"sourceMaterialIdentifier": 3.0,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="ShaderMaterial" id="StandardMaterial3D_76jjg"]
+resource_local_to_scene = true
+resource_name = "Material sol_opac_doubleSided"
+shader = ExtResource("6_qkv43")
+shader_parameter/albedo_texture = ExtResource("4_76jjg")
+shader_parameter/emission_texture = ExtResource("4_76jjg")
+shader_parameter/albedo_tint = Color(0.9112231, 1, 1, 1)
+shader_parameter/emission_strength = 0.0
+metadata/extras = {
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "solarian_lm.tifsolarian_op.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 4.0,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[sub_resource type="ShaderMaterial" id="StandardMaterial3D_f8lco"]
+resource_local_to_scene = true
+resource_name = "markings_soltm5_tc"
+shader = ExtResource("6_qkv43")
+shader_parameter/albedo_texture = ExtResource("5_f8lco")
+shader_parameter/emission_texture = ExtResource("5_f8lco")
+shader_parameter/albedo_tint = Color(1, 1, 0, 1)
+shader_parameter/emission_strength = 0.0
+metadata/extras = {
+"sourceDiffuseTextureFlags": 64.0,
+"sourceDiffuseTextureName": "solarian_tm6.tif",
+"sourceEmissionTextureBlend": 1.0,
+"sourceEmissionTextureFlags": 0.0,
+"sourceEmissionTextureName": null,
+"sourceMaterialIdentifier": 2.0,
+"sourceSpecular": [0.9, 0.9, 0.9]
+}
+
+[node name="ssmonolith_3db2" unique_id=349805997 instance=ExtResource("1_xj2eb")]
+
+[node name="ssmonolith_3db" parent="." index="0" unique_id=1383767037]
+surface_material_override/0 = SubResource("StandardMaterial3D_xj2eb")
+surface_material_override/1 = SubResource("StandardMaterial3D_1vskx")
+surface_material_override/2 = SubResource("StandardMaterial3D_4j7oj")
+surface_material_override/3 = SubResource("StandardMaterial3D_76jjg")
+surface_material_override/4 = SubResource("StandardMaterial3D_f8lco")

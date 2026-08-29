@@ -1,0 +1,116 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "sshydrofoil.cmp.xml",
+    "gltf": "sshydrofoil_cmp.gltf",
+    "unitName": "sshydrofoil.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "hydrofoil.pte",
+      "sourcePartDir": "Part_hydrofoil.pte",
+      "sourcePartIndex": 1,
+      "fileName": "hydrofoil.pte",
+      "sourceXml": "hydrofoil.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "hydrofoil000915110012.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "hydrofoil.pte",
+        "relativePosition": [
+          -2.8260483741760254,
+          177.36514282226562,
+          73.66869354248047
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          -8.233391213252617e-08,
+          -4.926662100501744e-08,
+          -4.998323888116829e-08,
+          0.008726597763597965,
+          0.9999619126319885,
+          -8.19008505459351e-08,
+          0.9999619126319885,
+          -0.008726597763597965
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          -0.028260483741760253,
+          1.7736514282226563,
+          0.7366869354248047
+        ],
+        "rotation": [
+          -4.6578383658763326e-08,
+          0.7101854010228665,
+          0.7040146988337587,
+          1.1487926185832776e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          -0.028260483741760253,
+          1.7736514282226563,
+          0.7366869354248047
+        ],
+        "rotation": [
+          -4.6578383658763326e-08,
+          0.7101854010228665,
+          0.7040146988337587,
+          1.1487926185832776e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 1,
+    "exportedMeshPartNames": [
+      "Root"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "hydrofoil000915110012.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "hydrofoil.pte",
+        "partDir": "Part_hydrofoil.pte",
+        "fileName": "hydrofoil.pte",
+        "index": 1,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

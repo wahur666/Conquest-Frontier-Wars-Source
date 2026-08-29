@@ -1,0 +1,134 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "ssproteus.cmp.xml",
+    "gltf": "ssproteus_cmp.gltf",
+    "unitName": "ssproteus.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "proteus.pte",
+      "sourcePartDir": "Part_proteus.pte",
+      "sourcePartIndex": 3,
+      "fileName": "proteus.pte",
+      "sourceXml": "proteus.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "Proteus000914173829.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "proteus.pte",
+        "relativePosition": [
+          1.996288537979126,
+          338.4693298339844,
+          -152.52944946289062
+        ],
+        "relativeOrientationRows": [
+          -3.2118435910888365e-08,
+          -1.0,
+          -1.2668921556269197e-07,
+          0.008726530708372593,
+          1.2640410318454087e-07,
+          -0.9999619126319885,
+          0.9999619126319885,
+          -3.322276853623407e-08,
+          0.008726530708372593
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.01996288537979126,
+          3.384693298339844,
+          -1.5252944946289062
+        ],
+        "rotation": [
+          0.4978135444861641,
+          -0.4978136240955505,
+          0.5021768729482393,
+          0.5021769198867108
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          0.01996288537979126,
+          3.384693298339844,
+          -1.5252944946289062
+        ],
+        "rotation": [
+          0.4978135444861641,
+          -0.4978136240955505,
+          0.5021768729482393,
+          0.5021769198867108
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 1,
+    "exportedMeshPartNames": [
+      "ring1",
+      "Root",
+      "turret"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "Proteus000914173829.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "ring1",
+        "partDir": "Part_ring1",
+        "fileName": "ring1000914173829.3db",
+        "index": 1,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "turret",
+        "partDir": "Part_turret",
+        "fileName": "turret000914173829.3db",
+        "index": 2,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "proteus.pte",
+        "partDir": "Part_proteus.pte",
+        "fileName": "proteus.pte",
+        "index": 3,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}

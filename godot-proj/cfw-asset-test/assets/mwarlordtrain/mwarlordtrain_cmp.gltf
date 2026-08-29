@@ -1,0 +1,1538 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "Conquest Frontier Wars CMP XML converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "mwarlordtrain.cmp",
+      "children": [
+        1
+      ],
+      "extras": {
+        "sourceCompoundJoints": [
+          {
+            "type": "fixed",
+            "parent": "Root",
+            "child": "roots"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Root",
+      "mesh": 0,
+      "extras": {
+        "sourcePartDir": "Root",
+        "sourceFileName": "Warlord000906142718.3db",
+        "sourcePartIndex": 0,
+        "sourceUnitName": "Warlord000906142718.3db"
+      },
+      "children": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ]
+    },
+    {
+      "name": "hp_blink21",
+      "translation": [
+        2.549158630371094,
+        10.264344482421874,
+        -5.480428466796875
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink22",
+      "translation": [
+        2.6072421264648438,
+        10.512637939453125,
+        -5.182716674804688
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink23",
+      "translation": [
+        2.657779541015625,
+        10.719112548828125,
+        -4.89342529296875
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink24",
+      "translation": [
+        2.707810974121094,
+        10.917218017578126,
+        -4.564039611816407
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink25",
+      "translation": [
+        2.7662750244140626,
+        11.147833251953125,
+        -4.187004699707031
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink26",
+      "translation": [
+        2.8602810668945313,
+        11.329169921875,
+        -3.7773486328125
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink27",
+      "translation": [
+        2.9086184692382813,
+        11.3871484375,
+        -3.391853637695313
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink28",
+      "translation": [
+        2.9416799926757813,
+        11.378253173828126,
+        -3.1043023681640625
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink29",
+      "translation": [
+        2.8761407470703126,
+        11.402467041015624,
+        -2.769902648925781
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink30",
+      "translation": [
+        2.846687927246094,
+        11.3448681640625,
+        -2.4511564636230467
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461441844701767,
+          -0.0030305874533951283,
+          -0.0014379803324118257,
+          -0.18222881853580475,
+          0.9832550883293152,
+          -0.008872015401721,
+          0.9832197427749634,
+          0.18220928311347961
+        ]
+      }
+    },
+    {
+      "name": "hp_blink31",
+      "translation": [
+        -2.9810137939453125,
+        10.2563916015625,
+        -5.5294952392578125
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink32",
+      "translation": [
+        -3.0450885009765627,
+        10.504508056640626,
+        -5.232864990234375
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink33",
+      "translation": [
+        -3.101337890625,
+        10.710831298828126,
+        -4.944520874023437
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink34",
+      "translation": [
+        -3.157770690917969,
+        10.90878173828125,
+        -4.616081848144531
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink35",
+      "translation": [
+        -3.2235836791992187,
+        11.139219970703126,
+        -4.240150451660156
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink36",
+      "translation": [
+        -3.3253683471679687,
+        11.320274658203125,
+        -3.832229919433594
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink37",
+      "translation": [
+        -3.373085327148438,
+        11.378116455078125,
+        -3.4475872802734377
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink38",
+      "translation": [
+        -3.4112249755859376,
+        11.369117431640625,
+        -3.1606671142578127
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink39",
+      "translation": [
+        -3.3516961669921876,
+        11.3935107421875,
+        -2.8251593017578127
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "hp_blink40",
+      "translation": [
+        -3.3277313232421877,
+        11.33598876953125,
+        -2.505939178466797
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          -0.9999595880508423,
+          -0.008461443707346916,
+          -0.0030305858235806227,
+          -0.0014379804488271475,
+          -0.18222858011722565,
+          0.98325514793396,
+          -0.00887201726436615,
+          0.9832198023796082,
+          0.1822090446949005
+        ]
+      }
+    },
+    {
+      "name": "mouth",
+      "translation": [
+        -0.19954139709472657,
+        3.4911007690429687,
+        -8.118619384765625
+      ],
+      "extras": {
+        "sourceType": "hardpoint",
+        "sourceOrientation3x3": [
+          0.00872653629630804,
+          5.379911627301226e-08,
+          0.9999619126319885,
+          0.008726303465664387,
+          0.9999619126319885,
+          -7.620710675837472e-05,
+          -0.999923825263977,
+          0.008726635947823524,
+          0.008726203814148903
+        ]
+      }
+    },
+    {
+      "name": "roots",
+      "mesh": 1,
+      "extras": {
+        "sourcePartDir": "Part_roots",
+        "sourceFileName": "roots000906142718.3db",
+        "sourcePartIndex": 1,
+        "sourceUnitName": "roots000906142718.3db"
+      },
+      "translation": [
+        -0.4631513595581055,
+        2.8474371337890627,
+        -0.5522859573364258
+      ],
+      "rotation": [
+        5.114435480462997e-07,
+        -0.008724925731869938,
+        -0.00015231038540831088,
+        0.9999619255112958
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Root",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 1
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 3,
+            "NORMAL": 4,
+            "TEXCOORD_0": 5
+          },
+          "mode": 4,
+          "material": 1,
+          "extras": {
+            "sourceFaceGroup": "Group1",
+            "sourceMaterialId": 3
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 6,
+            "NORMAL": 7,
+            "TEXCOORD_0": 8
+          },
+          "mode": 4,
+          "material": 2,
+          "extras": {
+            "sourceFaceGroup": "Group2",
+            "sourceMaterialId": 4
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 9,
+            "NORMAL": 10,
+            "TEXCOORD_0": 11
+          },
+          "mode": 4,
+          "material": 3,
+          "extras": {
+            "sourceFaceGroup": "Group3",
+            "sourceMaterialId": 2
+          }
+        },
+        {
+          "attributes": {
+            "POSITION": 12,
+            "NORMAL": 13,
+            "TEXCOORD_0": 14
+          },
+          "mode": 4,
+          "material": 4,
+          "extras": {
+            "sourceFaceGroup": "Group4",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "roots",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 15,
+            "NORMAL": 16,
+            "TEXCOORD_0": 17
+          },
+          "mode": 4,
+          "material": 5,
+          "extras": {
+            "sourceFaceGroup": "Group0",
+            "sourceMaterialId": 0
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "MantisTex_2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 1,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "mantis tex 2",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.9921569228172302,
+          0.9921569228172302,
+          0.9921569228172302,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 3,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            0.9921569228172302,
+            0.9921569228172302,
+            0.9921569228172302
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "markings",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 4,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "MantisTex_2.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "MantisTex_2.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            0.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "MantisTex_2.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "plat tex",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 1
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 2,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "PlatTex.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "PlatTex.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "PlatTex.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "smooth shit 08",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 3
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "smoothShit8.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "smoothShit8.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "smoothShit8.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    },
+    {
+      "name": "M_roots",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.7763932005840206,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "doubleSided": false,
+      "extras": {
+        "sourceMaterialIdentifier": 0,
+        "sourceSpecular": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.8999999761581421
+        ],
+        "sourceDiffuseTextureName": "root_text.bmproot_text_trans.bmp",
+        "sourceDiffuseTextureFlags": 64,
+        "sourceSecondDiffuseTextureName": null,
+        "sourceSecondDiffuseTextureFlags": 0,
+        "sourceEmissionTextureName": null,
+        "sourceEmissionTextureFlags": 0,
+        "sourceEmissionTextureBlend": 1.0,
+        "cfwMaterial": {
+          "diffuseTexture": "root_text.bmproot_text_trans.bmp",
+          "diffuseFlags": 64,
+          "diffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 4
+          },
+          "secondDiffuseTexture": null,
+          "secondDiffuseFlags": 0,
+          "secondDiffuseAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionTexture": null,
+          "emissionFlags": 0,
+          "emissionAddress": {
+            "u": 0,
+            "v": 0,
+            "coordinateSet": 0,
+            "wrapMode": 0
+          },
+          "emissionBlend": 1.0,
+          "diffuseConstant": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissionConstant": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "specular": [
+            0.8999999761581421,
+            0.8999999761581421,
+            0.8999999761581421
+          ],
+          "transparency": 1.0,
+          "shininess": [
+            0.25,
+            0.05000000074505806
+          ],
+          "exportedBaseColorTexture": "root_text.bmproot_text_trans.bmp",
+          "exportedBaseColorFlags": 64,
+          "usesVertexColors": false,
+          "usesEnvironmentDiffuseAsChrome": false,
+          "recommendedGodotShader": "cfw_legacy_lit"
+        }
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      },
+      "alphaMode": "BLEND",
+      "alphaCutoff": 0.01
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 54624,
+      "uri": "mwarlordtrain_cmp.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 2160,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2160,
+      "byteLength": 2160,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 4320,
+      "byteLength": 1440,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 5760,
+      "byteLength": 180,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 5940,
+      "byteLength": 180,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 6120,
+      "byteLength": 120,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 6240,
+      "byteLength": 3384,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 9624,
+      "byteLength": 3384,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 13008,
+      "byteLength": 2256,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 15264,
+      "byteLength": 5760,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 21024,
+      "byteLength": 5760,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 26784,
+      "byteLength": 3840,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 30624,
+      "byteLength": 7416,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 38040,
+      "byteLength": 7416,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 45456,
+      "byteLength": 4944,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 50400,
+      "byteLength": 1584,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 51984,
+      "byteLength": 1584,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 53568,
+      "byteLength": 1056,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 180,
+      "type": "VEC3",
+      "min": [
+        -3.882734069824219,
+        -13.849508056640625,
+        -5.492426147460938
+      ],
+      "max": [
+        3.315484619140625,
+        3.0955828857421874,
+        1.4720529174804688
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 180,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 180,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 15,
+      "type": "VEC3",
+      "min": [
+        -7.870655517578125,
+        3.6265594482421877,
+        -4.040634765625
+      ],
+      "max": [
+        -0.24342132568359376,
+        10.522581787109376,
+        3.302718505859375
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 15,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 15,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 282,
+      "type": "VEC3",
+      "min": [
+        -11.852598876953126,
+        -7.416550903320313,
+        -6.923001708984375
+      ],
+      "max": [
+        11.69197998046875,
+        10.64632568359375,
+        5.299165649414062
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 282,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 8,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 282,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 9,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 480,
+      "type": "VEC3",
+      "min": [
+        -9.517677612304688,
+        -7.986233520507812,
+        -7.203946533203125
+      ],
+      "max": [
+        8.785343627929688,
+        13.870057373046876,
+        3.288323669433594
+      ]
+    },
+    {
+      "bufferView": 10,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 480,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 11,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 480,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 12,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 618,
+      "type": "VEC3",
+      "min": [
+        -11.852598876953126,
+        -7.986233520507812,
+        -13.97899658203125
+      ],
+      "max": [
+        11.69197998046875,
+        10.37126708984375,
+        2.3436923217773438
+      ]
+    },
+    {
+      "bufferView": 13,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 618,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 14,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 618,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 15,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 132,
+      "type": "VEC3",
+      "min": [
+        -22.3191552734375,
+        -21.12818115234375,
+        -0.5435612487792969
+      ],
+      "max": [
+        22.70320556640625,
+        17.913663330078126,
+        22.23507568359375
+      ]
+    },
+    {
+      "bufferView": 16,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 132,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 17,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 132,
+      "type": "VEC2"
+    }
+  ],
+  "images": [
+    {
+      "name": "MantisTex_2.bmp",
+      "uri": "MantisTex_2.png"
+    },
+    {
+      "name": "PlatTex.bmp",
+      "uri": "PlatTex.png"
+    },
+    {
+      "name": "root_text.bmproot_text_trans.bmp",
+      "uri": "root_text.bmproot_text_trans.png"
+    },
+    {
+      "name": "smoothShit8.bmp",
+      "uri": "smoothShit8.png"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "MantisTex_2.bmp"
+    },
+    {
+      "sampler": 1,
+      "source": 1,
+      "name": "PlatTex.bmp"
+    },
+    {
+      "sampler": 2,
+      "source": 2,
+      "name": "root_text.bmproot_text_trans.bmp"
+    },
+    {
+      "sampler": 3,
+      "source": 3,
+      "name": "smoothShit8.bmp"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9728,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "animations": [],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ]
+}

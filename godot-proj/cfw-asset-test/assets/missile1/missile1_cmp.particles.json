@@ -1,0 +1,204 @@
+{
+  "asset": {
+    "version": 1,
+    "generator": "Conquest Frontier Wars 3db XML converter",
+    "source": "missile1.cmp.xml",
+    "gltf": "missile1_cmp.gltf",
+    "unitName": "missile1.cmp",
+    "scale": 0.01
+  },
+  "particles": [
+    {
+      "name": "m1trail.pte",
+      "sourcePartDir": "Part_m1trail.pte",
+      "sourcePartIndex": 1,
+      "fileName": "m1trail.pte",
+      "sourceXml": "m1trail.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "missle 'o death01000522183214.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "m1trail.pte",
+        "relativePosition": [
+          0.37000420689582825,
+          0.03287187218666077,
+          196.1117706298828
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          1.509957598955225e-07,
+          7.341045677984578e-22,
+          -1.800009556825969e-14,
+          -1.1920928244535389e-07,
+          1.0,
+          1.509957598955225e-07,
+          1.0,
+          1.1920928244535389e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.0037000420689582824,
+          0.00032871872186660765,
+          1.961117706298828
+        ],
+        "rotation": [
+          5.3385059694272534e-08,
+          0.7071067390397008,
+          0.7071068233333877,
+          -5.338506605826671e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          0.0037000420689582824,
+          0.00032871872186660765,
+          1.961117706298828
+        ],
+        "rotation": [
+          5.3385059694272534e-08,
+          0.7071067390397008,
+          0.7071068233333877,
+          -5.338506605826671e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    },
+    {
+      "name": "m1trail2.pte",
+      "sourcePartDir": "Part_m1trail2.pte",
+      "sourcePartIndex": 2,
+      "fileName": "m1trail2.pte",
+      "sourceXml": "m1trail2.pte.xml",
+      "sourceXmlExists": true,
+      "parentPartName": "Root",
+      "parentPartFileName": "missle 'o death01000522183214.3db",
+      "attachedToExportedMesh": true,
+      "attachedToNodeName": "Root",
+      "joint": {
+        "type": "fixed",
+        "parent": "Root",
+        "child": "m1trail2.pte",
+        "relativePosition": [
+          0.37000420689582825,
+          7.492252826690674,
+          196.1117706298828
+        ],
+        "relativeOrientationRows": [
+          -1.0,
+          1.5099578831723193e-07,
+          -1.4210851327070215e-14,
+          -3.22109485893958e-14,
+          -1.1920927533992653e-07,
+          1.0,
+          1.5099578831723193e-07,
+          1.0,
+          1.1920927533992653e-07
+        ],
+        "parentPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "childPoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "axis": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "localTransform": {
+        "translation": [
+          0.0037000420689582824,
+          0.07492252826690673,
+          1.961117706298828
+        ],
+        "rotation": [
+          5.338506471856923e-08,
+          0.7071067390397033,
+          0.7071068233333851,
+          -5.338508113115301e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "worldTransform": {
+        "translation": [
+          0.0037000420689582824,
+          0.07492252826690673,
+          1.961117706298828
+        ],
+        "rotation": [
+          5.3385064718569236e-08,
+          0.7071067390397034,
+          0.7071068233333853,
+          -5.3385081131153014e-08
+        ],
+        "rotationFormat": "xyzw"
+      },
+      "notes": [
+        "localTransform is relative to parentPartName when attachedToExportedMesh is true.",
+        "worldTransform is composed through CMP joints at bind pose using the exporter scale."
+      ]
+    }
+  ],
+  "extras": {
+    "particleCount": 2,
+    "exportedMeshPartNames": [
+      "Root"
+    ],
+    "allCompoundParts": [
+      {
+        "name": "Root",
+        "partDir": "Root",
+        "fileName": "missle 'o death01000522183214.3db",
+        "index": 0,
+        "isParticle": false,
+        "isExportedMesh": true
+      },
+      {
+        "name": "m1trail.pte",
+        "partDir": "Part_m1trail.pte",
+        "fileName": "m1trail.pte",
+        "index": 1,
+        "isParticle": true,
+        "isExportedMesh": false
+      },
+      {
+        "name": "m1trail2.pte",
+        "partDir": "Part_m1trail2.pte",
+        "fileName": "m1trail2.pte",
+        "index": 2,
+        "isParticle": true,
+        "isExportedMesh": false
+      }
+    ]
+  }
+}
